@@ -43,7 +43,8 @@ public static class Event
         List<PhigrosEvent>? events,
         double horizonBeat,
         Func<PhigrosEvent, float> startSelector,
-        Func<PhigrosEvent, float> endSelector)
+        Func<PhigrosEvent, float> endSelector,
+        Func<float, double> valueTransformer)
     {
         if (events is not { Count: > 0 }) return null;
 
@@ -56,8 +57,8 @@ public static class Event
             var endBeat = ev.EndTime / 32.0;
             if (endBeat <= startBeat) continue;
 
-            var startValue = Transform.ToKpcX(startSelector(ev));
-            var endValue = Transform.ToKpcX(endSelector(ev));
+            var startValue = valueTransformer(startSelector(ev));
+            var endValue = valueTransformer(endSelector(ev));
             if (startValue == endValue && endBeat - startBeat > 1d)
                 endBeat = startBeat + 1d;
             result.Add(CreateLinearEvent(startBeat, endBeat, startValue, endValue));
