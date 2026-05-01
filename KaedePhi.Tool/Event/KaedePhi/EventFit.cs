@@ -59,7 +59,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
             return [];
 
         var degree = ResolveMaxDegreeOfParallelism(maxDegreeOfParallelism);
-        OnInfo($"EventListFit: 开始拟合，共 {events.Count} 个事件，容差={tolerance}% ，并行度={degree}");
+        LogInfo($"EventListFit: 开始拟合，共 {events.Count} 个事件，容差={tolerance}% ，并行度={degree}");
 
         var sortedEvents = events
             .Select(e => e.Clone())
