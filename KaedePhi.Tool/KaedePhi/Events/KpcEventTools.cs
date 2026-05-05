@@ -12,38 +12,54 @@ public static class KpcEventTools
     /// <summary>
     /// 在指定拍范围内将事件按固定拍长切割。
     /// </summary>
+    [Obsolete("请使用 global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>().CutEventsInRange")]
     public static List<Kpc.Event<T>> CutEventsInRange<T>(
         List<Kpc.Event<T>> events,
         Beat startBeat,
         Beat endBeat,
         Beat cutLength)
-        => EventCutter.CutEventsInRange(events, startBeat, endBeat, cutLength);
+    {
+        var cutter = new global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>();
+        return cutter.CutEventsInRange(events, startBeat, endBeat, cutLength);
+    }
 
     /// <summary>
     /// 在指定拍范围内将事件按固定拍长切割。
     /// </summary>
+    [Obsolete("请使用 global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>().CutEventsInRange")]
     public static List<Kpc.Event<T>> CutEventsInRange<T>(
         List<Kpc.Event<T>> events,
         Beat startBeat,
         Beat endBeat,
         double cutLength)
-        => EventCutter.CutEventsInRange(events, startBeat, endBeat, cutLength);
+    {
+        var cutter = new global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>();
+        return cutter.CutEventsInRange(events, startBeat, endBeat, cutLength);
+    }
 
     /// <summary>
     /// 将单个事件切割为固定拍长线性事件
     /// </summary>
+    [Obsolete("请使用 global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>().CutEventToLiner")]
     public static List<Kpc.Event<T>> CutEventToLiner<T>(
         Kpc.Event<T> evt,
         Beat cutLength)
-        => EventCutter.CutEventToLiner(evt, cutLength);
+    {
+        var cutter = new global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>();
+        return cutter.CutEventToLiner(evt, cutLength);
+    }
 
     /// <summary>
     /// 将单个事件切割为固定拍长线性事件
     /// </summary>
+    [Obsolete("请使用 global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>().CutEventToLiner")]
     public static List<Kpc.Event<T>> CutEventToLiner<T>(
         Kpc.Event<T> evt,
         double cutLength)
-        => EventCutter.CutEventToLiner(evt, cutLength);
+    {
+        var cutter = new global::KaedePhi.Tool.Event.KaedePhi.EventCutter<T>();
+        return cutter.CutEventToLiner(evt, cutLength);
+    }
 
     /// <summary>
     /// 对事件列表做缓动拟合；仅会拟合连续线性事件，原有非线性事件会被保留。
@@ -51,7 +67,7 @@ public static class KpcEventTools
     public static List<Kpc.Event<T>> EventListFit<T>(
         List<Kpc.Event<T>> events,
         double tolerance = 5d)
-        => EventFit.EventListFit(events, tolerance);
+        => new global::KaedePhi.Tool.Event.KaedePhi.EventFit<T>().EventListFit(events, tolerance);
 
     /// <summary>
     /// 对事件列表做缓动拟合（多核版）；maxDegreeOfParallelism 为并行线程数。
@@ -60,12 +76,13 @@ public static class KpcEventTools
         List<Kpc.Event<T>> events,
         double tolerance,
         int? maxDegreeOfParallelism)
-        => EventFit.EventListFit(events, tolerance, maxDegreeOfParallelism);
+        => new global::KaedePhi.Tool.Event.KaedePhi.EventFit<T>().EventListFit(events, tolerance,
+            maxDegreeOfParallelism);
 
     /// <summary>
     /// 对事件列表做缓动拟合（异步版）。
     /// </summary>
-    [Obsolete("异步版不再支持",true)]
+    [Obsolete("异步版不再支持", true)]
     public static Task<List<Kpc.Event<T>>> EventListFitAsync<T>(
         List<Kpc.Event<T>> events,
         double tolerance = 5d,
@@ -78,7 +95,10 @@ public static class KpcEventTools
     [Obsolete("已废弃，请改用 EventListCompressSqrt 或 EventListCompressSlope 方法，EventListCompress 方法将被移除。")]
     public static List<Kpc.Event<T>> EventListCompress<T>(
         List<Kpc.Event<T>> events, double tolerance = 5)
-        => EventCompressor.EventListCompressSqrt(events, tolerance);
+    {
+        var compressor = new global::KaedePhi.Tool.Event.KaedePhi.EventCompressor<T>();
+        return compressor.EventListCompressSqrt(events, tolerance);
+    }
 
     /// <summary>
     /// 使用了欧几里得距离做算法，对空间更敏感，适用于移动类事件
@@ -89,7 +109,11 @@ public static class KpcEventTools
     /// <returns></returns>
     [Obsolete("此方法弃用，请使用KaedePhi.Tool.Event.KaedePhi.EventCompressor<T>中的EventListCompressSqrt", false)]
     public static List<Kpc.Event<T>> EventListCompressSqrt<T>(List<Kpc.Event<T>> events, double tolerance = 5)
-        => EventCompressor.EventListCompressSqrt(events, tolerance);
+    {
+        var compressor = new global::KaedePhi.Tool.Event.KaedePhi.EventCompressor<T>();
+        return compressor.EventListCompressSqrt(events, tolerance);
+    }
+
     /// <summary>
     /// 使用了普通变化率算法的压缩算法，适用于非移动类事件
     /// </summary>
@@ -99,7 +123,10 @@ public static class KpcEventTools
     /// <returns></returns>
     [Obsolete("此方法弃用，请使用KaedePhi.Tool.Event.KaedePhi.EventCompressor<T>中的EventListCompressSlope", false)]
     public static List<Kpc.Event<T>> EventListCompressSlope<T>(List<Kpc.Event<T>> events, double tolerance = 5)
-        => EventCompressor.EventListCompressSlope(events, tolerance);
+    {
+        var compressor = new global::KaedePhi.Tool.Event.KaedePhi.EventCompressor<T>();
+        return compressor.EventListCompressSlope(events, tolerance);
+    }
 
     /// <summary>
     /// 将两个事件列表合并（固定采样策略）。有重叠区间时按等长切片逐段相加，可选压缩。
@@ -108,15 +135,21 @@ public static class KpcEventTools
     public static List<Kpc.Event<T>> EventListMerge<T>(
         List<Kpc.Event<T>> toEvents, List<Kpc.Event<T>> fromEvents,
         double precision = 64d)
-        => EventMerger.EventListMerge(toEvents, fromEvents, precision);
+    {
+        var merger = new global::KaedePhi.Tool.Event.KaedePhi.EventMerger<T>();
+        return merger.EventListMerge(toEvents, fromEvents, precision);
+    }
 
     [Obsolete("此方法弃用，请使用KaedePhi.Tool.Event.KaedePhi.EventMerger<T>中的EventMergePlus", false)]
     public static List<Kpc.Event<T>> EventMergePlus<T>(
         List<Kpc.Event<T>> toEvents, List<Kpc.Event<T>> fromEvents,
         double precision = 64d, double tolerance = 5d)
-        => EventMerger.EventMergePlus(toEvents, fromEvents, precision, tolerance);
+    {
+        var merger = new global::KaedePhi.Tool.Event.KaedePhi.EventMerger<T>();
+        return merger.EventMergePlus(toEvents, fromEvents, precision,tolerance);
+    }
 
-    public static double GetMsAtBeat(Beat beat, List<BpmItem> bpmList,float bpmFactor = 1f)
+    public static double GetMsAtBeat(Beat beat, List<BpmItem> bpmList, float bpmFactor = 1f)
     {
         var sortedBpms = bpmList.OrderBy(b => (double)b.StartBeat).ToList();
         double ms = 0;

@@ -16,7 +16,7 @@ public static class Note
         Type = (Kpc.NoteType)(int)src.Type
     };
 
-    public static Pe.Note ConvertNote(Kpc.Note src,Action<string> warnLogger)
+    public static Pe.Note ConvertNote(Kpc.Note src,Action<string>? warnLogger)
     {
         WarnIfUnsupportedNoteFields(src, warnLogger);
         return new Pe.Note
@@ -32,7 +32,7 @@ public static class Note
         };
     }
     
-    private static void WarnIfUnsupportedNoteFields(Kpc.Note src, Action<string> warnLogger)
+    private static void WarnIfUnsupportedNoteFields(Kpc.Note src, Action<string>? warnLogger)
     {
         if (src.Alpha != 255)
             Warn($"PE 不支持 Note.Alpha（值={src.Alpha}）");
@@ -49,7 +49,7 @@ public static class Note
         if (!string.IsNullOrWhiteSpace(src.HitSound))
             Warn($"PE 不支持 Note.HitSound（值='{src.HitSound}'）");
         return;
-        void Warn(string message) => warnLogger.Invoke(message);
+        void Warn(string message) => warnLogger?.Invoke(message);
     }
 
     private static bool IsDefaultTint(byte[]? tint) => tint is [255, 255, 255];

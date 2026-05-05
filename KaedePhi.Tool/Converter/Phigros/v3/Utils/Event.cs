@@ -10,6 +10,7 @@ public static class Event
 {
     private const double TrailingBeatPadding = 1d / 64d;
     private const double SpeedValueRatio = 4.5d;
+    private const double FloatTolerance = 1e-6;
 
     public static List<Kpc.Event<T>>? ConvertEvents<T>(
         List<PhigrosEvent>? events,
@@ -59,7 +60,7 @@ public static class Event
 
             var startValue = valueTransformer(startSelector(ev));
             var endValue = valueTransformer(endSelector(ev));
-            if (startValue == endValue && endBeat - startBeat > 1d)
+            if (Math.Abs(startValue - endValue) < FloatTolerance && endBeat - startBeat > 1d)
                 endBeat = startBeat + 1d;
             result.Add(CreateLinearEvent(startBeat, endBeat, startValue, endValue));
         }
@@ -109,11 +110,17 @@ public static class Event
         maxBeat = Math.Max(maxBeat, GetMaxBeat(src.SpeedEvents?.Select(e =>
             Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1))));
         maxBeat = Math.Max(maxBeat, GetMaxBeat(src.JudgeLineMoveEvents?.Select(e =>
-            e.Start == e.End ? Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1) : (double)e.EndTime / 32)));
+            Math.Abs(e.Start - e.End) < FloatTolerance
+                ? Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1)
+                : (double)e.EndTime / 32)));
         maxBeat = Math.Max(maxBeat, GetMaxBeat(src.JudgeLineRotateEvents?.Select(e =>
-            e.Start == e.End ? Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1) : (double)e.EndTime / 32)));
+            Math.Abs(e.Start - e.End) < FloatTolerance
+                ? Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1)
+                : (double)e.EndTime / 32)));
         maxBeat = Math.Max(maxBeat, GetMaxBeat(src.JudgeLineDisappearEvents?.Select(e =>
-            e.Start == e.End ? Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1) : (double)e.EndTime / 32)));
+            Math.Abs(e.Start - e.End) < FloatTolerance
+                ? Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1)
+                : (double)e.EndTime / 32)));
         return maxBeat + TrailingBeatPadding;
     }
 
