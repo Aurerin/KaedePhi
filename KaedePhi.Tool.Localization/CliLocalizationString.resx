@@ -72,4 +72,13 @@
     <data name="render_opt_output" xml:space="preserve">
         <value>图片输出文件夹路径。</value>
     </data>
+    <data name="warn_unstable_version" xml:space="preserve">
+        <value>您正在使用预发布版本，若发现问题，请及时反馈到 {0} ，感谢支持。</value>
+    </data>
+    <data name="project_link" xml:space="preserve">
+        <value>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</value>
+    </data>
+    <data name="hit_help" xml:space="preserve">
+        <value>咦？是输错命令了吗？可以试试--help哦~</value>
+    </data>
 </root>

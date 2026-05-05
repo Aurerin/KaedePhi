@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="app_title" xml:space="preserve">
+    <value>KaedePhi</value>
+  </data>
+  <data name="import_button" xml:space="preserve">
+    <value>匯入譜面檔案</value>
+  </data>
+  <data name="import_stream_loading" xml:space="preserve">
+    <value>串流載入</value>
+  </data>
+  <data name="header_file" xml:space="preserve">
+    <value>檔案:</value>
+  </data>
+  <data name="header_format" xml:space="preserve">
+    <value>格式:</value>
+  </data>
+  <data name="tool_select_title" xml:space="preserve">
+    <value>選擇工具</value>
+  </data>
+  <data name="tool_options_title" xml:space="preserve">
+    <value>工具選項</value>
+  </data>
+  <data name="option_precision" xml:space="preserve">
+    <value>精度</value>
+  </data>
+  <data name="option_tolerance" xml:space="preserve">
+    <value>容差 (%)</value>
+  </data>
+  <data name="option_classic_mode" xml:space="preserve">
+    <value>經典模式</value>
+  </data>
+  <data name="option_disable_compress" xml:space="preserve">
+    <value>停用壓縮</value>
+  </data>
+  <data name="option_pixels_per_beat" xml:space="preserve">
+    <value>每拍像素</value>
+  </data>
+  <data name="option_channel_width" xml:space="preserve">
+    <value>通道寬度</value>
+  </data>
+  <data name="option_samples_per_event" xml:space="preserve">
+    <value>每事件取樣數</value>
+  </data>
+  <data name="option_beat_subdivisions" xml:space="preserve">
+    <value>拍細分數</value>
+  </data>
+  <data name="btn_run_tool" xml:space="preserve">
+    <value>執行工具</value>
+  </data>
+  <data name="btn_export_chart" xml:space="preserve">
+    <value>匯出譜面</value>
+  </data>
+  <data name="btn_export" xml:space="preserve">
+    <value>匯出</value>
+  </data>
+  <data name="btn_back_to_import" xml:space="preserve">
+    <value>返回匯入</value>
+  </data>
+  <data name="btn_back_to_tools" xml:space="preserve">
+    <value>返回工具</value>
+  </data>
+  <data name="export_title" xml:space="preserve">
+    <value>匯出譜面</value>
+  </data>
+  <data name="export_output_format" xml:space="preserve">
+    <value>輸出格式</value>
+  </data>
+  <data name="export_stream_writing" xml:space="preserve">
+    <value>串流寫入</value>
+  </data>
+  <data name="processing_title" xml:space="preserve">
+    <value>處理譜面</value>
+  </data>
+  <data name="processing_error" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="processing_log_file" xml:space="preserve">
+    <value>日誌檔案:</value>
+  </data>
+  <data name="processing_success" xml:space="preserve">
+    <value>操作已完成。</value>
+  </data>
+  <data name="step_loading" xml:space="preserve">
+    <value>載入檔案</value>
+  </data>
+  <data name="step_detecting" xml:space="preserve">
+    <value>推斷格式</value>
+  </data>
+  <data name="step_to_kpc" xml:space="preserve">
+    <value>轉換為中間格式</value>
+  </data>
+  <data name="step_running_tool" xml:space="preserve">
+    <value>使用工具</value>
+  </data>
+  <data name="step_from_kpc" xml:space="preserve">
+    <value>轉換回原始格式</value>
+  </data>
+  <data name="step_saving" xml:space="preserve">
+    <value>輸出到工作區</value>
+  </data>
+  <data name="tool_unbind_name" xml:space="preserve">
+    <value>父子線解綁</value>
+  </data>
+  <data name="tool_unbind_desc" xml:space="preserve">
+    <value>將子判定線從父線坐標系解綁為絕對坐標</value>
+  </data>
+  <data name="tool_layermerge_name" xml:space="preserve">
+    <value>層級合併</value>
+  </data>
+  <data name="tool_layermerge_desc" xml:space="preserve">
+    <value>將多個事件層合併為單層</value>
+  </data>
+  <data name="tool_cut_name" xml:space="preserve">
+    <value>事件切割</value>
+  </data>
+  <data name="tool_cut_desc" xml:space="preserve">
+    <value>將事件按等長段切割</value>
+  </data>
+  <data name="tool_fit_name" xml:space="preserve">
+    <value>事件擬合</value>
+  </data>
+  <data name="tool_fit_desc" xml:space="preserve">
+    <value>將線性事件擬合為緩動曲線</value>
+  </data>
+  <data name="tool_render_name" xml:space="preserve">
+    <value>事件渲染</value>
+  </data>
+  <data name="tool_render_desc" xml:space="preserve">
+    <value>將譜面事件層渲染為圖片</value>
+  </data>
+  <data name="log_app_starting" xml:space="preserve">
+    <value>應用程式啟動中...</value>
+  </data>
+  <data name="log_navigate_import" xml:space="preserve">
+    <value>已導航至匯入頁面。</value>
+  </data>
+  <data name="log_file_selected" xml:space="preserve">
+    <value>已選擇檔案: {0}, 串流={1}</value>
+  </data>
+  <data name="log_step_loading" xml:space="preserve">
+    <value>正在載入檔案...</value>
+  </data>
+  <data name="log_step_detected" xml:space="preserve">
+    <value>已偵測到格式: {0}</value>
+  </data>
+  <data name="log_step_converting" xml:space="preserve">
+    <value>正在轉換為 KPC...</value>
+  </data>
+  <data name="log_step_saved" xml:space="preserve">
+    <value>已儲存至工作區。</value>
+  </data>
+  <data name="log_judge_lines_loaded" xml:space="preserve">
+    <value>已載入 {0} 條判定線。</value>
+  </data>
+  <data name="log_chart_ready" xml:space="preserve">
+    <value>譜面已載入，準備處理。</value>
+  </data>
+  <data name="log_load_failed" xml:space="preserve">
+    <value>載入檔案失敗。</value>
+  </data>
+  <data name="log_running_tool" xml:space="preserve">
+    <value>正在執行工具: {0}</value>
+  </data>
+  <data name="log_tool_completed" xml:space="preserve">
+    <value>工具 "{0}" 已完成。您可以執行其它工具或匯出。</value>
+  </data>
+  <data name="log_tool_failed" xml:space="preserve">
+    <value>工具執行失敗。</value>
+  </data>
+  <data name="log_exporting_to" xml:space="preserve">
+    <value>正在匯出至: {0}，格式: {1}</value>
+  </data>
+  <data name="log_export_done" xml:space="preserve">
+    <value>匯出完成。</value>
+  </data>
+  <data name="log_export_failed" xml:space="preserve">
+    <value>匯出失敗。</value>
+  </data>
+  <data name="log_export_cancelled" xml:space="preserve">
+    <value>匯出已取消。</value>
+  </data>
+  <data name="log_cannot_access_picker" xml:space="preserve">
+    <value>無法存取檔案選擇器。</value>
+  </data>
+  <data name="log_workspace_cleared" xml:space="preserve">
+    <value>工作區已清除。</value>
+  </data>
+  <data name="log_shutdown" xml:space="preserve">
+    <value>應用程式關閉，正在清除工作區。</value>
+  </data>
+  <data name="status_exporting" xml:space="preserve">
+    <value>正在匯出...</value>
+  </data>
+  <data name="status_processing" xml:space="preserve">
+    <value>正在處理...</value>
+  </data>
+  <data name="status_exported_to" xml:space="preserve">
+    <value>已匯出至: {0}</value>
+  </data>
+  <data name="status_export_cancelled" xml:space="preserve">
+    <value>匯出已取消。</value>
+  </data>
+  <data name="status_cannot_access_picker" xml:space="preserve">
+    <value>無法存取檔案選擇器。</value>
+  </data>
+  <data name="status_tool_completed" xml:space="preserve">
+    <value>工具 "{0}" 已完成。您可以執行其它工具或匯出。</value>
+  </data>
+  <data name="status_error_with_log" xml:space="preserve">
+    <value>錯誤: {0}。詳見日誌: {1}</value>
+  </data>
+  <data name="status_loaded_lines" xml:space="preserve">
+    <value>已載入 {0} 條判定線。</value>
+  </data>
+</root>

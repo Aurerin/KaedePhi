@@ -21,6 +21,7 @@ namespace KaedePhi.Tool.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [Obsolete]
     public class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
@@ -436,15 +437,6 @@ namespace KaedePhi.Tool.Localization {
         public static string cli_warn_unstable_version {
             get {
                 return ResourceManager.GetString("cli_warn_unstable_version", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to v0.1.x — GUI 版.
-        /// </summary>
-        public static string gui_version_label {
-            get {
-                return ResourceManager.GetString("gui_version_label", resourceCulture);
             }
         }
     }

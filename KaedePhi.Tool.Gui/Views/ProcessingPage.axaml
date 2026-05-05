@@ -1,0 +1,91 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:KaedePhi.Tool.Gui.ViewModels"
+             xmlns:loc="using:KaedePhi.Tool.Localization"
+             x:Class="KaedePhi.Tool.Gui.Views.ProcessingPage"
+             x:DataType="vm:ProcessingViewModel">
+
+    <Grid>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1" CornerRadius="12" Padding="48,36" MinWidth="480">
+            <StackPanel Spacing="20">
+
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="&#xE71C;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="24" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_title}" FontSize="22" FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <!-- Progress bar -->
+                <ProgressBar Value="{Binding Progress}" Maximum="100" Height="8"
+                             CornerRadius="4"/>
+
+                <!-- Current step -->
+                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding CurrentStep}" FontWeight="SemiBold" FontSize="14"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" Opacity="0.6"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Error display -->
+                <Border IsVisible="{Binding HasError}"
+                        Background="#33FF0000" CornerRadius="8" Padding="16,12">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="&#xEA39;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       FontSize="16" Foreground="Red" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_error}" FontWeight="SemiBold" FontSize="14" Foreground="Red"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding ErrorMessage}" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="Red"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_log_file}" FontSize="11" Opacity="0.7" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding LogFilePath}" FontSize="11"
+                                       Foreground="{DynamicResource SystemAccentColor}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Completion buttons -->
+                <StackPanel IsVisible="{Binding IsCompleted}" Spacing="8" HorizontalAlignment="Center">
+                    <TextBlock IsVisible="{Binding !HasError}"
+                               Text="{x:Static loc:GuiLocalizationString.processing_success}"
+                               Foreground="Green" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                        <!-- Success: Back to Tools + Export -->
+                        <Button Padding="20,8" Click="OnReturnToToolsClick"
+                                IsVisible="{Binding !HasError}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="&#xE72B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           FontSize="13" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_tools}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Padding="20,8" Click="OnGoToExportClick"
+                                IsVisible="{Binding !HasError}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="&#xE898;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           FontSize="13" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_export_chart}"/>
+                            </StackPanel>
+                        </Button>
+                        <!-- Error: Back to Import -->
+                        <Button Padding="20,8" Click="OnReturnToImportClick"
+                                IsVisible="{Binding HasError}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="&#xE8E5;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           FontSize="13" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

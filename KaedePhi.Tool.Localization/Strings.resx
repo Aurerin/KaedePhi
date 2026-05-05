@@ -184,9 +184,6 @@
     <comment>{0} = 工作区名</comment>
   </data>
   <!-- ── GUI ───────────────────────────────────────────────────────────────── -->
-  <data name="gui_version_label" xml:space="preserve">
-    <value>v0.1.x — GUI 版</value>
-  </data>
   <!-- nav -->
   <!-- page subtitles -->
   <!-- section headers -->
