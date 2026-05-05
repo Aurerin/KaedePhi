@@ -91,32 +91,32 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         if (layer.AlphaEvents is { Count: > 0 })
             cutEventLayer.AlphaEvents = _intCutter.CutEventsInRange(
                 layer.AlphaEvents,
-                layer.AlphaEvents.Min(e => e.StartBeat),
-                layer.AlphaEvents.Max(e => e.EndBeat), cutLength);
+                layer.AlphaEvents.Min(e => e.StartBeat) ?? new Beat(0),
+                layer.AlphaEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
 
         if (layer.MoveXEvents is { Count: > 0 })
             cutEventLayer.MoveXEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveXEvents,
-                layer.MoveXEvents.Min(e => e.StartBeat),
-                layer.MoveXEvents.Max(e => e.EndBeat), cutLength);
+                layer.MoveXEvents.Min(e => e.StartBeat) ?? new Beat(0),
+                layer.MoveXEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
 
         if (layer.MoveYEvents is { Count: > 0 })
             cutEventLayer.MoveYEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveYEvents,
-                layer.MoveYEvents.Min(e => e.StartBeat),
-                layer.MoveYEvents.Max(e => e.EndBeat), cutLength);
+                layer.MoveYEvents.Min(e => e.StartBeat) ?? new Beat(0),
+                layer.MoveYEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
 
         if (layer.RotateEvents is { Count: > 0 })
             cutEventLayer.RotateEvents = _doubleCutter.CutEventsInRange(
                 layer.RotateEvents,
-                layer.RotateEvents.Min(e => e.StartBeat),
-                layer.RotateEvents.Max(e => e.EndBeat), cutLength);
+                layer.RotateEvents.Min(e => e.StartBeat) ?? new Beat(0),
+                layer.RotateEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
 
         if (layer.SpeedEvents is { Count: > 0 })
             cutEventLayer.SpeedEvents = _floatCutter.CutEventsInRange(
                 layer.SpeedEvents,
-                layer.SpeedEvents.Min(e => e.StartBeat),
-                layer.SpeedEvents.Max(e => e.EndBeat), cutLength);
+                layer.SpeedEvents.Min(e => e.StartBeat) ?? new Beat(0),
+                layer.SpeedEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
 
         return cutEventLayer;
     }

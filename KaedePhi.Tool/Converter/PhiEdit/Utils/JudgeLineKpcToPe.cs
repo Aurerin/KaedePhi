@@ -18,9 +18,9 @@ public class JudgeLineKpcToPe
     private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhiEditConvertOptions _options;
     private readonly LineEventBuilder _eventBuilder;
-    private readonly Action<string> _warnLogger;
+    private readonly Action<string>? _warnLogger;
 
-    public JudgeLineKpcToPe(KpcToPhiEditConvertOptions options, Action<string> warnLogger)
+    public JudgeLineKpcToPe(KpcToPhiEditConvertOptions options, Action<string>? warnLogger)
     {
         _options = options;
         _eventBuilder = new LineEventBuilder(options);
