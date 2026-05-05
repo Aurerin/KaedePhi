@@ -44,7 +44,8 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <returns>解绑后的判定线（已转换为绝对坐标）。</returns>
     TJudgeLine FatherUnbind(
         int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
-        double precision);
+        double precision,
+        IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将判定线与父判定线解绑（等间隔采样，指定渲染坐标系）。
@@ -53,10 +54,12 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="allTJudgeLines">当前谱面的全部判定线。</param>
     /// <param name="renderProfile">渲染坐标系配置。</param>
     /// <param name="precision">每拍内的采样步数。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线。</returns>
     TJudgeLine FatherUnbind(
         int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
-        double precision);
+        double precision,
+        IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将判定线与父判定线解绑（自适应采样）。
@@ -66,10 +69,12 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="allTJudgeLines">当前谱面的全部判定线。</param>
     /// <param name="precision">自适应采样的最大步数上限（同时作为事件合并精度）。</param>
     /// <param name="tolerance">误差容差百分比，决定何时插入额外切割点及压缩阈值。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线。</returns>
     TJudgeLine FatherUnbindPlus(
         int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
-        double precision, double tolerance);
+        double precision, double tolerance,
+        IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将判定线与父判定线解绑（自适应采样，指定渲染坐标系）。
@@ -79,8 +84,10 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="renderProfile">渲染坐标系配置。</param>
     /// <param name="precision">自适应采样的最大步数上限。</param>
     /// <param name="tolerance">误差容差百分比。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线。</returns>
     TJudgeLine FatherUnbindPlus(
         int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
-        double precision, double tolerance);
+        double precision, double tolerance,
+        IProgress<ToolProgress>? progress = null);
 }

@@ -23,15 +23,17 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <inheritdoc/>
     public List<Kpc.Event<TPayload>> EventListFit(
         List<Kpc.Event<TPayload>>? events,
-        double tolerance)
-        => EventListFitCore(events, tolerance, null, CancellationToken.None);
+        double tolerance,
+        IProgress<ToolProgress>? progress = null)
+        => EventListFitCore(events, tolerance, null, CancellationToken.None, progress);
 
     /// <inheritdoc/>
     public List<Kpc.Event<TPayload>> EventListFit(
         List<Kpc.Event<TPayload>>? events,
         double tolerance,
-        int? maxDegreeOfParallelism)
-        => EventListFitCore(events, tolerance, maxDegreeOfParallelism, CancellationToken.None);
+        int? maxDegreeOfParallelism,
+        IProgress<ToolProgress>? progress = null)
+        => EventListFitCore(events, tolerance, maxDegreeOfParallelism, CancellationToken.None, progress);
 
     /// <summary>
     /// 对事件列表执行异步拟合。
@@ -40,15 +42,17 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         List<Kpc.Event<TPayload>>? events,
         double tolerance = 5d,
         int? maxDegreeOfParallelism = null,
-        CancellationToken cancellationToken = default)
-        => Task.Run(() => EventListFitCore(events, tolerance, maxDegreeOfParallelism, cancellationToken),
+        CancellationToken cancellationToken = default,
+        IProgress<ToolProgress>? progress = null)
+        => Task.Run(() => EventListFitCore(events, tolerance, maxDegreeOfParallelism, cancellationToken, progress),
             cancellationToken);
 
     private List<Kpc.Event<TPayload>> EventListFitCore(
         List<Kpc.Event<TPayload>>? events,
         double tolerance,
         int? maxDegreeOfParallelism,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IProgress<ToolProgress>? progress = null)
     {
         if (tolerance is > 100 or < 0)
             throw new ArgumentOutOfRangeException(nameof(tolerance), "Tolerance must be between 0 and 100.");
@@ -69,6 +73,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
 
         var units = BuildFitUnits(sortedEvents, tolerance);
         var outputs = new List<Kpc.Event<TPayload>>[units.Count];
+        var completedUnits = 0;
 
         if (units is [{ NeedsFit: true }])
         {
@@ -80,6 +85,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
                 tolerance,
                 degree,
                 cancellationToken);
+            progress?.Report(new ToolProgress(1.0));
         }
         else
         {
@@ -96,16 +102,20 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
                 if (!unit.NeedsFit)
                 {
                     outputs[unitIndex] = [sortedEvents[unit.Start].Clone()];
-                    return;
+                }
+                else
+                {
+                    outputs[unitIndex] = FitLinearRun(
+                        sortedEvents,
+                        unit.Start,
+                        unit.EndExclusive,
+                        tolerance,
+                        1,
+                        cancellationToken);
                 }
 
-                outputs[unitIndex] = FitLinearRun(
-                    sortedEvents,
-                    unit.Start,
-                    unit.EndExclusive,
-                    tolerance,
-                    1,
-                    cancellationToken);
+                var done = System.Threading.Interlocked.Increment(ref completedUnits);
+                progress?.Report(new ToolProgress((double)done / units.Count));
             });
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using KaedePhi.Core.Common;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Event.KaedePhi;
 using JudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 
@@ -67,30 +68,38 @@ public static class FatherUnbindProcessor
         Action<string>? logInfo = null,
         Action<string>? logWarning = null,
         Action<string>? logError = null,
-        Action<string>? logDebug = null)
+        Action<string>? logDebug = null,
+        IProgress<ToolProgress>? progress = null)
     {
         JudgeLine judgeLineCopy;
         try
         {
+            progress?.Report(new ToolProgress(0.1, "准备解绑上下文"));
+
             var (judgeLine, fatherLine, shouldReturn) = PrepareUnbindContext(
                 targetJudgeLineIndex,
                 allJudgeLines,
                 cache,
                 logTag: "FatherUnbind",
                 startAction: "开始解绑",
-                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, cache, logInfo, logWarning, logError, logDebug),
+                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, cache, logInfo, logWarning, logError, logDebug, progress),
                 logInfo, logWarning, logError, logDebug);
 
             judgeLineCopy = judgeLine;
             if (shouldReturn || fatherLine is null)
+            {
+                progress?.Report(new ToolProgress(1.0));
                 return judgeLineCopy;
+            }
 
             var merger = new EventMerger<double>();
             var cutter = new EventCutter<double>();
 
+            progress?.Report(new ToolProgress(0.2, "合并通道"));
             var mergedChannels =
                 FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
 
+            progress?.Report(new ToolProgress(0.4, "切割事件"));
             var cutLength = new Beat(1d / precision);
             var (txMin, txMax) = FatherUnbindHelpers.GetEventRange(mergedChannels.Tx);
             var (tyMin, tyMax) = FatherUnbindHelpers.GetEventRange(mergedChannels.Ty);
@@ -117,14 +126,17 @@ public static class FatherUnbindProcessor
             var step = new Beat(1d / precision);
             var beats = FatherUnbindHelpers.BuildBeatList(overallMin, overallMax, step);
 
+            progress?.Report(new ToolProgress(0.6, "等间隔采样"));
             logDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 等间隔采样 {beats.Count} 段，精度={precision}");
             var (sortedX, sortedY) = FatherUnbindHelpers.EqualSpacingSampling(beats, overallMax, step, cutChannels);
 
+            progress?.Report(new ToolProgress(0.9, "写回结果"));
             logDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 采样完成，写回");
             FatherUnbindHelpers.WriteResultToLine(judgeLineCopy, sortedX, sortedY, cutChannels.Fr, Merge);
 
             cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
             logInfo?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑完成");
+            progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
@@ -150,26 +162,33 @@ public static class FatherUnbindProcessor
         Action<string>? logInfo = null,
         Action<string>? logWarning = null,
         Action<string>? logError = null,
-        Action<string>? logDebug = null)
+        Action<string>? logDebug = null,
+        IProgress<ToolProgress>? progress = null)
     {
         JudgeLine judgeLineCopy;
         try
         {
+            progress?.Report(new ToolProgress(0.1, "准备解绑上下文"));
+
             var (judgeLine, fatherLine, shouldReturn) = PrepareUnbindContext(
                 targetJudgeLineIndex,
                 allJudgeLines,
                 cache,
                 logTag: "FatherUnbindPlus",
                 startAction: "开始解绑（自适应采样）",
-                recursiveUnbind: (idx, lines) => FatherUnbindPlus(idx, lines, precision, tolerance, cache, logInfo, logWarning, logError, logDebug),
+                recursiveUnbind: (idx, lines) => FatherUnbindPlus(idx, lines, precision, tolerance, cache, logInfo, logWarning, logError, logDebug, progress),
                 logInfo, logWarning, logError, logDebug);
 
             judgeLineCopy = judgeLine;
             if (shouldReturn || fatherLine is null)
+            {
+                progress?.Report(new ToolProgress(1.0));
                 return judgeLineCopy;
+            }
 
             var merger = new EventMerger<double>();
 
+            progress?.Report(new ToolProgress(0.2, "合并通道"));
             var ch = FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
 
             var rangeResult = FatherUnbindHelpers.TryGetOverallRange(ch);
@@ -177,17 +196,22 @@ public static class FatherUnbindProcessor
             {
                 judgeLineCopy.Father = -1;
                 cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
+                progress?.Report(new ToolProgress(1.0));
                 return judgeLineCopy;
             }
 
             var (overallMin, overallMax) = rangeResult.Value;
             var step = new Beat(1d / precision);
+
+            progress?.Report(new ToolProgress(0.4, "收集关键帧"));
             var keyBeats = FatherUnbindHelpers.CollectKeyBeats(overallMin, overallMax, ch);
 
+            progress?.Report(new ToolProgress(0.6, "自适应采样"));
             logDebug?.Invoke(
                 $"FatherUnbindPlus[{targetJudgeLineIndex}]: 自适应采样，关键帧数={keyBeats.Count}，最大精度={precision}");
             var (resultX, resultY) = FatherUnbindHelpers.RunAdaptiveSampling(keyBeats, step, tolerance, ch);
 
+            progress?.Report(new ToolProgress(0.9, "写回结果"));
             logDebug?.Invoke(
                 $"FatherUnbindPlus[{targetJudgeLineIndex}]: 采样完成（生成 {resultX.Count} 段），压缩并写回");
             FatherUnbindHelpers.WriteResultToLine(
@@ -195,6 +219,7 @@ public static class FatherUnbindProcessor
 
             cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
             logInfo?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑完成");
+            progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)

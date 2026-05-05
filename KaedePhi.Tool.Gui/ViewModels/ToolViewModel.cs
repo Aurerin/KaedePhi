@@ -41,7 +41,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_unbind_name,
             Description = tool_unbind_desc,
-            IconGlyph = "\uE717",
+            IconGlyph = "\uE71B",
             ToolId = "unbind",
             HasPrecision = true,
             HasTolerance = true,
@@ -52,7 +52,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_layermerge_name,
             Description = tool_layermerge_desc,
-            IconGlyph = "\uE71C",
+            IconGlyph = "\uE74C",
             ToolId = "layermerge",
             HasPrecision = true,
             HasTolerance = true,
@@ -73,7 +73,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_fit_name,
             Description = tool_fit_desc,
-            IconGlyph = "\uE9D9",
+            IconGlyph = "\uE8A5",
             ToolId = "fit",
             HasTolerance = true,
             DefaultTolerance = 0.5
@@ -94,17 +94,19 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         set
         {
             _selectedTool = value;
+            if (value != null)
+            {
+                Precision = value.DefaultPrecision;
+                Tolerance = value.DefaultTolerance;
+                ClassicMode = false;
+                DisableCompress = false;
+            }
             OnPropertyChanged();
             OnPropertyChanged(nameof(ShowPrecision));
             OnPropertyChanged(nameof(ShowTolerance));
             OnPropertyChanged(nameof(ShowClassicMode));
             OnPropertyChanged(nameof(ShowDisableCompress));
             OnPropertyChanged(nameof(ShowRenderOptions));
-            if (value != null)
-            {
-                Precision = value.DefaultPrecision;
-                Tolerance = value.DefaultTolerance;
-            }
         }
     }
 
@@ -176,9 +178,46 @@ public sealed class ToolViewModel : INotifyPropertyChanged
 
     public event Action? RequestRun;
     public event Action? RequestExport;
+    public event Action? RequestSettings;
 
     public void OnRunClicked() => RequestRun?.Invoke();
     public void OnExportClicked() => RequestExport?.Invoke();
+    public void OnSettingsClicked() => RequestSettings?.Invoke();
+
+    public void ApplyConfigDefaults(GuiAppConfig config)
+    {
+        if (SelectedTool == null) return;
+
+        switch (SelectedTool.ToolId)
+        {
+            case "unbind":
+                Precision = config.Unbind.Precision;
+                Tolerance = config.Unbind.Tolerance;
+                ClassicMode = config.Unbind.ClassicMode;
+                DisableCompress = config.Unbind.DisableCompress;
+                break;
+            case "layermerge":
+                Precision = config.LayerMerge.Precision;
+                Tolerance = config.LayerMerge.Tolerance;
+                ClassicMode = config.LayerMerge.ClassicMode;
+                DisableCompress = config.LayerMerge.DisableCompress;
+                break;
+            case "cut":
+                Precision = config.Cut.Precision;
+                Tolerance = config.Cut.Tolerance;
+                DisableCompress = config.Cut.DisableCompress;
+                break;
+            case "fit":
+                Tolerance = config.Fit.Tolerance;
+                break;
+            case "render":
+                PixelsPerBeat = config.Render.PixelsPerBeat;
+                ChannelWidth = config.Render.ChannelWidth;
+                SamplesPerEvent = config.Render.SamplesPerEvent;
+                BeatSubdivisions = config.Render.BeatSubdivisions;
+                break;
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

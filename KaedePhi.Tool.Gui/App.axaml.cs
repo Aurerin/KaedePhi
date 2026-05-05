@@ -10,7 +10,8 @@ namespace KaedePhi.Tool.Gui;
 
 public partial class App : Application
 {
-    internal static LogService LogService { get; } = new();
+    internal static ConfigService ConfigService { get; } = new();
+    internal static LogService LogService { get; } = new(ConfigService.Config.MaxLogFiles);
     internal static GuiChartService ChartService { get; } = new(LogService);
 
     public override void Initialize()
@@ -24,12 +25,11 @@ public partial class App : Application
         {
             LogService.StartSession();
             LogService.Info(log_app_starting);
-            ChartService.ClearWorkspace();
 
             var mainVm = new MainViewModel();
             var mainWindow = new MainWindow { DataContext = mainVm };
 
-            var controller = new AppController(mainVm, ChartService, LogService, mainWindow);
+            var controller = new AppController(mainVm, ChartService, LogService, ConfigService, mainWindow);
             controller.Initialize();
 
             desktop.MainWindow = mainWindow;

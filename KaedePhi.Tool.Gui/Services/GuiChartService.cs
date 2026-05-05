@@ -158,80 +158,149 @@ public sealed class GuiChartService
         return outputPath;
     }
 
-    public void RunFatherUnbind(Chart chart, double precision, double tolerance, bool classic, bool disableCompress)
+    public void RunFatherUnbind(Chart chart, double precision, double tolerance, bool classic, bool disableCompress,
+        IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_unbind_name));
         var unbinder = new KpcJudgeLineUnbinder();
+        var linesToProcess = new List<int>();
         for (var i = 0; i < chart.JudgeLineList.Count; i++)
         {
-            if (chart.JudgeLineList[i].Father == -1) continue;
-            chart.JudgeLineList[i] = classic
-                ? unbinder.FatherUnbind(i, chart.JudgeLineList, precision)
-                : unbinder.FatherUnbindPlus(i, chart.JudgeLineList, precision, tolerance);
+            if (chart.JudgeLineList[i].Father != -1)
+                linesToProcess.Add(i);
         }
+
+        var totalLines = linesToProcess.Count;
+        for (var idx = 0; idx < totalLines; idx++)
+        {
+            var i = linesToProcess[idx];
+            var capturedIdx = idx;
+            var lineProgress = new Progress<ToolProgress>(p =>
+            {
+                var overall = (double)capturedIdx / totalLines;
+                progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
+            });
+            chart.JudgeLineList[i] = classic
+                ? unbinder.FatherUnbind(i, chart.JudgeLineList, precision, lineProgress)
+                : unbinder.FatherUnbindPlus(i, chart.JudgeLineList, precision, tolerance, lineProgress);
+        }
+
+        progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    public void RunLayerMerge(Chart chart, double precision, double tolerance, bool classic, bool disableCompress)
+    public void RunLayerMerge(Chart chart, double precision, double tolerance, bool classic, bool disableCompress,
+        IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_layermerge_name));
         var processor = new KpcLayerProcessor();
-        foreach (var line in chart.JudgeLineList)
+        var totalLines = chart.JudgeLineList.Count;
+        for (var li = 0; li < totalLines; li++)
         {
-            if (line.EventLayers is not { Count: > 1 }) continue;
+            var line = chart.JudgeLineList[li];
+            if (line.EventLayers is not { Count: > 1 })
+            {
+                progress?.Report(new ToolProgress(1.0, (double)(li + 1) / totalLines));
+                continue;
+            }
+
+            var capturedLi = li;
+            var lineProgress = new Progress<ToolProgress>(p =>
+            {
+                var overall = (double)capturedLi / totalLines;
+                progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
+            });
             var merged = classic
-                ? processor.LayerMerge(line.EventLayers, precision)
-                : processor.LayerMergePlus(line.EventLayers, precision, tolerance);
+                ? processor.LayerMerge(line.EventLayers, precision, lineProgress)
+                : processor.LayerMergePlus(line.EventLayers, precision, tolerance, lineProgress);
             if (!disableCompress)
-                processor.LayerEventsCompress(merged, tolerance);
+                processor.LayerEventsCompress(merged, tolerance, lineProgress);
             line.EventLayers.Clear();
             line.EventLayers.Add(merged);
         }
+
+        progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    public void RunCutEvent(Chart chart, double precision, double tolerance, bool disableCompress)
+    public void RunCutEvent(Chart chart, double precision, double tolerance, bool disableCompress,
+        IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_cut_name));
         var processor = new KpcLayerProcessor();
-        foreach (var line in chart.JudgeLineList)
+        var totalLines = chart.JudgeLineList.Count;
+        for (var li = 0; li < totalLines; li++)
         {
-            if (line.EventLayers is not { Count: > 0 }) continue;
-            line.EventLayers = processor.CutLayerEvents(line.EventLayers, precision);
+            var line = chart.JudgeLineList[li];
+            if (line.EventLayers is not { Count: > 0 })
+            {
+                progress?.Report(new ToolProgress(1.0, (double)(li + 1) / totalLines));
+                continue;
+            }
+
+            var capturedLi = li;
+            var lineProgress = new Progress<ToolProgress>(p =>
+            {
+                var overall = (double)capturedLi / totalLines;
+                progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
+            });
+            line.EventLayers = processor.CutLayerEvents(line.EventLayers, precision, lineProgress);
             if (!disableCompress)
             {
                 foreach (var layer in line.EventLayers)
-                    processor.LayerEventsCompress(layer, tolerance);
+                    processor.LayerEventsCompress(layer, tolerance, lineProgress);
             }
         }
+
+        progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    public void RunFitEvent(Chart chart, double tolerance)
+    public void RunFitEvent(Chart chart, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_fit_name));
         var degree = Environment.ProcessorCount;
-        foreach (var line in chart.JudgeLineList)
+        var totalLines = chart.JudgeLineList.Count;
+        for (var li = 0; li < totalLines; li++)
         {
-            if (line.EventLayers is not { Count: > 0 }) continue;
-            foreach (var layer in line.EventLayers)
+            var line = chart.JudgeLineList[li];
+            if (line.EventLayers is not { Count: > 0 })
             {
+                progress?.Report(new ToolProgress(1.0, (double)(li + 1) / totalLines));
+                continue;
+            }
+
+            var totalLayers = line.EventLayers.Count;
+            for (var ei = 0; ei < totalLayers; ei++)
+            {
+                var layer = line.EventLayers[ei];
+                var capturedLi = li;
+                var capturedEi = ei;
+                var layerProgress = new Progress<ToolProgress>(p =>
+                {
+                    var overall = ((double)capturedLi + (double)capturedEi / totalLayers) / totalLines;
+                    progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
+                });
+
                 var doubleFit = new EventFit<double>();
                 var intFit = new EventFit<int>();
                 var floatFit = new EventFit<float>();
 
                 if (layer.MoveXEvents is { Count: > 0 })
-                    layer.MoveXEvents = doubleFit.EventListFit(layer.MoveXEvents, tolerance, degree);
+                    layer.MoveXEvents = doubleFit.EventListFit(layer.MoveXEvents, tolerance, degree, layerProgress);
                 if (layer.MoveYEvents is { Count: > 0 })
-                    layer.MoveYEvents = doubleFit.EventListFit(layer.MoveYEvents, tolerance, degree);
+                    layer.MoveYEvents = doubleFit.EventListFit(layer.MoveYEvents, tolerance, degree, layerProgress);
                 if (layer.RotateEvents is { Count: > 0 })
-                    layer.RotateEvents = doubleFit.EventListFit(layer.RotateEvents, tolerance, degree);
+                    layer.RotateEvents = doubleFit.EventListFit(layer.RotateEvents, tolerance, degree, layerProgress);
                 if (layer.AlphaEvents is { Count: > 0 })
-                    layer.AlphaEvents = intFit.EventListFit(layer.AlphaEvents, tolerance, degree);
+                    layer.AlphaEvents = intFit.EventListFit(layer.AlphaEvents, tolerance, degree, layerProgress);
                 if (layer.SpeedEvents is { Count: > 0 })
-                    layer.SpeedEvents = floatFit.EventListFit(layer.SpeedEvents, tolerance, degree);
+                    layer.SpeedEvents = floatFit.EventListFit(layer.SpeedEvents, tolerance, degree, layerProgress);
             }
         }
+
+        progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    public IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions)
+    public IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions,
+        IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_render_name));
         var outputDir = Path.Combine(_workspaceDir, "render_output");
@@ -243,6 +312,6 @@ public sealed class GuiChartService
             BeatSubdivisions = beatSubdivisions
         };
         var exporter = new KpcChartRenderExporter();
-        return exporter.ExportChart(chart, outputDir, options);
+        return exporter.ExportChart(chart, outputDir, options, progress: progress);
     }
 }

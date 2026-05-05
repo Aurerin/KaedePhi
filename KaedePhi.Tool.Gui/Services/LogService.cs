@@ -1,16 +1,19 @@
 using System;
 using System.IO;
+using System.Linq;
 
 namespace KaedePhi.Tool.Gui.Services;
 
 public sealed class LogService
 {
     private readonly string _logDir;
+    private readonly int _maxLogFiles;
     private readonly object _lock = new();
 
-    public LogService()
+    public LogService(int maxLogFiles = 5)
     {
         _logDir = Path.Combine(AppContext.BaseDirectory, "logs");
+        _maxLogFiles = maxLogFiles;
         Directory.CreateDirectory(_logDir);
     }
 
@@ -23,6 +26,7 @@ public sealed class LogService
         var fileName = $"session_{DateTime.Now:yyyyMMdd_HHmmss}.log";
         CurrentLogFile = Path.Combine(_logDir, fileName);
         WriteToFile("=== KaedePhi GUI Session Started ===");
+        CleanupOldLogs();
     }
 
     public void Info(string message)
@@ -46,6 +50,24 @@ public sealed class LogService
     public void Step(string stepName)
     {
         WriteToFile($"[STEP  {DateTime.Now:HH:mm:ss}] --- {stepName} ---");
+    }
+
+    private void CleanupOldLogs()
+    {
+        try
+        {
+            var files = new DirectoryInfo(_logDir)
+                .GetFiles("session_*.log")
+                .OrderByDescending(f => f.CreationTime)
+                .ToList();
+
+            for (var i = _maxLogFiles; i < files.Count; i++)
+                files[i].Delete();
+        }
+        catch
+        {
+            // Cleanup failure should not crash the application
+        }
     }
 
     private void WriteToFile(string line)

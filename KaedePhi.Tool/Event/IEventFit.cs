@@ -9,11 +9,13 @@ public interface IEventFit<TEvent> : ILoggable
     /// </summary>
     /// <param name="events"></param>
     /// <param name="tolerance"></param>
+    /// <param name="progress">进度回调。</param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     List<TEvent> EventListFit(
         List<TEvent>? events,
-        double tolerance);
+        double tolerance,
+        IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将事件列表中存在的线性事件拟合为有缓动函数的事件（可指定最大并行度）
@@ -21,10 +23,12 @@ public interface IEventFit<TEvent> : ILoggable
     /// <param name="events"></param>
     /// <param name="tolerance"></param>
     /// <param name="maxDegreeOfParallelism"></param>
+    /// <param name="progress">进度回调。</param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     List<TEvent> EventListFit(
         List<TEvent>? events,
         double tolerance,
-        int? maxDegreeOfParallelism);
+        int? maxDegreeOfParallelism,
+        IProgress<ToolProgress>? progress = null);
 }

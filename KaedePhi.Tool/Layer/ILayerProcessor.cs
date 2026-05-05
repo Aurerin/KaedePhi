@@ -14,8 +14,9 @@ public interface ILayerProcessor<TLayer> : ILoggable
     /// </summary>
     /// <param name="layers">待合并的事件层列表。</param>
     /// <param name="precision">每拍内的采样步数；越大精度越高，计算量越大。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>合并后的单个事件层。</returns>
-    TLayer LayerMerge(List<TLayer> layers, double precision);
+    TLayer LayerMerge(List<TLayer> layers, double precision, IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将多个事件层合并为单层（自适应采样）。
@@ -24,29 +25,33 @@ public interface ILayerProcessor<TLayer> : ILoggable
     /// <param name="layers">待合并的事件层列表。</param>
     /// <param name="precision">自适应采样的最大步数上限（同时作为事件合并精度）。</param>
     /// <param name="tolerance">误差容差百分比，决定何时插入额外切割点。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>合并后的单个事件层。</returns>
-    TLayer LayerMergePlus(List<TLayer> layers, double precision, double tolerance);
+    TLayer LayerMergePlus(List<TLayer> layers, double precision, double tolerance, IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将单个事件层中各通道事件按指定精度切割为等长段。
     /// </summary>
     /// <param name="layer">待切割的事件层。</param>
     /// <param name="precision">每拍内的切割步数。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>切割后的事件层。</returns>
-    TLayer CutLayerEvents(TLayer layer, double precision);
+    TLayer CutLayerEvents(TLayer layer, double precision, IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将多个事件层中各通道事件按指定精度切割为等长段。
     /// </summary>
     /// <param name="layers">待切割的事件层列表。</param>
     /// <param name="precision">每拍内的切割步数。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>切割后的事件层列表。</returns>
-    List<TLayer> CutLayerEvents(List<TLayer> layers, double precision);
+    List<TLayer> CutLayerEvents(List<TLayer> layers, double precision, IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 压缩事件层中各通道的事件列表，合并变化率相近的相邻线性事件。
     /// </summary>
     /// <param name="layer">待压缩的事件层（原地修改）。</param>
     /// <param name="tolerance">容差百分比，越大拟合精细度越低。</param>
-    void LayerEventsCompress(TLayer layer, double tolerance);
+    /// <param name="progress">进度回调。</param>
+    void LayerEventsCompress(TLayer layer, double tolerance, IProgress<ToolProgress>? progress = null);
 }

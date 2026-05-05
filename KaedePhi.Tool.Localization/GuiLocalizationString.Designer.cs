@@ -258,15 +258,6 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 已加载 {0} 条判定线。.
-        /// </summary>
-        public static string log_judge_lines_loaded {
-            get {
-                return ResourceManager.GetString("log_judge_lines_loaded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 加载文件失败。.
         /// </summary>
         public static string log_load_failed {

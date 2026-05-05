@@ -21,15 +21,17 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     private readonly EventCompressor<float> _floatCompressor = new();
 
     /// <inheritdoc/>
-    public EventLayer LayerMerge(List<EventLayer> layers, double precision)
+    public EventLayer LayerMerge(List<EventLayer> layers, double precision, IProgress<ToolProgress>? progress = null)
     {
         layers.RemoveAll(layer => (object?)layer is null);
         if (layers.Count <= 1) return layers.FirstOrDefault() ?? new EventLayer();
         layers = RemoveUnlessLayer(layers) ?? layers;
 
         var mergedLayer = new EventLayer();
-        foreach (var layer in layers)
+        var totalLayers = layers.Count;
+        for (var li = 0; li < totalLayers; li++)
         {
+            var layer = layers[li];
             if (layer.AlphaEvents is { Count: > 0 })
                 mergedLayer.AlphaEvents =
                     _intMerger.EventListMerge(mergedLayer.AlphaEvents, layer.AlphaEvents, precision);
@@ -45,21 +47,26 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
             if (layer.SpeedEvents is { Count: > 0 })
                 mergedLayer.SpeedEvents =
                     _floatMerger.EventListMerge(mergedLayer.SpeedEvents, layer.SpeedEvents, precision);
+
+            progress?.Report(new ToolProgress((double)(li + 1) / totalLayers));
         }
 
+        progress?.Report(new ToolProgress(1.0));
         return mergedLayer;
     }
 
     /// <inheritdoc/>
-    public EventLayer LayerMergePlus(List<EventLayer> layers, double precision, double tolerance)
+    public EventLayer LayerMergePlus(List<EventLayer> layers, double precision, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         layers.RemoveAll(layer => (object?)layer is null);
         if (layers.Count <= 1) return layers.FirstOrDefault() ?? new EventLayer();
         layers = RemoveUnlessLayer(layers) ?? layers;
 
         var mergedLayer = new EventLayer();
-        foreach (var layer in layers)
+        var totalLayers = layers.Count;
+        for (var li = 0; li < totalLayers; li++)
         {
+            var layer = layers[li];
             if (layer.AlphaEvents is { Count: > 0 })
                 mergedLayer.AlphaEvents =
                     _intMerger.EventMergePlus(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
@@ -75,73 +82,103 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
             if (layer.SpeedEvents is { Count: > 0 })
                 mergedLayer.SpeedEvents =
                     _floatMerger.EventMergePlus(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
+
+            progress?.Report(new ToolProgress((double)(li + 1) / totalLayers));
         }
 
+        progress?.Report(new ToolProgress(1.0));
         return mergedLayer;
     }
 
     /// <inheritdoc/>
-    public EventLayer CutLayerEvents(EventLayer? layer, double precision)
+    public EventLayer CutLayerEvents(EventLayer? layer, double precision, IProgress<ToolProgress>? progress = null)
     {
         if (layer == null) return new EventLayer();
 
         var cutLength = new Beat(1d / precision);
         var cutEventLayer = new EventLayer();
+        const int totalChannels = 5;
+        var completedChannels = 0;
 
         if (layer.AlphaEvents is { Count: > 0 })
             cutEventLayer.AlphaEvents = _intCutter.CutEventsInRange(
                 layer.AlphaEvents,
                 layer.AlphaEvents.Min(e => e.StartBeat) ?? new Beat(0),
                 layer.AlphaEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveXEvents is { Count: > 0 })
             cutEventLayer.MoveXEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveXEvents,
                 layer.MoveXEvents.Min(e => e.StartBeat) ?? new Beat(0),
                 layer.MoveXEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveYEvents is { Count: > 0 })
             cutEventLayer.MoveYEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveYEvents,
                 layer.MoveYEvents.Min(e => e.StartBeat) ?? new Beat(0),
                 layer.MoveYEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.RotateEvents is { Count: > 0 })
             cutEventLayer.RotateEvents = _doubleCutter.CutEventsInRange(
                 layer.RotateEvents,
                 layer.RotateEvents.Min(e => e.StartBeat) ?? new Beat(0),
                 layer.RotateEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.SpeedEvents is { Count: > 0 })
             cutEventLayer.SpeedEvents = _floatCutter.CutEventsInRange(
                 layer.SpeedEvents,
                 layer.SpeedEvents.Min(e => e.StartBeat) ?? new Beat(0),
                 layer.SpeedEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+        progress?.Report(new ToolProgress(1.0));
 
         return cutEventLayer;
     }
 
     /// <inheritdoc/>
-    public List<EventLayer> CutLayerEvents(List<EventLayer> layers, double precision)
+    public List<EventLayer> CutLayerEvents(List<EventLayer> layers, double precision, IProgress<ToolProgress>? progress = null)
     {
         layers.RemoveAll(layer => (object?)layer is null);
         layers = RemoveUnlessLayer(layers) ?? layers;
-        return layers.Select(layer => CutLayerEvents(layer, precision)).ToList();
+        var result = new List<EventLayer>(layers.Count);
+        for (var i = 0; i < layers.Count; i++)
+        {
+            result.Add(CutLayerEvents(layers[i], precision));
+            progress?.Report(new ToolProgress((double)(i + 1) / layers.Count));
+        }
+
+        progress?.Report(new ToolProgress(1.0));
+        return result;
     }
 
     /// <inheritdoc/>
-    public void LayerEventsCompress(EventLayer layer, double tolerance)
+    public void LayerEventsCompress(EventLayer layer, double tolerance, IProgress<ToolProgress>? progress = null)
     {
+        const int totalChannels = 5;
+        var completedChannels = 0;
+
         if (layer.AlphaEvents is { Count: > 0 })
             layer.AlphaEvents = _intCompressor.EventListCompressSlope(layer.AlphaEvents, tolerance);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
+
         if (layer.MoveXEvents is { Count: > 0 })
             layer.MoveXEvents = _doubleCompressor.EventListCompressSqrt(layer.MoveXEvents, tolerance);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
+
         if (layer.MoveYEvents is { Count: > 0 })
             layer.MoveYEvents = _doubleCompressor.EventListCompressSqrt(layer.MoveYEvents, tolerance);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
+
         if (layer.RotateEvents is { Count: > 0 })
             layer.RotateEvents = _doubleCompressor.EventListCompressSlope(layer.RotateEvents, tolerance);
+        progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
+
         if (layer.SpeedEvents is { Count: > 0 })
             layer.SpeedEvents = _floatCompressor.EventListCompressSlope(layer.SpeedEvents, tolerance);
+        progress?.Report(new ToolProgress(1.0));
     }
 
     private static List<EventLayer>? RemoveUnlessLayer(List<EventLayer>? layers)

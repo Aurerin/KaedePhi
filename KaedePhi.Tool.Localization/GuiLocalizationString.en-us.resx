@@ -208,9 +208,6 @@
   <data name="log_step_saved" xml:space="preserve">
     <value>Saved to workspace.</value>
   </data>
-  <data name="log_judge_lines_loaded" xml:space="preserve">
-    <value>Loaded {0} judge lines.</value>
-  </data>
   <data name="log_chart_ready" xml:space="preserve">
     <value>Chart loaded and ready for processing.</value>
   </data>
