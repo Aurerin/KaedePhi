@@ -32,6 +32,16 @@
         <EmbeddedResource Update="CliLocalizationString.zh-hant.resx">
           <DependentUpon>CliLocalizationString.resx</DependentUpon>
         </EmbeddedResource>
+        <EmbeddedResource Update="GuiLocalizationString.resx">
+          <Generator>PublicResXFileCodeGenerator</Generator>
+          <LastGenOutput>GuiLocalizationString.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="GuiLocalizationString.en-us.resx">
+          <DependentUpon>GuiLocalizationString.resx</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="GuiLocalizationString.zh-hant.resx">
+          <DependentUpon>GuiLocalizationString.resx</DependentUpon>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -44,6 +54,11 @@
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
           <DependentUpon>CliLocalizationString.resx</DependentUpon>
+        </Compile>
+        <Compile Update="GuiLocalizationString.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>GuiLocalizationString.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 

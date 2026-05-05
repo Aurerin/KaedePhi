@@ -1,0 +1,26 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:KaedePhi.Tool.Gui.ViewModels"
+             xmlns:views="using:KaedePhi.Tool.Gui.Views"
+             x:Class="KaedePhi.Tool.Gui.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+    <Application.DataTemplates>
+        <DataTemplate DataType="vm:ImportViewModel">
+            <views:ImportPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ToolViewModel">
+            <views:ToolPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ExportViewModel">
+            <views:ExportPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ProcessingViewModel">
+            <views:ProcessingPage/>
+        </DataTemplate>
+    </Application.DataTemplates>
+</Application>

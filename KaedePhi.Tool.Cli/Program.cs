@@ -6,7 +6,7 @@ using KaedePhi.Tool.Cli.Infrastructure;
 
 var writer = new ConsoleWriter();
 #if !Release
-writer.Warn(Strings.cli_warn_unstable_version);
+writer.Warn(string.Format(CliLocalizationString.warn_unstable_version,CliLocalizationString.project_link));
 #endif
 
 var app = new CommandApp();
@@ -28,7 +28,7 @@ app.Configure(config =>
         if (ex is CommandParseException)
         {
             writer.Error(CliLocalizationString.err_unknown);
-            writer.Info(Strings.cli_hint_use_help);
+            writer.Info(CliLocalizationString.hit_help);
             return 1;
         }
 

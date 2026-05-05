@@ -105,6 +105,24 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 咦？是输错命令了吗？可以试试--help哦~.
+        /// </summary>
+        public static string hit_help {
+            get {
+                return ResourceManager.GetString("hit_help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/NuanRMxi-Lazy-Team/KaedePhi.
+        /// </summary>
+        public static string project_link {
+            get {
+                return ResourceManager.GetString("project_link", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 将谱面各通道事件渲染为 PNG 图片.
         /// </summary>
         public static string render_command_desc {
@@ -218,6 +236,15 @@ namespace KaedePhi.Tool.Localization {
         public static string render_warn_nothing {
             get {
                 return ResourceManager.GetString("render_warn_nothing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 您正在使用预发布版本，若发现问题，请及时反馈到 {0} ，感谢支持。.
+        /// </summary>
+        public static string warn_unstable_version {
+            get {
+                return ResourceManager.GetString("warn_unstable_version", resourceCulture);
             }
         }
     }

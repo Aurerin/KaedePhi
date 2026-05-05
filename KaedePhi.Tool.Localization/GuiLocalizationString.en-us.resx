@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="app_title" xml:space="preserve">
+    <value>KaedePhi</value>
+  </data>
+  <data name="import_button" xml:space="preserve">
+    <value>Import Chart File</value>
+  </data>
+  <data name="import_stream_loading" xml:space="preserve">
+    <value>Stream Loading</value>
+  </data>
+  <data name="header_file" xml:space="preserve">
+    <value>File:</value>
+  </data>
+  <data name="header_format" xml:space="preserve">
+    <value>Format:</value>
+  </data>
+  <data name="tool_select_title" xml:space="preserve">
+    <value>Select a Tool</value>
+  </data>
+  <data name="tool_options_title" xml:space="preserve">
+    <value>Tool Options</value>
+  </data>
+  <data name="option_precision" xml:space="preserve">
+    <value>Precision</value>
+  </data>
+  <data name="option_tolerance" xml:space="preserve">
+    <value>Tolerance (%)</value>
+  </data>
+  <data name="option_classic_mode" xml:space="preserve">
+    <value>Classic Mode</value>
+  </data>
+  <data name="option_disable_compress" xml:space="preserve">
+    <value>Disable Compression</value>
+  </data>
+  <data name="option_pixels_per_beat" xml:space="preserve">
+    <value>Pixels Per Beat</value>
+  </data>
+  <data name="option_channel_width" xml:space="preserve">
+    <value>Channel Width</value>
+  </data>
+  <data name="option_samples_per_event" xml:space="preserve">
+    <value>Samples Per Event</value>
+  </data>
+  <data name="option_beat_subdivisions" xml:space="preserve">
+    <value>Beat Subdivisions</value>
+  </data>
+  <data name="btn_run_tool" xml:space="preserve">
+    <value>Run Tool</value>
+  </data>
+  <data name="btn_export_chart" xml:space="preserve">
+    <value>Export Chart</value>
+  </data>
+  <data name="btn_export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="btn_back_to_import" xml:space="preserve">
+    <value>Back to Import</value>
+  </data>
+  <data name="btn_back_to_tools" xml:space="preserve">
+    <value>Back to Tools</value>
+  </data>
+  <data name="export_title" xml:space="preserve">
+    <value>Export Chart</value>
+  </data>
+  <data name="export_output_format" xml:space="preserve">
+    <value>Output Format</value>
+  </data>
+  <data name="export_stream_writing" xml:space="preserve">
+    <value>Stream Writing</value>
+  </data>
+  <data name="processing_title" xml:space="preserve">
+    <value>Processing Chart</value>
+  </data>
+  <data name="processing_error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="processing_log_file" xml:space="preserve">
+    <value>Log file:</value>
+  </data>
+  <data name="processing_success" xml:space="preserve">
+    <value>Operation completed successfully.</value>
+  </data>
+  <data name="step_loading" xml:space="preserve">
+    <value>Loading file</value>
+  </data>
+  <data name="step_detecting" xml:space="preserve">
+    <value>Detecting format</value>
+  </data>
+  <data name="step_to_kpc" xml:space="preserve">
+    <value>Converting to KPC</value>
+  </data>
+  <data name="step_running_tool" xml:space="preserve">
+    <value>Running tool</value>
+  </data>
+  <data name="step_from_kpc" xml:space="preserve">
+    <value>Converting back to original format</value>
+  </data>
+  <data name="step_saving" xml:space="preserve">
+    <value>Saving to workspace</value>
+  </data>
+  <data name="tool_unbind_name" xml:space="preserve">
+    <value>Father Unbind</value>
+  </data>
+  <data name="tool_unbind_desc" xml:space="preserve">
+    <value>Unbind father judge lines to absolute coordinates</value>
+  </data>
+  <data name="tool_layermerge_name" xml:space="preserve">
+    <value>Layer Merge</value>
+  </data>
+  <data name="tool_layermerge_desc" xml:space="preserve">
+    <value>Merge multiple event layers into a single layer</value>
+  </data>
+  <data name="tool_cut_name" xml:space="preserve">
+    <value>Cut Events</value>
+  </data>
+  <data name="tool_cut_desc" xml:space="preserve">
+    <value>Cut events into equal-length segments</value>
+  </data>
+  <data name="tool_fit_name" xml:space="preserve">
+    <value>Fit Events</value>
+  </data>
+  <data name="tool_fit_desc" xml:space="preserve">
+    <value>Fit linear events into easing curves</value>
+  </data>
+  <data name="tool_render_name" xml:space="preserve">
+    <value>Render Events</value>
+  </data>
+  <data name="tool_render_desc" xml:space="preserve">
+    <value>Render chart event layers to images</value>
+  </data>
+  <data name="log_app_starting" xml:space="preserve">
+    <value>Application starting...</value>
+  </data>
+  <data name="log_navigate_import" xml:space="preserve">
+    <value>Navigated to Import page.</value>
+  </data>
+  <data name="log_file_selected" xml:space="preserve">
+    <value>File selected: {0}, stream={1}</value>
+  </data>
+  <data name="log_step_loading" xml:space="preserve">
+    <value>Loading file...</value>
+  </data>
+  <data name="log_step_detected" xml:space="preserve">
+    <value>Detected format: {0}</value>
+  </data>
+  <data name="log_step_converting" xml:space="preserve">
+    <value>Converting to KPC...</value>
+  </data>
+  <data name="log_step_saved" xml:space="preserve">
+    <value>Saved to workspace.</value>
+  </data>
+  <data name="log_judge_lines_loaded" xml:space="preserve">
+    <value>Loaded {0} judge lines.</value>
+  </data>
+  <data name="log_chart_ready" xml:space="preserve">
+    <value>Chart loaded and ready for processing.</value>
+  </data>
+  <data name="log_load_failed" xml:space="preserve">
+    <value>Failed to load file.</value>
+  </data>
+  <data name="log_running_tool" xml:space="preserve">
+    <value>Running tool: {0}</value>
+  </data>
+  <data name="log_tool_completed" xml:space="preserve">
+    <value>Tool "{0}" completed. You can run another tool or export.</value>
+  </data>
+  <data name="log_tool_failed" xml:space="preserve">
+    <value>Tool execution failed.</value>
+  </data>
+  <data name="log_exporting_to" xml:space="preserve">
+    <value>Exporting to: {0}, format: {1}</value>
+  </data>
+  <data name="log_export_done" xml:space="preserve">
+    <value>Export completed.</value>
+  </data>
+  <data name="log_export_failed" xml:space="preserve">
+    <value>Export failed.</value>
+  </data>
+  <data name="log_export_cancelled" xml:space="preserve">
+    <value>Export cancelled.</value>
+  </data>
+  <data name="log_cannot_access_picker" xml:space="preserve">
+    <value>Cannot access file picker.</value>
+  </data>
+  <data name="log_workspace_cleared" xml:space="preserve">
+    <value>Workspace cleared.</value>
+  </data>
+  <data name="log_shutdown" xml:space="preserve">
+    <value>Application shutting down, clearing workspace.</value>
+  </data>
+  <data name="status_exporting" xml:space="preserve">
+    <value>Exporting...</value>
+  </data>
+  <data name="status_processing" xml:space="preserve">
+    <value>Processing...</value>
+  </data>
+  <data name="status_exported_to" xml:space="preserve">
+    <value>Exported to: {0}</value>
+  </data>
+  <data name="status_export_cancelled" xml:space="preserve">
+    <value>Export cancelled.</value>
+  </data>
+  <data name="status_cannot_access_picker" xml:space="preserve">
+    <value>Cannot access file picker.</value>
+  </data>
+  <data name="status_tool_completed" xml:space="preserve">
+    <value>Tool "{0}" completed. You can run another tool or export.</value>
+  </data>
+  <data name="status_error_with_log" xml:space="preserve">
+    <value>Error: {0}. See log: {1}</value>
+  </data>
+  <data name="status_loaded_lines" xml:space="preserve">
+    <value>Loaded {0} judge lines.</value>
+  </data>
+</root>

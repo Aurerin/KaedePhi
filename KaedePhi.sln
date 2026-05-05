@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tool.Cli", "KaedeP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tool.Localization", "KaedePhi.Tool.Localization\KaedePhi.Tool.Localization.csproj", "{E68B6C62-910B-4321-8994-2E04F5939C50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tool.Gui", "KaedePhi.Tool.Gui\KaedePhi.Tool.Gui.csproj", "{13894E81-CE42-46E3-905B-25C651960D2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -39,5 +41,11 @@ Global
 		{E68B6C62-910B-4321-8994-2E04F5939C50}.Release|x64.Build.0 = Release|x64
 		{E68B6C62-910B-4321-8994-2E04F5939C50}.PreRelease|x64.ActiveCfg = PreRelease|x64
 		{E68B6C62-910B-4321-8994-2E04F5939C50}.PreRelease|x64.Build.0 = PreRelease|x64
+		{13894E81-CE42-46E3-905B-25C651960D2F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{13894E81-CE42-46E3-905B-25C651960D2F}.Debug|x64.Build.0 = Debug|Any CPU
+		{13894E81-CE42-46E3-905B-25C651960D2F}.Release|x64.ActiveCfg = Release|Any CPU
+		{13894E81-CE42-46E3-905B-25C651960D2F}.Release|x64.Build.0 = Release|Any CPU
+		{13894E81-CE42-46E3-905B-25C651960D2F}.PreRelease|x64.ActiveCfg = Debug|Any CPU
+		{13894E81-CE42-46E3-905B-25C651960D2F}.PreRelease|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

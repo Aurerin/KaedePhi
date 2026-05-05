@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:KaedePhi.Tool.Gui.ViewModels"
+             xmlns:loc="using:KaedePhi.Tool.Localization"
+             x:Class="KaedePhi.Tool.Gui.Views.ImportPage"
+             x:DataType="vm:ImportViewModel">
+
+    <Grid>
+        <!-- Center import button -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+            <TextBlock Text="{x:Static loc:GuiLocalizationString.app_title}"
+                       FontSize="36" FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource SystemAccentColor}"/>
+            <TextBlock Text="{x:Static loc:GuiLocalizationString.app_subtitle}"
+                       FontSize="14" Opacity="0.6"
+                       HorizontalAlignment="Center"/>
+            <Button Classes="accent"
+                    HorizontalAlignment="Center"
+                    Padding="40,16"
+                    FontSize="16"
+                    Click="OnImportClick">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="&#xE8E5;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="20"/>
+                    <TextBlock Text="{x:Static loc:GuiLocalizationString.import_button}"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Bottom-right stream checkbox -->
+        <CheckBox Content="{x:Static loc:GuiLocalizationString.import_stream_loading}"
+                  IsChecked="{Binding UseStream}"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Margin="24"/>
+    </Grid>
+</UserControl>

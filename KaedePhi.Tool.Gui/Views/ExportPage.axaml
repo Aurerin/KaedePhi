@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:KaedePhi.Tool.Gui.ViewModels"
+             xmlns:loc="using:KaedePhi.Tool.Localization"
+             x:Class="KaedePhi.Tool.Gui.Views.ExportPage"
+             x:DataType="vm:ExportViewModel">
+
+    <Grid>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1" CornerRadius="12" Padding="40,32" MinWidth="400">
+            <StackPanel Spacing="20">
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="&#xE898;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="24" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static loc:GuiLocalizationString.export_title}" FontSize="22" FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Static loc:GuiLocalizationString.export_output_format}" FontSize="13" Opacity="0.7"/>
+                    <ComboBox ItemsSource="{Binding AvailableFormats}"
+                              SelectedItem="{Binding SelectedFormat}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <CheckBox Content="{x:Static loc:GuiLocalizationString.export_stream_writing}" IsChecked="{Binding UseStream}"/>
+
+                <Button Classes="accent" Padding="32,10" FontSize="14"
+                        HorizontalAlignment="Center"
+                        Content="{x:Static loc:GuiLocalizationString.btn_export}"
+                        Click="OnExportClick"
+                        IsEnabled="{Binding !IsExporting}"/>
+
+                <TextBlock Text="{Binding StatusText}" FontSize="12" Opacity="0.7"
+                           HorizontalAlignment="Center" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Return to import button -->
+        <Button HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                Margin="24" Padding="16,8"
+                Click="OnReturnClick">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#xE72B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           FontSize="14" VerticalAlignment="Center"/>
+                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>
