@@ -23,6 +23,12 @@
                 <ProgressBar Value="{Binding Progress}" Maximum="100" Height="8"
                              CornerRadius="4"/>
 
+                <!-- Tool sub-progress bar -->
+                <StackPanel IsVisible="{Binding !IsCompleted}" Spacing="4">
+                    <ProgressBar Value="{Binding ToolProgressValue}" Maximum="100" Height="4"
+                                 CornerRadius="2" Opacity="0.7"/>
+                </StackPanel>
+
                 <!-- Current step -->
                 <StackPanel Spacing="4" HorizontalAlignment="Center">
                     <TextBlock Text="{Binding CurrentStep}" FontWeight="SemiBold" FontSize="14"

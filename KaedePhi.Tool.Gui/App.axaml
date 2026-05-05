@@ -22,5 +22,8 @@
         <DataTemplate DataType="vm:ProcessingViewModel">
             <views:ProcessingPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:SettingsViewModel">
+            <views:SettingsPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 </Application>

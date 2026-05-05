@@ -78,7 +78,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
 
     /// <inheritdoc/>
     public List<Kpc.Event<TPayload>> EventListCompressSqrt(
-        List<Kpc.Event<TPayload>>? events, double tolerance)
+        List<Kpc.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         ValidateParams(tolerance);
         if (events == null || events.Count == 0) return [];
@@ -101,14 +101,16 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
             }
 
             compressed.Add(currentEvent);
+            progress?.Report(new ToolProgress((double)i / events.Count));
         }
 
+        progress?.Report(new ToolProgress(1.0));
         return compressed;
     }
 
     /// <inheritdoc/>
     public List<Kpc.Event<TPayload>> EventListCompressSlope(
-        List<Kpc.Event<TPayload>>? events, double tolerance)
+        List<Kpc.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         ValidateParams(tolerance);
         if (events == null || events.Count == 0) return [];
@@ -131,8 +133,10 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
             }
 
             compressed.Add(currentEvent);
+            progress?.Report(new ToolProgress((double)i / events.Count));
         }
 
+        progress?.Report(new ToolProgress(1.0));
         return compressed;
     }
 

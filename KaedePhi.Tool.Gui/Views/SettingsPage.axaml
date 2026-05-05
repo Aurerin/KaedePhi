@@ -1,0 +1,150 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:KaedePhi.Tool.Gui.ViewModels"
+             x:Class="KaedePhi.Tool.Gui.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel">
+
+    <Grid RowDefinitions="*,Auto,Auto">
+        <Border Grid.Row="0" Padding="24">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="24" Width="560" HorizontalAlignment="Left">
+                    <!-- Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="24" VerticalAlignment="Center"/>
+                    <TextBlock Text="默认设置" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- General -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="最大日志文件数 (Max Log Files)" FontSize="12" Opacity="0.7"/>
+                    <NumericUpDown Value="{Binding MaxLogFiles}" Minimum="1" Maximum="100"
+                                   Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Unbind -->
+                    <Expander Header="判定线解绑 (Unbind)">
+                        <StackPanel Spacing="12" Margin="0,12,0,0">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="精度 (Precision)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding UnbindPrecision}" Minimum="1" Maximum="10000"
+                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="容差 (Tolerance)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding UnbindTolerance}" Minimum="0" Maximum="100"
+                                               Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <CheckBox Content="经典模式 (Classic Mode)" IsChecked="{Binding UnbindClassicMode}"/>
+                            <CheckBox Content="禁用压缩 (Disable Compress)" IsChecked="{Binding UnbindDisableCompress}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- LayerMerge -->
+                    <Expander Header="层级合并 (Layer Merge)">
+                        <StackPanel Spacing="12" Margin="0,12,0,0">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="精度 (Precision)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding LayerMergePrecision}" Minimum="1" Maximum="10000"
+                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="容差 (Tolerance)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding LayerMergeTolerance}" Minimum="0" Maximum="100"
+                                               Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <CheckBox Content="经典模式 (Classic Mode)" IsChecked="{Binding LayerMergeClassicMode}"/>
+                            <CheckBox Content="禁用压缩 (Disable Compress)" IsChecked="{Binding LayerMergeDisableCompress}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Cut -->
+                    <Expander Header="事件切割 (Cut)">
+                        <StackPanel Spacing="12" Margin="0,12,0,0">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="精度 (Precision)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding CutPrecision}" Minimum="1" Maximum="10000"
+                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="容差 (Tolerance)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding CutTolerance}" Minimum="0" Maximum="100"
+                                               Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <CheckBox Content="禁用压缩 (Disable Compress)" IsChecked="{Binding CutDisableCompress}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Fit -->
+                    <Expander Header="事件拟合 (Fit)">
+                        <StackPanel Spacing="12" Margin="0,12,0,0">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="容差 (Tolerance)" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding FitTolerance}" Minimum="0" Maximum="100"
+                                               Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Render -->
+                    <Expander Header="谱面渲染 (Render)">
+                        <StackPanel Spacing="12" Margin="0,12,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="每拍像素 (Pixels Per Beat)" FontSize="12" Opacity="0.7"/>
+                                    <NumericUpDown Value="{Binding RenderPixelsPerBeat}" Minimum="10" Maximum="1000"
+                                                   Increment="10" FormatString="F0" Width="140"/>
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="通道宽度 (Channel Width)" FontSize="12" Opacity="0.7"/>
+                                    <NumericUpDown Value="{Binding RenderChannelWidth}" Minimum="50" Maximum="1000"
+                                                   Increment="10" FormatString="F0" Width="140"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="采样点数 (Samples Per Event)" FontSize="12" Opacity="0.7"/>
+                                    <NumericUpDown Value="{Binding RenderSamplesPerEvent}" Minimum="4" Maximum="1024"
+                                                   Increment="4" FormatString="F0" Width="140"/>
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="拍细分 (Beat Subdivisions)" FontSize="12" Opacity="0.7"/>
+                                    <NumericUpDown Value="{Binding RenderBeatSubdivisions}" Minimum="1" Maximum="16"
+                                                   Increment="1" FormatString="F0" Width="140"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Status bar -->
+        <Border Grid.Row="1" Padding="16,8"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0">
+            <TextBlock Text="{Binding StatusText}" FontSize="12" Opacity="0.7"/>
+        </Border>
+
+        <!-- Bottom buttons -->
+        <Border Grid.Row="2" Padding="16,12"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <Button Padding="20,8" Click="OnReturnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="&#xE72B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="13" VerticalAlignment="Center"/>
+                        <TextBlock Text="返回"/>
+                    </StackPanel>
+                </Button>
+                <Button Padding="20,8" Click="OnResetClick">
+                    <TextBlock Text="恢复默认"/>
+                </Button>
+                <Button Classes="accent" Padding="24,8" FontSize="14" Click="OnSaveClick">
+                    <TextBlock Text="保存设置"/>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

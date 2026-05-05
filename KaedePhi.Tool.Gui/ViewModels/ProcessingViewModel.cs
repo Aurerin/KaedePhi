@@ -9,6 +9,7 @@ namespace KaedePhi.Tool.Gui.ViewModels;
 public sealed class ProcessingViewModel : INotifyPropertyChanged
 {
     private double _progress;
+    private double _toolProgressValue;
     private string _currentStep = string.Empty;
     private string _statusMessage = string.Empty;
     private bool _isCompleted;
@@ -30,6 +31,12 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
     {
         get => _progress;
         set { _progress = value; OnPropertyChanged(); }
+    }
+
+    public double ToolProgressValue
+    {
+        get => _toolProgressValue;
+        set { _toolProgressValue = value; OnPropertyChanged(); }
     }
 
     public string CurrentStep
@@ -82,6 +89,21 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
         CurrentStep = Steps[index];
         StatusMessage = string.IsNullOrEmpty(detail) ? Steps[index] : detail;
         Progress = (double)(index + 1) / Steps.Count * 100;
+        if (index != 3) ToolProgressValue = 0;
+    }
+
+    public void SetToolProgress(double toolProgress, double overallProgress, string? detail = null)
+    {
+        ToolProgressValue = Math.Clamp(toolProgress, 0, 1) * 100;
+        if (overallProgress >= 0)
+        {
+            const int toolStepIndex = 3;
+            var stepStart = (double)toolStepIndex / Steps.Count * 100;
+            var stepEnd = (double)(toolStepIndex + 1) / Steps.Count * 100;
+            Progress = stepStart + Math.Clamp(overallProgress, 0, 1) * (stepEnd - stepStart);
+        }
+        if (!string.IsNullOrEmpty(detail))
+            StatusMessage = detail;
     }
 
     public void SetCompleted(string message)

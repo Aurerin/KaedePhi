@@ -19,15 +19,16 @@
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="YamlDotNet" Version="17.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\KaedePhi.Core\KaedePhi.Core.csproj"/>
-        <ProjectReference Include="..\KaedePhi.Tool\KaedePhi.Tool.csproj"/>
-        <ProjectReference Include="..\KaedePhi.Tool.Localization\KaedePhi.Tool.Localization.csproj"/>
+        <ProjectReference Include="..\KaedePhi.Core\KaedePhi.Core.csproj" />
+        <ProjectReference Include="..\KaedePhi.Tool\KaedePhi.Tool.csproj" />
+        <ProjectReference Include="..\KaedePhi.Tool.Localization\KaedePhi.Tool.Localization.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="..\PhiFanmadeToolIcon.png" Link="Assets\PhiFanmadeToolIcon.png"/>
+        <AvaloniaResource Include="..\PhiFanmadeToolIcon.png" Link="Assets\PhiFanmadeToolIcon.png" />
     </ItemGroup>
 </Project>

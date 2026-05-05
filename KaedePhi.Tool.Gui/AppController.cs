@@ -1,8 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
@@ -15,27 +17,32 @@ internal sealed class AppController
     private readonly MainViewModel _main;
     private readonly GuiChartService _chart;
     private readonly LogService _log;
+    private readonly ConfigService _config;
     private readonly Window _window;
 
     private readonly ImportViewModel _importVm;
     private readonly ToolViewModel _toolVm;
     private readonly ExportViewModel _exportVm;
     private readonly ProcessingViewModel _processingVm;
+    private readonly SettingsViewModel _settingsVm;
 
     private ChartType _detectedType;
     private CancellationTokenSource? _cts;
+    private bool _isFileProcessing;
 
-    public AppController(MainViewModel main, GuiChartService chart, LogService log, Window window)
+    public AppController(MainViewModel main, GuiChartService chart, LogService log, ConfigService config, Window window)
     {
         _main = main;
         _chart = chart;
         _log = log;
+        _config = config;
         _window = window;
 
         _importVm = new ImportViewModel();
         _toolVm = new ToolViewModel();
         _exportVm = new ExportViewModel();
         _processingVm = new ProcessingViewModel();
+        _settingsVm = new SettingsViewModel(config);
 
         WireEvents();
     }
@@ -50,11 +57,20 @@ internal sealed class AppController
         _importVm.FileSelected += OnFileSelected;
         _toolVm.RequestRun += OnToolRun;
         _toolVm.RequestExport += OnToolExport;
+        _toolVm.RequestSettings += NavigateToSettings;
+        _toolVm.PropertyChanged += OnToolVmPropertyChanged;
         _exportVm.RequestExport += OnExportExecute;
         _exportVm.RequestReturnToImport += OnReturnToImport;
         _processingVm.RequestReturnToTools += NavigateToTool;
         _processingVm.RequestReturnToImport += OnReturnToImport;
         _processingVm.RequestGoToExport += NavigateToExport;
+        _settingsVm.RequestReturnToTools += OnReturnFromSettings;
+    }
+
+    private void OnToolVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ToolViewModel.SelectedTool) && _toolVm.SelectedTool != null)
+            _toolVm.ApplyConfigDefaults(_config.Config);
     }
 
     private void NavigateToImport()
@@ -67,6 +83,7 @@ internal sealed class AppController
 
     private void NavigateToTool()
     {
+        _toolVm.StatusText = string.Empty;
         _main.CurrentPage = _toolVm;
     }
 
@@ -77,6 +94,18 @@ internal sealed class AppController
         _exportVm.StatusText = string.Empty;
         _exportVm.IsExporting = false;
         _main.CurrentPage = _exportVm;
+    }
+
+    private void NavigateToSettings()
+    {
+        _settingsVm.StatusText = string.Empty;
+        _main.CurrentPage = _settingsVm;
+    }
+
+    private void OnReturnFromSettings()
+    {
+        _toolVm.ApplyConfigDefaults(_config.Config);
+        NavigateToTool();
     }
 
     private void NavigateToProcessing()
@@ -98,7 +127,8 @@ internal sealed class AppController
 
     private async void OnFileSelected(string filePath, bool useStream)
     {
-        _log.Info(string.Format(log_file_selected, filePath, useStream));
+        if (_isFileProcessing) return;
+        _isFileProcessing = true;
 
         try
         {
@@ -117,6 +147,10 @@ internal sealed class AppController
         catch (Exception ex)
         {
             _log.Error(log_load_failed, ex);
+        }
+        finally
+        {
+            _isFileProcessing = false;
         }
     }
 
@@ -147,28 +181,33 @@ internal sealed class AppController
 
             // Step 3: Run tool
             _processingVm.SetStep(3, string.Format(log_running_tool, toolId));
+            var toolProgress = new Progress<ToolProgress>(p =>
+            {
+                var overall = p.OverallPercentage >= 0 ? p.OverallPercentage : p.Percentage;
+                _processingVm.SetToolProgress(p.Percentage, overall, p.Detail);
+            });
             await Task.Run(() =>
             {
                 switch (toolId)
                 {
                     case "unbind":
                         _chart.RunFatherUnbind(kpcChart, _toolVm.Precision, _toolVm.Tolerance,
-                            _toolVm.ClassicMode, _toolVm.DisableCompress);
+                            _toolVm.ClassicMode, _toolVm.DisableCompress, toolProgress);
                         break;
                     case "layermerge":
                         _chart.RunLayerMerge(kpcChart, _toolVm.Precision, _toolVm.Tolerance,
-                            _toolVm.ClassicMode, _toolVm.DisableCompress);
+                            _toolVm.ClassicMode, _toolVm.DisableCompress, toolProgress);
                         break;
                     case "cut":
                         _chart.RunCutEvent(kpcChart, _toolVm.Precision, _toolVm.Tolerance,
-                            _toolVm.DisableCompress);
+                            _toolVm.DisableCompress, toolProgress);
                         break;
                     case "fit":
-                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance);
+                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, toolProgress);
                         break;
                     case "render":
                         _chart.RunRender(kpcChart, _toolVm.PixelsPerBeat,
-                            _toolVm.ChannelWidth, _toolVm.SamplesPerEvent, _toolVm.BeatSubdivisions);
+                            _toolVm.ChannelWidth, _toolVm.SamplesPerEvent, _toolVm.BeatSubdivisions, toolProgress);
                         break;
                 }
             }, _cts.Token);

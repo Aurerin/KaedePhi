@@ -28,36 +28,40 @@ public class KpcJudgeLineUnbinder : LoggableBase, IJudgeLineUnbinder<JudgeLine>
     /// <inheritdoc/>
     public JudgeLine FatherUnbind(
         int targetJudgeLineIndex, List<JudgeLine> allJudgeLines,
-        double precision)
+        double precision,
+        IProgress<ToolProgress>? progress = null)
         => FatherUnbindProcessor.FatherUnbind(
             targetJudgeLineIndex, allJudgeLines, precision,
             FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines),
-            LogInfo, LogWarning, LogError, LogDebug);
+            LogInfo, LogWarning, LogError, LogDebug, progress);
 
     /// <inheritdoc/>
     public JudgeLine FatherUnbind(
         int targetJudgeLineIndex, List<JudgeLine> allJudgeLines, CoordinateProfile renderProfile,
-        double precision)
+        double precision,
+        IProgress<ToolProgress>? progress = null)
     {
         using var _ = FatherUnbindHelpers.UseRenderProfile(renderProfile);
-        return FatherUnbind(targetJudgeLineIndex, allJudgeLines, precision);
+        return FatherUnbind(targetJudgeLineIndex, allJudgeLines, precision, progress);
     }
 
     /// <inheritdoc/>
     public JudgeLine FatherUnbindPlus(
         int targetJudgeLineIndex, List<JudgeLine> allJudgeLines,
-        double precision, double tolerance)
+        double precision, double tolerance,
+        IProgress<ToolProgress>? progress = null)
         => FatherUnbindProcessor.FatherUnbindPlus(
             targetJudgeLineIndex, allJudgeLines, precision, tolerance,
             FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines),
-            LogInfo, LogWarning, LogError, LogDebug);
+            LogInfo, LogWarning, LogError, LogDebug, progress);
 
     /// <inheritdoc/>
     public JudgeLine FatherUnbindPlus(
         int targetJudgeLineIndex, List<JudgeLine> allJudgeLines, CoordinateProfile renderProfile,
-        double precision, double tolerance)
+        double precision, double tolerance,
+        IProgress<ToolProgress>? progress = null)
     {
         using var _ = FatherUnbindHelpers.UseRenderProfile(renderProfile);
-        return FatherUnbindPlus(targetJudgeLineIndex, allJudgeLines, precision, tolerance);
+        return FatherUnbindPlus(targetJudgeLineIndex, allJudgeLines, precision, tolerance, progress);
     }
 }
