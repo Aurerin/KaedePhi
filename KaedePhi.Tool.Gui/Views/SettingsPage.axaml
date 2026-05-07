@@ -10,7 +10,7 @@
                 <StackPanel Spacing="24" Width="560" HorizontalAlignment="Left">
                     <!-- Header -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        <TextBlock Text="&#xf013;" Classes="fa-icon"
                                    FontSize="24" VerticalAlignment="Center"/>
                     <TextBlock Text="默认设置" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -133,7 +133,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
                 <Button Padding="20,8" Click="OnReturnClick">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="&#xE72B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        <TextBlock Text="&#xf060;" Classes="fa-icon"
                                    FontSize="13" VerticalAlignment="Center"/>
                         <TextBlock Text="返回"/>
                     </StackPanel>

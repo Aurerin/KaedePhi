@@ -54,13 +54,13 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
     public bool IsCompleted
     {
         get => _isCompleted;
-        set { _isCompleted = value; OnPropertyChanged(); }
+        set { _isCompleted = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowSuccessIcon)); }
     }
 
     public bool HasError
     {
         get => _hasError;
-        set { _hasError = value; OnPropertyChanged(); }
+        set { _hasError = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowSuccessIcon)); }
     }
 
     public string ErrorMessage
@@ -74,6 +74,8 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
         get => _logFilePath;
         set { _logFilePath = value; OnPropertyChanged(); }
     }
+
+    public bool ShowSuccessIcon => IsCompleted && !HasError;
 
     public event Action? RequestReturnToTools;
     public event Action? RequestReturnToImport;

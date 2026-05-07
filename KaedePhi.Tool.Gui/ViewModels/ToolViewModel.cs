@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using KaedePhi.Tool.Gui.Models;
+using static KaedePhi.Tool.Gui.Models.FA;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
 namespace KaedePhi.Tool.Gui.ViewModels;
@@ -41,7 +42,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_unbind_name,
             Description = tool_unbind_desc,
-            IconGlyph = "\uE71B",
+            IconGlyph = Unbind,
             ToolId = "unbind",
             HasPrecision = true,
             HasTolerance = true,
@@ -52,7 +53,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_layermerge_name,
             Description = tool_layermerge_desc,
-            IconGlyph = "\uE74C",
+            IconGlyph = Merge,
             ToolId = "layermerge",
             HasPrecision = true,
             HasTolerance = true,
@@ -63,7 +64,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_cut_name,
             Description = tool_cut_desc,
-            IconGlyph = "\uE8C6",
+            IconGlyph = Cut,
             ToolId = "cut",
             HasPrecision = true,
             HasTolerance = true,
@@ -73,7 +74,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_fit_name,
             Description = tool_fit_desc,
-            IconGlyph = "\uE8A5",
+            IconGlyph = Fix,
             ToolId = "fit",
             HasTolerance = true,
             DefaultTolerance = 0.5
@@ -82,7 +83,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             Name = tool_render_name,
             Description = tool_render_desc,
-            IconGlyph = "\uE8B9",
+            IconGlyph = Image,
             ToolId = "render",
             HasRenderOptions = true
         }
