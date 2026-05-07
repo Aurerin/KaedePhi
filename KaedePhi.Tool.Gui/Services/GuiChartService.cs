@@ -32,7 +32,7 @@ public sealed class GuiChartService
     public GuiChartService(LogService log)
     {
         _log = log;
-        _workspaceRoot = Path.Combine(AppContext.BaseDirectory, "workspaces");
+        _workspaceRoot = AppPaths.GetDirectory("workspaces");
         _workspaceDir = Path.Combine(_workspaceRoot, WorkspaceId);
         _workspaceFilePath = Path.Combine(_workspaceDir, WorkspaceFileName);
         Directory.CreateDirectory(_workspaceDir);

@@ -79,8 +79,9 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 特殊事件层（故事板）
         /// </summary>
-        [JsonProperty("extended", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public ExtendLayer Extended = new ExtendLayer();
+        [JsonProperty("extended", DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore)]
+        public ExtendLayer Extended = new();
 
         /// <summary>
         /// 判定线的Z轴顺序

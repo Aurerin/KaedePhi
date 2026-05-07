@@ -16,8 +16,7 @@ public sealed class ConfigService
 
     public ConfigService()
     {
-        var configDir = Path.Combine(AppContext.BaseDirectory, "config");
-        Directory.CreateDirectory(configDir);
+        var configDir = AppPaths.GetDirectory("config");
         _configPath = Path.Combine(configDir, "config.yaml");
 
         _serializer = new SerializerBuilder()

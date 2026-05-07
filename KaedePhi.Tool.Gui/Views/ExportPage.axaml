@@ -12,7 +12,7 @@
                 BorderThickness="1" CornerRadius="12" Padding="40,32" MinWidth="400">
             <StackPanel Spacing="20">
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                    <TextBlock Text="&#xE898;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                    <TextBlock Text="&#xf56e;" Classes="fa-icon"
                                FontSize="24" VerticalAlignment="Center"/>
                     <TextBlock Text="{x:Static loc:GuiLocalizationString.export_title}" FontSize="22" FontWeight="SemiBold"/>
                 </StackPanel>
@@ -42,7 +42,7 @@
                 Margin="24" Padding="16,8"
                 Click="OnReturnClick">
             <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#xE72B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                <TextBlock Text="&#xf060;" Classes="fa-icon"
                            FontSize="14" VerticalAlignment="Center"/>
                 <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
             </StackPanel>

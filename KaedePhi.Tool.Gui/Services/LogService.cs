@@ -12,9 +12,8 @@ public sealed class LogService
 
     public LogService(int maxLogFiles = 5)
     {
-        _logDir = Path.Combine(AppContext.BaseDirectory, "logs");
+        _logDir = AppPaths.GetDirectory("logs");
         _maxLogFiles = maxLogFiles;
-        Directory.CreateDirectory(_logDir);
     }
 
     public string LogDirectory => _logDir;

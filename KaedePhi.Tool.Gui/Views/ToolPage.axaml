@@ -10,7 +10,7 @@
         <!-- Header: file info -->
         <Border Grid.Row="0" Background="{DynamicResource SystemAccentColor}" Padding="16,10">
             <StackPanel Orientation="Horizontal" Spacing="16">
-                <TextBlock Text="&#xE8E5;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18"
+                <TextBlock Text="&#xf07c;" Classes="fa-icon" FontSize="18"
                            VerticalAlignment="Center" Foreground="White"/>
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="{x:Static loc:GuiLocalizationString.header_file}" Foreground="White" Opacity="0.8" VerticalAlignment="Center"/>
@@ -61,7 +61,8 @@
                             <StackPanel Spacing="6">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="{Binding IconGlyph}"
-                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               FontFamily="avares://KaedePhi.Tool.Gui/Assets/Fonts/fa-solid-900.ttf#Font Awesome 6 Free"
+                                               FontWeight="Bold"
                                                FontSize="20" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14"
                                                VerticalAlignment="Center"/>
@@ -80,7 +81,7 @@
                         BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,8,0,0">
                     <StackPanel Spacing="8">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="&#xE9F5;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            <TextBlock Text="&#xf1de;" Classes="fa-icon"
                                        FontSize="16" VerticalAlignment="Center"/>
                             <TextBlock Text="{x:Static loc:GuiLocalizationString.tool_options_title}" FontWeight="SemiBold" FontSize="14"/>
                         </StackPanel>
@@ -158,7 +159,7 @@
                 <Button Grid.Column="0" Padding="12,8" Click="OnSettingsClick"
                         IsEnabled="{Binding !IsProcessing}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        <TextBlock Text="&#xf013;" Classes="fa-icon"
                                    FontSize="14" VerticalAlignment="Center"/>
                         <TextBlock Text="设置" VerticalAlignment="Center"/>
                     </StackPanel>

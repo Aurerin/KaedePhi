@@ -14,8 +14,33 @@
 
                 <!-- Header -->
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                    <TextBlock Text="&#xE71C;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                               FontSize="24" VerticalAlignment="Center"/>
+                    <!-- Processing spinner (animated) -->
+                    <TextBlock Text="&#xf110;" Classes="fa-icon" Name="SpinnerIcon"
+                               FontSize="24" VerticalAlignment="Center"
+                               IsVisible="{Binding !IsCompleted}">
+                        <TextBlock.Styles>
+                            <Style Selector="TextBlock#SpinnerIcon">
+                                <Style.Animations>
+                                    <Animation Duration="0:0:1" IterationCount="Infinite">
+                                        <KeyFrame Cue="0%">
+                                            <Setter Property="RotateTransform.Angle" Value="0"/>
+                                        </KeyFrame>
+                                        <KeyFrame Cue="100%">
+                                            <Setter Property="RotateTransform.Angle" Value="360"/>
+                                        </KeyFrame>
+                                    </Animation>
+                                </Style.Animations>
+                            </Style>
+                        </TextBlock.Styles>
+                    </TextBlock>
+                    <!-- Success icon (completed without error) -->
+                    <TextBlock Text="&#xf058;" Classes="fa-icon"
+                               FontSize="24" VerticalAlignment="Center" Foreground="Green"
+                               IsVisible="{Binding ShowSuccessIcon}"/>
+                    <!-- Error icon (completed with error) -->
+                    <TextBlock Text="&#xf057;" Classes="fa-icon"
+                               FontSize="24" VerticalAlignment="Center" Foreground="Red"
+                               IsVisible="{Binding HasError}"/>
                     <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_title}" FontSize="22" FontWeight="SemiBold"/>
                 </StackPanel>
 
@@ -42,7 +67,7 @@
                         Background="#33FF0000" CornerRadius="8" Padding="16,12">
                     <StackPanel Spacing="8">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="&#xEA39;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            <TextBlock Text="&#xf06a;" Classes="fa-icon"
                                        FontSize="16" Foreground="Red" VerticalAlignment="Center"/>
                             <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_error}" FontWeight="SemiBold" FontSize="14" Foreground="Red"/>
                         </StackPanel>
@@ -67,7 +92,7 @@
                         <Button Padding="20,8" Click="OnReturnToToolsClick"
                                 IsVisible="{Binding !HasError}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="&#xE72B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                <TextBlock Text="&#xf060;" Classes="fa-icon"
                                            FontSize="13" VerticalAlignment="Center"/>
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_tools}"/>
                             </StackPanel>
@@ -75,7 +100,7 @@
                         <Button Padding="20,8" Click="OnGoToExportClick"
                                 IsVisible="{Binding !HasError}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="&#xE898;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                <TextBlock Text="&#xf56e;" Classes="fa-icon"
                                            FontSize="13" VerticalAlignment="Center"/>
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_export_chart}"/>
                             </StackPanel>
@@ -84,7 +109,7 @@
                         <Button Padding="20,8" Click="OnReturnToImportClick"
                                 IsVisible="{Binding HasError}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="&#xE8E5;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                <TextBlock Text="&#xf07c;" Classes="fa-icon"
                                            FontSize="13" VerticalAlignment="Center"/>
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
                             </StackPanel>
