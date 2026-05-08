@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
 
@@ -26,7 +27,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 判定线事件层列表
         /// </summary>
         [JsonProperty("eventLayers", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<EventLayer> EventLayers = new List<EventLayer>(); // 事件层
+        public List<EventLayer> EventLayers = new(); // 事件层
 
         /// <summary>
         /// 父级判定线索引，-1表示无父级
@@ -50,11 +51,11 @@ namespace KaedePhi.Core.RePhiEdit
             set => _notes = value ?? new List<Note>();
         } // note列表
 
-        private List<Note> _notes = new List<Note>();
+        private List<Note> _notes = new();
 
 
         /// <summary>
-        /// Note总数量(包含 FakeNote，不包含任何形式的Hold)。
+        /// Note总数量(包含 FakeNote，不包含Hold)。
         /// 为什么？RePhiEdit就是这样设计的。。。
         /// </summary>
         [JsonProperty("numOfNotes")]
@@ -64,15 +65,7 @@ namespace KaedePhi.Core.RePhiEdit
             get
             {
                 // Note总数量(包含 FakeNote，不包含任何形式的Hold)
-                int count = 0;
-                foreach (var note in Notes)
-                {
-                    if (note.Type == NoteType.Hold)
-                        continue;
-                    count++;
-                }
-
-                return count;
+                return Notes.Count(note => note.Type != NoteType.Hold);
             }
         }
 
@@ -93,7 +86,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         [JsonProperty("attachUI", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(AttachUiConverter))]
-        public AttachUi? AttachUi = null; // 绑定UI名，当不绑定时为null
+        public AttachUi? AttachUi; // 绑定UI名，当不绑定时为null
 
         /// <summary>
         /// 判定线纹理是否为GIF
@@ -103,7 +96,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 所属组
         /// </summary>
-        [JsonProperty("Group")] public int Group = 0; // 绑定组
+        [JsonProperty("Group")] public int Group; // 绑定组
 
         /// <summary>
         /// 当前判定线相对于当前BPM的因子。判定线BPM = 谱面BPM / BpmFactor
@@ -113,7 +106,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 是否跟随父线旋转
         /// </summary>
-        [JsonProperty("rotateWithFather")] public bool RotateWithFather = false; // 是否随父级旋转
+        [JsonProperty("rotateWithFather")] public bool RotateWithFather; // 是否随父级旋转
 
         /// <summary>
         /// Position（X） Control 控制点列表
@@ -123,10 +116,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                if (_positionControls == null)
-                {
-                    _positionControls = new List<XControl>();
-                }
+                _positionControls ??= new List<XControl>();
 
                 return _positionControls;
             }
@@ -143,10 +133,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                if (_alphaControls == null)
-                {
-                    _alphaControls = new List<AlphaControl>();
-                }
+                _alphaControls ??= new List<AlphaControl>();
 
                 return _alphaControls;
             }
@@ -163,10 +150,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                if (_sizeControls == null)
-                {
-                    _sizeControls = new List<SizeControl>();
-                }
+                _sizeControls ??= new List<SizeControl>();
 
                 return _sizeControls;
             }
@@ -183,10 +167,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                if (_skewControls == null)
-                {
-                    _skewControls = new List<SkewControl>();
-                }
+                _skewControls ??= new List<SkewControl>();
 
                 return _skewControls;
             }
@@ -203,10 +184,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                if (_yControls == null)
-                {
-                    _yControls = new List<YControl>();
-                }
+                _yControls ??= new List<YControl>();
 
                 return _yControls;
             }
