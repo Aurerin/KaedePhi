@@ -7,9 +7,9 @@ namespace KaedePhi.Core.RePhiEdit
 {
     public abstract class ControlBase
     {
-        [JsonProperty("easing")] public Easing Easing = new Easing(1);
+        [JsonProperty("easing")] public Easing Easing = new(1);
 
-        [JsonProperty("x")] public float X = 0.0f;
+        [JsonProperty("x")] public float X;
 
         public abstract ControlBase Clone();
     }
@@ -25,13 +25,13 @@ namespace KaedePhi.Core.RePhiEdit
             {
                 return new List<AlphaControl>
                 {
-                    new AlphaControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Alpha = 1.0f,
                         X = 0.0f
                     },
-                    new AlphaControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Alpha = 1.0f,
@@ -44,7 +44,7 @@ namespace KaedePhi.Core.RePhiEdit
         public override ControlBase Clone()
         {
             // 深拷贝
-            return new AlphaControl()
+            return new AlphaControl
             {
                 Easing = new Easing(Easing),
                 X = X,
@@ -64,13 +64,13 @@ namespace KaedePhi.Core.RePhiEdit
             {
                 return new List<XControl>
                 {
-                    new XControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Pos = 1.0f,
                         X = 0.0f
                     },
-                    new XControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Pos = 1.0f,
@@ -83,7 +83,7 @@ namespace KaedePhi.Core.RePhiEdit
         public override ControlBase Clone()
         {
             // 深拷贝
-            return new XControl()
+            return new XControl
             {
                 Easing = new Easing(Easing),
                 X = X,
@@ -103,13 +103,13 @@ namespace KaedePhi.Core.RePhiEdit
             {
                 return new List<SizeControl>
                 {
-                    new SizeControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Size = 1.0f,
                         X = 0.0f
                     },
-                    new SizeControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Size = 1.0f,
@@ -122,7 +122,7 @@ namespace KaedePhi.Core.RePhiEdit
         public override ControlBase Clone()
         {
             // 深拷贝
-            return new SizeControl()
+            return new SizeControl
             {
                 Easing = new Easing(Easing),
                 X = X,
@@ -142,13 +142,13 @@ namespace KaedePhi.Core.RePhiEdit
             {
                 return new List<SkewControl>
                 {
-                    new SkewControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Skew = 0.0f,
                         X = 0.0f
                     },
-                    new SkewControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Skew = 0.0f,
@@ -161,7 +161,7 @@ namespace KaedePhi.Core.RePhiEdit
         public override ControlBase Clone()
         {
             // 深拷贝
-            return new SkewControl()
+            return new SkewControl
             {
                 Easing = new Easing(Easing),
                 X = X,
@@ -181,13 +181,13 @@ namespace KaedePhi.Core.RePhiEdit
             {
                 return new List<YControl>
                 {
-                    new YControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Y = 1.0f,
                         X = 0.0f
                     },
-                    new YControl
+                    new()
                     {
                         Easing = new Easing(1),
                         Y = 1.0f,
@@ -200,7 +200,7 @@ namespace KaedePhi.Core.RePhiEdit
         public override ControlBase Clone()
         {
             // 深拷贝
-            return new YControl()
+            return new YControl
             {
                 Easing = new Easing(Easing),
                 X = X,

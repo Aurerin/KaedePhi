@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using KaedePhi.Core.Utils;
@@ -144,145 +142,88 @@ namespace KaedePhi.Core.RePhiEdit
                 throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
         }
 
-        private bool IsImmutableType(Type type)
-        {
-            // 值类型是不可变的
-            if (type.IsValueType)
-                return true;
-
-            // 字符串是不可变的
-            if (type == typeof(string))
-                return true;
-
-            // 检查常见的不可变类型
-            if (type == typeof(DateTime) || type == typeof(DateTimeOffset) ||
-                type == typeof(TimeSpan) || type == typeof(Guid) ||
-                type == typeof(Uri) || type == typeof(Version))
-                return true;
-
-            // 检查是否为枚举
-            if (type.IsEnum)
-                return true;
-
-            return false;
-        }
-
-        private TValue DeepClone<TValue>(TValue value)
+        /// <summary>
+        /// 针对已知T类型（int/byte/byte[]/string/float/double）的DeepClone实现
+        /// 完全避免反射，直接处理已知类型
+        /// </summary>
+        private static TValue DeepClone<TValue>(TValue value)
         {
             if (value == null)
-                return default(TValue);
+                return default;
 
             var type = typeof(TValue);
 
-            // 不可变类型直接返回
-            if (IsImmutableType(type))
+            // 值类型：int, float, double, byte
+            if (type == typeof(int) || type == typeof(float) ||
+                type == typeof(double) || type == typeof(byte))
                 return value;
 
-            // 处理数组
-            if (type.IsArray)
-            {
-                var elementType = type.GetElementType();
-                var array = value as Array;
-                if (elementType != null && array != null)
-                {
-                    var clonedArray = Array.CreateInstance(elementType, array.Length);
-                    for (int i = 0; i < array.Length; i++)
-                    {
-                        var element = array.GetValue(i);
-                        if (IsImmutableType(elementType))
-                            clonedArray.SetValue(element, i);
-                        else
-                        {
-                            var cloneMethod = typeof(Event<T>)
-                                .GetMethod("DeepClone", BindingFlags.NonPublic | BindingFlags.Instance)
-                                ?.MakeGenericMethod(elementType);
-                            if (cloneMethod != null)
-                                clonedArray.SetValue(cloneMethod.Invoke(this, new[] { element }), i);
-                        }
-                    }
+            // 不可变引用类型：string
+            if (type == typeof(string))
+                return value;
 
-                    return (TValue)(object)clonedArray;
-                }
+            // byte[]：需要深拷贝
+            if (type == typeof(byte[]))
+            {
+                var arr = (byte[])(object)value;
+                return (TValue)(object)arr.ToArray();
             }
 
-            // 处理泛型集合 (List<T>, Dictionary<K,V>, etc.)
-            if (type.IsGenericType)
-            {
-                var genericTypeDef = type.GetGenericTypeDefinition();
-
-                // List<T>
-                if (genericTypeDef == typeof(List<>))
-                {
-                    var elementType = type.GetGenericArguments()[0];
-                    var list = value as System.Collections.IList;
-                    var clonedListType = typeof(List<>).MakeGenericType(elementType);
-                    var clonedList = Activator.CreateInstance(clonedListType) as System.Collections.IList;
-
-                    foreach (var item in list)
-                    {
-                        if (IsImmutableType(elementType))
-                            clonedList.Add(item);
-                        else
-                        {
-                            var cloneMethod = typeof(Event<T>)
-                                .GetMethod("DeepClone", BindingFlags.NonPublic | BindingFlags.Instance)
-                                .MakeGenericMethod(elementType);
-                            clonedList.Add(cloneMethod.Invoke(this, new[] { item }));
-                        }
-                    }
-
-                    return (TValue)clonedList;
-                }
-            }
-
-            // 尝试调用对象的 Clone() 方法
-            var cloneMethodInfo = type.GetMethod("Clone", BindingFlags.Public | BindingFlags.Instance, null,
-                Type.EmptyTypes, null);
-            if (cloneMethodInfo != null && cloneMethodInfo.ReturnType == type)
-            {
-                return (TValue)cloneMethodInfo.Invoke(value, null);
-            }
-
-            // 使用反射进行浅拷贝并递归处理引用类型字段
-            var cloned = Activator.CreateInstance(type);
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            foreach (var field in fields)
-            {
-                var fieldValue = field.GetValue(value);
-                if (fieldValue == null)
-                    continue;
-
-                var fieldType = field.FieldType;
-                if (IsImmutableType(fieldType))
-                    field.SetValue(cloned, fieldValue);
-                else
-                {
-                    var cloneMethod = typeof(Event<T>)
-                        .GetMethod("DeepClone", BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(fieldType);
-                    field.SetValue(cloned, cloneMethod.Invoke(this, new[] { fieldValue }));
-                }
-            }
-
-            return (TValue)cloned;
+            // 不应到达此处，但提供兜底
+            return value;
         }
 
         public Event<T> Clone()
         {
-            return new Event<T>
+            var clone = new Event<T>
             {
                 IsBezier = IsBezier,
-                BezierPoints = BezierPoints.ToArray(),
                 EasingLeft = EasingLeft,
                 EasingRight = EasingRight,
                 Easing = Easing,
-                StartValue = DeepClone(StartValue),
-                EndValue = DeepClone(EndValue),
-                StartBeat = new Beat((int[])StartBeat),
-                EndBeat = new Beat((int[])EndBeat),
                 Font = Font
             };
+
+            // BezierPoints: 直接Array.Copy，避免LINQ的ToArray()分配
+            if (BezierPoints != null)
+            {
+                var bp = new float[BezierPoints.Length];
+                Array.Copy(BezierPoints, bp, BezierPoints.Length);
+                clone.BezierPoints = bp;
+            }
+
+            // 针对已知T类型优化：int/float/double/byte直接赋值，byte[]/string特殊处理
+            if (typeof(T) == typeof(int) || typeof(T) == typeof(float) ||
+                typeof(T) == typeof(double) || typeof(T) == typeof(byte))
+            {
+                // 值类型直接赋值，无开销
+                clone.StartValue = StartValue;
+                clone.EndValue = EndValue;
+            }
+            else if (typeof(T) == typeof(byte[]))
+            {
+                // byte[]需要深拷贝
+                clone.StartValue = StartValue != null ? (T)(object)((byte[])(object)StartValue).ToArray() : default(T);
+                clone.EndValue = EndValue != null ? (T)(object)((byte[])(object)EndValue).ToArray() : default(T);
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                // string是不可变类型，直接赋值
+                clone.StartValue = StartValue;
+                clone.EndValue = EndValue;
+            }
+            else
+            {
+                // 兜底：使用DeepClone（不应到达此处）
+                clone.StartValue = DeepClone(StartValue);
+                clone.EndValue = DeepClone(EndValue);
+            }
+
+            // Beat拷贝
+            clone.StartBeat = new Beat((int[])StartBeat);
+            clone.EndBeat = new Beat((int[])EndBeat);
+
+            return clone;
         }
     }
 }

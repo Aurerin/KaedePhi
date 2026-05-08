@@ -9,17 +9,17 @@ public class EventLayer
     public static Kpc.EventLayer ConvertEventLayer(Rpe.EventLayer src)
     {
         var result = new Kpc.EventLayer();
-        if (src.MoveXEvents != null)
+        if (src.MoveXEvents is not null)
             result.MoveXEvents =
                 src.MoveXEvents.ConvertAll(e => Event.ConvertFloatToDoubleEvent(e, Transform.TransformToKpcX));
-        if (src.MoveYEvents != null)
+        if (src.MoveYEvents is not null)
             result.MoveYEvents =
                 src.MoveYEvents.ConvertAll(e => Event.ConvertFloatToDoubleEvent(e, Transform.TransformToKpcY));
-        if (src.RotateEvents != null)
+        if (src.RotateEvents is not null)
             result.RotateEvents =
                 src.RotateEvents.ConvertAll(e => Event.ConvertFloatToDoubleEvent(e, Transform.TransformToKpcAngle));
-        if (src.AlphaEvents != null) result.AlphaEvents = src.AlphaEvents.ConvertAll(Event.ConvertIntEvent);
-        if (src.SpeedEvents != null) result.SpeedEvents = src.SpeedEvents.ConvertAll(Event.ConvertFloatEvent);
+        if (src.AlphaEvents is not null) result.AlphaEvents = src.AlphaEvents.ConvertAll(Event.ConvertIntEvent);
+        if (src.SpeedEvents is not null) result.SpeedEvents = src.SpeedEvents.ConvertAll(Event.ConvertFloatEvent);
         return result;
     }
 
@@ -27,12 +27,13 @@ public class EventLayer
     {
         if (src == null) return null;
         var result = new Kpc.ExtendLayer();
-        if (src.ColorEvents != null) result.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
-        if (src.ScaleXEvents != null) result.ScaleXEvents = src.ScaleXEvents.ConvertAll(Event.ConvertFloatEvent);
-        if (src.ScaleYEvents != null) result.ScaleYEvents = src.ScaleYEvents.ConvertAll(Event.ConvertFloatEvent);
-        if (src.TextEvents != null) result.TextEvents = src.TextEvents.ConvertAll(Event.ConvertStringEvent);
-        if (src.PaintEvents != null) result.PaintEvents = src.PaintEvents.ConvertAll(Event.ConvertFloatEvent);
-        if (src.GifEvents != null) result.GifEvents = src.GifEvents.ConvertAll(Event.ConvertFloatEvent);
+        if (src.ColorEvents is not null) result.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
+        if (src.ScaleXEvents is not null) result.ScaleXEvents = src.ScaleXEvents.ConvertAll(Event.ConvertFloatEvent);
+        if (src.ScaleYEvents is not null) result.ScaleYEvents = src.ScaleYEvents.ConvertAll(Event.ConvertFloatEvent);
+        if (src.TextEvents is not null) result.TextEvents = src.TextEvents.ConvertAll(Event.ConvertStringEvent);
+        if (src.PaintEvents is not null) result.PaintEvents = src.PaintEvents.ConvertAll(Event.ConvertFloatEvent);
+        if (src.GifEvents is not null) result.GifEvents = src.GifEvents.ConvertAll(Event.ConvertFloatEvent);
+        if (src.InclineEvents is not null) result.InclineEvents = src.InclineEvents.ConvertAll(Event.ConvertFloatEvent);
         return result;
     }
 
@@ -83,30 +84,37 @@ public class EventLayer
     {
         if (src is null) return null;
         var rpe = new Rpe.ExtendLayer();
-        if (src.ColorEvents != null) rpe.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
-        if (src.ScaleXEvents != null)
+        if (src.ColorEvents is not null) rpe.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
+        if (src.ScaleXEvents is not null)
         {
             rpe.ScaleXEvents = [];
             foreach (var e in src.ScaleXEvents) rpe.ScaleXEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         }
 
-        if (src.ScaleYEvents != null)
+        if (src.ScaleYEvents is not null)
         {
             rpe.ScaleYEvents = [];
             foreach (var e in src.ScaleYEvents) rpe.ScaleYEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         }
 
-        if (src.TextEvents != null) rpe.TextEvents = src.TextEvents.ConvertAll(Event.ConvertStringEvent);
-        if (src.PaintEvents != null)
+        if (src.TextEvents is not null) rpe.TextEvents = src.TextEvents.ConvertAll(Event.ConvertStringEvent);
+        if (src.PaintEvents is not null)
         {
             rpe.PaintEvents = [];
             foreach (var e in src.PaintEvents) rpe.PaintEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         }
 
-        if (src.GifEvents != null)
+        if (src.GifEvents is not null)
         {
             rpe.GifEvents = [];
             foreach (var e in src.GifEvents) rpe.GifEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
+        }
+
+        if (src.InclineEvents is not null)
+        {
+            rpe.InclineEvents = [];
+            foreach (var e in src.InclineEvents)
+                rpe.InclineEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         }
 
         return rpe;

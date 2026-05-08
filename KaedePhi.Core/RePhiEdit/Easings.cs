@@ -10,9 +10,9 @@ namespace KaedePhi.Core.RePhiEdit
         private static double Evaluate(EasingFunction function, double start, double end, double t)
         {
             // code by PhiZone Player
-            double progress = function(start + (end - start) * t);
-            double progressStart = function(start);
-            double progressEnd = function(end);
+            var progress = function(start + (end - start) * t);
+            var progressStart = function(start);
+            var progressEnd = function(end);
             return (progress - progressStart) / (progressEnd - progressStart);
         }
 
@@ -71,28 +71,28 @@ namespace KaedePhi.Core.RePhiEdit
         public float Do(float minLim, float maxLim, float start, float end, float t)
         {
             var easedTime = Easings.Evaluate(_easingNumber, minLim, maxLim, t);
-            //插值后返回
+            // 插值后返回
             return (float)(start + (end - start) * easedTime);
         }
 
         public double Do(float minLim, float maxLim, double start, double end, double t)
         {
             var easedTime = Easings.Evaluate(_easingNumber, minLim, maxLim, t);
-            //插值后返回
+            // 插值后返回
             return start + (end - start) * easedTime;
         }
 
         public int Do(float minLim, float maxLim, int start, int end, float t)
         {
             var easedTime = Easings.Evaluate(_easingNumber, minLim, maxLim, t);
-            //插值后返回
+            // 插值后返回
             return (int)(start + (end - start) * easedTime);
         }
 
         public byte Do(float minLim, float maxLim, byte start, byte end, float t)
         {
             var easedTime = Easings.Evaluate(_easingNumber, minLim, maxLim, t);
-            //插值后返回
+            // 插值后返回
             return (byte)(start + (end - start) * easedTime);
         }
 

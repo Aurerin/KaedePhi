@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,14 +32,16 @@ namespace KaedePhi.Core.RePhiEdit
                     {
                         if (eventLayer.AlphaEvents is null || eventLayer.AlphaEvents.Count == 0)
                         {
-                            eventLayer.AlphaEvents = new();
-                            eventLayer.AlphaEvents.Add(new Event<int>
+                            eventLayer.AlphaEvents = new List<Event<int>>
                             {
-                                StartBeat = new Beat(0),
-                                EndBeat = new Beat(1),
-                                StartValue = 0,
-                                EndValue = 0
-                            });
+                                new()
+                                {
+                                    StartBeat = new Beat(0),
+                                    EndBeat = new Beat(1),
+                                    StartValue = 0,
+                                    EndValue = 0
+                                }
+                            };
                         }
                     }
 
@@ -46,13 +49,6 @@ namespace KaedePhi.Core.RePhiEdit
                 }
 
                 judgeLine.Extended.Anticipation();
-                // 如果Extended所有层级都是null，将Extended本身设置为null
-                if (judgeLine.Extended.ColorEvents is null && judgeLine.Extended.GifEvents is null &&
-                    judgeLine.Extended.PaintEvents is null && judgeLine.Extended.ScaleXEvents is null &&
-                    judgeLine.Extended.ScaleYEvents is null && judgeLine.Extended.TextEvents is null)
-                {
-                    judgeLine.Extended = null;
-                }
 
                 // 如果判定线上有任何类型的Control组为空或null，则设定一个默认值
                 if (judgeLine.AlphaControls is null || judgeLine.AlphaControls.Count == 0)
@@ -140,6 +136,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// <param name="json">谱面Json数据</param>
         /// <returns>谱面对象</returns>
         /// <exception cref="InvalidOperationException">谱面json数据无法正确序列化</exception>
+        [PublicAPI]
         public static Chart LoadFromJson(string json)
         {
             var chart = JsonConvert.DeserializeObject<Chart>(json) ??
