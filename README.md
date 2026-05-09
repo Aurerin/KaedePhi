@@ -70,7 +70,21 @@ Kaede NuanR_Star Copyright © 2026 PhiFanmadeTool Project.
 暖星 Copyright © 2026 PhiFanmadeTool Project.  
 NuanR_Mxi Lazy Team Copyright © 2026 PhiFanmadeTool Project.  
 NuanR_Star Lazy Team Copyright © 2026 PhiFanmadeTool Project.  
-NuanR_Star Ciallo Team Copyright © 2026 PhiFanmadeTool Project.
+NuanR_Star Ciallo Team Copyright © 2026 PhiFanmadeTool Project.  
+NuanR_Mxi Copyright © 2026 KaedePhi Project.  
+NuanR_Star Copyright © 2026 KaedePhi Project.  
+Kaede HikariN Copyright © 2026 KaedePhi Project.  
+Kaede NuanR_Mxi Copyright © 2026 KaedePhi Project.  
+Kaede NuanR_Star Copyright © 2026 KaedePhi Project.  
+枫暖日明曦 Copyright © 2026 KaedePhi Project.  
+枫暖日星辉 Copyright © 2026 KaedePhi Project.  
+暖日明曦 Copyright © 2026 KaedePhi Project.  
+暖日星辉 Copyright © 2026 KaedePhi Project.  
+暖日 Copyright © 2026 KaedePhi Project.  
+暖星 Copyright © 2026 KaedePhi Project.  
+NuanR_Mxi Lazy Team Copyright © 2026 KaedePhi Project.  
+NuanR_Star Lazy Team Copyright © 2026 KaedePhi Project.  
+NuanR_Star Ciallo Team Copyright © 2026 KaedePhi Project.
 
 ## 免责声明
 本软件与南京鸽游网络有限公司（厦门鸽游网络有限公司）无任何关联。  
