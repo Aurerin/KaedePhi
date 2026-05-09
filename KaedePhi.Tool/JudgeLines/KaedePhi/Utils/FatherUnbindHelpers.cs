@@ -13,6 +13,8 @@ namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
 /// </summary>
 public static class FatherUnbindHelpers
 {
+    private static readonly EventCompressor<int> IntCompressor = new();
+    private static readonly EventCompressor<double> DoubleCompressor = new();
     private static readonly AsyncLocal<CoordinateProfile?> RenderProfileContext = new();
 
     public static CoordinateProfile CurrentRenderProfile
@@ -193,14 +195,12 @@ public static class FatherUnbindHelpers
     {
         if (layers is not { Count: > 1 }) return layers;
         var layersCopy = layers.Select(l => l.Clone()).ToList();
-        var intCompressor = new EventCompressor<int>();
-        var doubleCompressor = new EventCompressor<double>();
         foreach (var layer in layersCopy)
         {
-            layer.AlphaEvents = intCompressor.RemoveUselessEvent(layer.AlphaEvents);
-            layer.MoveXEvents = doubleCompressor.RemoveUselessEvent(layer.MoveXEvents);
-            layer.MoveYEvents = doubleCompressor.RemoveUselessEvent(layer.MoveYEvents);
-            layer.RotateEvents = doubleCompressor.RemoveUselessEvent(layer.RotateEvents);
+            layer.AlphaEvents = IntCompressor.RemoveUselessEvent(layer.AlphaEvents);
+            layer.MoveXEvents = DoubleCompressor.RemoveUselessEvent(layer.MoveXEvents);
+            layer.MoveYEvents = DoubleCompressor.RemoveUselessEvent(layer.MoveYEvents);
+            layer.RotateEvents = DoubleCompressor.RemoveUselessEvent(layer.RotateEvents);
         }
 
         return layersCopy;

@@ -17,6 +17,10 @@ namespace KaedePhi.Core.Common
         public Beat(int[] beatArray)
         {
             _beat = beatArray ?? new[] { 0, 0, 1 };
+            if (_beat.Length != 3)
+                throw new ArgumentException("Beat array must have exactly 3 elements.", nameof(beatArray));
+            if (_beat[2] == 0)
+                throw new ArgumentException("Beat denominator (beat[2]) cannot be zero.", nameof(beatArray));
             // calculate curBeat
             _curBeatDouble = (double)_beat[1] / _beat[2] + _beat[0];
             _curBeatFloat = (float)_curBeatDouble;
@@ -121,6 +125,8 @@ namespace KaedePhi.Core.Common
                 if (index < 0 || index > 2)
                     throw new ArgumentOutOfRangeException(nameof(index), index,
                         "RePhiEdit Beat index must be between 0 and 2.");
+                if (index == 2 && value == 0)
+                    throw new ArgumentException("Beat denominator (beat[2]) cannot be zero.", nameof(index));
                 _beat[index] = value;
                 // recalculate curBeat
                 _curBeatDouble = (double)_beat[1] / _beat[2] + _beat[0];

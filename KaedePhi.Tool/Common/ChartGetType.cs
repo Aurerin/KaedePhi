@@ -30,31 +30,27 @@ public static class ChartGetType
             throw new NotSupportedException(UnsupportedChartMessage);
         }
 
-        // 看起来是一个json文件，序列化为dynamic对象，按特征进行读取
+        // 看起来是一个json文件，解析为JObject，按特征进行读取
         try
         {
-            dynamic jsonObj = JsonConvert.DeserializeObject(chartText) ??
-                              throw new ArgumentNullException(nameof(chartText), "啊拉？序列化失败了...");
+            var jsonObj = JObject.Parse(chartText);
 
             // 如果存在META字段在根目录，且此字段为一个JsonObject，则这是一个RePhiEdit谱面
-            if (jsonObj.META is JObject)
+            if (jsonObj["META"] is JObject)
                 return ChartType.RePhiEdit;
 
             // 如果存在formatVersion字段，且字段类型为int，则根据版本号判断PhigrosV1/V3谱面
-            if (jsonObj.formatVersion is JValue
-                {
-                    Type: JTokenType.Integer or JTokenType.Float
-                })
-                return GetTypeFromFormatVersion((int)jsonObj.formatVersion);
+            if (jsonObj["formatVersion"] is JValue { Type: JTokenType.Integer or JTokenType.Float } formatVersionValue)
+                return GetTypeFromFormatVersion((int)formatVersionValue);
 
             // 如果存在info字段的同时，info字段为jsonObject，且存在lines字段，且lines字段为JsonArray，则这是PhiFans谱面
-            if (jsonObj.info is JObject && jsonObj.lines != null && jsonObj.lines is JArray)
+            if (jsonObj["info"] is JObject && jsonObj["lines"] is JArray)
                 return ChartType.PhiFans;
         }
-        catch (Exception e)
+        catch (JsonException e)
         {
             // 附加原始异常的同时包装NotSupportedException
-            throw new NotSupportedException(e.Message);
+            throw new NotSupportedException(e.Message, e);
         }
 
         throw new NotSupportedException(UnsupportedChartMessage);

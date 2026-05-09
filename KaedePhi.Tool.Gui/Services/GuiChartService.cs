@@ -257,6 +257,10 @@ public sealed class GuiChartService
         _log.Info(string.Format(log_running_tool, tool_fit_name));
         var degree = Environment.ProcessorCount;
         var totalLines = chart.JudgeLineList.Count;
+        var doubleFit = new EventFit<double>();
+        var intFit = new EventFit<int>();
+        var floatFit = new EventFit<float>();
+
         for (var li = 0; li < totalLines; li++)
         {
             var line = chart.JudgeLineList[li];
@@ -276,20 +280,18 @@ public sealed class GuiChartService
                     var overall = (capturedLi + (double)capturedEi / totalLayers) / totalLines;
                     progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
                 });
-                FitLayer(line.EventLayers[ei], tolerance, degree, layerProgress);
+                FitLayer(line.EventLayers[ei], doubleFit, intFit, floatFit, tolerance, degree, layerProgress);
             }
         }
 
         progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    private static void FitLayer(Core.KaedePhi.EventLayer layer, double tolerance, int degree,
+    private static void FitLayer(Core.KaedePhi.EventLayer layer,
+        EventFit<double> doubleFit, EventFit<int> intFit, EventFit<float> floatFit,
+        double tolerance, int degree,
         IProgress<ToolProgress>? progress)
     {
-        var doubleFit = new EventFit<double>();
-        var intFit = new EventFit<int>();
-        var floatFit = new EventFit<float>();
-
         if (layer.MoveXEvents is { Count: > 0 })
             layer.MoveXEvents = doubleFit.EventListFit(layer.MoveXEvents, tolerance, degree, progress);
         if (layer.MoveYEvents is { Count: > 0 })

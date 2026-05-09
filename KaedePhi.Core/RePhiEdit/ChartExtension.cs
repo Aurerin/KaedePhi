@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using KaedePhi.Core.Common;
+using KaedePhi.Core.Utils;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.RePhiEdit
@@ -84,11 +85,8 @@ namespace KaedePhi.Core.RePhiEdit
         public void ExportToJsonStream(Stream stream, bool format)
         {
             Anticipation();
-            using var streamWriter = new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true);
-            var serializer = new JsonSerializer
-            {
-                Formatting = format ? Formatting.Indented : Formatting.None
-            };
+            using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
 
             using var jsonWriter = new JsonTextWriter(streamWriter) { CloseOutput = false };
             serializer.Serialize(jsonWriter, this);
@@ -105,11 +103,8 @@ namespace KaedePhi.Core.RePhiEdit
         {
             Anticipation();
             await using var streamWriter =
-                new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true);
-            var serializer = new JsonSerializer
-            {
-                Formatting = format ? Formatting.Indented : Formatting.None
-            };
+                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
 
             await Task.Run(() =>
             {
@@ -139,7 +134,7 @@ namespace KaedePhi.Core.RePhiEdit
         [PublicAPI]
         public static Chart LoadFromJson(string json)
         {
-            var chart = JsonConvert.DeserializeObject<Chart>(json) ??
+            var chart = JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings) ??
                         throw new InvalidOperationException(
                             "Failed to deserialize Chart from JSON.");
             foreach (var judgeLine in chart.JudgeLineList)
@@ -171,12 +166,12 @@ namespace KaedePhi.Core.RePhiEdit
         {
             using var streamReader = new StreamReader(
                 stream,
-                new UTF8Encoding(false),
+                JsonDefaults.NoBomUtf8,
                 detectEncodingFromByteOrderMarks: true,
                 bufferSize: 1024,
                 leaveOpen: true);
             using var jsonReader = new JsonTextReader(streamReader);
-            var serializer = new JsonSerializer();
+            var serializer = JsonDefaults.CreateSerializer(Formatting.None);
             var chart = serializer.Deserialize<Chart>(jsonReader) ??
                         throw new InvalidOperationException(
                             "Failed to deserialize Chart from stream.");
@@ -204,12 +199,12 @@ namespace KaedePhi.Core.RePhiEdit
             {
                 using var streamReader = new StreamReader(
                     stream,
-                    new UTF8Encoding(false),
+                    JsonDefaults.NoBomUtf8,
                     detectEncodingFromByteOrderMarks: true,
                     bufferSize: 1024,
                     leaveOpen: true);
                 using var jsonReader = new JsonTextReader(streamReader);
-                var serializer = new JsonSerializer();
+                var serializer = JsonDefaults.CreateSerializer(Formatting.None);
                 var chart = serializer.Deserialize<Chart>(jsonReader) ??
                             throw new InvalidOperationException(
                                 "Failed to deserialize Chart from stream.");

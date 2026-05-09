@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using KaedePhi.Tool.Gui.Models;
 using YamlDotNet.Serialization;
@@ -38,9 +39,9 @@ public sealed class ConfigService
                 return _deserializer.Deserialize<GuiAppConfig>(yaml) ?? new GuiAppConfig();
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Config parse error, fall back to defaults
+            System.Diagnostics.Debug.WriteLine($"[ConfigService] Failed to load config: {ex.Message}");
         }
 
         var defaults = new GuiAppConfig();
@@ -60,9 +61,9 @@ public sealed class ConfigService
             var yaml = _serializer.Serialize(config);
             File.WriteAllText(_configPath, yaml);
         }
-        catch
+        catch (Exception ex)
         {
-            // Save failure should not crash the app
+            System.Diagnostics.Debug.WriteLine($"[ConfigService] Failed to save config: {ex.Message}");
         }
     }
 }

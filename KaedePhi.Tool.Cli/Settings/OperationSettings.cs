@@ -11,6 +11,14 @@ namespace KaedePhi.Tool.Cli.Settings;
 /// </summary>
 public class OperationSettings : CommandSettings
 {
+    private static readonly IDeserializer YamlDeserializer = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .Build();
+
+    private static readonly ISerializer YamlSerializer = new SerializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .Build();
+
     [CommandOption("-i|--input <PATH>")]
     [LocalizedDescription("cli_opt_input_rpe_desc")]
     public string? Input { get; set; }
@@ -71,17 +79,11 @@ public class OperationSettings : CommandSettings
         if (File.Exists("config.yaml"))
         {
             var text = File.ReadAllText("config.yaml");
-            return new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build()
-                .Deserialize<AppConfig>(text);
+            return YamlDeserializer.Deserialize<AppConfig>(text);
         }
 
         var config = new AppConfig();
-        var yaml = new SerializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build()
-            .Serialize(config);
+        var yaml = YamlSerializer.Serialize(config);
         File.WriteAllText("config.yaml", yaml);
         return config;
     }

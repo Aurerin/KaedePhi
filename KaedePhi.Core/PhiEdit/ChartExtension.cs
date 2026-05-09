@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using KaedePhi.Core.Utils;
 
 namespace KaedePhi.Core.PhiEdit
 {
@@ -44,6 +44,8 @@ namespace KaedePhi.Core.PhiEdit
 
                 if (part[0] == "bp")
                 {
+                    if (part.Length < 3)
+                        throw new FormatException($"Malformed 'bp' command at line {i + 1}: expected at least 3 parts, got {part.Length}.");
                     chart.BpmList.Add(new BpmItem
                     {
                         StartBeat = float.Parse(part[1]),
@@ -76,7 +78,7 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static Chart LoadStream(Stream stream)
         {
-            using var reader = new StreamReader(stream, new UTF8Encoding(false), detectEncodingFromByteOrderMarks: true,
+            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
                 1024, leaveOpen: true);
 
             var chart = new Chart();
@@ -107,7 +109,7 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static async Task<Chart> LoadStreamAsync(Stream stream)
         {
-            using var reader = new StreamReader(stream, new UTF8Encoding(false), detectEncodingFromByteOrderMarks: true,
+            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
                 1024, leaveOpen: true);
 
             var chart = new Chart();
@@ -136,6 +138,8 @@ namespace KaedePhi.Core.PhiEdit
 
             if (part[0] == "bp")
             {
+                if (part.Length < 3)
+                    throw new FormatException($"Malformed 'bp' command: expected at least 3 parts, got {part.Length}.");
                 chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
             }
             else if (line.StartsWith('n'))
@@ -146,6 +150,8 @@ namespace KaedePhi.Core.PhiEdit
                     // 需要额外读取后续两行
                     speedPart = reader.ReadLine()?.Split(' ');
                     widthPart = reader.ReadLine()?.Split(' ');
+                    if (speedPart == null || widthPart == null)
+                        throw new FormatException("Malformed note: missing speed or width lines.");
                 }
                 AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
             }
@@ -160,6 +166,8 @@ namespace KaedePhi.Core.PhiEdit
 
             if (part[0] == "bp")
             {
+                if (part.Length < 3)
+                    throw new FormatException($"Malformed 'bp' command: expected at least 3 parts, got {part.Length}.");
                 chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
             }
             else if (line.StartsWith('n'))
@@ -170,6 +178,8 @@ namespace KaedePhi.Core.PhiEdit
                     // 需要额外读取后续两行
                     speedPart = (await reader.ReadLineAsync())?.Split(' ');
                     widthPart = (await reader.ReadLineAsync())?.Split(' ');
+                    if (speedPart == null || widthPart == null)
+                        throw new FormatException("Malformed note: missing speed or width lines.");
                 }
                 AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
             }
@@ -183,26 +193,31 @@ namespace KaedePhi.Core.PhiEdit
             switch (part[0])
             {
                 case "cv":
+                    if (part.Length < 4) throw new FormatException($"Malformed 'cv' command: expected at least 4 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].SpeedFrames.Add(new Frame
                         { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
                     break;
                 case "cp":
+                    if (part.Length < 5) throw new FormatException($"Malformed 'cp' command: expected at least 5 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].MoveFrames.Add(new MoveFrame
                         { Beat = float.Parse(part[2]), XValue = float.Parse(part[3]), YValue = float.Parse(part[4]) });
                     break;
                 case "cd":
+                    if (part.Length < 4) throw new FormatException($"Malformed 'cd' command: expected at least 4 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].RotateFrames.Add(new Frame
                         { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
                     break;
                 case "ca":
+                    if (part.Length < 4) throw new FormatException($"Malformed 'ca' command: expected at least 4 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].AlphaFrames.Add(new Frame
                         { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
                     break;
                 case "cm":
+                    if (part.Length < 7) throw new FormatException($"Malformed 'cm' command: expected at least 7 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].MoveEvents.Add(new MoveEvent
                     {
@@ -212,6 +227,7 @@ namespace KaedePhi.Core.PhiEdit
                     });
                     break;
                 case "cr":
+                    if (part.Length < 6) throw new FormatException($"Malformed 'cr' command: expected at least 6 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].RotateEvents.Add(new Event
                     {
@@ -220,6 +236,7 @@ namespace KaedePhi.Core.PhiEdit
                     });
                     break;
                 case "cf":
+                    if (part.Length < 5) throw new FormatException($"Malformed 'cf' command: expected at least 5 parts, got {part.Length}.");
                     Ensure();
                     judgeDict[judgeLineIndex].AlphaEvents.Add(new Event
                     {
@@ -239,6 +256,13 @@ namespace KaedePhi.Core.PhiEdit
 
         private static Note BuildNote(string[] part, string[] noteSpeedMultiplierPart, string[] noteWidthRatioPart)
         {
+            if (part.Length < 4)
+                throw new FormatException($"Malformed note command: expected at least 4 parts, got {part.Length}.");
+            if (noteSpeedMultiplierPart.Length < 2)
+                throw new FormatException("Malformed note speed multiplier part: expected at least 2 elements.");
+            if (noteWidthRatioPart.Length < 2)
+                throw new FormatException("Malformed note width ratio part: expected at least 2 elements.");
+
             var noteType = (NoteType)int.Parse(part[0].Substring(1, 1));
             var isHold = noteType == NoteType.Hold;
             return new Note
@@ -258,7 +282,7 @@ namespace KaedePhi.Core.PhiEdit
         {
             var hashIndex = Array.IndexOf(part, "#");
             var ampIndex = Array.IndexOf(part, "&");
-            if (hashIndex != -1 && ampIndex != -1)
+            if (hashIndex != -1 && ampIndex != -1 && hashIndex + 1 < part.Length && ampIndex + 1 < part.Length)
                 return (new[] { "#", part[hashIndex + 1] }, new[] { "&", part[ampIndex + 1] });
             return (null, null);
         }
@@ -275,6 +299,8 @@ namespace KaedePhi.Core.PhiEdit
             var (speedPart, widthPart) = GetInlineNoteParts(part);
             if (speedPart == null)
             {
+                if (i + 2 >= lines.Length)
+                    throw new FormatException($"Malformed note at line {i + 1}: missing speed or width lines.");
                 speedPart = lines[i + 1].Split(' ');
                 widthPart = lines[i + 2].Split(' ');
                 i += 2;
@@ -301,8 +327,6 @@ namespace KaedePhi.Core.PhiEdit
                 judgeLine.AlphaEvents = judgeLine.AlphaEvents.OrderBy(e => e.StartBeat).ToList();
                 // Note
                 judgeLine.NoteList = judgeLine.NoteList.OrderBy(n => n.StartBeat).ToList();
-                // BPM
-                chart.BpmList = chart.BpmList.OrderBy(b => b.StartBeat).ToList();
             }
 
             chart.JudgeLineList = judgeDict.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
@@ -369,7 +393,7 @@ namespace KaedePhi.Core.PhiEdit
         public void ExportToStream(Stream stream)
         {
             using var writer =
-                new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true);
+                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
             foreach (var line in GetExportLines())
                 writer.WriteLine(line);
         }
@@ -381,7 +405,7 @@ namespace KaedePhi.Core.PhiEdit
         public async Task ExportToStreamAsync(Stream stream)
         {
             await using var writer =
-                new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true);
+                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
             foreach (var line in GetExportLines())
                 await writer.WriteLineAsync(line);
         }

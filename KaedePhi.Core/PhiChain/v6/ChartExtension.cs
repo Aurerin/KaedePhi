@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using KaedePhi.Core.Utils;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.PhiChain.v6
@@ -23,7 +24,7 @@ namespace KaedePhi.Core.PhiChain.v6
         {
             try
             {
-                var chart = JsonConvert.DeserializeObject<Chart>(json)
+                var chart = JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings)
                             ?? throw new InvalidOperationException(
                                 "Failed to deserialize Chart from JSON: result is null");
 
@@ -45,7 +46,7 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <returns>Chart 对象</returns>
         public static async Task<Chart> LoadFromJsonStreamAsync(Stream stream)
         {
-            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true,
+            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
                 bufferSize: 1024, leaveOpen: true);
             var json = await reader.ReadToEndAsync();
             return await LoadFromJsonAsync(json);
@@ -58,7 +59,7 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <returns>Chart 对象</returns>
         public static Chart LoadFromJsonStream(Stream stream)
         {
-            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true,
+            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
                 bufferSize: 1024, leaveOpen: true);
             var json = reader.ReadToEnd();
             return LoadFromJson(json);
@@ -91,11 +92,8 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <param name="format">是否格式化输出</param>
         public void ExportToJsonStream(Stream stream, bool format = false)
         {
-            using var streamWriter = new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true);
-            var serializer = new JsonSerializer
-            {
-                Formatting = format ? Formatting.Indented : Formatting.None
-            };
+            using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
 
             using var jsonWriter = new JsonTextWriter(streamWriter) { CloseOutput = false };
             serializer.Serialize(jsonWriter, this);
@@ -110,11 +108,8 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <param name="format">是否格式化输出</param>
         public async Task ExportToJsonStreamAsync(Stream stream, bool format = false)
         {
-            await using var streamWriter = new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true);
-            var serializer = new JsonSerializer
-            {
-                Formatting = format ? Formatting.Indented : Formatting.None
-            };
+            await using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
 
             await Task.Run(() =>
             {
@@ -145,7 +140,7 @@ namespace KaedePhi.Core.PhiChain.v6
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"Chart file not found: {filePath}");
 
-            var json = File.ReadAllText(filePath, Encoding.UTF8);
+            var json = File.ReadAllText(filePath, JsonDefaults.NoBomUtf8);
             return LoadFromJson(json);
         }
 
@@ -159,7 +154,7 @@ namespace KaedePhi.Core.PhiChain.v6
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"Chart file not found: {filePath}");
 
-            var json = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+            var json = await File.ReadAllTextAsync(filePath, JsonDefaults.NoBomUtf8);
             return await LoadFromJsonAsync(json);
         }
 
@@ -171,7 +166,7 @@ namespace KaedePhi.Core.PhiChain.v6
         public void SaveToFile(string filePath, bool format = true)
         {
             var json = ExportToJson(format);
-            File.WriteAllText(filePath, json, Encoding.UTF8);
+            File.WriteAllText(filePath, json, JsonDefaults.NoBomUtf8);
         }
 
         /// <summary>
@@ -182,7 +177,7 @@ namespace KaedePhi.Core.PhiChain.v6
         public async Task SaveToFileAsync(string filePath, bool format = true)
         {
             var json = await ExportToJsonAsync(format);
-            await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
+            await File.WriteAllTextAsync(filePath, json, JsonDefaults.NoBomUtf8);
         }
 
         /// <summary>
