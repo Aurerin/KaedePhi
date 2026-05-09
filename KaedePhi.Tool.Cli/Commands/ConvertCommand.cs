@@ -1,7 +1,6 @@
 ﻿using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Settings;
 using KaedePhi.Tool.Common;
-using KaedePhi.Tool.KaedePhi;
 
 namespace KaedePhi.Tool.Cli.Commands;
 
@@ -28,7 +27,6 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         var kpc = await svc.LoadKpcAsync(s.Input, s.Workspace, ct);
         if (kpc == null) { writer.Error(Strings.cli_err_unimplemented); return 1; }
 
-        using var _ = KpcToolLog.Subscribe(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
 
         var output = svc.ResolveOutputPath(s.Input, s.Output, s.Workspace);
         var result = await svc.SaveAsAsync(kpc, output, s.TargetType ?? ChartType.RePhiEdit,

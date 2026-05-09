@@ -1,6 +1,5 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
-using KaedePhi.Tool.KaedePhi.Events.Internal;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
 
@@ -87,6 +86,7 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
     }
 
     #region 共用工具
+
     /// <summary>
     /// 校验事件值类型是否为合并器支持的数值类型。
     /// </summary>
@@ -208,7 +208,8 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
     /// <param name="start">重叠起始拍。</param>
     /// <param name="end">重叠结束拍。</param>
     /// <returns>存在重叠时返回 <see langword="true"/>。</returns>
-    private static bool TryGetOverlapBounds(Kpc.Event<TPayload> fe, Kpc.Event<TPayload> te, out Beat start, out Beat end)
+    private static bool TryGetOverlapBounds(Kpc.Event<TPayload> fe, Kpc.Event<TPayload> te, out Beat start,
+        out Beat end)
     {
         if (fe.StartBeat >= te.EndBeat || fe.EndBeat <= te.StartBeat)
         {
@@ -260,7 +261,7 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
             => a.Start != b.Start ? a.Start.CompareTo(b.Start) : a.End.CompareTo(b.End));
 
     #endregion
-    
+
     #region 固定采样路径
 
     /// <summary>
@@ -271,8 +272,6 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
     /// <param name="fromEventsCopy">来源事件拷贝。</param>
     /// <param name="precision">每拍切片精度。</param>
     /// <returns>合并后的事件列表。</returns>
-
-
     private static List<Kpc.Event<TPayload>> MergeWithOverlapFixedSampling(
         List<Kpc.Event<TPayload>> toEventsForOffsetLookup,
         List<Kpc.Event<TPayload>> toEventsCopy,
@@ -438,8 +437,8 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
         var cutFrom = new List<Kpc.Event<TPayload>>();
         foreach (var (start, end) in overlapIntervals)
         {
-            cutTo.AddRange(EventCutter.CutEventsInRange(toEventsCopy, start, end, cutLength));
-            cutFrom.AddRange(EventCutter.CutEventsInRange(fromEventsCopy, start, end, cutLength));
+            cutTo.AddRange(new EventCutter<TPayload>().CutEventsInRange(toEventsCopy, start, end, cutLength));
+            cutFrom.AddRange(new EventCutter<TPayload>().CutEventsInRange(fromEventsCopy, start, end, cutLength));
             toEventsCopy.RemoveAll(e => e.StartBeat < end && e.EndBeat > start);
             fromEventsCopy.RemoveAll(e => e.StartBeat < end && e.EndBeat > start);
         }
