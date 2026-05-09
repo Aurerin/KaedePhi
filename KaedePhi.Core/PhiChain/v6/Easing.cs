@@ -59,5 +59,22 @@ namespace KaedePhi.Core.PhiChain.v6
         [JsonIgnore] public int Count { get; set; }
 
         [JsonIgnore] public float Omega { get; set; }
+
+        /// <summary>
+        /// 深克隆当前 Easing 对象
+        /// </summary>
+        public Easing Clone()
+        {
+            return new Easing
+            {
+                Kind = Kind,
+                X1 = X1,
+                Y1 = Y1,
+                X2 = X2,
+                Y2 = Y2,
+                Count = Count,
+                Omega = Omega
+            };
+        }
     }
 }
