@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
@@ -20,6 +21,20 @@ namespace KaedePhi.Core.PhiChain.v6
             return new Chart
             {
                 Lines = new List<SerializedLine>()
+            };
+        }
+
+        /// <summary>
+        /// 深克隆当前 Chart 对象
+        /// </summary>
+        public Chart Clone()
+        {
+            return new Chart
+            {
+                Format = Format,
+                Offset = Offset,
+                BpmList = BpmList.Clone(),
+                Lines = Lines.Select(l => l.Clone()).ToList()
             };
         }
     }
@@ -47,6 +62,21 @@ namespace KaedePhi.Core.PhiChain.v6
         public static SerializedLine CreateDefault()
         {
             return new SerializedLine();
+        }
+
+        /// <summary>
+        /// 深克隆当前 SerializedLine 对象
+        /// </summary>
+        public SerializedLine Clone()
+        {
+            return new SerializedLine
+            {
+                Name = Name,
+                Notes = Notes.Select(n => n.Clone()).ToList(),
+                Events = Events.Select(e => e.Clone()).ToList(),
+                Children = Children.Select(c => c.Clone()).ToList(),
+                CurveNoteTracks = CurveNoteTracks.Select(t => t.Clone()).ToList()
+            };
         }
 
         private static List<LineEvent> DefaultEvents()

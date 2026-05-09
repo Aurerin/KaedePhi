@@ -42,6 +42,22 @@ namespace KaedePhi.Core.PhiChain.v6
 
         [JsonProperty("speed")]
         public float Speed { get; set; } = 1f;
+
+        /// <summary>
+        /// 深克隆当前 Note 对象
+        /// </summary>
+        public Note Clone()
+        {
+            return new Note
+            {
+                Kind = Kind,
+                HoldBeat = new Beat((int[])HoldBeat),
+                Above = Above,
+                Beat = new Beat((int[])Beat),
+                X = X,
+                Speed = Speed
+            };
+        }
     }
 }
 

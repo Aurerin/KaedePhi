@@ -179,15 +179,5 @@ namespace KaedePhi.Core.PhiChain.v6
             var json = await ExportToJsonAsync(format);
             await File.WriteAllTextAsync(filePath, json, JsonDefaults.NoBomUtf8);
         }
-
-        /// <summary>
-        /// 克隆当前 Chart 对象
-        /// </summary>
-        /// <returns>克隆后的 Chart 对象</returns>
-        public Chart Clone()
-        {
-            var json = ExportToJson(format: false);
-            return LoadFromJson(json);
-        }
     }
 }

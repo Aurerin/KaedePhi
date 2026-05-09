@@ -114,14 +114,34 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
         => events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
 
     /// <summary>
-    /// 判断两个事件列表是否存在时间重叠。
+    /// 判断两个已排序事件列表是否存在时间重叠。
+    /// 使用双指针算法，O(N+M) 复杂度。
     /// </summary>
-    /// <param name="toEvents">目标事件列表。</param>
-    /// <param name="fromEvents">来源事件列表。</param>
-    /// <returns>存在任意重叠区间时返回 <see langword="true"/>。</returns>
     private static bool HasOverlap(List<Kpc.Event<TPayload>> toEvents, List<Kpc.Event<TPayload>> fromEvents)
-        => fromEvents.Any(fe =>
-            toEvents.Any(te => fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat));
+    {
+        // 确保两个列表都已排序
+        SortByStartBeat(toEvents);
+        SortByStartBeat(fromEvents);
+
+        var i = 0;
+        var j = 0;
+        while (i < toEvents.Count && j < fromEvents.Count)
+        {
+            var te = toEvents[i];
+            var fe = fromEvents[j];
+
+            // 检查重叠：fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat
+            if (fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat)
+                return true;
+
+            // 移动结束时间较早的指针
+            if (te.EndBeat <= fe.EndBeat)
+                i++;
+            else
+                j++;
+        }
+        return false;
+    }
 
     #endregion
 
@@ -129,18 +149,23 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
 
     /// <summary>
     /// 合并无重叠的两组事件，按前序事件终值补偿偏移。
+    /// 使用二分查找优化，O(N*logM) 复杂度。
     /// </summary>
-    /// <param name="toEventsCopy">目标事件拷贝。</param>
-    /// <param name="fromEventsCopy">来源事件拷贝。</param>
-    /// <returns>合并后的事件列表。</returns>
     private static List<Kpc.Event<TPayload>> MergeWithoutOverlap(
         List<Kpc.Event<TPayload>> toEventsCopy,
         List<Kpc.Event<TPayload>> fromEventsCopy)
     {
-        var newEvents = (from toEvent in toEventsCopy
-            let prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat)
-            let formOffset = prevForm is null ? default : prevForm.EndValue
-            select new Kpc.Event<TPayload>
+        // 确保排序
+        SortByStartBeat(toEventsCopy);
+        SortByStartBeat(fromEventsCopy);
+
+        var newEvents = new List<Kpc.Event<TPayload>>(toEventsCopy.Count + fromEventsCopy.Count);
+
+        // 处理 toEvents，查找 fromEvents 中的前序值
+        foreach (var toEvent in toEventsCopy)
+        {
+            var formOffset = GetPreviousEndValue(fromEventsCopy, toEvent.StartBeat);
+            newEvents.Add(new Kpc.Event<TPayload>
             {
                 StartBeat = toEvent.StartBeat,
                 EndBeat = toEvent.EndBeat,
@@ -151,12 +176,14 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
                 EasingLeft = toEvent.EasingLeft,
                 EasingRight = toEvent.EasingRight,
                 IsBezier = toEvent.IsBezier,
-            }).ToList();
+            });
+        }
 
-        newEvents.AddRange(from formEvent in fromEventsCopy
-            let prevTo = toEventsCopy.FindLast(e => e.EndBeat <= formEvent.StartBeat)
-            let toEventValue = prevTo.EndValue ?? default
-            select new Kpc.Event<TPayload>
+        // 处理 fromEvents，查找 toEvents 中的前序值
+        foreach (var formEvent in fromEventsCopy)
+        {
+            var toEventValue = GetPreviousEndValue(toEventsCopy, formEvent.StartBeat);
+            newEvents.Add(new Kpc.Event<TPayload>
             {
                 StartBeat = formEvent.StartBeat,
                 EndBeat = formEvent.EndBeat,
@@ -168,6 +195,7 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
                 EasingRight = formEvent.EasingRight,
                 IsBezier = formEvent.IsBezier,
             });
+        }
 
         SortByStartBeat(newEvents);
         return newEvents;
@@ -179,23 +207,42 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
 
     /// <summary>
     /// 构建两组事件的重叠区间，并将可连接区间归并。
+    /// 使用扫描线算法，O(N+M+K) 复杂度，其中K是重叠区间数。
     /// </summary>
-    /// <param name="toEvents">目标事件列表。</param>
-    /// <param name="fromEvents">来源事件列表。</param>
+    /// <param name="toEvents">目标事件列表，需按 StartBeat 排序。</param>
+    /// <param name="fromEvents">来源事件列表，需按 StartBeat 排序。</param>
     /// <returns>按开始拍排序后的重叠区间集合。</returns>
     private static List<(Beat Start, Beat End)> BuildOverlapIntervals(
         List<Kpc.Event<TPayload>> toEvents,
         List<Kpc.Event<TPayload>> fromEvents)
     {
+        // 确保排序
+        SortByStartBeat(toEvents);
+        SortByStartBeat(fromEvents);
+
         var overlapIntervals = new List<(Beat Start, Beat End)>();
-        foreach (var fe in fromEvents)
+
+        // 使用双指针扫描
+        var i = 0;
+        var j = 0;
+        while (i < toEvents.Count && j < fromEvents.Count)
         {
-            foreach (var te in toEvents)
+            var te = toEvents[i];
+            var fe = fromEvents[j];
+
+            // 检查重叠
+            if (fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat)
             {
-                if (!TryGetOverlapBounds(fe, te, out var start, out var end)) continue;
-                if (overlapIntervals.Any(iv => iv.Start == start && iv.End == end)) continue;
+                var start = fe.StartBeat > te.StartBeat ? fe.StartBeat : te.StartBeat;
+                var end = fe.EndBeat < te.EndBeat ? fe.EndBeat : te.EndBeat;
                 AddOrMergeOverlapInterval(overlapIntervals, start, end);
             }
+
+            // 移动结束时间较早的指针
+            if (te.EndBeat <= fe.EndBeat)
+                i++;
+            else
+                j++;
         }
 
         SortIntervals(overlapIntervals);
@@ -669,23 +716,69 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
 
     /// <summary>
     /// 获取指定拍点处处于激活状态且起始拍最晚的事件。
+    /// 使用二分查找，O(logN) 复杂度。要求 events 已按 StartBeat 排序。
     /// </summary>
-    /// <param name="events">事件列表。</param>
-    /// <param name="beat">查询拍点。</param>
-    /// <returns>命中的活动事件；若不存在则为 <see langword="null"/>。</returns>
     private static Kpc.Event<TPayload>? GetActiveEventAtBeat(List<Kpc.Event<TPayload>> events, Beat beat)
-        => events.Where(e => e.StartBeat <= beat && e.EndBeat >= beat).MaxBy(e => e.StartBeat);
+    {
+        if (events.Count == 0) return null;
+
+        // 二分查找最后一个 StartBeat <= beat 的事件
+        var lo = 0;
+        var hi = events.Count - 1;
+        var result = -1;
+
+        while (lo <= hi)
+        {
+            var mid = lo + (hi - lo) / 2;
+            if (events[mid].StartBeat <= beat)
+            {
+                result = mid;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid - 1;
+            }
+        }
+
+        // 从 result 开始向前找，找到第一个 EndBeat >= beat 的事件
+        for (var i = result; i >= 0; i--)
+        {
+            if (events[i].EndBeat >= beat)
+                return events[i];
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// 获取指定拍点之前最近事件的终值。
+    /// 使用二分查找，O(logN) 复杂度。要求 events 已按 StartBeat 排序。
     /// </summary>
-    /// <param name="events">事件列表。</param>
-    /// <param name="beat">查询拍点。</param>
-    /// <returns>最近前序终值；不存在时返回默认值。</returns>
     private static TPayload? GetPreviousEndValue(List<Kpc.Event<TPayload>> events, Beat beat)
     {
-        var prev = events.FindLast(e => e.EndBeat <= beat);
-        return prev != null ? prev.EndValue : default;
+        if (events.Count == 0) return default;
+
+        // 二分查找最后一个 EndBeat <= beat 的事件
+        var lo = 0;
+        var hi = events.Count - 1;
+        var result = -1;
+
+        while (lo <= hi)
+        {
+            var mid = lo + (hi - lo) / 2;
+            if (events[mid].EndBeat <= beat)
+            {
+                result = mid;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid - 1;
+            }
+        }
+
+        return result >= 0 ? events[result].EndValue : default;
     }
 
     /// <summary>
