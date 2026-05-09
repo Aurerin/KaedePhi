@@ -5,6 +5,8 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 
 public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPayload>>
 {
+    private static readonly EventCutter<TPayload> Cutter = new();
+
     #region 入口
 
     /// <inheritdoc/>
@@ -437,8 +439,8 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
         var cutFrom = new List<Kpc.Event<TPayload>>();
         foreach (var (start, end) in overlapIntervals)
         {
-            cutTo.AddRange(new EventCutter<TPayload>().CutEventsInRange(toEventsCopy, start, end, cutLength));
-            cutFrom.AddRange(new EventCutter<TPayload>().CutEventsInRange(fromEventsCopy, start, end, cutLength));
+            cutTo.AddRange(Cutter.CutEventsInRange(toEventsCopy, start, end, cutLength));
+            cutFrom.AddRange(Cutter.CutEventsInRange(fromEventsCopy, start, end, cutLength));
             toEventsCopy.RemoveAll(e => e.StartBeat < end && e.EndBeat > start);
             fromEventsCopy.RemoveAll(e => e.StartBeat < end && e.EndBeat > start);
         }

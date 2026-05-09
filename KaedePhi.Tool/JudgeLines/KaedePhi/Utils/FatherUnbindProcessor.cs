@@ -13,6 +13,9 @@ namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
 /// </summary>
 public static class FatherUnbindProcessor
 {
+    private static readonly EventMerger<double> Merger = new();
+    private static readonly EventCutter<double> Cutter = new();
+
     private readonly record struct PrepareResult(
         JudgeLine JudgeLine,
         JudgeLine? FatherLine,
@@ -92,9 +95,6 @@ public static class FatherUnbindProcessor
                 return judgeLineCopy;
             }
 
-            var merger = new EventMerger<double>();
-            var cutter = new EventCutter<double>();
-
             progress?.Report(new ToolProgress(0.2, "合并通道"));
             var mergedChannels =
                 FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
@@ -109,11 +109,11 @@ public static class FatherUnbindProcessor
 
             var cutTasks = new[]
             {
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Tx, txMin, txMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Ty, tyMin, tyMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Fx, fxMin, fxMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength))
+                Task.Run(() => Cutter.CutEventsInRange(mergedChannels.Tx, txMin, txMax, cutLength)),
+                Task.Run(() => Cutter.CutEventsInRange(mergedChannels.Ty, tyMin, tyMax, cutLength)),
+                Task.Run(() => Cutter.CutEventsInRange(mergedChannels.Fx, fxMin, fxMax, cutLength)),
+                Task.Run(() => Cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)),
+                Task.Run(() => Cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength))
             };
             Task.WaitAll(cutTasks);
 
@@ -140,13 +140,12 @@ public static class FatherUnbindProcessor
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
-                => merger.EventListMerge(a, b, precision);
+                => Merger.EventListMerge(a, b, precision);
         }
         catch (Exception ex)
         {
-            judgeLineCopy = allJudgeLines[targetJudgeLineIndex].Clone();
-            logError?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 未知错误: " + ex.Message);
-            return judgeLineCopy;
+            logError?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message);
+            return allJudgeLines[targetJudgeLineIndex].Clone();
         }
     }
 
@@ -186,8 +185,6 @@ public static class FatherUnbindProcessor
                 return judgeLineCopy;
             }
 
-            var merger = new EventMerger<double>();
-
             progress?.Report(new ToolProgress(0.2, "合并通道"));
             var ch = FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
 
@@ -223,13 +220,12 @@ public static class FatherUnbindProcessor
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
-                => merger.EventMergePlus(a, b, precision, tolerance);
+                => Merger.EventMergePlus(a, b, precision, tolerance);
         }
         catch (Exception ex)
         {
-            judgeLineCopy = allJudgeLines[targetJudgeLineIndex].Clone();
-            logError?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 未知错误: " + ex.Message);
-            return judgeLineCopy;
+            logError?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message);
+            return allJudgeLines[targetJudgeLineIndex].Clone();
         }
     }
 }

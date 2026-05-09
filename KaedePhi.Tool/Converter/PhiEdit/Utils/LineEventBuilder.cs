@@ -21,6 +21,8 @@ public class LineEventBuilder
     private readonly EventCompressor<float> _eventCompressorFloat;
     private readonly EventCutter<double> _eventCutterDouble;
     private readonly EventCompressor<double> _eventCompressorDouble;
+    private readonly KpcLayerProcessor _layerProcessor = new();
+    private readonly Dictionary<Type, object> _eventCutters = new();
 
     public LineEventBuilder(KpcToPhiEditConvertOptions options, Action<string>? warnLogger = null)
     {
@@ -46,22 +48,21 @@ public class LineEventBuilder
         {
             if (!HasAnyEventData(layers[i])) continue;
             Warn("JudgeLine 存在多个事件层；PE 仅支持单层，将自动合并为一层");
-            var layerProcessor = new KpcLayerProcessor();
             if (_options.MultiLayerMerge.ClassicMode)
             {
                 if (_options.MultiLayerMerge.Compress)
                 {
-                    var layer = layerProcessor.LayerMerge(layers,
+                    var layer = _layerProcessor.LayerMerge(layers,
                         _options.MultiLayerMerge.Precision);
-                    layerProcessor.LayerEventsCompress(layer, 0.1d);
+                    _layerProcessor.LayerEventsCompress(layer, 0.1d);
                     primaryLayer = layer;
                 }
                 else
-                    primaryLayer = layerProcessor.LayerMerge(layers,
+                    primaryLayer = _layerProcessor.LayerMerge(layers,
                         _options.MultiLayerMerge.Precision);
             }
             else
-                primaryLayer = layerProcessor.LayerMergePlus(
+                primaryLayer = _layerProcessor.LayerMergePlus(
                     layers,
                     _options.MultiLayerMerge.Precision,
                     _options.MultiLayerMerge.Tolerance);
@@ -471,8 +472,20 @@ public class LineEventBuilder
         {
             Warn(
                 $"{context}：检测到不支持的缓动，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件");
-            return new EventCutter<T>().CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
+            var cutter = GetOrCreateCutter<T>();
+            return cutter.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
         }
+    }
+
+    private EventCutter<T> GetOrCreateCutter<T>()
+    {
+        var type = typeof(T);
+        if (!_eventCutters.TryGetValue(type, out var cutter))
+        {
+            cutter = new EventCutter<T>();
+            _eventCutters[type] = cutter;
+        }
+        return (EventCutter<T>)cutter;
     }
 
     #endregion

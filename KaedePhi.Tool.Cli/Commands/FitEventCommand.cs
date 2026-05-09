@@ -45,16 +45,16 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
                 if (el == null) continue;
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var mx = Task.Run(() => mxFitter.EventListFit(el.MoveXEvents, tol, degree), cancellationToken);
-                var my = Task.Run(() => myFitter.EventListFit(el.MoveYEvents, tol, degree), cancellationToken);
-                var al = Task.Run(() => alFitter.EventListFit(el.AlphaEvents, tol, degree), cancellationToken);
-                var ro = Task.Run(() => roFitter.EventListFit(el.RotateEvents, tol, degree), cancellationToken);
-                await Task.WhenAll(mx, my, al, ro);
+                // 使用顺序执行避免嵌套并行导致线程池抖动
+                var mxResult = mxFitter.EventListFit(el.MoveXEvents, tol, degree);
+                var myResult = myFitter.EventListFit(el.MoveYEvents, tol, degree);
+                var alResult = alFitter.EventListFit(el.AlphaEvents, tol, degree);
+                var roResult = roFitter.EventListFit(el.RotateEvents, tol, degree);
 
-                nrcCopy.JudgeLineList[i].EventLayers[j].MoveXEvents = mx.Result;
-                nrcCopy.JudgeLineList[i].EventLayers[j].MoveYEvents = my.Result;
-                nrcCopy.JudgeLineList[i].EventLayers[j].AlphaEvents = al.Result;
-                nrcCopy.JudgeLineList[i].EventLayers[j].RotateEvents = ro.Result;
+                nrcCopy.JudgeLineList[i].EventLayers[j].MoveXEvents = mxResult;
+                nrcCopy.JudgeLineList[i].EventLayers[j].MoveYEvents = myResult;
+                nrcCopy.JudgeLineList[i].EventLayers[j].AlphaEvents = alResult;
+                nrcCopy.JudgeLineList[i].EventLayers[j].RotateEvents = roResult;
             }
         }
 

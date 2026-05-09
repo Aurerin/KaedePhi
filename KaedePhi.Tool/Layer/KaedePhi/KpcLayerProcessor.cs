@@ -181,18 +181,16 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         progress?.Report(new ToolProgress(1.0));
     }
 
-    private static List<EventLayer>? RemoveUnlessLayer(List<EventLayer>? layers)
+    private List<EventLayer>? RemoveUnlessLayer(List<EventLayer>? layers)
     {
         if (layers is not { Count: > 1 }) return layers;
         var layersCopy = layers.Select(l => l.Clone()).ToList();
-        var intCompressor = new EventCompressor<int>();
-        var doubleCompressor = new EventCompressor<double>();
         foreach (var layer in layersCopy)
         {
-            layer.AlphaEvents = intCompressor.RemoveUselessEvent(layer.AlphaEvents);
-            layer.MoveXEvents = doubleCompressor.RemoveUselessEvent(layer.MoveXEvents);
-            layer.MoveYEvents = doubleCompressor.RemoveUselessEvent(layer.MoveYEvents);
-            layer.RotateEvents = doubleCompressor.RemoveUselessEvent(layer.RotateEvents);
+            layer.AlphaEvents = _intCompressor.RemoveUselessEvent(layer.AlphaEvents);
+            layer.MoveXEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents);
+            layer.MoveYEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents);
+            layer.RotateEvents = _doubleCompressor.RemoveUselessEvent(layer.RotateEvents);
         }
 
         return layersCopy;

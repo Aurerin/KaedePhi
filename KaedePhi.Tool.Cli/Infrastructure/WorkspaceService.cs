@@ -20,11 +20,30 @@ public sealed class WorkspaceService
         Directory.EnumerateDirectories(_rootDir).Select(Path.GetFileName)!;
 
     /// <summary>
+    /// 验证工作区 ID 的合法性，防止路径遍历攻击。
+    /// </summary>
+    private string ValidateAndResolveId(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            throw new ArgumentException("Workspace ID cannot be null or whitespace.", nameof(id));
+
+        // 只允许字母、数字、下划线、连字符
+        if (!id.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-'))
+            throw new ArgumentException("Workspace ID contains invalid characters. Only alphanumeric, underscore, and hyphen are allowed.", nameof(id));
+
+        var dir = Path.GetFullPath(Path.Combine(_rootDir, id));
+        if (!dir.StartsWith(Path.GetFullPath(_rootDir), StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Workspace ID resolves to a path outside the workspace root.", nameof(id));
+
+        return dir;
+    }
+
+    /// <summary>
     /// 将外部谱面文件以流的方式复制到工作区目录，不做任何解析。
     /// </summary>
     public async Task LoadAsync(string id, string chartPath)
     {
-        var dir = Path.Combine(_rootDir, id);
+        var dir = ValidateAndResolveId(id);
         Directory.CreateDirectory(dir);
         var dest = Path.Combine(dir, ChartFileName);
         await using var src = new FileStream(chartPath, FileMode.Open, FileAccess.Read,
@@ -34,14 +53,15 @@ public sealed class WorkspaceService
         await src.CopyToAsync(dst);
     }
 
-    public bool Exists(string id) => Directory.Exists(Path.Combine(_rootDir, id));
+    public bool Exists(string id) => Directory.Exists(ValidateAndResolveId(id));
 
     /// <summary>
     /// 返回工作区谱面文件的路径，若工作区不存在则返回 null。
     /// </summary>
     public string? GetChartPath(string id)
     {
-        var file = Path.Combine(_rootDir, id, ChartFileName);
+        var dir = ValidateAndResolveId(id);
+        var file = Path.Combine(dir, ChartFileName);
         return File.Exists(file) ? file : null;
     }
 
@@ -69,7 +89,7 @@ public sealed class WorkspaceService
             return;
         }
 
-        var dir = Path.Combine(_rootDir, id);
+        var dir = ValidateAndResolveId(id);
         if (Directory.Exists(dir)) Directory.Delete(dir, true);
     }
 }

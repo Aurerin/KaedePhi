@@ -13,7 +13,7 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
         public string? Input { get; set; }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, GetTypeTestCommand.Settings settings,
+        protected override async Task<int> ExecuteAsync(CommandContext context, GetTypeTestCommand.Settings settings,
         CancellationToken cancellationToken)
     {
         var writer = new ConsoleWriter();
@@ -26,7 +26,7 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
         }
         
         // 创建文件流
-        var stream = File.OpenRead(input);
+        using var stream = File.OpenRead(input);
         // 测试pec
         var chart = await Core.PhiEdit.Chart.LoadStreamAsync(stream);
         writer.Info(chart.Offset.ToString());
