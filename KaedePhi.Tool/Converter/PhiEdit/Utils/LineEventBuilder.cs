@@ -1,10 +1,7 @@
 using KaedePhi.Core.Common;
-using global::KaedePhi.Tool.KaedePhi.Converters.Utils;
-using global::KaedePhi.Tool.Event.KaedePhi;
 using global::KaedePhi.Tool.Layer.KaedePhi;
-using global::KaedePhi.Tool.KaedePhi.Events;
-using global::KaedePhi.Tool.KaedePhi;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
+using KaedePhi.Tool.Event.KaedePhi;
 using KpcEasing = KaedePhi.Core.KaedePhi.Easing;
 using KpcEventLayer = KaedePhi.Core.KaedePhi.EventLayer;
 
@@ -17,10 +14,24 @@ public class LineEventBuilder
 {
     private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhiEditConvertOptions _options;
+    private readonly Action<string>? _warnLogger;
+    private readonly EventCutter<int> _eventCutterInt;
+    private readonly EventCompressor<int> _eventCompressorInt;
+    private readonly EventCutter<float> _eventCutterFloat;
+    private readonly EventCompressor<float> _eventCompressorFloat;
+    private readonly EventCutter<double> _eventCutterDouble;
+    private readonly EventCompressor<double> _eventCompressorDouble;
 
-    public LineEventBuilder(KpcToPhiEditConvertOptions options)
+    public LineEventBuilder(KpcToPhiEditConvertOptions options, Action<string>? warnLogger = null)
     {
         _options = options;
+        _warnLogger = warnLogger;
+        _eventCutterInt = new EventCutter<int>();
+        _eventCompressorInt = new EventCompressor<int>();
+        _eventCutterFloat = new EventCutter<float>();
+        _eventCompressorFloat = new EventCompressor<float>();
+        _eventCutterDouble = new EventCutter<double>();
+        _eventCompressorDouble = new EventCompressor<double>();
     }
 
     /// <summary>
@@ -78,9 +89,9 @@ public class LineEventBuilder
             .OrderBy(e => (double)e.StartBeat)
             .SelectMany(srcEvent =>
             {
-                var sliced = KpcEventTools.CutEventToLiner(srcEvent, 1d / _options.Alpha.CutPrecision);
+                var sliced = _eventCutterInt.CutEventToLiner(srcEvent, 1d / _options.Alpha.CutPrecision);
                 return _options.Alpha.CutCompress
-                    ? KpcEventTools.EventListCompressSlope(sliced, _options.Alpha.CutTolerance)
+                    ? _eventCompressorInt.EventListCompressSlope(sliced, _options.Alpha.CutTolerance)
                     : sliced;
             })
             .ToList();
@@ -130,7 +141,7 @@ public class LineEventBuilder
 
         foreach (var srcEvent in sourceEvents.OrderBy(e => (double)e.StartBeat))
         {
-            var slices = KpcEventTools.CutEventToLiner(srcEvent, 1d / _options.Speed.CutPrecision);
+            var slices = _eventCutterFloat.CutEventToLiner(srcEvent, 1d / _options.Speed.CutPrecision);
             for (var i = 0; i < slices.Count; i++)
             {
                 var slice = slices[i];
@@ -223,7 +234,7 @@ public class LineEventBuilder
         }
     }
 
-    private static void EmitAlignedMoveSegment(
+    private void EmitAlignedMoveSegment(
         Pe.JudgeLine target,
         float start, float end,
         Kpc.Event<double>? activeX, Kpc.Event<double>? activeY,
@@ -280,7 +291,7 @@ public class LineEventBuilder
         lastY = endYv;
     }
 
-    private static void WarnMoveSegmentMisalignment(
+    private void WarnMoveSegmentMisalignment(
         Kpc.Event<double>? activeX, Kpc.Event<double>? activeY,
         bool xAligned, bool yAligned,
         float start, float end)
@@ -325,8 +336,8 @@ public class LineEventBuilder
         var endBeat = new Beat(end);
         var cutLength = 1d / _options.Cutting.MisalignedXyEventPrecision;
 
-        var cutX = KpcEventTools.CutEventsInRange(xEvents, startBeat, endBeat, cutLength);
-        var cutY = KpcEventTools.CutEventsInRange(yEvents, startBeat, endBeat, cutLength);
+        var cutX = _eventCutterDouble.CutEventsInRange(xEvents, startBeat, endBeat, cutLength);
+        var cutY = _eventCutterDouble.CutEventsInRange(yEvents, startBeat, endBeat, cutLength);
 
         var subBoundaries = CollectBoundaries(cutX, cutY);
         subBoundaries.Add(start);
@@ -460,7 +471,7 @@ public class LineEventBuilder
         {
             Warn(
                 $"{context}：检测到不支持的缓动，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件");
-            return KpcEventTools.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
+            return new EventCutter<T>().CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
         }
     }
 
@@ -498,7 +509,7 @@ public class LineEventBuilder
             && Math.Abs((double)e.EndBeat - end) <= FloatEpsilon);
     }
 
-    private static int SafeConvertEasingToInt(KpcEasing easing, string context)
+    private int SafeConvertEasingToInt(KpcEasing easing, string context)
     {
         try
         {
@@ -506,7 +517,7 @@ public class LineEventBuilder
         }
         catch (EasingConverter.EasingNotSupportedException)
         {
-            Warn($"{context}：展开后仍存在不支持的缓动，回退为线性(1)");
+            Warn($"{context}：展开后仍存在不支持的缓动，回退为线性");
             return 1;
         }
     }
@@ -532,8 +543,6 @@ public class LineEventBuilder
         {
             if (e.IsBezier)
                 Warn($"{channel}：Bezier 事件不受 PE 原生事件模型支持，事件将被自动转换为线性事件");
-            if (!IsDefaultBezierPoints(e.BezierPoints))
-                Warn($"{channel}：非默认 BezierPoints 将被丢弃");
             if (Math.Abs(e.EasingLeft) > FloatEpsilon || Math.Abs(e.EasingRight - 1f) > FloatEpsilon)
                 Warn($"{channel}：PE 不支持 EasingLeft/EasingRight 裁剪，事件将被自动转换为线性事件");
             if (!string.IsNullOrWhiteSpace(e.Font))
@@ -541,14 +550,7 @@ public class LineEventBuilder
         }
     }
 
-    private static bool IsDefaultBezierPoints(float[]? points)
-        => points is { Length: 4 }
-           && Math.Abs(points[0]) <= FloatEpsilon
-           && Math.Abs(points[1]) <= FloatEpsilon
-           && Math.Abs(points[2]) <= FloatEpsilon
-           && Math.Abs(points[3]) <= FloatEpsilon;
-
-    private static void Warn(string message) => KpcToolLog.OnWarning($"[ToPe] {message}");
+    private void Warn(string message) => _warnLogger?.Invoke($"[ToPe] {message}");
 
     #endregion
 }

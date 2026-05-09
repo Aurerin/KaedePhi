@@ -1,7 +1,6 @@
 ﻿using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Settings;
 using KaedePhi.Tool.JudgeLines.KaedePhi;
-using KaedePhi.Tool.KaedePhi;
 
 namespace KaedePhi.Tool.Cli.Commands;
 
@@ -24,7 +23,7 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
 
         var nrcCopy = nrc.Clone();
         var unbinder = new KpcJudgeLineUnbinder();
-        using var _ = KpcToolLog.Subscribe(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
+        unbinder.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
 
         for (var i = 0; i < nrc.JudgeLineList.Count; i++)
         {

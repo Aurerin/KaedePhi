@@ -1,6 +1,5 @@
 ﻿using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Settings;
-using KaedePhi.Tool.KaedePhi;
 using KaedePhi.Tool.Render.KaedePhi;
 
 namespace KaedePhi.Tool.Cli.Commands;
@@ -62,7 +61,7 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         };
 
         var exporter = new KpcChartRenderExporter();
-        using var _ = KpcToolLog.Subscribe(info: writer.Info, warning: writer.Warn, error: writer.Error);
+        exporter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error);
 
         try
         {
