@@ -82,64 +82,22 @@ namespace KaedePhi.Core.PhiEdit
             var chart = new Chart();
             var judgeDict = new Dictionary<int, JudgeLine>();
 
-            // 第一行：offset
             var firstLine = reader.ReadLine();
             if (!int.TryParse(firstLine, out var offset))
                 throw new FormatException("Malformed chart file: first line is not a valid integer offset.");
             chart.Offset = offset;
 
-            // 逐行解析，但 ParseNote 可能需要向后看最多2行（当inline参数不存在时）
-            // 用一个单行缓冲来支持"预读"
-            string pendingLine = null;
-
             string line;
-            while ((line = ReadNextLine()) != null)
+            while ((line = reader.ReadLine()) != null)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                var part = line.Split(' ');
-                int judgeLineIndex = -1;
-                if (part[0] != "bp")
-                    judgeLineIndex = part.Length > 1 ? int.Parse(part[1]) : -1;
-
-                if (part[0] == "bp")
-                {
-                    chart.BpmList.Add(new BpmItem
-                    {
-                        StartBeat = float.Parse(part[1]),
-                        Bpm = float.Parse(part[2])
-                    });
-                }
-                else if (line.StartsWith('n'))
-                {
-                    var (speedPart, widthPart) = GetInlineNoteParts(part);
-                    if (speedPart == null)
-                    {
-                        // 需要额外读取后续两行
-                        speedPart = reader.ReadLine()?.Split(' ');
-                        widthPart = reader.ReadLine()?.Split(' ');
-                    }
-
-                    AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
-                }
-                else
-                    ParseLineCommand(part, judgeLineIndex, judgeDict);
-                
+                if (!string.IsNullOrWhiteSpace(line))
+                    ParseChartLine(line, reader, chart, judgeDict);
             }
 
             SortAndBuild(chart, judgeDict);
             return chart;
-
-            string ReadNextLine()
-            {
-                if (pendingLine is null) return reader.ReadLine();
-                var tmp = pendingLine;
-                pendingLine = null;
-                return tmp;
-            }
         }
-        
+
         /// <summary>
         /// 异步从流中加载PhiEditChart
         /// </summary>
@@ -155,63 +113,68 @@ namespace KaedePhi.Core.PhiEdit
             var chart = new Chart();
             var judgeDict = new Dictionary<int, JudgeLine>();
 
-            // 第一行：offset
             var firstLine = await reader.ReadLineAsync();
             if (!int.TryParse(firstLine, out var offset))
                 throw new FormatException("Malformed chart file: first line is not a valid integer offset.");
             chart.Offset = offset;
 
-            // 逐行解析，但 ParseNote 可能需要向后看最多2行（当inline参数不存在时）
-            // 用一个单行缓冲来支持"预读"
-            string pendingLine = null;
-
             string line;
-            while ((line = await ReadNextLine()) != null)
+            while ((line = await reader.ReadLineAsync()) != null)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                var part = line.Split(' ');
-                int judgeLineIndex = -1;
-                if (part[0] != "bp")
-                    judgeLineIndex = part.Length > 1 ? int.Parse(part[1]) : -1;
-
-                if (part[0] == "bp")
-                {
-                    chart.BpmList.Add(new BpmItem
-                    {
-                        StartBeat = float.Parse(part[1]),
-                        Bpm = float.Parse(part[2])
-                    });
-                }
-                else if (line.StartsWith('n'))
-                {
-                    var (speedPart, widthPart) = GetInlineNoteParts(part);
-                    if (speedPart == null)
-                    {
-                        // 需要额外读取后续两行
-                        speedPart = (await reader.ReadLineAsync())?.Split(' ');
-                        widthPart = (await reader.ReadLineAsync())?.Split(' ');
-                    }
-
-                    AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
-                }
-                else
-                    ParseLineCommand(part, judgeLineIndex, judgeDict);
-                
+                if (!string.IsNullOrWhiteSpace(line))
+                    await ParseChartLineAsync(line, reader, chart, judgeDict);
             }
 
             SortAndBuild(chart, judgeDict);
             return chart;
+        }
 
-            async Task<string> ReadNextLine()
+        private static void ParseChartLine(string line, StreamReader reader, Chart chart, Dictionary<int, JudgeLine> judgeDict)
+        {
+            var part = line.Split(' ');
+            var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
+
+            if (part[0] == "bp")
             {
-                // ReSharper disable once AccessToDisposedClosure
-                if (pendingLine is null) return await reader.ReadLineAsync();
-                var tmp = pendingLine;
-                pendingLine = null;
-                return tmp;
+                chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
             }
+            else if (line.StartsWith('n'))
+            {
+                var (speedPart, widthPart) = GetInlineNoteParts(part);
+                if (speedPart == null)
+                {
+                    // 需要额外读取后续两行
+                    speedPart = reader.ReadLine()?.Split(' ');
+                    widthPart = reader.ReadLine()?.Split(' ');
+                }
+                AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
+            }
+            else
+                ParseLineCommand(part, judgeLineIndex, judgeDict);
+        }
+
+        private static async Task ParseChartLineAsync(string line, StreamReader reader, Chart chart, Dictionary<int, JudgeLine> judgeDict)
+        {
+            var part = line.Split(' ');
+            var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
+
+            if (part[0] == "bp")
+            {
+                chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
+            }
+            else if (line.StartsWith('n'))
+            {
+                var (speedPart, widthPart) = GetInlineNoteParts(part);
+                if (speedPart == null)
+                {
+                    // 需要额外读取后续两行
+                    speedPart = (await reader.ReadLineAsync())?.Split(' ');
+                    widthPart = (await reader.ReadLineAsync())?.Split(' ');
+                }
+                AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
+            }
+            else
+                ParseLineCommand(part, judgeLineIndex, judgeDict);
         }
         
 

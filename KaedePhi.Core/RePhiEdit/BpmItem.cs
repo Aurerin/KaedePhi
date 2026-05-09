@@ -6,14 +6,8 @@ namespace KaedePhi.Core.RePhiEdit
 {
     public class BpmItem
     {
-        private float _beatPerMinute = 120f;
-
         [JsonProperty("bpm")]
-        public float Bpm
-        {
-            get => _beatPerMinute;
-            set { _beatPerMinute = value; }
-        }
+        public float Bpm { get; set; } = 120f;
 
         [JsonIgnore]
         [Obsolete("拍与时间容易产生歧义，未来将会改为StartBeat", false)]
@@ -23,7 +17,8 @@ namespace KaedePhi.Core.RePhiEdit
             set => StartBeat = value;
         }
 
-        [JsonProperty("startTime")] public Beat StartBeat = new Beat(BeatArray);
+        [JsonProperty("startTime")] 
+        public Beat StartBeat { get; set; } = new(BeatArray);
         private static readonly int[] BeatArray = { 0, 0, 1 };
 
         public BpmItem Clone()

@@ -62,6 +62,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// XY事件是否一一对应
         /// </summary>
+        // ReSharper disable once StringLiteralTypo
         [JsonProperty("xybind")]
         public bool XyBind { get; set; } = true;
     }
