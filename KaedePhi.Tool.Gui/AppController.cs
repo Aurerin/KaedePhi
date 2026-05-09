@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
@@ -26,7 +25,6 @@ internal sealed class AppController
     private readonly ProcessingViewModel _processingVm;
     private readonly SettingsViewModel _settingsVm;
 
-    private ChartType _detectedType;
     private CancellationTokenSource? _cts;
     private bool _isFileProcessing;
 
@@ -91,6 +89,7 @@ internal sealed class AppController
     {
         _exportVm.SelectedFormat = ChartType.RePhiEdit;
         _exportVm.UseStream = false;
+        _exportVm.IndentedOutput = false;
         _exportVm.StatusText = string.Empty;
         _exportVm.IsExporting = false;
         _main.CurrentPage = _exportVm;
@@ -135,7 +134,6 @@ internal sealed class AppController
             await _chart.CopyToWorkspaceAsync(filePath, useStream, CancellationToken.None);
 
             var (_, detectedType) = await _chart.LoadAndDetectFromWorkspaceAsync(CancellationToken.None);
-            _detectedType = detectedType;
 
             _toolVm.CurrentFileName = System.IO.Path.GetFileName(filePath);
             _toolVm.DetectedFormat = detectedType.ToString();
@@ -170,7 +168,6 @@ internal sealed class AppController
             // Step 0: Load from workspace
             _processingVm.SetStep(0, log_step_loading);
             var (text, detectedType) = await _chart.LoadAndDetectFromWorkspaceAsync(_cts.Token);
-            _detectedType = detectedType;
 
             // Step 1: Detect format
             _processingVm.SetStep(1, string.Format(log_step_detected, detectedType));
@@ -240,6 +237,19 @@ internal sealed class AppController
         NavigateToExport();
     }
 
+    /// <summary>
+    /// 根据导出格式返回 (扩展名不含点, 文件类型描述) 元组
+    /// </summary>
+    private static (string Extension, string TypeLabel) GetFormatFileInfo(ChartType format) => format switch
+    {
+        ChartType.PhiEdit   => ("pec",  "PhiEdit Chart"),
+        ChartType.RePhiEdit => ("json", "RePhiEdit JSON"),
+        ChartType.PhigrosV3 => ("json", "Phigros v3 JSON"),
+        ChartType.PhiFans   => ("json", "PhiFans JSON"),
+        ChartType.PhiChain  => ("json", "PhiChain JSON"),
+        _                   => ("json", "JSON Files")
+    };
+
     private async void OnExportExecute()
     {
         _exportVm.IsExporting = true;
@@ -256,15 +266,17 @@ internal sealed class AppController
 
             var targetFormat = _exportVm.SelectedFormat;
             var formatName = targetFormat.ToString();
+            var (ext, typeLabel) = GetFormatFileInfo(targetFormat);
 
             var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
                 Title = export_title,
-                SuggestedFileName = $"export_{formatName}.json",
-                FileTypeChoices = new[]
-                {
-                    new FilePickerFileType("JSON Files") { Patterns = new[] { "*.json" } }
-                }
+                SuggestedFileName = $"export_{formatName}.{ext}",
+                DefaultExtension = ext,
+                FileTypeChoices =
+                [
+                    new FilePickerFileType(typeLabel) { Patterns = [$"*.{ext}"] }
+                ]
             });
 
             if (file != null)
@@ -272,13 +284,18 @@ internal sealed class AppController
                 var outputPath = file.TryGetLocalPath();
                 if (!string.IsNullOrEmpty(outputPath))
                 {
+                    // 若 OS 未自动附加扩展名，则手动补全
+                    var expectedExt = $".{ext}";
+                    if (!outputPath.EndsWith(expectedExt, StringComparison.OrdinalIgnoreCase))
+                        outputPath = outputPath + expectedExt;
+
                     _log.Info(string.Format(log_exporting_to, outputPath, targetFormat));
 
                     // Read current workspace, detect, convert to KPC, then export as target
                     var (text, detectedType) = await _chart.LoadAndDetectFromWorkspaceAsync(CancellationToken.None);
                     var kpcChart = _chart.ConvertToKpc(text, detectedType);
                     await _chart.ConvertFromKpcAndSaveAsync(
-                        kpcChart, targetFormat, outputPath, _exportVm.UseStream, CancellationToken.None);
+                        kpcChart, targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, CancellationToken.None);
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
                     _log.Info(log_export_done);

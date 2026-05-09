@@ -127,6 +127,9 @@
   <data name="export_stream_writing" xml:space="preserve">
     <value>Stream Writing</value>
   </data>
+  <data name="export_indented_output" xml:space="preserve">
+    <value>Indented Output (Formatted)</value>
+  </data>
   <data name="processing_title" xml:space="preserve">
     <value>Processing Chart</value>
   </data>

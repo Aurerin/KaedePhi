@@ -127,6 +127,9 @@
   <data name="export_stream_writing" xml:space="preserve">
     <value>串流寫入</value>
   </data>
+  <data name="export_indented_output" xml:space="preserve">
+    <value>格式化輸出（縮排）</value>
+  </data>
   <data name="processing_title" xml:space="preserve">
     <value>處理譜面</value>
   </data>

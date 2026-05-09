@@ -123,6 +123,15 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 格式化输出（缩进）.
+        /// </summary>
+        public static string export_indented_output {
+            get {
+                return ResourceManager.GetString("export_indented_output", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 输出格式.
         /// </summary>
         public static string export_output_format {
