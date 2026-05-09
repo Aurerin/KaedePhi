@@ -9,19 +9,19 @@ namespace KaedePhi.Core.RePhiEdit
     public class EventLayer
     {
         [JsonProperty("moveXEvents", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> MoveXEvents; // 移动事件
+        public List<Event<float>> MoveXEvents { get; set; } // 移动事件
 
         [JsonProperty("moveYEvents", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> MoveYEvents; // 移动事件
+        public List<Event<float>> MoveYEvents { get; set; } // 移动事件
 
         [JsonProperty("rotateEvents", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> RotateEvents; // 旋转事件
+        public List<Event<float>> RotateEvents { get; set; } // 旋转事件
 
         [JsonProperty("alphaEvents", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<int>> AlphaEvents; // 透明度事件
+        public List<Event<int>> AlphaEvents { get; set; } // 透明度事件
 
         [JsonProperty("speedEvents", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> SpeedEvents; // 速度事件
+        public List<Event<float>> SpeedEvents { get; set; } // 速度事件
 
         /// <summary>
         /// 获取某个拍时，指定事件层级指定事件列表的数值
@@ -29,7 +29,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// <param name="events">事件数组</param>
         /// <param name="beat">指定拍</param>
         /// <returns>在指定拍时，指定事件列表的数值</returns>
-        public T GetValueAtBeat<T>(List<Event<T>> events, Beat beat)
+        public static T GetValueAtBeat<T>(List<Event<T>> events, Beat beat)
         {
             for (int i = 0; i < events.Count; i++)
             {
