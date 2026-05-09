@@ -8,7 +8,7 @@ public sealed class LayerMergeCommand : AsyncCommand<LayerMergeCommand.Settings>
 {
     public sealed class Settings : OperationSettings;
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
     {
         var c = s.AppConfig.LayerMergeConfig;
         s.Precision ??= c.Precision;
@@ -25,7 +25,7 @@ public sealed class LayerMergeCommand : AsyncCommand<LayerMergeCommand.Settings>
 
         var writer = new ConsoleWriter();
         var svc = new ChartService();
-        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, ct);
+        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
         if (nrc == null) { writer.Error(Strings.cli_err_unimplemented); return 1; }
 
         var nrcCopy = nrc.Clone();
@@ -41,7 +41,7 @@ public sealed class LayerMergeCommand : AsyncCommand<LayerMergeCommand.Settings>
             ];
         }
 
-        var output = await svc.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace), s.DryRun ?? false, ct);
+        var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace), s.DryRun ?? false, cancellationToken);
         writer.Info(string.Format(Strings.cli_msg_written, output));
         return 0;
     }

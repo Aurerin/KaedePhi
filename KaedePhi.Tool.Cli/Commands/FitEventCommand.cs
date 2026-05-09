@@ -8,7 +8,7 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 {
     public sealed class Settings : OperationSettings;
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
     {
         var c = s.AppConfig.FitConfig;
         s.Tolerance ??= c.Tolerance;
@@ -16,7 +16,7 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 
         var writer = new ConsoleWriter();
         var svc = new ChartService();
-        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, ct);
+        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
         if (nrc == null)
         {
             writer.Error(Strings.cli_err_unimplemented);
@@ -43,12 +43,12 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
             {
                 var el = nrc.JudgeLineList[i].EventLayers[j];
                 if (el == null) continue;
-                ct.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
-                var mx = Task.Run(() => mxFitter.EventListFit(el.MoveXEvents, tol, degree), ct);
-                var my = Task.Run(() => myFitter.EventListFit(el.MoveYEvents, tol, degree), ct);
-                var al = Task.Run(() => alFitter.EventListFit(el.AlphaEvents, tol, degree), ct);
-                var ro = Task.Run(() => roFitter.EventListFit(el.RotateEvents, tol, degree), ct);
+                var mx = Task.Run(() => mxFitter.EventListFit(el.MoveXEvents, tol, degree), cancellationToken);
+                var my = Task.Run(() => myFitter.EventListFit(el.MoveYEvents, tol, degree), cancellationToken);
+                var al = Task.Run(() => alFitter.EventListFit(el.AlphaEvents, tol, degree), cancellationToken);
+                var ro = Task.Run(() => roFitter.EventListFit(el.RotateEvents, tol, degree), cancellationToken);
                 await Task.WhenAll(mx, my, al, ro);
 
                 nrcCopy.JudgeLineList[i].EventLayers[j].MoveXEvents = mx.Result;
@@ -58,8 +58,8 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
             }
         }
 
-        var output = await svc.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
-            s.DryRun ?? false, ct);
+        var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
+            s.DryRun ?? false, cancellationToken);
         writer.Info(string.Format(Strings.cli_msg_written, output));
         return 0;
     }
