@@ -32,7 +32,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Configure git
         run: |
@@ -65,11 +65,13 @@ jobs:
             echo "Forced release type: release"
             echo "build_type=release" >> $GITHUB_OUTPUT
             echo "version=$CURRENT" >> $GITHUB_OUTPUT
+            echo "change_level=minor" >> $GITHUB_OUTPUT
             exit 0
           elif [ "$FORCE" = "prerelease" ]; then
             echo "Forced release type: prerelease"
             echo "build_type=prerelease" >> $GITHUB_OUTPUT
             echo "version=$CURRENT" >> $GITHUB_OUTPUT
+            echo "change_level=patch" >> $GITHUB_OUTPUT
             exit 0
           elif [ "$FORCE" = "skip" ]; then
             echo "Forced skip"
@@ -97,12 +99,18 @@ jobs:
           PREV_MAJOR=$(echo "$PREVIOUS" | cut -d'.' -f1)
           PREV_MINOR=$(echo "$PREVIOUS" | cut -d'.' -f2)
 
-          if [ -z "$PREVIOUS" ] || [ "$CUR_MAJOR" != "$PREV_MAJOR" ] || [ "$CUR_MINOR" != "$PREV_MINOR" ]; then
-            echo "Major/minor version changed ($PREVIOUS → $CURRENT) → Release"
+          if [ -z "$PREVIOUS" ] || [ "$CUR_MAJOR" != "$PREV_MAJOR" ]; then
+            echo "Major version changed ($PREVIOUS → $CURRENT) → Release"
             echo "build_type=release" >> $GITHUB_OUTPUT
+            echo "change_level=major" >> $GITHUB_OUTPUT
+          elif [ "$CUR_MINOR" != "$PREV_MINOR" ]; then
+            echo "Minor version changed ($PREVIOUS → $CURRENT) → Release"
+            echo "build_type=release" >> $GITHUB_OUTPUT
+            echo "change_level=minor" >> $GITHUB_OUTPUT
           else
             echo "Patch version changed ($PREVIOUS → $CURRENT) → PreRelease"
             echo "build_type=prerelease" >> $GITHUB_OUTPUT
+            echo "change_level=patch" >> $GITHUB_OUTPUT
           fi
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
 
@@ -120,6 +128,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_TYPE: ${{ steps.version.outputs.build_type }}
           VERSION: ${{ steps.version.outputs.version }}
+          CHANGE_LEVEL: ${{ steps.version.outputs.change_level }}
         run: |
           CSPROJ="KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
           output_dir="./artifacts/cli"
@@ -153,10 +162,50 @@ jobs:
             exit 0
           fi
 
+          # ── Changelog generation ──────────────────────────────────────────
+          CUR_MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
+          CUR_MINOR=$(echo "$VERSION" | cut -d'.' -f2)
+
+          BASE_TAG=""
+          while read -r tag; do
+            tver="${tag#Cli-v}"
+            tmaj=$(echo "$tver" | cut -d'.' -f1)
+            tmin=$(echo "$tver" | cut -d'.' -f2)
+            case "$CHANGE_LEVEL" in
+              patch)
+                # Last tag in the same major.minor series
+                [ "$tmaj" = "$CUR_MAJOR" ] && [ "$tmin" = "$CUR_MINOR" ] && { BASE_TAG="$tag"; break; }
+                ;;
+              minor)
+                # Last tag with same major but a different (older) minor
+                { [ "$tmaj" = "$CUR_MAJOR" ] && [ "$tmin" != "$CUR_MINOR" ]; } \
+                  || [ "$tmaj" != "$CUR_MAJOR" ] && { BASE_TAG="$tag"; break; }
+                ;;
+              major)
+                # Last tag with a different (older) major
+                [ "$tmaj" != "$CUR_MAJOR" ] && { BASE_TAG="$tag"; break; }
+                ;;
+            esac
+          done < <(git tag --list 'Cli-v*' | sed 's/^Cli-v//' | sort -rV | sed 's/^/Cli-v/')
+
+          NOTES_FILE=$(mktemp)
+          echo "## Changelog" >> "$NOTES_FILE"
+          echo "" >> "$NOTES_FILE"
+          if [ -n "$BASE_TAG" ]; then
+            echo "_Changes since \`${BASE_TAG}\`_" >> "$NOTES_FILE"
+            echo "" >> "$NOTES_FILE"
+            git log "${BASE_TAG}..HEAD" --pretty=format:"- %s (%h)" --no-merges >> "$NOTES_FILE"
+          else
+            echo "_Full history (no previous Cli tag found)_" >> "$NOTES_FILE"
+            echo "" >> "$NOTES_FILE"
+            git log HEAD --pretty=format:"- %s (%h)" --no-merges >> "$NOTES_FILE"
+          fi
+          # ──────────────────────────────────────────────────────────────────
+
           git tag "$TAG"
           git push origin "$TAG"
 
-          RELEASE_FLAGS=("$TAG" --title "Cli v${VERSION}" --notes "自动发布 Cli 版本 $VERSION")
+          RELEASE_FLAGS=("$TAG" --title "Cli v${VERSION}" --notes-file "$NOTES_FILE")
           [ "$BUILD_TYPE" = "prerelease" ] && RELEASE_FLAGS+=(--prerelease) || RELEASE_FLAGS+=(--latest)
           RELEASE_FLAGS+=(./artifacts/cli/*.zip)
 
