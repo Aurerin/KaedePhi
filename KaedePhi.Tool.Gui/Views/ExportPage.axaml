@@ -26,6 +26,10 @@
 
                 <CheckBox Content="{x:Static loc:GuiLocalizationString.export_stream_writing}" IsChecked="{Binding UseStream}"/>
 
+                <CheckBox Content="{x:Static loc:GuiLocalizationString.export_indented_output}"
+                          IsChecked="{Binding IndentedOutput}"
+                          IsVisible="{Binding IsJsonFormat}"/>
+
                 <Button Classes="accent" Padding="32,10" FontSize="14"
                         HorizontalAlignment="Center"
                         Content="{x:Static loc:GuiLocalizationString.btn_export}"

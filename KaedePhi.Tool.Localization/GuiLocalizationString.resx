@@ -130,6 +130,9 @@
   <data name="export_stream_writing" xml:space="preserve">
     <value>流式写入</value>
   </data>
+  <data name="export_indented_output" xml:space="preserve">
+    <value>格式化输出（缩进）</value>
+  </data>
   <data name="processing_title" xml:space="preserve">
     <value>处理谱面</value>
   </data>

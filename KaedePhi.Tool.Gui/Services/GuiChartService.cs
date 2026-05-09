@@ -25,15 +25,14 @@ public sealed class GuiChartService
     private readonly LogService _log;
     private const string WorkspaceId = "gui_session";
     private const string WorkspaceFileName = "chart.json";
-    private readonly string _workspaceRoot;
     private readonly string _workspaceDir;
     private readonly string _workspaceFilePath;
 
     public GuiChartService(LogService log)
     {
         _log = log;
-        _workspaceRoot = AppPaths.GetDirectory("workspaces");
-        _workspaceDir = Path.Combine(_workspaceRoot, WorkspaceId);
+        var workspaceRoot = AppPaths.GetDirectory("workspaces");
+        _workspaceDir = Path.Combine(workspaceRoot, WorkspaceId);
         _workspaceFilePath = Path.Combine(_workspaceDir, WorkspaceFileName);
         Directory.CreateDirectory(_workspaceDir);
     }
@@ -112,12 +111,12 @@ public sealed class GuiChartService
 
     public async Task SaveKpcToWorkspaceAsync(Chart chart, ChartType originalType, bool stream, CancellationToken ct)
     {
-        await ConvertFromKpcAndSaveAsync(chart, originalType, _workspaceFilePath, stream, ct);
+        await ConvertFromKpcAndSaveAsync(chart, originalType, _workspaceFilePath, stream, false, ct);
         _log.Info(log_step_saved);
     }
 
     public async Task<string> ConvertFromKpcAndSaveAsync(
-        Chart chart, ChartType targetType, string outputPath, bool stream, CancellationToken ct)
+        Chart chart, ChartType targetType, string outputPath, bool stream, bool indented, CancellationToken ct)
     {
         _log.Info(string.Format(log_exporting_to, outputPath, targetType));
         switch (targetType)
@@ -128,11 +127,11 @@ public sealed class GuiChartService
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
-                    await rpeChart.ExportToJsonStreamAsync(s, false);
+                    await rpeChart.ExportToJsonStreamAsync(s, indented);
                 }
                 else
                 {
-                    await File.WriteAllTextAsync(outputPath, await rpeChart.ExportToJsonAsync(false), ct);
+                    await File.WriteAllTextAsync(outputPath, await rpeChart.ExportToJsonAsync(indented), ct);
                 }
                 break;
             }
@@ -270,33 +269,37 @@ public sealed class GuiChartService
             var totalLayers = line.EventLayers.Count;
             for (var ei = 0; ei < totalLayers; ei++)
             {
-                var layer = line.EventLayers[ei];
                 var capturedLi = li;
                 var capturedEi = ei;
                 var layerProgress = new Progress<ToolProgress>(p =>
                 {
-                    var overall = ((double)capturedLi + (double)capturedEi / totalLayers) / totalLines;
+                    var overall = (capturedLi + (double)capturedEi / totalLayers) / totalLines;
                     progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
                 });
-
-                var doubleFit = new EventFit<double>();
-                var intFit = new EventFit<int>();
-                var floatFit = new EventFit<float>();
-
-                if (layer.MoveXEvents is { Count: > 0 })
-                    layer.MoveXEvents = doubleFit.EventListFit(layer.MoveXEvents, tolerance, degree, layerProgress);
-                if (layer.MoveYEvents is { Count: > 0 })
-                    layer.MoveYEvents = doubleFit.EventListFit(layer.MoveYEvents, tolerance, degree, layerProgress);
-                if (layer.RotateEvents is { Count: > 0 })
-                    layer.RotateEvents = doubleFit.EventListFit(layer.RotateEvents, tolerance, degree, layerProgress);
-                if (layer.AlphaEvents is { Count: > 0 })
-                    layer.AlphaEvents = intFit.EventListFit(layer.AlphaEvents, tolerance, degree, layerProgress);
-                if (layer.SpeedEvents is { Count: > 0 })
-                    layer.SpeedEvents = floatFit.EventListFit(layer.SpeedEvents, tolerance, degree, layerProgress);
+                FitLayer(line.EventLayers[ei], tolerance, degree, layerProgress);
             }
         }
 
         progress?.Report(new ToolProgress(1.0, 1.0));
+    }
+
+    private static void FitLayer(Core.KaedePhi.EventLayer layer, double tolerance, int degree,
+        IProgress<ToolProgress>? progress)
+    {
+        var doubleFit = new EventFit<double>();
+        var intFit = new EventFit<int>();
+        var floatFit = new EventFit<float>();
+
+        if (layer.MoveXEvents is { Count: > 0 })
+            layer.MoveXEvents = doubleFit.EventListFit(layer.MoveXEvents, tolerance, degree, progress);
+        if (layer.MoveYEvents is { Count: > 0 })
+            layer.MoveYEvents = doubleFit.EventListFit(layer.MoveYEvents, tolerance, degree, progress);
+        if (layer.RotateEvents is { Count: > 0 })
+            layer.RotateEvents = doubleFit.EventListFit(layer.RotateEvents, tolerance, degree, progress);
+        if (layer.AlphaEvents is { Count: > 0 })
+            layer.AlphaEvents = intFit.EventListFit(layer.AlphaEvents, tolerance, degree, progress);
+        if (layer.SpeedEvents is { Count: > 0 })
+            layer.SpeedEvents = floatFit.EventListFit(layer.SpeedEvents, tolerance, degree, progress);
     }
 
     public IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions,
