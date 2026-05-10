@@ -13,7 +13,7 @@ namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
 /// </summary>
 public class FatherUnbindProcessor
 {
-    private readonly EventMerger<double> _merger = new();
+    private readonly EventListMerger<double> _merger = new();
     private readonly EventCutter<double> _cutter = new();
 
     private readonly ConcurrentDictionary<int, JudgeLine> _cache;
@@ -221,7 +221,7 @@ public class FatherUnbindProcessor
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
-                => _merger.EventMergePlus(a, b, precision, tolerance);
+                => _merger.EventListMergePlus(a, b, precision, tolerance);
         }
         catch (Exception ex)
         {

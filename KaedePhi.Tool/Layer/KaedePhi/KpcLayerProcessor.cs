@@ -10,9 +10,9 @@ namespace KaedePhi.Tool.Layer.KaedePhi;
 /// </summary>
 public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
 {
-    private readonly EventMerger<double> _doubleMerger = new();
-    private readonly EventMerger<int> _intMerger = new();
-    private readonly EventMerger<float> _floatMerger = new();
+    private readonly EventListMerger<double> _doubleMerger = new();
+    private readonly EventListMerger<int> _intMerger = new();
+    private readonly EventListMerger<float> _floatMerger = new();
     private readonly EventCutter<double> _doubleCutter = new();
     private readonly EventCutter<int> _intCutter = new();
     private readonly EventCutter<float> _floatCutter = new();
@@ -69,19 +69,19 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
             var layer = layers[li];
             if (layer.AlphaEvents is { Count: > 0 })
                 mergedLayer.AlphaEvents =
-                    _intMerger.EventMergePlus(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
+                    _intMerger.EventListMergePlus(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
             if (layer.MoveXEvents is { Count: > 0 })
                 mergedLayer.MoveXEvents =
-                    _doubleMerger.EventMergePlus(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
+                    _doubleMerger.EventListMergePlus(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
             if (layer.MoveYEvents is { Count: > 0 })
                 mergedLayer.MoveYEvents =
-                    _doubleMerger.EventMergePlus(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
+                    _doubleMerger.EventListMergePlus(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
             if (layer.RotateEvents is { Count: > 0 })
                 mergedLayer.RotateEvents =
-                    _doubleMerger.EventMergePlus(mergedLayer.RotateEvents, layer.RotateEvents, precision, tolerance);
+                    _doubleMerger.EventListMergePlus(mergedLayer.RotateEvents, layer.RotateEvents, precision, tolerance);
             if (layer.SpeedEvents is { Count: > 0 })
                 mergedLayer.SpeedEvents =
-                    _floatMerger.EventMergePlus(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
+                    _floatMerger.EventListMergePlus(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
 
             progress?.Report(new ToolProgress((double)(li + 1) / totalLayers));
         }
