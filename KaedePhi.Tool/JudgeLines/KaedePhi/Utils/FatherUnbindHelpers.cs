@@ -55,6 +55,10 @@ public static class FatherUnbindHelpers
     /// <summary>
     /// Kpc 虽然以归一化坐标存储，但几何误差必须在当前渲染坐标系评估，
     /// 否则 X/Y 轴缩放不一致会导致切段阈值偏斜。
+    /// <para>
+    /// 采用逐轴独立误差检测：分别计算屏幕空间 X/Y 轴误差，各轴以自身位移尺度归一化，
+    /// 任一轴超过容差即触发切割。避免欧几里得距离将细小轴偏差淹没在主运动轴中。
+    /// </para>
     /// </summary>
     public static bool NeedsAdaptiveCut(
         (double X, double Y) segmentStart,
@@ -72,13 +76,30 @@ public static class FatherUnbindHelpers
         var predicted = (
             X: segmentStart.X + (intervalEnd.X - segmentStart.X) * progress,
             Y: segmentStart.Y + (intervalEnd.Y - segmentStart.Y) * progress);
-        var error = CoordinateGeometry.GetKpcScreenDistance(next, predicted, CurrentRenderProfile);
 
-        var localScale = Math.Max(
-            CoordinateGeometry.GetKpcScreenDistance(segmentStart, intervalEnd, CurrentRenderProfile),
-            CoordinateGeometry.GetKpcScreenDistance(segmentStart, next, CurrentRenderProfile));
-        var threshold = tolerance / 100.0 * Math.Max(localScale, 1e-3);
-        return error > threshold;
+        var profile = CurrentRenderProfile;
+        var tolFraction = tolerance / 100.0;
+
+        // 逐轴屏幕空间误差：测试点相对线性预测的各轴偏差
+        var screenErrorX = CoordinateGeometry.GetKpcScreenDistance(
+            (next.X, predicted.Y), predicted, profile);
+        var screenErrorY = CoordinateGeometry.GetKpcScreenDistance(
+            (predicted.X, next.Y), predicted, profile);
+
+        // 逐轴屏幕空间位移尺度：局部运动范围
+        var segEndXScale = CoordinateGeometry.GetKpcScreenDistance(
+            (intervalEnd.X, segmentStart.Y), segmentStart, profile);
+        var nextXScale = CoordinateGeometry.GetKpcScreenDistance(
+            (next.X, segmentStart.Y), segmentStart, profile);
+        var segEndYScale = CoordinateGeometry.GetKpcScreenDistance(
+            (segmentStart.X, intervalEnd.Y), segmentStart, profile);
+        var nextYScale = CoordinateGeometry.GetKpcScreenDistance(
+            (segmentStart.X, next.Y), segmentStart, profile);
+
+        var thresholdX = tolFraction * Math.Max(Math.Max(segEndXScale, nextXScale), 1e-3);
+        var thresholdY = tolFraction * Math.Max(Math.Max(segEndYScale, nextYScale), 1e-3);
+
+        return screenErrorX > thresholdX || screenErrorY > thresholdY;
     }
 
     /// <summary>
@@ -253,9 +274,9 @@ public static class FatherUnbindHelpers
     /// <summary>
     /// 对 X/Y 位置通道进行联合压缩。
     /// <para>
-    /// 使用屏幕空间欧几里得距离衡量合并误差，同时感知两轴偏差，
-    /// 避免独立单轴压缩时因 X/Y 比例不等而产生的误差失真。
-    /// 误差阈值 = <paramref name="tolerance"/>% × 合并段的局部屏幕位移尺度。
+    /// 采用逐轴独立误差检测：分别计算屏幕空间 X/Y 轴误差，各轴以自身位移尺度归一化，
+    /// 任一轴超过容差即拒绝合并。避免欧几里得距离将细小轴偏差淹没在主运动轴中。
+    /// 误差阈值 = <paramref name="tolerance"/>% × 合并段的各轴局部屏幕位移尺度。
     /// 使用局部尺度可避免远离原点时阈值被放大，从而产生位置相关的外偏/内偏。
     /// </para>
     /// <para>
@@ -282,6 +303,7 @@ public static class FatherUnbindHelpers
         var compX = new List<Kpc.Event<double>> { xEvents[0] };
         var compY = new List<Kpc.Event<double>> { yEvents[0] };
         var relTol = tolerance / 100.0;
+        var profile = CurrentRenderProfile;
 
         for (var i = 1; i < xEvents.Count; i++)
         {
@@ -301,25 +323,26 @@ public static class FatherUnbindHelpers
                 continue;
             }
 
-            // 使用局部位移尺度，避免离原点越远阈值越大而导致过度压缩。
-            var screenScale = Math.Max(
-                CoordinateGeometry.GetKpcScreenDistance(
-                    (lastX.StartValue, lastY.StartValue),
-                    (curX.EndValue, curY.EndValue),
-                    CurrentRenderProfile),
-                CoordinateGeometry.GetKpcScreenDistance(
-                    (lastX.StartValue, lastY.StartValue),
-                    (lastX.EndValue, lastY.EndValue),
-                    CurrentRenderProfile));
-            var threshold = relTol * Math.Max(screenScale, 1e-9);
+            // 逐轴屏幕空间位移尺度，避免离原点越远阈值越大而导致过度压缩。
+            var mergedDx = CoordinateGeometry.GetKpcScreenDistance(
+                (curX.EndValue, lastY.StartValue), (lastX.StartValue, lastY.StartValue), profile);
+            var mergedDy = CoordinateGeometry.GetKpcScreenDistance(
+                (lastX.StartValue, curY.EndValue), (lastX.StartValue, lastY.StartValue), profile);
+            var firstDx = CoordinateGeometry.GetKpcScreenDistance(
+                (lastX.EndValue, lastY.StartValue), (lastX.StartValue, lastY.StartValue), profile);
+            var firstDy = CoordinateGeometry.GetKpcScreenDistance(
+                (lastX.StartValue, lastY.EndValue), (lastX.StartValue, lastY.StartValue), profile);
 
-            // 检查交界处连续性（屏幕空间间距）
-            var junctionGap = CoordinateGeometry.GetKpcScreenDistance(
-                (lastX.EndValue, lastY.EndValue),
-                (curX.StartValue, curY.StartValue),
-                CurrentRenderProfile);
+            var thresholdX = relTol * Math.Max(Math.Max(mergedDx, firstDx), 1e-9);
+            var thresholdY = relTol * Math.Max(Math.Max(mergedDy, firstDy), 1e-9);
 
-            if (junctionGap > threshold)
+            // 检查交界处连续性（逐轴屏幕空间间距）
+            var junctionGapX = CoordinateGeometry.GetKpcScreenDistance(
+                (lastX.EndValue, lastY.EndValue), (curX.StartValue, lastY.EndValue), profile);
+            var junctionGapY = CoordinateGeometry.GetKpcScreenDistance(
+                (lastX.EndValue, lastY.EndValue), (lastX.EndValue, curY.StartValue), profile);
+
+            if (junctionGapX > thresholdX || junctionGapY > thresholdY)
             {
                 compX.Add(curX);
                 compY.Add(curY);
@@ -345,13 +368,13 @@ public static class FatherUnbindHelpers
                 var predX = lastX.StartValue + (curX.EndValue - lastX.StartValue) * p;
                 var predY = lastY.StartValue + (curY.EndValue - lastY.StartValue) * p;
 
-                // 屏幕空间欧几里得距离：交界实际位置 vs 合并段预测位置
-                var junctionDev = CoordinateGeometry.GetKpcScreenDistance(
-                    (lastX.EndValue, lastY.EndValue),
-                    (predX, predY),
-                    CurrentRenderProfile);
+                // 逐轴屏幕空间偏差：交界实际位置 vs 合并段预测位置
+                var junctionDevX = CoordinateGeometry.GetKpcScreenDistance(
+                    (lastX.EndValue, lastY.EndValue), (predX, lastY.EndValue), profile);
+                var junctionDevY = CoordinateGeometry.GetKpcScreenDistance(
+                    (lastX.EndValue, lastY.EndValue), (lastX.EndValue, predY), profile);
 
-                canMerge = junctionDev <= threshold;
+                canMerge = junctionDevX <= thresholdX && junctionDevY <= thresholdY;
             }
 
             if (canMerge)

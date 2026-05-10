@@ -9,7 +9,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
     {
         public override void WriteJson(JsonWriter writer, BpmList value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, (IReadOnlyList<BpmPoint>)value);
+            serializer.Serialize(writer, value);
         }
 
         public override BpmList ReadJson(JsonReader reader, Type objectType, BpmList existingValue,
