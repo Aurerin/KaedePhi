@@ -9,7 +9,7 @@ namespace KaedePhi.Core.PhiFans
         /// 谱面基本信息
         /// </summary>
         [JsonProperty("info")]
-        public Info Info { get; set; } = new Info();
+        public Info Info { get; set; } = new();
 
         /// <summary>
         /// 谱面偏移
@@ -21,13 +21,13 @@ namespace KaedePhi.Core.PhiFans
         /// 谱面BPM列表
         /// </summary>
         [JsonProperty("bpm")]
-        public List<Bpm> BpmList { get; set; } = new List<Bpm>();
+        public List<Bpm> BpmList { get; set; } = new();
 
         /// <summary>
         /// 谱面判定线列表
         /// </summary>
         [JsonProperty("lines")]
-        public List<Line> JudgeLineList { get; set; } = new List<Line>();
+        public List<Line> JudgeLineList { get; set; } = new();
 
         /// <summary>
         /// 坐标系范围

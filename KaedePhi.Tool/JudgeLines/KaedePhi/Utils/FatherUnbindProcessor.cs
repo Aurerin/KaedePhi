@@ -7,30 +7,48 @@ using JudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
 
 /// <summary>
-/// NRC 判定线父子解绑同步处理器。
+/// KPC 判定线父子解绑同步处理器。
 /// 所有采样算法均委托给 <see cref="FatherUnbindHelpers"/> 中的共享实现，
 /// 本类只负责缓存检查、父线递归解绑、通道合并及日志记录。
 /// </summary>
-public static class FatherUnbindProcessor
+public class FatherUnbindProcessor
 {
+    private readonly EventListMerger<double> _merger = new();
+    private readonly EventCutter<double> _cutter = new();
+
+    private readonly ConcurrentDictionary<int, JudgeLine> _cache;
+    private readonly Action<string>? _logInfo;
+    private readonly Action<string>? _logWarning;
+    private readonly Action<string>? _logError;
+    private readonly Action<string>? _logDebug;
+
+    public FatherUnbindProcessor(
+        ConcurrentDictionary<int, JudgeLine> cache,
+        Action<string>? logInfo = null,
+        Action<string>? logWarning = null,
+        Action<string>? logError = null,
+        Action<string>? logDebug = null)
+    {
+        _cache = cache;
+        _logInfo = logInfo;
+        _logWarning = logWarning;
+        _logError = logError;
+        _logDebug = logDebug;
+    }
+
     private readonly record struct PrepareResult(
         JudgeLine JudgeLine,
         JudgeLine? FatherLine,
         bool ShouldReturn);
 
-    private static PrepareResult PrepareUnbindContext(
+    private PrepareResult PrepareUnbindContext(
         int targetJudgeLineIndex,
         List<JudgeLine> allJudgeLines,
-        ConcurrentDictionary<int, JudgeLine> cache,
         string logTag,
         string startAction,
-        Func<int, List<JudgeLine>, JudgeLine> recursiveUnbind,
-        Action<string>? logInfo,
-        Action<string>? logWarning,
-        Action<string>? logError,
-        Action<string>? logDebug)
+        Func<int, List<JudgeLine>, JudgeLine> recursiveUnbind)
     {
-        if (FatherUnbindHelpers.TryGetCachedClone(targetJudgeLineIndex, cache, logTag, out var cached, logDebug))
+        if (FatherUnbindHelpers.TryGetCachedClone(targetJudgeLineIndex, _cache, logTag, out var cached, _logDebug))
         {
             return new PrepareResult(cached, null, true);
         }
@@ -38,17 +56,17 @@ public static class FatherUnbindProcessor
         var judgeLineCopy = allJudgeLines[targetJudgeLineIndex].Clone();
         var allJudgeLinesCopy = allJudgeLines.Select(jl => jl.Clone()).ToList();
 
-        if (FatherUnbindHelpers.TryReturnWhenNoFather(targetJudgeLineIndex, judgeLineCopy, cache, logTag, logWarning))
+        if (FatherUnbindHelpers.TryReturnWhenNoFather(targetJudgeLineIndex, judgeLineCopy, _cache, logTag, _logWarning))
         {
             return new PrepareResult(judgeLineCopy, null, true);
         }
 
-        logInfo?.Invoke($"{logTag}[{targetJudgeLineIndex}]: {startAction}，父线索引={judgeLineCopy.Father}");
+        _logInfo?.Invoke($"{logTag}[{targetJudgeLineIndex}]: {startAction}，父线索引={judgeLineCopy.Father}");
 
         var fatherLineCopy = allJudgeLinesCopy[judgeLineCopy.Father].Clone();
         if (fatherLineCopy.Father >= 0)
         {
-            logDebug?.Invoke($"{logTag}[{targetJudgeLineIndex}]: 父线 {judgeLineCopy.Father} 仍有父线，递归解绑");
+            _logDebug?.Invoke($"{logTag}[{targetJudgeLineIndex}]: 父线 {judgeLineCopy.Father} 仍有父线，递归解绑");
             fatherLineCopy = recursiveUnbind(judgeLineCopy.Father, allJudgeLinesCopy);
         }
 
@@ -60,15 +78,10 @@ public static class FatherUnbindProcessor
     /// <summary>
     /// 等间隔采样解绑（同步版）：将判定线与父线解绑，以等间隔拍步长采样保持原始行为。
     /// </summary>
-    public static JudgeLine FatherUnbind(
+    public JudgeLine FatherUnbind(
         int targetJudgeLineIndex,
         List<JudgeLine> allJudgeLines,
         double precision,
-        ConcurrentDictionary<int, JudgeLine> cache,
-        Action<string>? logInfo = null,
-        Action<string>? logWarning = null,
-        Action<string>? logError = null,
-        Action<string>? logDebug = null,
         IProgress<ToolProgress>? progress = null)
     {
         JudgeLine judgeLineCopy;
@@ -79,11 +92,9 @@ public static class FatherUnbindProcessor
             var (judgeLine, fatherLine, shouldReturn) = PrepareUnbindContext(
                 targetJudgeLineIndex,
                 allJudgeLines,
-                cache,
                 logTag: "FatherUnbind",
                 startAction: "开始解绑",
-                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, cache, logInfo, logWarning, logError, logDebug, progress),
-                logInfo, logWarning, logError, logDebug);
+                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, progress));
 
             judgeLineCopy = judgeLine;
             if (shouldReturn || fatherLine is null)
@@ -91,9 +102,6 @@ public static class FatherUnbindProcessor
                 progress?.Report(new ToolProgress(1.0));
                 return judgeLineCopy;
             }
-
-            var merger = new EventMerger<double>();
-            var cutter = new EventCutter<double>();
 
             progress?.Report(new ToolProgress(0.2, "合并通道"));
             var mergedChannels =
@@ -109,12 +117,15 @@ public static class FatherUnbindProcessor
 
             var cutTasks = new[]
             {
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Tx, txMin, txMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Ty, tyMin, tyMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Fx, fxMin, fxMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)),
-                Task.Run(() => cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength))
+                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Tx, txMin, txMax, cutLength)),
+                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Ty, tyMin, tyMax, cutLength)),
+                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fx, fxMin, fxMax, cutLength)),
+                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)),
+                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength))
             };
+            // Task.WaitAll 只读取数组元素进行等待，不会向数组写入任何对象，
+            // 因此此处协变数组转换（Task<List<Event<double>>>[] → Task[]）绝不会触发 ArrayTypeMismatchException。
+            // ReSharper disable once CoVariantArrayConversion
             Task.WaitAll(cutTasks);
 
             var cutChannels = new FatherUnbindHelpers.EventChannels(
@@ -127,26 +138,25 @@ public static class FatherUnbindProcessor
             var beats = FatherUnbindHelpers.BuildBeatList(overallMin, overallMax, step);
 
             progress?.Report(new ToolProgress(0.6, "等间隔采样"));
-            logDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 等间隔采样 {beats.Count} 段，精度={precision}");
+            _logDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 等间隔采样 {beats.Count} 段，精度={precision}");
             var (sortedX, sortedY) = FatherUnbindHelpers.EqualSpacingSampling(beats, overallMax, step, cutChannels);
 
             progress?.Report(new ToolProgress(0.9, "写回结果"));
-            logDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 采样完成，写回");
+            _logDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 采样完成，写回");
             FatherUnbindHelpers.WriteResultToLine(judgeLineCopy, sortedX, sortedY, cutChannels.Fr, Merge);
 
-            cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
-            logInfo?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑完成");
+            _cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
+            _logInfo?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑完成");
             progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
-                => merger.EventListMerge(a, b, precision);
+                => _merger.EventListMerge(a, b, precision);
         }
         catch (Exception ex)
         {
-            judgeLineCopy = allJudgeLines[targetJudgeLineIndex].Clone();
-            logError?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 未知错误: " + ex.Message);
-            return judgeLineCopy;
+            _logError?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message);
+            return allJudgeLines[targetJudgeLineIndex].Clone();
         }
     }
 
@@ -154,15 +164,10 @@ public static class FatherUnbindProcessor
     /// 自适应采样解绑（同步版）：以事件边界为强制切割点，仅在误差超过容差时插入新采样段，
     /// 相较等间隔版可减少冗余段数。
     /// </summary>
-    public static JudgeLine FatherUnbindPlus(
+    public JudgeLine FatherUnbindPlus(
         int targetJudgeLineIndex,
         List<JudgeLine> allJudgeLines,
         double precision, double tolerance,
-        ConcurrentDictionary<int, JudgeLine> cache,
-        Action<string>? logInfo = null,
-        Action<string>? logWarning = null,
-        Action<string>? logError = null,
-        Action<string>? logDebug = null,
         IProgress<ToolProgress>? progress = null)
     {
         JudgeLine judgeLineCopy;
@@ -173,11 +178,9 @@ public static class FatherUnbindProcessor
             var (judgeLine, fatherLine, shouldReturn) = PrepareUnbindContext(
                 targetJudgeLineIndex,
                 allJudgeLines,
-                cache,
                 logTag: "FatherUnbindPlus",
                 startAction: "开始解绑（自适应采样）",
-                recursiveUnbind: (idx, lines) => FatherUnbindPlus(idx, lines, precision, tolerance, cache, logInfo, logWarning, logError, logDebug, progress),
-                logInfo, logWarning, logError, logDebug);
+                recursiveUnbind: (idx, lines) => FatherUnbindPlus(idx, lines, precision, tolerance, progress));
 
             judgeLineCopy = judgeLine;
             if (shouldReturn || fatherLine is null)
@@ -186,8 +189,6 @@ public static class FatherUnbindProcessor
                 return judgeLineCopy;
             }
 
-            var merger = new EventMerger<double>();
-
             progress?.Report(new ToolProgress(0.2, "合并通道"));
             var ch = FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
 
@@ -195,7 +196,7 @@ public static class FatherUnbindProcessor
             if (rangeResult is null)
             {
                 judgeLineCopy.Father = -1;
-                cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
+                _cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
                 progress?.Report(new ToolProgress(1.0));
                 return judgeLineCopy;
             }
@@ -207,29 +208,28 @@ public static class FatherUnbindProcessor
             var keyBeats = FatherUnbindHelpers.CollectKeyBeats(overallMin, overallMax, ch);
 
             progress?.Report(new ToolProgress(0.6, "自适应采样"));
-            logDebug?.Invoke(
+            _logDebug?.Invoke(
                 $"FatherUnbindPlus[{targetJudgeLineIndex}]: 自适应采样，关键帧数={keyBeats.Count}，最大精度={precision}");
             var (resultX, resultY) = FatherUnbindHelpers.RunAdaptiveSampling(keyBeats, step, tolerance, ch);
 
             progress?.Report(new ToolProgress(0.9, "写回结果"));
-            logDebug?.Invoke(
+            _logDebug?.Invoke(
                 $"FatherUnbindPlus[{targetJudgeLineIndex}]: 采样完成（生成 {resultX.Count} 段），压缩并写回");
             FatherUnbindHelpers.WriteResultToLine(
                 judgeLineCopy, resultX, resultY, ch.Fr, Merge);
 
-            cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
-            logInfo?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑完成");
+            _cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
+            _logInfo?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑完成");
             progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
             List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
-                => merger.EventMergePlus(a, b, precision, tolerance);
+                => _merger.EventListMergePlus(a, b, precision, tolerance);
         }
         catch (Exception ex)
         {
-            judgeLineCopy = allJudgeLines[targetJudgeLineIndex].Clone();
-            logError?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 未知错误: " + ex.Message);
-            return judgeLineCopy;
+            _logError?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message);
+            return allJudgeLines[targetJudgeLineIndex].Clone();
         }
     }
 }

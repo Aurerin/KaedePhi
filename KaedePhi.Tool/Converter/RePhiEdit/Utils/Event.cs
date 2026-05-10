@@ -1,11 +1,15 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Converter.RePhiEdit.Model;
-using KaedePhi.Tool.KaedePhi.Events;
+using KaedePhi.Tool.Event.KaedePhi;
 
 namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
 public static class Event
 {
+    private static readonly EventCutter<float> FloatCutter = new();
+    private static readonly EventCutter<double> DoubleCutter = new();
+    private static readonly EventCutter<int> IntCutter = new();
+
     #region RpeToKpc
 
     public static Kpc.Event<T> ConvertEvent<T>(Rpe.Event<T> src, Func<T, T>? valueCopier = null,
@@ -99,7 +103,7 @@ public static class Event
         }
         catch (Easing.EasingNotSupportedException)
         {
-            return KpcEventTools
+            return FloatCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
                 .ConvertAll(e => new Rpe.Event<float>
                 {
@@ -137,7 +141,7 @@ public static class Event
         }
         catch (Easing.EasingNotSupportedException)
         {
-            return KpcEventTools
+            return DoubleCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
                 .ConvertAll(e => new Rpe.Event<float>
                 {
@@ -159,7 +163,7 @@ public static class Event
         }
         catch (Easing.EasingNotSupportedException)
         {
-            return KpcEventTools
+            return IntCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
                 .ConvertAll(e => new Rpe.Event<int>
                 {

@@ -18,17 +18,18 @@ public sealed class SaveCommand : AsyncCommand<SaveCommand.Settings>
         public override ValidationResult Validate()
         {
             if (string.IsNullOrWhiteSpace(Output))
-                return ValidationResult.Error(Strings.cli_err_output_required);
+                return ValidationResult.Error(CliLocalizationString.err_output_required);
             return base.Validate();
         }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings,CancellationToken cancellationToken)
     {
+        var output = settings.Output ?? throw new InvalidOperationException(CliLocalizationString.err_output_required);
         var writer = new ConsoleWriter();
         var ws = new WorkspaceService();
-        await ws.SaveAsync(settings.Workspace, settings.Output!);
-        writer.Info(string.Format(Strings.cli_msg_saved, settings.Workspace, settings.Output!));
+        await ws.SaveAsync(settings.Workspace, output);
+        writer.Info(string.Format(CliLocalizationString.msg_saved, settings.Workspace, output));
         return 0;
     }
 }

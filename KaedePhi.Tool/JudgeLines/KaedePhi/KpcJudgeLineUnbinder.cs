@@ -25,15 +25,16 @@ public class KpcJudgeLineUnbinder : LoggableBase, IJudgeLineUnbinder<JudgeLine>
         return FatherUnbindHelpers.GetLinePos(fatherLineX, fatherLineY, angleDegrees, lineX, lineY);
     }
 
+    private FatherUnbindProcessor CreateProcessor(List<JudgeLine> allJudgeLines)
+        => new(FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines),
+            LogInfo, LogWarning, LogError, LogDebug);
+
     /// <inheritdoc/>
     public JudgeLine FatherUnbind(
         int targetJudgeLineIndex, List<JudgeLine> allJudgeLines,
         double precision,
         IProgress<ToolProgress>? progress = null)
-        => FatherUnbindProcessor.FatherUnbind(
-            targetJudgeLineIndex, allJudgeLines, precision,
-            FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines),
-            LogInfo, LogWarning, LogError, LogDebug, progress);
+        => CreateProcessor(allJudgeLines).FatherUnbind(targetJudgeLineIndex, allJudgeLines, precision, progress);
 
     /// <inheritdoc/>
     public JudgeLine FatherUnbind(
@@ -50,10 +51,7 @@ public class KpcJudgeLineUnbinder : LoggableBase, IJudgeLineUnbinder<JudgeLine>
         int targetJudgeLineIndex, List<JudgeLine> allJudgeLines,
         double precision, double tolerance,
         IProgress<ToolProgress>? progress = null)
-        => FatherUnbindProcessor.FatherUnbindPlus(
-            targetJudgeLineIndex, allJudgeLines, precision, tolerance,
-            FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines),
-            LogInfo, LogWarning, LogError, LogDebug, progress);
+        => CreateProcessor(allJudgeLines).FatherUnbindPlus(targetJudgeLineIndex, allJudgeLines, precision, tolerance, progress);
 
     /// <inheritdoc/>
     public JudgeLine FatherUnbindPlus(

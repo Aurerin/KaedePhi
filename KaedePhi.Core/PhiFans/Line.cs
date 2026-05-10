@@ -9,12 +9,12 @@ namespace KaedePhi.Core.PhiFans
         /// 判定线事件组
         /// </summary>
         [JsonProperty("props")]
-        public Props Props { get; set; } = new Props();
+        public Props Props { get; set; } = new();
 
         /// <summary>
         /// 判定线音符列表
         /// </summary>
         [JsonProperty("notes")]
-        public List<Note> NoteList { get; set; } = new List<Note>();
+        public List<Note> NoteList { get; set; } = new();
     }
 }

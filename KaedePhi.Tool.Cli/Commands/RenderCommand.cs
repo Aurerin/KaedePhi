@@ -1,6 +1,5 @@
 ﻿using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Settings;
-using KaedePhi.Tool.KaedePhi;
 using KaedePhi.Tool.Render.KaedePhi;
 
 namespace KaedePhi.Tool.Cli.Commands;
@@ -34,7 +33,7 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         public int? LayerIndex { get; set; }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
     {
         var c = s.AppConfig.RenderConfig;
         s.PixelsPerBeat ??= c.PixelsPerBeat;
@@ -44,12 +43,16 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
 
         var writer = new ConsoleWriter();
         var svc = new ChartService();
-        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, ct);
+        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
         if (nrc == null) { writer.Error(CliLocalizationString.render_err_load_failed); return 1; }
 
-        var outputDir = !string.IsNullOrWhiteSpace(s.Output) ? s.Output
-            : !string.IsNullOrWhiteSpace(s.Input) ? Path.Combine(Path.GetDirectoryName(s.Input) ?? ".", "render_output")
-            : Path.Combine(Directory.GetCurrentDirectory(), "render_output");
+        string? outputDir;
+        if (!string.IsNullOrWhiteSpace(s.Output))
+            outputDir = s.Output;
+        else
+            outputDir = !string.IsNullOrWhiteSpace(s.Input)
+                ? Path.Combine(Path.GetDirectoryName(s.Input) ?? ".", "render_output")
+                : Path.Combine(Directory.GetCurrentDirectory(), "render_output");
 
         writer.Info(string.Format(CliLocalizationString.render_msg_start, outputDir));
 
@@ -62,7 +65,7 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         };
 
         var exporter = new KpcChartRenderExporter();
-        using var _ = KpcToolLog.Subscribe(info: writer.Info, warning: writer.Warn, error: writer.Error);
+        exporter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error);
 
         try
         {

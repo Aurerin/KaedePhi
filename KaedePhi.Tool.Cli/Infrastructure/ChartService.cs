@@ -25,11 +25,11 @@ public sealed class ChartService
         {
             path = _workspace.GetChartPath(workspace)
                    ?? throw new InvalidOperationException(
-                       string.Format(Strings.cli_err_workspace_missing, workspace));
+                       string.Format(CliLocalizationString.err_workspace_missing, workspace));
         }
         else
         {
-            path = input ?? throw new InvalidOperationException(Strings.cli_err_input_required);
+            path = input ?? throw new InvalidOperationException(CliLocalizationString.err_input_required);
         }
 
         return await File.ReadAllTextAsync(path, ct);
@@ -60,9 +60,8 @@ public sealed class ChartService
                 var kaedePhiConverter = new KaedePhiConverter();
                 var phiEditChart = await Core.PhiEdit.Chart.LoadAsync(text);
                 return ChartPipeline
-                    .From(phiEditChart, phiEditConverter, null)
+                    .From(phiEditChart, phiEditConverter, new PhiEditToKpcConvertOptions())
                     .To(kaedePhiConverter, null);
-                //return new PhiEditConverter().ToKpc(await global::KaedePhi.Core.PhiEdit.Chart.LoadAsync(text));
             }
 
             case ChartType.PhigrosV3:
@@ -85,15 +84,16 @@ public sealed class ChartService
     public string ResolveOutputPath(string? input, string? output, string? workspace)
     {
         if (!string.IsNullOrWhiteSpace(output)) return output;
+        if (string.IsNullOrEmpty(input)) throw new InvalidOperationException(CliLocalizationString.err_input_required);
         if (string.IsNullOrWhiteSpace(workspace))
             return Path.Combine(
-                Path.GetDirectoryName(input!) ?? ".",
-                Path.GetFileNameWithoutExtension(input!) + "_PFC.json");
+                Path.GetDirectoryName(input) ?? ".",
+                Path.GetFileNameWithoutExtension(input) + "_PFC.json");
         return Path.Combine(_workspace.Root, workspace, "chart.json");
     }
 
     /// <summary>将 KPC 谱面导出为 RPE 格式并写入。</summary>
-    public async Task<string> SaveAsRpeAsync(Chart chart, string outputPath, bool dryRun,
+    public static async Task<string> SaveAsRpeAsync(Chart chart, string outputPath, bool dryRun,
         CancellationToken ct = default)
     {
         var rpeChart = new RePhiEditConverter().FromKpc(chart, new ConvertOption());
@@ -104,7 +104,7 @@ public sealed class ChartService
     }
 
     /// <summary>将 KPC 谱面导出为目标格式并写入。</summary>
-    public async Task<string?> SaveAsAsync(Chart chart, string outputPath, ChartType target,
+    public static async Task<string?> SaveAsAsync(Chart chart, string outputPath, ChartType target,
         bool stream, bool format, bool dryRun, CancellationToken ct = default)
     {
         switch (target)

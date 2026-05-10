@@ -52,7 +52,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 判定线是否绑定UI
         /// </summary>
-        public AttachUi? AttachUi { get; set; } = null; // 绑定UI名，当不绑定时为null
+        public AttachUi? AttachUi { get; set; } // 绑定UI名，当不绑定时为null
 
         /// <summary>
         /// 判定线纹理是否为GIF

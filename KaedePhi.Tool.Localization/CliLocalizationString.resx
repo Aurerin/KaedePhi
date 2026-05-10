@@ -18,8 +18,43 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <!-- ── app ───────────────────────────────────────────────────────────────── -->
     <data name="app_title" xml:space="preserve">
         <value>KaedePhi</value>
+    </data>
+    <!-- ── command / branch descriptions ────────────────────────────────────── -->
+    <data name="cmd_version_desc" xml:space="preserve">
+        <value>显示当前版本号</value>
+    </data>
+    <data name="cmd_load_desc" xml:space="preserve">
+        <value>载入谱面文件到工作区，供后续操作使用</value>
+    </data>
+    <data name="cmd_save_desc" xml:space="preserve">
+        <value>将工作区中的谱面保存到文件</value>
+    </data>
+    <data name="branch_workspace_desc" xml:space="preserve">
+        <value>工作区管理</value>
+    </data>
+    <data name="cmd_workspace_list_desc" xml:space="preserve">
+        <value>列出所有工作区 ID</value>
+    </data>
+    <data name="cmd_workspace_clear_desc" xml:space="preserve">
+        <value>清理工作区缓存（可指定 --id 只清理单个）</value>
+    </data>
+    <data name="branch_rpe_desc" xml:space="preserve">
+        <value>RPE 谱面操作</value>
+    </data>
+    <data name="cmd_rpe_unbind_father_desc" xml:space="preserve">
+        <value>将判定线与父级解绑（已弃置）</value>
+    </data>
+    <data name="cmd_rpe_layer_merge_desc" xml:space="preserve">
+        <value>将所有判定线的多个事件层级合并为单一层级</value>
+    </data>
+    <data name="cmd_rpe_convert_desc" xml:space="preserve">
+        <value>将 RPE 谱面转换为其他格式（尚未完整实现）</value>
+    </data>
+    <data name="cmd_rpe_cut_event_desc" xml:space="preserve">
+        <value>将所有事件碎尸万段为线性事件，完全破坏可编辑性</value>
     </data>
     <data name="fit_command_desc" xml:space="preserve">
         <value>拟合谱面中线性事件</value>
@@ -30,11 +65,62 @@
     <data name="convert_command_opt_target" xml:space="preserve">
         <value>目标格式（如：RePhiEdit、PhiEdit、PhigrosV3）</value>
     </data>
-    <data name="err_unknown" xml:space="preserve">
-        <value>咦？是写错命令了吗？</value>
-    </data>
     <data name="render_command_desc" xml:space="preserve">
         <value>将谱面各通道事件渲染为 PNG 图片</value>
+    </data>
+    <!-- ── option descriptions ───────────────────────────────────────────────── -->
+    <data name="opt_input_phiedit_desc" xml:space="preserve">
+        <value>输入的 RPE/PhiEdit 谱面文件路径</value>
+        <comment>LoadCommand --input 选项</comment>
+    </data>
+    <data name="opt_workspace_default_desc" xml:space="preserve">
+        <value>工作区 ID（默认：default）</value>
+        <comment>LoadCommand / SaveCommand --workspace 选项</comment>
+    </data>
+    <data name="opt_output_path_desc" xml:space="preserve">
+        <value>输出文件路径</value>
+        <comment>SaveCommand --output 选项</comment>
+    </data>
+    <data name="opt_workspace_clear_id_desc" xml:space="preserve">
+        <value>只清理指定工作区（不填则清理全部）</value>
+        <comment>WorkspaceClearCommand --id 选项</comment>
+    </data>
+    <data name="opt_input_rpe_desc" xml:space="preserve">
+        <value>输入的 RPE 谱面文件路径（与 --workspace 二选一）</value>
+        <comment>RpeOperationSettings --input 选项</comment>
+    </data>
+    <data name="opt_output_auto_desc" xml:space="preserve">
+        <value>输出文件路径（不填则自动生成 _PFC.json 后缀）</value>
+        <comment>RpeOperationSettings --output 选项</comment>
+    </data>
+    <data name="opt_workspace_rpe_desc" xml:space="preserve">
+        <value>工作区 ID（与 --input 二选一）</value>
+        <comment>RpeOperationSettings --workspace 选项</comment>
+    </data>
+    <data name="opt_precision_desc" xml:space="preserve">
+        <value>采样精度（每拍细分数，默认：64，即每次采样步进六十四分之一拍）</value>
+        <comment>RpeOperationSettings --precision 选项</comment>
+    </data>
+    <data name="opt_tolerance_desc" xml:space="preserve">
+        <value>拟合容差百分比（默认：5）</value>
+        <comment>RpeOperationSettings --tolerance 选项</comment>
+    </data>
+    <data name="opt_dry_run_desc" xml:space="preserve">
+        <value>试运行模式，不写入文件</value>
+        <comment>RpeOperationSettings --dry-run 选项</comment>
+    </data>
+    <data name="opt_stream_output_desc" xml:space="preserve">
+        <value>流式输出模式（若发生内存不足错误，请考虑使用此选项）</value>
+        <comment>RpeOperationSettings --stream 选项</comment>
+    </data>
+    <data name="opt_classic_mode_desc" xml:space="preserve">
+        <value>旧版行为模式，这个模式通常会消耗更多性能，但是输出通常更加稳定</value>
+    </data>
+    <data name="opt_format_desc" xml:space="preserve">
+        <value>使输出的文件格式化</value>
+    </data>
+    <data name="opt_compress_desc" xml:space="preserve">
+        <value>禁用压缩</value>
     </data>
     <data name="render_opt_pixels_per_beat" xml:space="preserve">
         <value>每拍对应的像素高度（默认：100）</value>
@@ -54,14 +140,76 @@
     <data name="render_opt_beat_subdivisions" xml:space="preserve">
         <value>每拍格线细分数（1=只绘节拍线，4=绘四分音符线，默认 2）</value>
     </data>
+    <data name="render_opt_output" xml:space="preserve">
+        <value>图片输出文件夹路径。</value>
+    </data>
+    <!-- ── messages ─────────────────────────────────────────────────────────── -->
+    <data name="msg_loaded" xml:space="preserve">
+        <value>已经将文件送入 {0} 工作区啦！</value>
+        <comment>{0} = 工作区名</comment>
+    </data>
+    <data name="msg_saved" xml:space="preserve">
+        <value>做好啦！把工作区 '{0}' 存到 '{1}' 了！</value>
+        <comment>{0} = 工作区名, {1} = 输出路径</comment>
+    </data>
+    <data name="msg_cleared" xml:space="preserve">
+        <value>哗啦啦~ 所有工作区都打扫干净了喵！</value>
+    </data>
+    <data name="msg_written" xml:space="preserve">
+        <value>文件已经成功输出到 {0} 了！</value>
+        <comment>{0} = 输出路径</comment>
+    </data>
+    <data name="msg_help" xml:space="preserve">
+        <value>还没想好怎么写喵...所以详见README.md喵...</value>
+    </data>
     <data name="render_msg_start" xml:space="preserve">
         <value>开始渲染，输出目录：{0}</value>
     </data>
     <data name="render_msg_done" xml:space="preserve">
         <value>渲染完成，共写入 {0} 张图片到 {1}</value>
     </data>
+    <!-- ── warnings ─────────────────────────────────────────────────────────── -->
+    <data name="warn_rpe_convert" xml:space="preserve">
+        <value>RPE 转换还在化妆中，稍等一下下~</value>
+    </data>
+    <data name="warn_unstable_version" xml:space="preserve">
+        <value>您正在使用预发布版本，若发现问题，请及时反馈到 {0} ，感谢支持。</value>
+    </data>
     <data name="render_warn_nothing" xml:space="preserve">
         <value>没有找到可渲染的事件层，请检查输入谱面或 --line / --layer 参数。</value>
+    </data>
+    <!-- ── errors ────────────────────────────────────────────────────────────── -->
+    <data name="err_unknown" xml:space="preserve">
+        <value>咦？是写错命令了吗？</value>
+    </data>
+    <data name="hint_use_help" xml:space="preserve">
+        <value>可以用 --help 查看所有可用命令哦~</value>
+    </data>
+    <data name="err_unimplemented" xml:space="preserve">
+        <value>这个命令功能还未完全实现呢...</value>
+    </data>
+    <data name="err_input_required" xml:space="preserve">
+        <value>需要提供 --input 哟，或者用 --workspace 也可以~</value>
+    </data>
+    <data name="err_output_required" xml:space="preserve">
+        <value>需要提供 --output 才能帮你保存呢~</value>
+    </data>
+    <data name="err_workspace_missing" xml:space="preserve">
+        <value>没有找到工作区 {0} 喵...</value>
+        <comment>{0} = 工作区名</comment>
+    </data>
+    <data name="err_ukerr" xml:space="preserve">
+        <value>すみません！软件遇到了未知错误！请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues 我们会尽快修复这个问题！
+{0}</value>
+        <comment>{0} = 错误</comment>
+    </data>
+    <data name="err_out_of_memory" xml:space="preserve">
+        <value>输出的结果可能有些大哦~请试着添加"--stream"选项来减少内存占用！若这没有解决你的问题，请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues，我们会尽快修复这个问题！
+{0}</value>
+        <comment>{0} = 错误</comment>
+    </data>
+    <data name="err_classic_disablsed" xml:space="preserve">
+        <value>某些选项禁用时，必须启用旧版行为</value>
     </data>
     <data name="render_err_load_failed" xml:space="preserve">
         <value>无法加载谱面，清检查文件格式。</value>
@@ -69,12 +217,7 @@
     <data name="render_err_render_failed" xml:space="preserve">
         <value>渲染时发生错误：{0}</value>
     </data>
-    <data name="render_opt_output" xml:space="preserve">
-        <value>图片输出文件夹路径。</value>
-    </data>
-    <data name="warn_unstable_version" xml:space="preserve">
-        <value>您正在使用预发布版本，若发现问题，请及时反馈到 {0} ，感谢支持。</value>
-    </data>
+    <!-- ── misc ──────────────────────────────────────────────────────────────── -->
     <data name="project_link" xml:space="preserve">
         <value>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</value>
     </data>

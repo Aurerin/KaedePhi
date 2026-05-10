@@ -23,7 +23,7 @@ public class JudgeLineKpcToPe
     public JudgeLineKpcToPe(KpcToPhiEditConvertOptions options, Action<string>? warnLogger)
     {
         _options = options;
-        _eventBuilder = new LineEventBuilder(options);
+        _eventBuilder = new LineEventBuilder(options, warnLogger);
         _warnLogger = warnLogger;
     }
 

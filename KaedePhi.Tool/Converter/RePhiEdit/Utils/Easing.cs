@@ -7,9 +7,11 @@ public static class Easing
     /// </summary>
     public sealed class EasingNotSupportedException(int nrcEasing)
         : Exception($"NRC easing {nrcEasing} is unsupported in pe and requires linear slicing");
-    public static Rpe.Easing ConvertEasing(Kpc.Easing src, bool isBezier = false)
+    public static Rpe.Easing ConvertEasing(Kpc.Easing src, bool isBezier)
         => isBezier ? throw new EasingNotSupportedException(-1): new Rpe.Easing(MapToPe((int)src));
-
+    public static Kpc.Easing ConvertEasing(Rpe.Easing src) => new(MapToKpc((int)src));
+    public static Rpe.Easing ConvertEasing(Kpc.Easing src) => new(MapToPe((int)src));
+    
     public static int MapToKpc(int rpe) => rpe switch
     {
         1 => 1, 2 => 3, 3 => 2, 4 => 6, 5 => 5, 6 => 4, 7 => 7,
@@ -58,7 +60,4 @@ public static class Easing
         };
         return mapped;
     }
-    
-    public static Kpc.Easing ConvertEasing(Rpe.Easing src) => new(Utils.Easing.MapToKpc((int)src));
-    public static Rpe.Easing ConvertEasing(Kpc.Easing src) => new(Utils.Easing.MapToPe((int)src));
 }
