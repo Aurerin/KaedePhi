@@ -350,7 +350,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 构建并评分一个候选拟合段；若无可用缓动则返回 null。
     /// </summary>
-    private FittedSegment? CreateFittedSegment(
+    private static FittedSegment? CreateFittedSegment(
         List<Kpc.Event<TPayload>> runEvents,
         int startIndex,
         int endIndex,
@@ -365,7 +365,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 在允许缓动集合中选择分数最低拟合事件。
     /// </summary>
-    private bool TryCreateBestFittedEvent(
+    private static bool TryCreateBestFittedEvent(
         List<Kpc.Event<TPayload>> runEvents,
         int startIndex,
         int endIndex,
@@ -435,7 +435,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return hasCandidate;
     }
 
-    private List<SamplePoint> BuildSamples(
+    private static List<SamplePoint> BuildSamples(
         List<Kpc.Event<TPayload>> runEvents,
         int startIndex,
         int endIndex)
@@ -497,13 +497,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         if (samples.Count == 0)
             return 1d;
 
-        var maxAbsValue = 0d;
-        for (var i = 0; i < samples.Count; i++)
-        {
-            var abs = Math.Abs(samples[i].Value);
-            if (abs > maxAbsValue)
-                maxAbsValue = abs;
-        }
+        var maxAbsValue = samples.Select(t => Math.Abs(t.Value)).Prepend(0d).Max();
 
         return Math.Max(maxAbsValue, 1d);
     }
@@ -595,10 +589,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         var first = true;
         var previous = 0d;
 
-        foreach (var t in samples)
+        foreach (var progress in samples.Select(t => t.Progress))
         {
-            var progress = t.Progress;
-
             // HasOvershoot检查
             if (progress is < -0.01d or > 1.01d)
                 hasOvershoot = true;
