@@ -56,8 +56,7 @@ namespace KaedePhi.Core.PhiEdit
 
     public class Easing
     {
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private int _easingNumber;
+        private readonly int _easingNumber;
         private readonly EasingFunction _function;
 
         public Easing(int easingNumber)
@@ -82,16 +81,6 @@ namespace KaedePhi.Core.PhiEdit
             var easedTime = _function(t);
             return start + (end - start) * easedTime;
         }
-
-        /// <inheritdoc cref="Interpolate(float,float,float)"/>
-        [Obsolete("请使用 Interpolate 方法替代 Do 方法")]
-        public float Do(float start, float end, float t)
-            => Interpolate(start, end, t);
-
-        /// <inheritdoc cref="Interpolate(float,float,float)"/>
-        [Obsolete("请使用 Interpolate 方法替代 Do 方法")]
-        public double Do(double start, double end, double t)
-            => Interpolate(start, end, t);
 
         public static implicit operator int(Easing easing) => easing._easingNumber;
         public static implicit operator Easing(int easingNumber) => new(easingNumber);
