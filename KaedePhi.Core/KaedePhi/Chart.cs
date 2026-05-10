@@ -24,7 +24,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 元数据
         /// </summary>
-        public Meta Meta { get; set; } = new Meta();
+        public Meta Meta { get; set; } = new();
 
         /// <summary>
         /// 判定线列表

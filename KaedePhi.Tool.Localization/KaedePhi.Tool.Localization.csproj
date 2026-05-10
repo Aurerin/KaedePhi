@@ -6,22 +6,9 @@
         <Nullable>enable</Nullable>
         <Configurations>Debug;Release;PreRelease</Configurations>
         <Platforms>x64</Platforms>
-        <!-- Satellite assemblies (e.g. zh-CN/) are produced automatically
-             by the SDK for every Strings.*.resx file found. -->
     </PropertyGroup>
 
-    <!-- Mark the default .resx so IDEs know Strings.Designer.cs is its code-behind -->
     <ItemGroup>
-        <EmbeddedResource Update="Strings.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Strings.en-US.resx">
-          <DependentUpon>Strings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Strings.zh-hant.resx">
-            <DependentUpon>Strings.resx</DependentUpon>
-        </EmbeddedResource>
         <EmbeddedResource Update="CliLocalizationString.resx">
           <Generator>PublicResXFileCodeGenerator</Generator>
           <LastGenOutput>CliLocalizationString.Designer.cs</LastGenOutput>
@@ -45,11 +32,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Strings.Designer.cs">
-            <AutoGen>True</AutoGen>
-            <DesignTime>True</DesignTime>
-            <DependentUpon>Strings.resx</DependentUpon>
-        </Compile>
         <Compile Update="CliLocalizationString.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>

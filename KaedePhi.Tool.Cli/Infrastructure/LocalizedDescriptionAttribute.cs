@@ -14,7 +14,7 @@ public sealed class LocalizedDescriptionAttribute : DescriptionAttribute
 {
     private readonly string _resourceKey;
 
-    /// <param name="resourceKey"><see cref="Strings"/> (.resx) 中对应的资源键。</param>
+    /// <param name="resourceKey"><see cref="CliLocalizationString"/> (.resx) 中对应的资源键。</param>
     public LocalizedDescriptionAttribute(string resourceKey) : base(resourceKey)
     {
         _resourceKey = resourceKey;
@@ -26,7 +26,7 @@ public sealed class LocalizedDescriptionAttribute : DescriptionAttribute
     /// 若找不到对应键，则回退为键名本身。
     /// </remarks>
     public override string Description =>
-        Strings.ResourceManager.GetString(_resourceKey, CultureInfo.CurrentUICulture)
+        CliLocalizationString.ResourceManager.GetString(_resourceKey, CultureInfo.CurrentUICulture)
         ?? CliLocalizationString.ResourceManager.GetString(_resourceKey, CultureInfo.CurrentCulture) 
         ?? _resourceKey;
 }

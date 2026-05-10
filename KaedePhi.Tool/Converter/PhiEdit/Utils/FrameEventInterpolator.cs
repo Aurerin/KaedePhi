@@ -1,6 +1,5 @@
 using KaedePhi.Core.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
-using KaedePhi.Tool.KaedePhi.Events;
 using KpcEasing = KaedePhi.Core.KaedePhi.Easing;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;

@@ -57,8 +57,8 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
                 return null;
             if (reader.TokenType == JsonToken.String)
             {
-                var value = (string)reader.Value;
-                var lowerValue = value!.ToLower();
+                var value = reader.Value as string;
+                var lowerValue = value?.ToLower();
                 return lowerValue switch
                 {
                     "bar" => AttachUi.Bar,

@@ -38,26 +38,27 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// 将判定线与父判定线解绑（等间隔采样）。
     /// 若父线仍有父线则递归解绑，确保父线已为绝对坐标后再解绑目标线。
     /// </summary>
-    /// <param name="targetTJudgeLineIndex">目标判定线在列表中的索引。</param>
+    /// <param name="targetJudgeLineIndex">目标判定线在列表中的索引。</param>
     /// <param name="allTJudgeLines">当前谱面的全部判定线。</param>
     /// <param name="precision">每拍内的采样步数；越大精度越高，计算量越大。</param>
+    /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线（已转换为绝对坐标）。</returns>
     TJudgeLine FatherUnbind(
-        int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
+        int targetJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
         double precision,
         IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将判定线与父判定线解绑（等间隔采样，指定渲染坐标系）。
     /// </summary>
-    /// <param name="targetTJudgeLineIndex">目标判定线在列表中的索引。</param>
+    /// <param name="targetJudgeLineIndex">目标判定线在列表中的索引。</param>
     /// <param name="allTJudgeLines">当前谱面的全部判定线。</param>
     /// <param name="renderProfile">渲染坐标系配置。</param>
     /// <param name="precision">每拍内的采样步数。</param>
     /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线。</returns>
     TJudgeLine FatherUnbind(
-        int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
+        int targetJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
         double precision,
         IProgress<ToolProgress>? progress = null);
 
@@ -65,21 +66,21 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// 将判定线与父判定线解绑（自适应采样）。
     /// 以事件边界为强制切割点，仅在误差超过容差时插入新采样段，相较等间隔版可减少冗余段数。
     /// </summary>
-    /// <param name="targetTJudgeLineIndex">目标判定线在列表中的索引。</param>
+    /// <param name="targetJudgeLineIndex">目标判定线在列表中的索引。</param>
     /// <param name="allTJudgeLines">当前谱面的全部判定线。</param>
     /// <param name="precision">自适应采样的最大步数上限（同时作为事件合并精度）。</param>
     /// <param name="tolerance">误差容差百分比，决定何时插入额外切割点及压缩阈值。</param>
     /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线。</returns>
     TJudgeLine FatherUnbindPlus(
-        int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
+        int targetJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
         double precision, double tolerance,
         IProgress<ToolProgress>? progress = null);
 
     /// <summary>
     /// 将判定线与父判定线解绑（自适应采样，指定渲染坐标系）。
     /// </summary>
-    /// <param name="targetTJudgeLineIndex">目标判定线在列表中的索引。</param>
+    /// <param name="targetJudgeLineIndex">目标判定线在列表中的索引。</param>
     /// <param name="allTJudgeLines">当前谱面的全部判定线。</param>
     /// <param name="renderProfile">渲染坐标系配置。</param>
     /// <param name="precision">自适应采样的最大步数上限。</param>
@@ -87,7 +88,7 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线。</returns>
     TJudgeLine FatherUnbindPlus(
-        int targetTJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
+        int targetJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
         double precision, double tolerance,
         IProgress<ToolProgress>? progress = null);
 }

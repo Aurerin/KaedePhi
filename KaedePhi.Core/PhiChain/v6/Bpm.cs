@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6.JsonConverter;
 using Newtonsoft.Json;
@@ -8,11 +9,24 @@ namespace KaedePhi.Core.PhiChain.v6
 {
     public sealed class BpmPoint
     {
-        [JsonProperty("beat")] public Beat Beat { get; set; } = new Beat(new[] { 0, 0, 1 });
+        [JsonProperty("beat")] public Beat Beat { get; set; } = new(new[] { 0, 0, 1 });
 
         [JsonProperty("bpm")] public float Bpm { get; set; } = 120f;
 
         [JsonIgnore] public float Time { get; internal set; }
+
+        /// <summary>
+        /// 深克隆当前 BpmPoint 对象
+        /// </summary>
+        public BpmPoint Clone()
+        {
+            return new BpmPoint
+            {
+                Beat = new Beat((int[])Beat),
+                Bpm = Bpm,
+                Time = Time
+            };
+        }
     }
 
     [JsonConverter(typeof(BpmListJsonConverter))]
@@ -51,6 +65,16 @@ namespace KaedePhi.Core.PhiChain.v6
                 lastBpm = point.Bpm;
                 point.Time = time;
             }
+        }
+
+        /// <summary>
+        /// 深克隆当前 BpmList 对象
+        /// </summary>
+        public BpmList Clone()
+        {
+            var cloned = new BpmList(this.Select(p => p.Clone()));
+            cloned.ComputeTimes();
+            return cloned;
         }
     }
 }

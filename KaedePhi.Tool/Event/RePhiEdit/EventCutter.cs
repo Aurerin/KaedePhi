@@ -58,6 +58,9 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<Rpe.Event<TPaylo
     public List<Rpe.Event<TPayload>> CutEventsInRange(List<Rpe.Event<TPayload>> events, Beat startBeat, Beat endBeat,
         Beat cutLength)
     {
+        if (cutLength <= new Beat(0))
+            throw new ArgumentOutOfRangeException(nameof(cutLength), "Cut length must be greater than zero.");
+
         var cutEvents = new List<Rpe.Event<TPayload>>();
         var eventsToCut = events.Where(e => e.StartBeat < endBeat && e.EndBeat > startBeat).ToList();
 

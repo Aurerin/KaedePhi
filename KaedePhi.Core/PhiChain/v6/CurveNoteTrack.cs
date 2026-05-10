@@ -22,6 +22,22 @@ namespace KaedePhi.Core.PhiChain.v6
 
         [JsonProperty("curve")]
         public Easing Curve { get; set; } = Easing.Linear;
+
+        /// <summary>
+        /// 深克隆当前 CurveNoteTrack 对象
+        /// </summary>
+        public CurveNoteTrack Clone()
+        {
+            return new CurveNoteTrack
+            {
+                From = From,
+                To = To,
+                Kind = Kind,
+                HoldBeat = HoldBeat != null ? new Beat((int[])HoldBeat) : null,
+                Density = Density,
+                Curve = Curve?.Clone()
+            };
+        }
     }
 }
 

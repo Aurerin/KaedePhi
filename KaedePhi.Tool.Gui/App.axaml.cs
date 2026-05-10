@@ -7,7 +7,7 @@ using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
 namespace KaedePhi.Tool.Gui;
 
-public partial class App : Application
+public class App : Application
 {
     internal static ConfigService ConfigService { get; } = new();
     internal static LogService LogService { get; } = new(ConfigService.Config.MaxLogFiles);

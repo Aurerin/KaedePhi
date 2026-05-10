@@ -1,5 +1,4 @@
-﻿using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
-using KaedePhi.Tool.Common;
+﻿using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Layer;
 
