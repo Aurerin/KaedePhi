@@ -36,7 +36,7 @@ public sealed class ConfigService
             if (File.Exists(_configPath))
             {
                 var yaml = File.ReadAllText(_configPath);
-                return _deserializer.Deserialize<GuiAppConfig>(yaml) ?? new GuiAppConfig();
+                return _deserializer.Deserialize<GuiAppConfig>(yaml);
             }
         }
         catch (Exception ex)

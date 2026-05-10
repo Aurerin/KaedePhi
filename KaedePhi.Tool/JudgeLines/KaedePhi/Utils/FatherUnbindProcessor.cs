@@ -123,6 +123,9 @@ public class FatherUnbindProcessor
                 Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)),
                 Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength))
             };
+            // Task.WaitAll 只读取数组元素进行等待，不会向数组写入任何对象，
+            // 因此此处协变数组转换（Task<List<Event<double>>>[] → Task[]）绝不会触发 ArrayTypeMismatchException。
+            // ReSharper disable once CoVariantArrayConversion
             Task.WaitAll(cutTasks);
 
             var cutChannels = new FatherUnbindHelpers.EventChannels(

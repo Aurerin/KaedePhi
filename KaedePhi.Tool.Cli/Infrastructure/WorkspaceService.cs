@@ -17,7 +17,7 @@ public sealed class WorkspaceService
     public string Root => _rootDir;
 
     public IEnumerable<string> List() =>
-        Directory.EnumerateDirectories(_rootDir).Select(Path.GetFileName)!;
+        Directory.EnumerateDirectories(_rootDir).Select(d => Path.GetFileName(d));
 
     /// <summary>
     /// 验证工作区 ID 的合法性，防止路径遍历攻击。
@@ -29,7 +29,9 @@ public sealed class WorkspaceService
 
         // 只允许字母、数字、下划线、连字符
         if (!id.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-'))
-            throw new ArgumentException("Workspace ID contains invalid characters. Only alphanumeric, underscore, and hyphen are allowed.", nameof(id));
+            throw new ArgumentException(
+                "Workspace ID contains invalid characters. Only alphanumeric, underscore, and hyphen are allowed.",
+                nameof(id));
 
         var dir = Path.GetFullPath(Path.Combine(_rootDir, id));
         if (!dir.StartsWith(Path.GetFullPath(_rootDir), StringComparison.OrdinalIgnoreCase))

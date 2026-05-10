@@ -94,7 +94,7 @@ public sealed class GuiChartService
                 var peChart = Core.PhiEdit.Chart.LoadAsync(text).GetAwaiter().GetResult();
                 var peConverter = new PhiEditConverter();
                 return ChartPipeline
-                    .From(peChart, peConverter, null)
+                    .From(peChart, peConverter, new PhiEditToKpcConvertOptions())
                     .To(new KaedePhiConverter(), null);
             }
             case ChartType.PhigrosV3:

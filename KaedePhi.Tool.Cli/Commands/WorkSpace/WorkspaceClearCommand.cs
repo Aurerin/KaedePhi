@@ -16,7 +16,7 @@ public sealed class WorkspaceClearCommand : Command<WorkspaceClearCommand.Settin
         var writer = new ConsoleWriter();
         var ws = new WorkspaceService();
         ws.Clear(settings.Id);
-        writer.Info(Strings.cli_msg_cleared);
+        writer.Info(CliLocalizationString.msg_cleared);
         return 0;
     }
 }

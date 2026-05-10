@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using KaedePhi.Tool.Gui.Models;
-using static KaedePhi.Tool.Gui.Models.FA;
+using static KaedePhi.Tool.Gui.Models.FontAwesome;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
 namespace KaedePhi.Tool.Gui.ViewModels;

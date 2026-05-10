@@ -3,7 +3,7 @@ using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands;
 
-// Description set via WithDescription(Strings.cli_cmd_version_desc) in Program.cs
+// Description set via WithDescription(CliLocalizationString.cmd_version_desc) in Program.cs
 public sealed class VersionCommand : AsyncCommand<VersionCommand.Settings>
 {
     public sealed class Settings : CommandSettings

@@ -70,7 +70,7 @@ public class OperationSettings : CommandSettings
     public override ValidationResult Validate()
     {
         if (string.IsNullOrWhiteSpace(Input) && string.IsNullOrWhiteSpace(Workspace))
-            return ValidationResult.Error(Strings.cli_err_input_required);
+            return ValidationResult.Error(CliLocalizationString.err_input_required);
         return base.Validate();
     }
 

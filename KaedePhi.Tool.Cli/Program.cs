@@ -35,16 +35,16 @@ app.Configure(config =>
         // 如果是out of memory这种错误，应该提示使用--stream选项，而不是让其反馈
         if (ex is OutOfMemoryException)
         {
-            new ConsoleWriter().Error(string.Format(Strings.cli_err_out_of_memory, ex));
+            new ConsoleWriter().Error(string.Format(CliLocalizationString.err_out_of_memory, ex));
             return 1;
         }
 
-        new ConsoleWriter().Error(string.Format(Strings.cli_err_ukerr, ex));
+        new ConsoleWriter().Error(string.Format(CliLocalizationString.err_ukerr, ex));
         return 1;
     });
 
     config.AddCommand<VersionCommand>("version")
-        .WithDescription(Strings.cli_cmd_version_desc)
+        .WithDescription(CliLocalizationString.cmd_version_desc)
         .WithAlias("ver");
     config.AddCommand<GetTypeTestCommand>("test")
         .IsHidden();
@@ -52,39 +52,39 @@ app.Configure(config =>
         .IsHidden();
 
     config.AddCommand<LoadCommand>("load")
-        .WithDescription(Strings.cli_cmd_load_desc);
+        .WithDescription(CliLocalizationString.cmd_load_desc);
 
     config.AddCommand<SaveCommand>("save")
-        .WithDescription(Strings.cli_cmd_save_desc);
+        .WithDescription(CliLocalizationString.cmd_save_desc);
     config.AddCommand<UnbindFatherCommand>("unbind-father")
         .WithAlias("unbind")
-        .WithDescription(Strings.cli_cmd_rpe_unbind_father_desc);
+        .WithDescription(CliLocalizationString.cmd_rpe_unbind_father_desc);
     config.AddCommand<FitEventCommand>("fit")
         .WithAlias("fit-event")
         .WithDescription(CliLocalizationString.fit_command_desc);
     config.AddCommand<ConvertCommand>("convert")
         .WithDescription(CliLocalizationString.convert_command_desc);
     config.AddCommand<LayerMergeCommand>("layer-merge")
-        .WithDescription(Strings.cli_cmd_rpe_layer_merge_desc);
+        .WithDescription(CliLocalizationString.cmd_rpe_layer_merge_desc);
     config.AddCommand<CutEventCommand>("cut")
         .WithAlias("cut-event")
         .WithAlias("cut-all")
-        .WithDescription(Strings.cli_cmd_rpe_cut_event_desc);
+        .WithDescription(CliLocalizationString.cmd_rpe_cut_event_desc);
     config.AddCommand<RenderCommand>("render-event")
         .WithAlias("render")
         .WithDescription(CliLocalizationString.render_command_desc);
 
     config.AddBranch("workspace", ws =>
     {
-        ws.SetDescription(Strings.cli_branch_workspace_desc);
+        ws.SetDescription(CliLocalizationString.branch_workspace_desc);
         ws.AddCommand<WorkspaceListCommand>("list")
-            .WithDescription(Strings.cli_cmd_workspace_list_desc);
+            .WithDescription(CliLocalizationString.cmd_workspace_list_desc);
         ws.AddCommand<WorkspaceClearCommand>("clear")
-            .WithDescription(Strings.cli_cmd_workspace_clear_desc);
+            .WithDescription(CliLocalizationString.cmd_workspace_clear_desc);
         ws.AddCommand<LoadCommand>("load")
-            .WithDescription(Strings.cli_cmd_load_desc);
+            .WithDescription(CliLocalizationString.cmd_load_desc);
         ws.AddCommand<SaveCommand>("save")
-            .WithDescription(Strings.cli_cmd_save_desc);
+            .WithDescription(CliLocalizationString.cmd_save_desc);
     });
 });
 

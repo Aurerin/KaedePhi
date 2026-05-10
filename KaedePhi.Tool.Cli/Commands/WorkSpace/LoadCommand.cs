@@ -3,7 +3,7 @@ using Spectre.Console;
 
 namespace KaedePhi.Tool.Cli.Commands.WorkSpace;
 
-// Description set via WithDescription(Strings.cli_cmd_load_desc) in Program.cs
+// Description set via WithDescription(CliLocalizationString.cmd_load_desc) in Program.cs
 public sealed class LoadCommand : AsyncCommand<LoadCommand.Settings>
 {
     public sealed class Settings : CommandSettings
@@ -19,7 +19,7 @@ public sealed class LoadCommand : AsyncCommand<LoadCommand.Settings>
         public override ValidationResult Validate()
         {
             if (string.IsNullOrWhiteSpace(Input))
-                return ValidationResult.Error(Strings.cli_err_input_required);
+                return ValidationResult.Error(CliLocalizationString.err_input_required);
             return base.Validate();
         }
     }
@@ -32,7 +32,7 @@ public sealed class LoadCommand : AsyncCommand<LoadCommand.Settings>
         if (settings.Input is not { } input)
             return 1;
         await ws.LoadAsync(settings.Workspace, input);
-        writer.Info(string.Format(Strings.cli_msg_loaded, settings.Workspace));
+        writer.Info(string.Format(CliLocalizationString.msg_loaded, settings.Workspace));
         return 0;
     }
 }

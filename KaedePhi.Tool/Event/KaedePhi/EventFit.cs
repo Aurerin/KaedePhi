@@ -35,18 +35,6 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         IProgress<ToolProgress>? progress = null)
         => EventListFitCore(events, tolerance, maxDegreeOfParallelism, CancellationToken.None, progress);
 
-    /// <summary>
-    /// 对事件列表执行异步拟合。
-    /// </summary>
-    private Task<List<Kpc.Event<TPayload>>> EventListFitAsync(
-        List<Kpc.Event<TPayload>>? events,
-        double tolerance = 5d,
-        int? maxDegreeOfParallelism = null,
-        CancellationToken cancellationToken = default,
-        IProgress<ToolProgress>? progress = null)
-        => Task.Run(() => EventListFitCore(events, tolerance, maxDegreeOfParallelism, cancellationToken, progress),
-            cancellationToken);
-
     private List<Kpc.Event<TPayload>> EventListFitCore(
         List<Kpc.Event<TPayload>>? events,
         double tolerance,
@@ -114,7 +102,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
                         cancellationToken);
                 }
 
-                var done = System.Threading.Interlocked.Increment(ref completedUnits);
+                var done = Interlocked.Increment(ref completedUnits);
                 progress?.Report(new ToolProgress((double)done / units.Count));
             });
         }
@@ -258,7 +246,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 以“保留最后一个原事件”作为 DP 初始方案。
     /// </summary>
-    private PlanChoice CreateKeepPlan(
+    private static PlanChoice CreateKeepPlan(
         List<Kpc.Event<TPayload>> runEvents,
         int startIndex,
         int endLocal,
@@ -276,7 +264,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 通过缓存的拟合段尝试改进当前最佳方案。
     /// </summary>
-    private PlanChoice ImprovePlanByFittedSegments(
+    private static PlanChoice ImprovePlanByFittedSegments(
         IReadOnlyDictionary<(int Start, int End), FittedSegment?> fitCache,
         int startIndex,
         int endLocal,
@@ -311,7 +299,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 枚举回看窗口内所有需要预计算的候选段对 (absoluteStart, absoluteEnd)。
     /// 段长至少覆盖 2 个原始事件，方可进行有意义的拟合。
     /// </summary>
-    private (int AbsStart, int AbsEnd)[] BuildSegmentPairs(int runLength, int window, int startIndex)
+    private static (int AbsStart, int AbsEnd)[] BuildSegmentPairs(int runLength, int window, int startIndex)
     {
         // 先统计总数，一次性分配数组，避免 List 扩容
         var count = 0;
@@ -338,7 +326,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 比较两种 DP 方案优先级。
     /// 优先顺序：总成本 -> 分段数 -> 前驱位置（更长段）-> 缓动编号。
     /// </summary>
-    private bool IsBetterPlan(PlanChoice candidate, PlanChoice currentBest)
+    private static bool IsBetterPlan(PlanChoice candidate, PlanChoice currentBest)
     {
         if (candidate.Cost < currentBest.Cost - NumericEpsilon)
             return true;
@@ -483,7 +471,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return samples;
     }
 
-    private void AddSample(
+    private static void AddSample(
         List<SamplePoint> samples,
         Beat globalStart,
         double beatSpan,
@@ -504,7 +492,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         samples.Add(new SamplePoint(beat, time, value, progress));
     }
 
-    private double GetErrorScale(List<SamplePoint> samples)
+    private static double GetErrorScale(List<SamplePoint> samples)
     {
         if (samples.Count == 0)
             return 1d;
@@ -523,7 +511,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 在容差约束下对候选事件打分；失败返回 <see langword="false"/>。
     /// </summary>
-    private bool TryScoreCandidate(
+    private static bool TryScoreCandidate(
         Kpc.Event<TPayload> candidate,
         List<SamplePoint> samples,
         SourceProfile sourceProfile,
@@ -561,7 +549,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return true;
     }
 
-    private bool TryMeasureCandidateError(
+    private static bool TryMeasureCandidateError(
         Kpc.Event<TPayload> candidate,
         List<SamplePoint> samples,
         double errorScale,
@@ -573,10 +561,10 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         var maxError = 0d;
         var sumSquaredError = 0d;
 
-        for (var i = 0; i < samples.Count; i++)
+        foreach (var t in samples)
         {
-            var candidateValue = candidate.GetValueAtBeatAsDouble(samples[i].Beat);
-            var error = Math.Abs(candidateValue - samples[i].Value);
+            var candidateValue = candidate.GetValueAtBeatAsDouble(t.Beat);
+            var error = Math.Abs(candidateValue - t.Value);
 
             if (error > allowedError)
             {
@@ -595,7 +583,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return true;
     }
 
-    private SourceProfile AnalyzeSourceProfile(List<SamplePoint> samples)
+    private static SourceProfile AnalyzeSourceProfile(List<SamplePoint> samples)
     {
         var p25 = GetProgressAtTime(samples, 0.25d);
         var p50 = GetProgressAtTime(samples, 0.50d);
@@ -607,12 +595,12 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         var first = true;
         var previous = 0d;
 
-        for (var i = 0; i < samples.Count; i++)
+        foreach (var t in samples)
         {
-            var progress = samples[i].Progress;
+            var progress = t.Progress;
 
             // HasOvershoot检查
-            if (progress < -0.01d || progress > 1.01d)
+            if (progress is < -0.01d or > 1.01d)
                 hasOvershoot = true;
 
             // IsMonotonic检查
@@ -640,7 +628,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
             isMonotonic);
     }
 
-    private CandidateProfile AnalyzeCandidateProfile(
+    private static CandidateProfile AnalyzeCandidateProfile(
         Kpc.Event<TPayload> candidate,
         List<SamplePoint> samples)
     {
@@ -701,7 +689,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return new CandidateProfile(p25, p50, p75, hasOvershoot, isMonotonic);
     }
 
-    private double GetProgressAtTime(List<SamplePoint> samples, double targetTime)
+    private static double GetProgressAtTime(List<SamplePoint> samples, double targetTime)
     {
         // 直接从samples读取progress，避免LINQ分配
         if (samples.Count == 0)
@@ -728,33 +716,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return samples[^1].Progress;
     }
 
-    private double GetProgressAtTime(List<SamplePoint> samples, List<double> progresses, double targetTime)
-    {
-        if (samples.Count == 0)
-            return 0d;
-
-        if (targetTime <= samples[0].Time)
-            return progresses[0];
-
-        for (var i = 1; i < samples.Count; i++)
-        {
-            if (samples[i].Time < targetTime)
-                continue;
-
-            var left = samples[i - 1];
-            var right = samples[i];
-            var span = right.Time - left.Time;
-            if (span <= NumericEpsilon)
-                return progresses[i];
-
-            var ratio = (targetTime - left.Time) / span;
-            return progresses[i - 1] + (progresses[i] - progresses[i - 1]) * ratio;
-        }
-
-        return progresses[^1];
-    }
-
-    private EasingPhase DetectPhase(double p25, double p75)
+    private static EasingPhase DetectPhase(double p25, double p75)
     {
         const double epsilon = 0.015d;
 
@@ -776,7 +738,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return EasingPhase.Unknown;
     }
 
-    private EasingPhase GetEasingPhase(int easingId)
+    private static EasingPhase GetEasingPhase(int easingId)
     {
         if (easingId <= 1)
             return EasingPhase.Linear;
@@ -791,7 +753,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         };
     }
 
-    private Kpc.Event<TPayload> CreateCandidateEvent(Kpc.Event<TPayload> first, Kpc.Event<TPayload> last,
+    private static Kpc.Event<TPayload> CreateCandidateEvent(Kpc.Event<TPayload> first, Kpc.Event<TPayload> last,
         int easingId)
         => new()
         {
@@ -803,13 +765,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
             Font = first.Font
         };
 
-    private Beat LerpBeat(Beat startBeat, Beat endBeat, double t)
+    private static Beat LerpBeat(Beat startBeat, Beat endBeat, double t)
         => new((double)startBeat + ((double)endBeat - (double)startBeat) * t);
 
-    private bool CanParticipateInFit(Kpc.Event<TPayload> evt)
+    private static bool CanParticipateInFit(Kpc.Event<TPayload> evt)
         => evt.EndBeat > evt.StartBeat && !evt.IsBezier && evt.Easing == 1;
 
-    private bool CanAppendToFitRun(
+    private static bool CanAppendToFitRun(
         Kpc.Event<TPayload> previousEvent,
         Kpc.Event<TPayload> currentEvent,
         double tolerance)
@@ -824,13 +786,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return AreClose(Convert.ToDouble(previousEvent.EndValue), Convert.ToDouble(currentEvent.StartValue), tolerance);
     }
 
-    private bool AreClose(double left, double right, double tolerance)
+    private static bool AreClose(double left, double right, double tolerance)
     {
         var scale = Math.Max(Math.Max(Math.Abs(left), Math.Abs(right)), 1d);
         return Math.Abs(left - right) <= tolerance / 100d * scale;
     }
 
-    private int ResolveMaxDegreeOfParallelism(int? maxDegreeOfParallelism)
+    private static int ResolveMaxDegreeOfParallelism(int? maxDegreeOfParallelism)
     {
         if (maxDegreeOfParallelism is null)
             return Math.Max(1, Environment.ProcessorCount);
@@ -842,7 +804,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         return maxDegreeOfParallelism.Value;
     }
 
-    private void EnsureSupportedNumericType()
+    private static void EnsureSupportedNumericType()
     {
         if (typeof(TPayload) != typeof(int) && typeof(TPayload) != typeof(float) && typeof(TPayload) != typeof(double))
             throw new NotSupportedException("EventListFit only supports int, float, and double types.");

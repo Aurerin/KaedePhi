@@ -3,7 +3,7 @@ namespace KaedePhi.Tool.Gui.Models;
 /// <summary>
 /// Font Awesome 6 Free (Solid) Unicode 常量
 /// </summary>
-public static class FA
+public static class FontAwesome
 {
     // Font Family URI
     public const string FontFamily = "avares://KaedePhi.Tool.Gui/Assets/Fonts/fa-solid-900.ttf#Font Awesome 6 Free";

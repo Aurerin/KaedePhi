@@ -120,11 +120,11 @@ internal static class CoordinateGeometry
     /// <summary>
     /// 将 Kpc 角度转换到目标坐标系角度方向。
     /// </summary>
-    /// <param name="KpcAngleDegrees">Kpc 角度（度）。</param>
+    /// <param name="kpcAngleDegrees">Kpc 角度（度）。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的角度（度）。</returns>
-    private static double ToTargetAngleCore(double KpcAngleDegrees, CoordinateProfile target)
-        => target.ClockwiseRotation == KpcProfile.ClockwiseRotation ? KpcAngleDegrees : -KpcAngleDegrees;
+    private static double ToTargetAngleCore(double kpcAngleDegrees, CoordinateProfile target)
+        => target.ClockwiseRotation == KpcProfile.ClockwiseRotation ? kpcAngleDegrees : -kpcAngleDegrees;
 
     /// <summary>
     /// 将源坐标系角度转换到 Kpc 角度方向。
@@ -200,11 +200,11 @@ internal static class CoordinateGeometry
     /// <summary>
     /// 将 Kpc 角度转换为指定坐标系角度。
     /// </summary>
-    /// <param name="KpcAngleDegrees">Kpc 角度（度）。</param>
+    /// <param name="kpcAngleDegrees">Kpc 角度（度）。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系角度（度）。</returns>
-    internal static double ToTargetAngle(double KpcAngleDegrees, in CoordinateProfile target)
-        => ToTargetAngleCore(KpcAngleDegrees, target);
+    internal static double ToTargetAngle(double kpcAngleDegrees, in CoordinateProfile target)
+        => ToTargetAngleCore(kpcAngleDegrees, target);
 
     /// <summary>
     /// 将指定坐标系角度转换为 Kpc 角度。
@@ -255,10 +255,10 @@ internal static class CoordinateGeometry
     /// <summary>
     /// 将 Kpc 角度转换为默认渲染坐标系角度。
     /// </summary>
-    /// <param name="KpcAngleDegrees">Kpc 角度（度）。</param>
+    /// <param name="kpcAngleDegrees">Kpc 角度（度）。</param>
     /// <returns>默认渲染坐标系角度（度）。</returns>
-    internal static double ToRenderAngle(double KpcAngleDegrees) =>
-        ToTargetAngleCore(KpcAngleDegrees, RenderProfileDefault);
+    internal static double ToRenderAngle(double kpcAngleDegrees) =>
+        ToTargetAngleCore(kpcAngleDegrees, RenderProfileDefault);
 
 
     /// <summary>

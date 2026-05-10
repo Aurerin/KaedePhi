@@ -18,9 +18,7 @@ public class LineEventBuilder
     private readonly EventCutter<int> _eventCutterInt;
     private readonly EventCompressor<int> _eventCompressorInt;
     private readonly EventCutter<float> _eventCutterFloat;
-    private readonly EventCompressor<float> _eventCompressorFloat;
     private readonly EventCutter<double> _eventCutterDouble;
-    private readonly EventCompressor<double> _eventCompressorDouble;
     private readonly KpcLayerProcessor _layerProcessor = new();
     private readonly Dictionary<Type, object> _eventCutters = new();
 
@@ -31,9 +29,7 @@ public class LineEventBuilder
         _eventCutterInt = new EventCutter<int>();
         _eventCompressorInt = new EventCompressor<int>();
         _eventCutterFloat = new EventCutter<float>();
-        _eventCompressorFloat = new EventCompressor<float>();
         _eventCutterDouble = new EventCutter<double>();
-        _eventCompressorDouble = new EventCompressor<double>();
     }
 
     /// <summary>
