@@ -3,7 +3,7 @@ using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
 
-public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPayload>>
+public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Event<TPayload>>
 {
     private static readonly EventCutter<TPayload> Cutter = new();
 
@@ -30,7 +30,7 @@ public class EventMerger<TPayload> : LoggableBase, IEventMerger<Kpc.Event<TPaylo
     }
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> EventMergePlus(
+    public List<Kpc.Event<TPayload>> EventListMergePlus(
         List<Kpc.Event<TPayload>>? toEvents,
         List<Kpc.Event<TPayload>>? fromEvents,
         double precision,

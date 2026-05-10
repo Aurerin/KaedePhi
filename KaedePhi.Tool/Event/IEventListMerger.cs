@@ -2,7 +2,7 @@
 
 namespace KaedePhi.Tool.Event;
 
-public interface IEventMerger<TEvent> : ILoggable
+public interface IEventListMerger<TEvent> : ILoggable
 {
     /// <summary>
     /// 最普通最暴力算法的事件列表拟合算法，将所有事件切成等长事件，然后逐段相加。
@@ -24,7 +24,7 @@ public interface IEventMerger<TEvent> : ILoggable
     /// <param name="precision">采样精度，数值越大，采样越细</param>
     /// <param name="tolerance">误差百分比</param>
     /// <returns>经过合并的事件列表，行为不变</returns>
-    List<TEvent> EventMergePlus(
+    List<TEvent> EventListMergePlus(
         List<TEvent>? toEvents,
         List<TEvent>? fromEvents,
         double precision,
