@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
 using System.Runtime.CompilerServices;
@@ -59,7 +57,7 @@ namespace KaedePhi.Core.KaedePhi
         /// 当此事件为文字事件时，此值为字体文件相对路径，默认cmdysj.ttf
         /// </summary>
 #nullable enable
-        public string? Font { get; set; } = null;
+        public string? Font { get; set; }
 #nullable disable
         /// <summary>
         /// 获取某个拍在这个事件中的值（返回double，避免装箱和类型检查）

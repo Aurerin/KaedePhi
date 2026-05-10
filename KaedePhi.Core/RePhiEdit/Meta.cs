@@ -54,7 +54,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 谱面偏移，单位为毫秒
         /// </summary>
         [JsonProperty("offset")]
-        public int Offset { get; set; } = 0; // 音乐偏移
+        public int Offset { get; set; } // 音乐偏移
 
         /// <summary>
         /// 音乐的相对路径

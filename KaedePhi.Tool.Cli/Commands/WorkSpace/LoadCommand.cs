@@ -24,11 +24,14 @@ public sealed class LoadCommand : AsyncCommand<LoadCommand.Settings>
         }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings,CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings,
+        CancellationToken cancellationToken)
     {
         var writer = new ConsoleWriter();
         var ws = new WorkspaceService();
-        await ws.LoadAsync(settings.Workspace, settings.Input!);
+        if (settings.Input is not { } input)
+            return 1;
+        await ws.LoadAsync(settings.Workspace, input);
         writer.Info(string.Format(Strings.cli_msg_loaded, settings.Workspace));
         return 0;
     }

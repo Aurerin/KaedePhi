@@ -86,7 +86,7 @@ public class KpcToPhiEditConvertOptions
 
     public class FatherLineUnbindOptions
     {
-        private bool _classicMode = false;
+        private bool _classicMode;
         private bool _compress = true;
 
         /// <summary>
@@ -136,7 +136,7 @@ public class KpcToPhiEditConvertOptions
 
     public class MultiLayerMergeOptions
     {
-        private bool _classicMode = false;
+        private bool _classicMode;
         private bool _compress = true;
 
         /// <summary>

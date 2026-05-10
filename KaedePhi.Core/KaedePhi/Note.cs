@@ -31,12 +31,12 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 音符是否为假音符
         /// </summary>
-        public bool IsFake { get; set; } = false;
+        public bool IsFake { get; set; }
 
         /// <summary>
         /// 音符相对于判定线的X坐标
         /// </summary>
-        public double PositionX { get; set; } = 0.0f; // X坐标
+        public double PositionX { get; set; } // X坐标
 
         /// <summary>
         /// 音符宽度倍率
@@ -77,7 +77,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 音符相对于判定线的Y轴偏移
         /// </summary>
-        public double YOffset { get; set; } = 0.0f; // Y偏移
+        public double YOffset { get; set; } // Y偏移
 
         /// <summary>
         /// 音符颜色（RGB，顶点颜色乘法）
@@ -87,12 +87,12 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 打击特效颜色（RGB，顶点颜色乘法）
         /// </summary>
-        public byte[] HitFxColor { get; set; } = null;
+        public byte[] HitFxColor { get; set; }
 
         /// <summary>
         /// 音符打击音效相对路径
         /// </summary>
-        public string HitSound { get; set; } = null; // 音效
+        public string HitSound { get; set; } // 音效
 
         public Note Clone()
         {

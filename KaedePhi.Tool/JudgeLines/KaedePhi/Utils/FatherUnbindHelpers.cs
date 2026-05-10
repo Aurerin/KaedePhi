@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
@@ -149,7 +150,7 @@ public static class FatherUnbindHelpers
     }
 
     /// <summary>
-    /// 按层顺序将某一类型的事件列表串行叠加合并。层间叠加不满足交换律，必须顺序处理。
+    /// 按层顺序将某一类型的事件列表串行叠加合并。
     /// </summary>
     public static List<Kpc.Event<double>> MergeLayerChannel(
         List<EventLayer> layers,
@@ -159,8 +160,10 @@ public static class FatherUnbindHelpers
         var result = new List<Kpc.Event<double>>();
         return layers.Select(selector)
             .Where(ch => ch is { Count: > 0 })
-            .Select(ch => ch!)
-            .Aggregate(result, (current, ch) => merge(current, ch));
+            .Select(ch => ch)
+            .Aggregate(result,
+                (current, ch) => merge(current,
+                    ch ?? throw new InvalidOperationException("Channel selector returned null")));
     }
 
     /// <summary>
@@ -170,7 +173,7 @@ public static class FatherUnbindHelpers
         int targetJudgeLineIndex,
         ConcurrentDictionary<int, JudgeLine> cache,
         string logTag,
-        out JudgeLine cachedClone,
+        [NotNullWhen(true)] out JudgeLine? cachedClone,
         Action<string>? logDebug = null)
     {
         if (cache.TryGetValue(targetJudgeLineIndex, out var cached))
@@ -234,12 +237,8 @@ public static class FatherUnbindHelpers
             : (events.Min(e => e.StartBeat) ?? new Beat(0), events.Max(e => e.EndBeat) ?? new Beat(0));
 
     /// <summary>
-    /// 将计算结果写回判定线：清除第 1 层及以上的 X/Y 事件，将压缩后的结果写入第 0 层。
+    /// 将计算结果写回判定线：清除第 1 层及以上的 X/Y 事件，将结果写入第 0 层。
     /// RotateWithFather 为 true 时叠加父线旋转事件；最后置 Father = -1 完成解绑。
-    /// <para>
-    /// 位置通道 X/Y 使用 <see cref="CompressXYPosition"/> 联合压缩，以屏幕空间欧几里得距离
-    /// 同时感知两轴偏差；旋转通道为单轴，仍使用 <see cref="EventCompressor{T}"/>。
-    /// </para>
     /// </summary>
     public static void WriteResultToLine(
         JudgeLine line,
@@ -271,6 +270,7 @@ public static class FatherUnbindHelpers
         line.Father = -1;
     }
 
+    /*
     /// <summary>
     /// 对 X/Y 位置通道进行联合压缩。
     /// <para>
@@ -393,6 +393,7 @@ public static class FatherUnbindHelpers
 
         return (compX, compY);
     }
+    */
 
     #region 共享数据结构
 

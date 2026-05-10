@@ -29,13 +29,13 @@ namespace KaedePhi.Core.PhiChain.v6
         public NoteKind Kind { get; set; } = NoteKind.Tap;
 
         [JsonIgnore]
-        public Beat HoldBeat { get; set; } = new Beat(new[] { 0, 0, 1 });
+        public Beat HoldBeat { get; set; } = new(new[] { 0, 0, 1 });
 
         [JsonProperty("above")]
         public bool Above { get; set; }
 
         [JsonProperty("beat")]
-        public Beat Beat { get; set; } = new Beat(new[] { 0, 0, 1 });
+        public Beat Beat { get; set; } = new(new[] { 0, 0, 1 });
 
         [JsonProperty("x")]
         public float X { get; set; }

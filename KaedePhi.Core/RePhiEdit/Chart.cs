@@ -27,7 +27,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 元数据
         /// </summary>
         [JsonProperty("META")]
-        public Meta Meta { get; set; } = new Meta();
+        public Meta Meta { get; set; } = new();
 
         /// <summary>
         /// 判定线列表
@@ -39,7 +39,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 制谱时长（秒）
         /// </summary>
         [JsonProperty("chartTime")]
-        public double ChartTime { get; set; } = 0d;
+        public double ChartTime { get; set; }
 
         /// <summary>
         /// 判定线组
