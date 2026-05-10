@@ -7,6 +7,8 @@ namespace KaedePhi.Core.Utils
         // Delegate for easing functions
         public delegate double EasingFunction(double t);
 
+        private const double FloatTolerance = 1e-7;
+
         // Linear
         public static double Linear(double t) => t;
 
@@ -65,14 +67,14 @@ namespace KaedePhi.Core.Utils
 
         // Exponential
         public static double EaseInExpo(double t) =>
-            t == 0 ? 0 : Math.Pow(2, 10 * (t - 1));
+            Math.Abs(t) < FloatTolerance ? 0 : Math.Pow(2, 10 * (t - 1));
 
         public static double EaseOutExpo(double t) =>
-            t == 1 ? 1 : 1 - Math.Pow(2, -10 * t);
+            Math.Abs(t - 1) < FloatTolerance ? 1 : 1 - Math.Pow(2, -10 * t);
 
         public static double EaseInOutExpo(double t)
         {
-            if (t == 0 || t == 1) return t;
+            if (Math.Abs(t) < FloatTolerance || Math.Abs(t - 1) < FloatTolerance) return t;
             return t < 0.5f
                 ? 0.5f * Math.Pow(2, 20 * t - 10)
                 : 1 - 0.5f * Math.Pow(2, -20 * t + 10);
@@ -117,21 +119,21 @@ namespace KaedePhi.Core.Utils
         // Elastic
         public static double EaseInElastic(double t)
         {
-            if (t == 0 || t == 1) return t;
+            if (Math.Abs(t) < FloatTolerance || Math.Abs(t - 1) < FloatTolerance) return t;
             return -Math.Pow(2, 10 * (t - 1)) *
                    Math.Sin((t - 1.1f) * 5 * Math.PI);
         }
 
         public static double EaseOutElastic(double t)
         {
-            if (t == 0 || t == 1) return t;
+            if (Math.Abs(t) < FloatTolerance || Math.Abs(t - 1) < FloatTolerance) return t;
             return Math.Pow(2, -10 * t) *
                 Math.Sin((t - 0.1f) * 5 * Math.PI) + 1;
         }
 
         public static double EaseInOutElastic(double t)
         {
-            if (t == 0 || t == 1) return t;
+            if (Math.Abs(t) < FloatTolerance || Math.Abs(t - 1) < FloatTolerance) return t;
             t *= 2;
             if (t < 1)
                 return -0.5f * Math.Pow(2, 10 * (t - 1)) *

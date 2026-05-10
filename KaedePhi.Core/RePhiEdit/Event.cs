@@ -14,7 +14,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         [JsonProperty("bezier")]
         [JsonConverter(typeof(BoolConverter))]
-        public bool IsBezier { get; set; } = false; // 是否为贝塞尔曲线
+        public bool IsBezier { get; set; } // 是否为贝塞尔曲线
 
         /// <summary>
         /// 贝塞尔曲线控制点
@@ -26,7 +26,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 缓动截取左界限
         /// </summary>
         [JsonProperty("easingLeft")]
-        public float EasingLeft { get; set; } = 0.0f; // 缓动开始
+        public float EasingLeft { get; set; } // 缓动开始
 
         /// <summary>
         /// 缓动截取右界限
@@ -38,7 +38,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 缓动类型
         /// </summary>
         [JsonProperty("easingType")]
-        public Easing Easing { get; set; } = new Easing(1); // 缓动类型
+        public Easing Easing { get; set; } = new(1); // 缓动类型
 
         /// <summary>
         /// 事件开始数值
@@ -56,13 +56,13 @@ namespace KaedePhi.Core.RePhiEdit
         /// 事件开始拍
         /// </summary>
         [JsonProperty("startTime")]
-        public Beat StartBeat { get; set; } = new Beat(new[] { 0, 0, 1 }); // 开始时间
+        public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 }); // 开始时间
 
         /// <summary>
         /// 事件结束拍
         /// </summary>
         [JsonProperty("endTime")]
-        public Beat EndBeat { get; set; } = new Beat(new[] { 1, 0, 1 }); // 结束时间
+        public Beat EndBeat { get; set; } = new(new[] { 1, 0, 1 }); // 结束时间
 
         /// <summary>
         /// 当此事件为文字事件时，此值为字体文件相对路径，默认cmdysj.ttf
@@ -70,7 +70,7 @@ namespace KaedePhi.Core.RePhiEdit
         [JsonProperty("font", DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore)]
 #nullable enable
-        public string? Font { get; set; } = null;
+        public string? Font { get; set; }
 #nullable disable
         /// <summary>
         /// 获取某个拍在这个事件中的值

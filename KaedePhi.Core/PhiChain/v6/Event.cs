@@ -91,10 +91,10 @@ namespace KaedePhi.Core.PhiChain.v6
         public LineEventKind Kind { get; set; }
 
         [JsonProperty("start_beat")]
-        public Beat StartBeat { get; set; } = new Beat(new[] { 0, 0, 1 });
+        public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 });
 
         [JsonProperty("end_beat")]
-        public Beat EndBeat { get; set; } = new Beat(new[] { 1, 0, 1 });
+        public Beat EndBeat { get; set; } = new(new[] { 1, 0, 1 });
 
         [JsonProperty("value")]
         public LineEventValue Value { get; set; } = LineEventValue.Constant(0f);

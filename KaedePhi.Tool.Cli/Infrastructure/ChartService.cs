@@ -60,7 +60,7 @@ public sealed class ChartService
                 var kaedePhiConverter = new KaedePhiConverter();
                 var phiEditChart = await Core.PhiEdit.Chart.LoadAsync(text);
                 return ChartPipeline
-                    .From(phiEditChart, phiEditConverter, null)
+                    .From(phiEditChart, phiEditConverter, new PhiEditToKpcConvertOptions())
                     .To(kaedePhiConverter, null);
             }
 

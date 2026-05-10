@@ -9,7 +9,7 @@ namespace KaedePhi.Core.PhiChain.v6
 {
     public sealed class BpmPoint
     {
-        [JsonProperty("beat")] public Beat Beat { get; set; } = new Beat(new[] { 0, 0, 1 });
+        [JsonProperty("beat")] public Beat Beat { get; set; } = new(new[] { 0, 0, 1 });
 
         [JsonProperty("bpm")] public float Bpm { get; set; } = 120f;
 

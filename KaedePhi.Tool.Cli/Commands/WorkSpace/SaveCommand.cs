@@ -25,10 +25,11 @@ public sealed class SaveCommand : AsyncCommand<SaveCommand.Settings>
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings,CancellationToken cancellationToken)
     {
+        var output = settings.Output ?? throw new InvalidOperationException(Strings.cli_err_output_required);
         var writer = new ConsoleWriter();
         var ws = new WorkspaceService();
-        await ws.SaveAsync(settings.Workspace, settings.Output!);
-        writer.Info(string.Format(Strings.cli_msg_saved, settings.Workspace, settings.Output!));
+        await ws.SaveAsync(settings.Workspace, output);
+        writer.Info(string.Format(Strings.cli_msg_saved, settings.Workspace, output));
         return 0;
     }
 }
