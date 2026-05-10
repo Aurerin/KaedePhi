@@ -69,6 +69,105 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RPE 谱面操作.
+        /// </summary>
+        public static string branch_rpe_desc {
+            get {
+                return ResourceManager.GetString("branch_rpe_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工作区管理.
+        /// </summary>
+        public static string branch_workspace_desc {
+            get {
+                return ResourceManager.GetString("branch_workspace_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 载入谱面文件到工作区，供后续操作使用.
+        /// </summary>
+        public static string cmd_load_desc {
+            get {
+                return ResourceManager.GetString("cmd_load_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 将 RPE 谱面转换为其他格式（尚未完整实现）.
+        /// </summary>
+        public static string cmd_rpe_convert_desc {
+            get {
+                return ResourceManager.GetString("cmd_rpe_convert_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 将所有事件碎尸万段为线性事件，完全破坏可编辑性.
+        /// </summary>
+        public static string cmd_rpe_cut_event_desc {
+            get {
+                return ResourceManager.GetString("cmd_rpe_cut_event_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 将所有判定线的多个事件层级合并为单一层级.
+        /// </summary>
+        public static string cmd_rpe_layer_merge_desc {
+            get {
+                return ResourceManager.GetString("cmd_rpe_layer_merge_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 将判定线与父级解绑（已弃置）.
+        /// </summary>
+        public static string cmd_rpe_unbind_father_desc {
+            get {
+                return ResourceManager.GetString("cmd_rpe_unbind_father_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 将工作区中的谱面保存到文件.
+        /// </summary>
+        public static string cmd_save_desc {
+            get {
+                return ResourceManager.GetString("cmd_save_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 显示当前版本号.
+        /// </summary>
+        public static string cmd_version_desc {
+            get {
+                return ResourceManager.GetString("cmd_version_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 清理工作区缓存（可指定 --id 只清理单个）.
+        /// </summary>
+        public static string cmd_workspace_clear_desc {
+            get {
+                return ResourceManager.GetString("cmd_workspace_clear_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 列出所有工作区 ID.
+        /// </summary>
+        public static string cmd_workspace_list_desc {
+            get {
+                return ResourceManager.GetString("cmd_workspace_list_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 转换输入谱面到目标谱面格式.
         /// </summary>
         public static string convert_command_desc {
@@ -87,11 +186,74 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 某些选项禁用时，必须启用旧版行为.
+        /// </summary>
+        public static string err_classic_disablsed {
+            get {
+                return ResourceManager.GetString("err_classic_disablsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 需要提供 --input 哟，或者用 --workspace 也可以~.
+        /// </summary>
+        public static string err_input_required {
+            get {
+                return ResourceManager.GetString("err_input_required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 输出的结果可能有些大哦~请试着添加&quot;--stream&quot;选项来减少内存占用！....
+        /// </summary>
+        public static string err_out_of_memory {
+            get {
+                return ResourceManager.GetString("err_out_of_memory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 需要提供 --output 才能帮你保存呢~.
+        /// </summary>
+        public static string err_output_required {
+            get {
+                return ResourceManager.GetString("err_output_required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to すみません！软件遇到了未知错误！....
+        /// </summary>
+        public static string err_ukerr {
+            get {
+                return ResourceManager.GetString("err_ukerr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 咦？是写错命令了吗？.
         /// </summary>
         public static string err_unknown {
             get {
                 return ResourceManager.GetString("err_unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 这个命令功能还未完全实现呢....
+        /// </summary>
+        public static string err_unimplemented {
+            get {
+                return ResourceManager.GetString("err_unimplemented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 没有找到工作区 {0} 喵....
+        /// </summary>
+        public static string err_workspace_missing {
+            get {
+                return ResourceManager.GetString("err_workspace_missing", resourceCulture);
             }
         }
         
@@ -105,11 +267,191 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 可以用 --help 查看所有可用命令哦~.
+        /// </summary>
+        public static string hint_use_help {
+            get {
+                return ResourceManager.GetString("hint_use_help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 咦？是输错命令了吗？可以试试--help哦~.
         /// </summary>
         public static string hit_help {
             get {
                 return ResourceManager.GetString("hit_help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 哗啦啦~ 所有工作区都打扫干净了喵！.
+        /// </summary>
+        public static string msg_cleared {
+            get {
+                return ResourceManager.GetString("msg_cleared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 还没想好怎么写喵...所以详见README.md喵....
+        /// </summary>
+        public static string msg_help {
+            get {
+                return ResourceManager.GetString("msg_help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 已经将文件送入 {0} 工作区啦！.
+        /// </summary>
+        public static string msg_loaded {
+            get {
+                return ResourceManager.GetString("msg_loaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 做好啦！把工作区 &apos;{0}&apos; 存到 &apos;{1}&apos; 了！.
+        /// </summary>
+        public static string msg_saved {
+            get {
+                return ResourceManager.GetString("msg_saved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 文件已经成功输出到 {0} 了！.
+        /// </summary>
+        public static string msg_written {
+            get {
+                return ResourceManager.GetString("msg_written", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 旧版行为模式，这个模式通常会消耗更多性能，但是输出通常更加稳定.
+        /// </summary>
+        public static string opt_classic_mode_desc {
+            get {
+                return ResourceManager.GetString("opt_classic_mode_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 禁用压缩.
+        /// </summary>
+        public static string opt_compress_desc {
+            get {
+                return ResourceManager.GetString("opt_compress_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 试运行模式，不写入文件.
+        /// </summary>
+        public static string opt_dry_run_desc {
+            get {
+                return ResourceManager.GetString("opt_dry_run_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 使输出的文件格式化.
+        /// </summary>
+        public static string opt_format_desc {
+            get {
+                return ResourceManager.GetString("opt_format_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 输入的 RPE/PhiEdit 谱面文件路径.
+        /// </summary>
+        public static string opt_input_phiedit_desc {
+            get {
+                return ResourceManager.GetString("opt_input_phiedit_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 输入的 RPE 谱面文件路径（与 --workspace 二选一）.
+        /// </summary>
+        public static string opt_input_rpe_desc {
+            get {
+                return ResourceManager.GetString("opt_input_rpe_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 输出文件路径（不填则自动生成 _PFC.json 后缀）.
+        /// </summary>
+        public static string opt_output_auto_desc {
+            get {
+                return ResourceManager.GetString("opt_output_auto_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 输出文件路径.
+        /// </summary>
+        public static string opt_output_path_desc {
+            get {
+                return ResourceManager.GetString("opt_output_path_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 采样精度（每拍细分数，默认：64，即每次采样步进六十四分之一拍）.
+        /// </summary>
+        public static string opt_precision_desc {
+            get {
+                return ResourceManager.GetString("opt_precision_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 流式输出模式（若发生内存不足错误，请考虑使用此选项）.
+        /// </summary>
+        public static string opt_stream_output_desc {
+            get {
+                return ResourceManager.GetString("opt_stream_output_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 拟合容差百分比（默认：5）.
+        /// </summary>
+        public static string opt_tolerance_desc {
+            get {
+                return ResourceManager.GetString("opt_tolerance_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 只清理指定工作区（不填则清理全部）.
+        /// </summary>
+        public static string opt_workspace_clear_id_desc {
+            get {
+                return ResourceManager.GetString("opt_workspace_clear_id_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工作区 ID（默认：default）.
+        /// </summary>
+        public static string opt_workspace_default_desc {
+            get {
+                return ResourceManager.GetString("opt_workspace_default_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工作区 ID（与 --input 二选一）.
+        /// </summary>
+        public static string opt_workspace_rpe_desc {
+            get {
+                return ResourceManager.GetString("opt_workspace_rpe_desc", resourceCulture);
             }
         }
         
@@ -236,6 +578,15 @@ namespace KaedePhi.Tool.Localization {
         public static string render_warn_nothing {
             get {
                 return ResourceManager.GetString("render_warn_nothing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPE 转换还在化妆中，稍等一下下~.
+        /// </summary>
+        public static string warn_rpe_convert {
+            get {
+                return ResourceManager.GetString("warn_rpe_convert", resourceCulture);
             }
         }
         

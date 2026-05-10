@@ -10,7 +10,6 @@ public interface IEventFit<TEvent> : ILoggable
     /// <param name="events"></param>
     /// <param name="tolerance"></param>
     /// <param name="progress">进度回调。</param>
-    /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     List<TEvent> EventListFit(
         List<TEvent>? events,
@@ -24,7 +23,6 @@ public interface IEventFit<TEvent> : ILoggable
     /// <param name="tolerance"></param>
     /// <param name="maxDegreeOfParallelism"></param>
     /// <param name="progress">进度回调。</param>
-    /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     List<TEvent> EventListFit(
         List<TEvent>? events,

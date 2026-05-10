@@ -25,11 +25,11 @@ public sealed class ChartService
         {
             path = _workspace.GetChartPath(workspace)
                    ?? throw new InvalidOperationException(
-                       string.Format(Strings.cli_err_workspace_missing, workspace));
+                       string.Format(CliLocalizationString.err_workspace_missing, workspace));
         }
         else
         {
-            path = input ?? throw new InvalidOperationException(Strings.cli_err_input_required);
+            path = input ?? throw new InvalidOperationException(CliLocalizationString.err_input_required);
         }
 
         return await File.ReadAllTextAsync(path, ct);
@@ -84,7 +84,7 @@ public sealed class ChartService
     public string ResolveOutputPath(string? input, string? output, string? workspace)
     {
         if (!string.IsNullOrWhiteSpace(output)) return output;
-        if (string.IsNullOrEmpty(input)) throw new InvalidOperationException(Strings.cli_err_input_required);
+        if (string.IsNullOrEmpty(input)) throw new InvalidOperationException(CliLocalizationString.err_input_required);
         if (string.IsNullOrWhiteSpace(workspace))
             return Path.Combine(
                 Path.GetDirectoryName(input) ?? ".",
