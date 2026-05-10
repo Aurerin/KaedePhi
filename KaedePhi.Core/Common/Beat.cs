@@ -73,7 +73,7 @@ namespace KaedePhi.Core.Common
             {
                 denominator = 1000;
                 numerator = (int)Math.Round(fractionalPart * denominator);
-                var gcd = GCD(numerator, denominator);
+                var gcd = Gcd(numerator, denominator);
                 numerator /= gcd;
                 denominator /= gcd;
             }
@@ -87,7 +87,7 @@ namespace KaedePhi.Core.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns>最大公约数</returns>
-        private static int GCD(int a, int b)
+        private static int Gcd(int a, int b)
         {
             while (b != 0)
             {
@@ -99,7 +99,7 @@ namespace KaedePhi.Core.Common
             return a;
         }
 
-        private static long GCD(long a, long b)
+        private static long Gcd(long a, long b)
         {
             while (b != 0)
             {
@@ -115,14 +115,14 @@ namespace KaedePhi.Core.Common
         {
             get
             {
-                if (index < 0 || index > 2)
+                if (index is < 0 or > 2)
                     throw new ArgumentOutOfRangeException(nameof(index), index,
                         "RePhiEdit Beat index must be between 0 and 2.");
                 return _beat[index];
             }
             set
             {
-                if (index < 0 || index > 2)
+                if (index is < 0 or > 2)
                     throw new ArgumentOutOfRangeException(nameof(index), index,
                         "RePhiEdit Beat index must be between 0 and 2.");
                 if (index == 2 && value == 0)
@@ -180,7 +180,7 @@ namespace KaedePhi.Core.Common
             }
 
             // 约分
-            var gcd = GCD(Math.Abs(numerator), denominator);
+            var gcd = Gcd(Math.Abs(numerator), denominator);
             numerator /= gcd;
             denominator /= gcd;
 
@@ -220,7 +220,7 @@ namespace KaedePhi.Core.Common
             }
 
             // 约分
-            var gcd = GCD(Math.Abs(numerator), denominator);
+            var gcd = Gcd(Math.Abs(numerator), denominator);
             numerator /= gcd;
             denominator /= gcd;
 

@@ -2,28 +2,50 @@
 
 namespace KaedePhi.Tool.Event;
 
+/// <summary>
+/// 定义将两组事件列表按值叠加合并的操作契约。
+/// <para>
+/// 合并语义：目标轨道（<c>toEvents</c>）与来源轨道（<c>fromEvents</c>）的值在时间轴上逐拍相加。
+/// 非重叠区段以对方轨道最近已结束事件的终值作为常量偏移直接叠加；
+/// 重叠区段根据实现策略（固定采样或自适应采样）将两轨道的瞬时值求和后生成分段线性近似。
+/// </para>
+/// </summary>
+/// <typeparam name="TEvent">事件类型。</typeparam>
 public interface IEventListMerger<TEvent> : ILoggable
 {
     /// <summary>
-    /// 最普通最暴力算法的事件列表拟合算法，将所有事件切成等长事件，然后逐段相加。
+    /// 将 <paramref name="fromEvents"/> 叠加到 <paramref name="toEvents"/> 上，返回合并后的新事件列表。
+    /// <para>
+    /// 对于两轨道无时间重叠的区段，以对方轨道最近一个已结束事件的终值作为常量偏移；
+    /// 对于重叠区段，将两轨道的事件按 <paramref name="precision"/> 等间隔切片后逐片求和，
+    /// 生成分段线性近似。切片精度越高，结果越精确，但产生的事件数量也越多。
+    /// </para>
+    /// <para>任意一个输入列表为 <see langword="null"/> 或空时直接返回另一列表的深拷贝；两者均为空时返回空列表。</para>
     /// </summary>
-    /// <param name="toEvents">从事件列表</param>
-    /// <param name="fromEvents">到事件列表</param>
-    /// <param name="precision">采样精度，数值越大，采样越细</param>
-    /// <returns>经过合并的事件列表，行为不变</returns>
+    /// <param name="toEvents">目标轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="fromEvents"/> 的克隆。</param>
+    /// <param name="fromEvents">来源轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="toEvents"/> 的克隆。</param>
+    /// <param name="precision">重叠区段的切片精度（每拍切片数）；值越大精度越高，事件数量也越多。</param>
+    /// <returns>叠加后的新事件列表，已按起始拍升序排序。</returns>
     List<TEvent> EventListMerge(
         List<TEvent>? toEvents,
         List<TEvent>? fromEvents,
         double precision);
 
     /// <summary>
-    /// 性能更优的，基于自适应算法的事件列表拟合算法，同时采样，同时计算误差百分比，天然直接压缩事件数量。
+    /// 将 <paramref name="fromEvents"/> 叠加到 <paramref name="toEvents"/> 上，返回合并后的新事件列表。
+    /// <para>
+    /// 对于两轨道无时间重叠的区段，以对方轨道最近一个已结束事件的终值作为常量偏移；
+    /// 对于重叠区段，以 <paramref name="precision"/> 为最大切片粒度进行自适应采样：
+    /// 仅在两轨道的事件边界处或叠加值偏离线性近似超过 <paramref name="tolerance"/> 容差时才插入新分段，
+    /// 在保证精度的前提下减少冗余事件数量。
+    /// </para>
+    /// <para>任意一个输入列表为 <see langword="null"/> 或空时直接返回另一列表的深拷贝；两者均为空时返回空列表。</para>
     /// </summary>
-    /// <param name="toEvents">从事件列表</param>
-    /// <param name="fromEvents">到事件列表</param>
-    /// <param name="precision">采样精度，数值越大，采样越细</param>
-    /// <param name="tolerance">误差百分比</param>
-    /// <returns>经过合并的事件列表，行为不变</returns>
+    /// <param name="toEvents">目标轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="fromEvents"/> 的克隆。</param>
+    /// <param name="fromEvents">来源轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="toEvents"/> 的克隆。</param>
+    /// <param name="precision">重叠区段自适应采样的最大切片粒度（每拍切片数）。</param>
+    /// <param name="tolerance">允许的线性近似误差百分比（0–100）；值越小结果越精确但分段越多。</param>
+    /// <returns>叠加后的新事件列表，已按起始拍升序排序。</returns>
     List<TEvent> EventListMergePlus(
         List<TEvent>? toEvents,
         List<TEvent>? fromEvents,
