@@ -17,7 +17,8 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     public List<ChartType> AvailableFormats { get; } = new()
     {
         ChartType.RePhiEdit,
-        ChartType.PhiEdit
+        ChartType.PhiEdit,
+        ChartType.PhigrosV3
     };
 
     public ChartType SelectedFormat

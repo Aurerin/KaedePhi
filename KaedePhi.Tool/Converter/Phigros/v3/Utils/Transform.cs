@@ -15,4 +15,8 @@ public static class Transform
     public static double ToKpcX(float x) => CoordinateGeometry.ToKpcX(x, PhigrosV3Profile);
     public static double ToKpcY(float y) => CoordinateGeometry.ToKpcY(y, PhigrosV3Profile);
     public static double ToKpcAngle(float angle) => CoordinateGeometry.ToKpcAngle(angle, PhigrosV3Profile);
+
+    public static float ToPhigrosV3X(double x) => CoordinateGeometry.ToTargetXf(x, PhigrosV3Profile);
+    public static float ToPhigrosV3Y(double y) => CoordinateGeometry.ToTargetYf(y, PhigrosV3Profile);
+    public static float ToPhigrosV3Angle(double angle) => (float)CoordinateGeometry.ToTargetAngle(angle, PhigrosV3Profile);
 }

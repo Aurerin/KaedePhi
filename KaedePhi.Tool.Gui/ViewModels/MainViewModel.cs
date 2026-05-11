@@ -6,10 +6,11 @@ namespace KaedePhi.Tool.Gui.ViewModels;
 
 public sealed class MainViewModel : INotifyPropertyChanged
 {
-    public object CurrentPage
+    public object? CurrentPage
     {
-        get => field ?? throw new InvalidOperationException("CurrentPage is not set.");
-        set { field = value; OnPropertyChanged(); }
+        get;
+        set
+        { field = value; OnPropertyChanged(); }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
