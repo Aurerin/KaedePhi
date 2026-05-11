@@ -217,11 +217,11 @@ namespace KaedePhi.Core.KaedePhi
         private T InterpolateEasing(double t)
         {
             if (typeof(T) == typeof(float))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
+                return (T)(object)(float)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
             if (typeof(T) == typeof(double))
                 return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t);
             if (typeof(T) == typeof(int))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
+                return (T)(object)(int)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");

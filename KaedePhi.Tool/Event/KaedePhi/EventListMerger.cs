@@ -671,94 +671,136 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     }
 
     /// <summary>
-    /// 在单个重叠区间内以 <paramref name="cutLength"/> 为最大步长执行自适应采样合并。
+    /// 在单个重叠区间内执行自适应合并采样。
     /// <para>
-    /// 算法：以 <paramref name="cutLength"/> 为步进逐拍推进 <c>currentBeat</c>，
-    /// 在每个采样点评估两轨道的瞬时叠加值。满足以下任一条件时立即提交当前段并开启新段：
-    /// <list type="bullet">
-    ///   <item>当前步跨越了任意一轨道的事件边界（<c>crossEvent == true</c>）；</item>
-    ///   <item>当前段的线性近似误差（归一化欧几里得垂直距离）超过 <paramref name="tolerance"/>（见 <see cref="ShouldSplitAdaptiveSegment"/>）；</item>
-    ///   <item>到达区间终点。</item>
+    /// 与解绑算法（<c>RunAdaptiveSampling + AdaptiveSampleInterval</c>）的结构完全一致：
+    /// <list type="number">
+    ///   <item>收集两轨道在 [<paramref name="start"/>, <paramref name="end"/>] 内的所有事件边界，
+    ///     与区间端点合并后去重排序，得到关键拍列表（等价于解绑的 <c>CollectKeyBeats</c>）；</item>
+    ///   <item>对每个相邻关键拍子区间 [k_i, k_{i+1}] 独立调用
+    ///     <see cref="AdaptiveSampleMergeKeyInterval"/>（等价于解绑的 <c>AdaptiveSampleInterval</c>）；</item>
+    ///   <item>容差评估始终相对于<b>局部子区间终点</b>而非全局重叠区间终点，
+    ///     消除长区间导致局部非线性被低估的问题。</item>
     /// </list>
     /// </para>
     /// </summary>
-    /// <param name="toEventsCopy">目标轨道事件深拷贝，已按 StartBeat 排序。</param>
-    /// <param name="fromEventsCopy">来源轨道事件深拷贝，已按 StartBeat 排序。</param>
-    /// <param name="start">区间起始拍。</param>
-    /// <param name="end">区间结束拍。</param>
-    /// <param name="cutLength">采样步长（= 1 / precision）。</param>
-    /// <param name="tolerance">允许的线性近似误差百分比（0–100）。</param>
-    /// <returns>本区间内自适应采样后的合并事件列表。</returns>
     private static List<Kpc.Event<TPayload>> MergeAdaptiveSingleInterval(
         List<Kpc.Event<TPayload>> toEventsCopy,
         List<Kpc.Event<TPayload>> fromEventsCopy,
         Beat start, Beat end, Beat cutLength, double tolerance)
     {
-        var result = new List<Kpc.Event<TPayload>>();
-        var currentBeat = start;
-
-        var lastToValue = GetPreviousEndValue(toEventsCopy, start);
-        var lastFormValue = GetPreviousEndValue(fromEventsCopy, start);
-
-        var toEventAtCurrent = GetActiveEventAtBeat(toEventsCopy, currentBeat);
-        var formEventAtCurrent = GetActiveEventAtBeat(fromEventsCopy, currentBeat);
-        var toValAtCurrent = toEventAtCurrent != null ? toEventAtCurrent.GetValueAtBeat(currentBeat) : lastToValue;
-        var formValAtCurrent =
-            formEventAtCurrent != null ? formEventAtCurrent.GetValueAtBeat(currentBeat) : lastFormValue;
-
-        var segmentStart = start;
-        var segmentStartToValue = toValAtCurrent;
-        var segmentStartFormValue = formValAtCurrent;
-        var segmentStartSum = AddValues(segmentStartToValue, segmentStartFormValue);
-
-        while (currentBeat < end)
+        // 收集两轨道在区间内的所有事件边界作为关键拍（等价于解绑的 CollectKeyBeats）
+        var keyBeatSet = new SortedSet<Beat> { start, end };
+        foreach (var ev in toEventsCopy.Concat(fromEventsCopy))
         {
-            var nextBeat = currentBeat + cutLength;
-            if (nextBeat > end) nextBeat = end;
+            if (ev.StartBeat > start && ev.StartBeat < end) keyBeatSet.Add(ev.StartBeat);
+            if (ev.EndBeat > start && ev.EndBeat < end) keyBeatSet.Add(ev.EndBeat);
+        }
 
-            var toEventAtNext = GetActiveEventAtBeat(toEventsCopy, nextBeat);
-            var formEventAtNext = GetActiveEventAtBeat(fromEventsCopy, nextBeat);
-            var crossEvent = !ReferenceEquals(toEventAtNext, toEventAtCurrent) ||
-                             !ReferenceEquals(formEventAtNext, formEventAtCurrent);
+        var keyBeats = keyBeatSet.ToList();
+        var result = new List<Kpc.Event<TPayload>>();
 
-            if (crossEvent && currentBeat > segmentStart)
-            {
-                AddSegmentEvent(result, segmentStart, currentBeat,
-                    segmentStartToValue, segmentStartFormValue, toValAtCurrent, formValAtCurrent);
-                segmentStart = currentBeat;
-                segmentStartToValue = toValAtCurrent;
-                segmentStartFormValue = formValAtCurrent;
-                segmentStartSum = AddValues(toValAtCurrent, formValAtCurrent);
-            }
-
-            var (toValueAtNext, toValUpdate) =
-                GetNextBeatValues(toEventsCopy, toEventAtCurrent, toEventAtNext, nextBeat);
-            var (formValueAtNext, formValUpdate) =
-                GetNextBeatValues(fromEventsCopy, formEventAtCurrent, formEventAtNext, nextBeat);
-
-            var sumAtNext = AddValues(toValueAtNext, formValueAtNext);
-            var sumAtEnd = AddValues(GetValueAtBeatOrPreviousEnd(toEventsCopy, end),
-                GetValueAtBeatOrPreviousEnd(fromEventsCopy, end));
-
-            if (crossEvent || ShouldSplitAdaptiveSegment(
-                    segmentStart, nextBeat, end, segmentStartSum, sumAtNext, sumAtEnd, tolerance))
-            {
-                AddSegmentEvent(result, segmentStart, nextBeat,
-                    segmentStartToValue, segmentStartFormValue, toValueAtNext, formValueAtNext);
-                segmentStart = nextBeat;
-                segmentStartToValue = toValUpdate;
-                segmentStartFormValue = formValUpdate;
-                segmentStartSum = AddValues(toValUpdate, formValUpdate);
-            }
-
-            toEventAtCurrent = toEventAtNext;
-            formEventAtCurrent = formEventAtNext;
-            toValAtCurrent = toValUpdate;
-            formValAtCurrent = formValUpdate;
-            currentBeat = nextBeat;
+        // 对每个关键拍子区间独立执行自适应采样（等价于解绑的 RunAdaptiveSampling 内循环）
+        for (var ki = 0; ki < keyBeats.Count - 1; ki++)
+        {
+            var iStart = keyBeats[ki];
+            var iEnd = keyBeats[ki + 1];
+            if (iStart >= iEnd) continue;
+            result.AddRange(AdaptiveSampleMergeKeyInterval(
+                toEventsCopy, fromEventsCopy, iStart, iEnd, cutLength, tolerance));
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 对单个关键拍子区间 [<paramref name="iStart"/>, <paramref name="iEnd"/>]
+    /// 执行自适应合并采样。
+    /// 变量命名、参数顺序及调用结构与 <c>FatherUnbindHelpers.AdaptiveSampleInterval</c> 完全一致，
+    /// 仅将 2D 坐标替换为 1D 标量叠加值。
+    /// </summary>
+    private static List<Kpc.Event<TPayload>> AdaptiveSampleMergeKeyInterval(
+        List<Kpc.Event<TPayload>> toEvents,
+        List<Kpc.Event<TPayload>> fromEvents,
+        Beat iStart, Beat iEnd, Beat step, double tolerance)
+    {
+        var result = new List<Kpc.Event<TPayload>>();
+
+        // 对应 AdaptiveSampleInterval:  var end = absPosOut(iEnd);
+        var end = GetSumOut(toEvents, fromEvents, iEnd);
+        var segStart = iStart;
+        // 对应 AdaptiveSampleInterval:  var seg = absPosIn(iStart);
+        var seg = GetSumIn(toEvents, fromEvents, iStart);
+
+        for (var cur = iStart; cur < iEnd;)
+        {
+            var next = cur + step > iEnd ? iEnd : cur + step;
+            var isLast = next >= iEnd;
+            // 对应 AdaptiveSampleInterval:  var nextPos = isLast ? end : absPosIn(next);
+            var nextPos = isLast ? end : GetSumIn(toEvents, fromEvents, next);
+
+            // 对应 AdaptiveSampleInterval:  if (isLast || NeedsAdaptiveCut(seg, nextPos, end, segStart, iEnd, next, tolerance))
+            if (isLast || NeedsAdaptiveCut1D(
+                    ToDouble(seg), ToDouble(nextPos), ToDouble(end),
+                    segStart, iEnd, next, tolerance))
+            {
+                result.Add(new Kpc.Event<TPayload>
+                {
+                    StartBeat = segStart,
+                    EndBeat = next,
+                    StartValue = seg,
+                    EndValue = nextPos,
+                });
+                segStart = next;
+                seg = nextPos;
+            }
+
+            cur = next;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// <c>NeedsAdaptiveCut</c> 的 1D 标量版本：判断在 <paramref name="nextBeat"/> 处是否需要切割当前段。
+    /// <para>
+    /// 参数顺序与 <c>FatherUnbindHelpers.NeedsAdaptiveCut(segmentStart, next, intervalEnd,
+    /// segmentStartBeat, intervalEndBeat, nextBeat, tolerance)</c> 完全一致，
+    /// 仅将 2D 屏幕坐标替换为 1D 标量值（比例因子在比值中相消，结果等价）。
+    /// </para>
+    /// </summary>
+    /// <param name="segmentStart">段起点处的叠加值（对应 <c>segmentStart.X</c>）。</param>
+    /// <param name="next">测试点处的叠加值（对应 <c>next.X</c>）。</param>
+    /// <param name="intervalEnd">关键拍子区间终点处的叠加值（对应 <c>intervalEnd.X</c>）。</param>
+    /// <param name="segmentStartBeat">段起点拍号。</param>
+    /// <param name="intervalEndBeat">关键拍子区间终点拍号。</param>
+    /// <param name="nextBeat">测试点拍号。</param>
+    /// <param name="tolerance">允许的线性近似误差百分比（0–100）。</param>
+    private static bool NeedsAdaptiveCut1D(
+        double segmentStart, double next, double intervalEnd,
+        Beat segmentStartBeat, Beat intervalEndBeat, Beat nextBeat,
+        double tolerance)
+    {
+        // 与 NeedsAdaptiveCut 完全相同的进度计算
+        var segmentLength = (double)(intervalEndBeat - segmentStartBeat);
+        var progress = segmentLength > 1e-12
+            ? (double)(nextBeat - segmentStartBeat) / segmentLength
+            : 1.0;
+
+        // 线性预测值（对应 predicted.X = segmentStart.X + (intervalEnd.X - segmentStart.X) * progress）
+        var predicted = segmentStart + (intervalEnd - segmentStart) * progress;
+
+        var tolFraction = tolerance / 100.0;
+
+        // 误差（对应 screenErrorX）
+        var error = Math.Abs(next - predicted);
+
+        // 尺度（对应 segEndXScale / nextXScale，屏幕比例因子在比值中相消）
+        var segEndScale = Math.Abs(intervalEnd - segmentStart);
+        var nextScale   = Math.Abs(next - segmentStart);
+        var threshold   = tolFraction * Math.Max(Math.Max(segEndScale, nextScale), 1e-3);
+
+        return error > threshold;
     }
 
     /// <summary>
@@ -847,91 +889,59 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     }
 
     /// <summary>
-    /// 计算 <paramref name="nextBeat"/> 处当前事件的出站值（Outgoing）与下一事件的入站值（Incoming），
-    /// 用于在事件边界处正确处理值的过渡。
-    /// <list type="bullet">
-    ///   <item><b>Outgoing</b>：若 <paramref name="eventAtCurrent"/> 延伸到 <paramref name="nextBeat"/> 或更晚，
-    ///     则为该事件在 <paramref name="nextBeat"/> 处的插值；否则为 <paramref name="nextBeat"/> 的前序终值。</item>
-    ///   <item><b>Incoming</b>：若 <paramref name="eventAtNext"/> 非空，则为该事件在 <paramref name="nextBeat"/> 处的插值；
-    ///     否则与 Outgoing 相同（均为前序终值）。</item>
-    /// </list>
+    /// 入站语义：取 <paramref name="beat"/> 时刻正在生效的事件插值（用于段起点）。
+    /// 与 <c>FatherUnbindHelpers.GetValIn</c> 等价，O(log N) 二分查找。
+    /// <para>找到最后一个 StartBeat &lt;= beat 的事件：若其 EndBeat &gt; beat 则插值，否则取 EndValue。</para>
     /// </summary>
-    /// <param name="events">事件列表，用于查询前序终值。</param>
-    /// <param name="eventAtCurrent">当前拍点的活动事件（可为 <see langword="null"/>）。</param>
-    /// <param name="eventAtNext">下一拍点的活动事件（可为 <see langword="null"/>）。</param>
-    /// <param name="nextBeat">下一拍点。</param>
-    /// <returns>
-    /// 元组 <c>(Outgoing, Incoming)</c>：<c>Outgoing</c> 为当前事件延续到 <paramref name="nextBeat"/> 的出站值，
-    /// <c>Incoming</c> 为下一拍点活动事件的入站值。
-    /// </returns>
-    private static (TPayload? Outgoing, TPayload? Incoming) GetNextBeatValues(
-        List<Kpc.Event<TPayload>> events, Kpc.Event<TPayload>? eventAtCurrent, Kpc.Event<TPayload>? eventAtNext,
-        Beat nextBeat)
+    private static TPayload? GetValueIn(List<Kpc.Event<TPayload>> events, Beat beat)
     {
-        var prevEnd = GetPreviousEndValue(events, nextBeat);
-        var outgoing = (eventAtCurrent != null && eventAtCurrent.EndBeat >= nextBeat)
-            ? eventAtCurrent.GetValueAtBeat(nextBeat)
-            : prevEnd;
-        var incoming = eventAtNext != null
-            ? eventAtNext.GetValueAtBeat(nextBeat)
-            : prevEnd;
-        return (outgoing, incoming);
+        if (events.Count == 0) return default;
+        int lo = 0, hi = events.Count - 1, idx = -1;
+        while (lo <= hi)
+        {
+            var mid = (lo + hi) >> 1;
+            if (events[mid].StartBeat <= beat) { idx = mid; lo = mid + 1; }
+            else hi = mid - 1;
+        }
+        if (idx < 0) return default;
+        var e = events[idx];
+        return e.EndBeat > beat ? e.GetValueAtBeat(beat) : e.EndValue;
     }
 
     /// <summary>
-    /// 在归一化的 (时间, 值) 二维空间中，计算测试点到理想线段的垂直距离，
-    /// 判断自适应分段是否需要在 <paramref name="nextBeat"/> 处切分。
-    /// <para>
-    /// 具体方法：将时间轴归一化到 [0, 1]（以 [<paramref name="segmentStart"/>, <paramref name="intervalEnd"/>] 为区间），
-    /// 以段内值域最大绝对值（与 1e-9 取较大值）为比例尺对值轴归一化，
-    /// 计算点 (<paramref name="nextBeat"/>, <paramref name="sumAtNext"/>) 到连接
-    /// (<paramref name="segmentStart"/>, <paramref name="segmentStartSum"/>) 与
-    /// (<paramref name="intervalEnd"/>, <paramref name="sumAtEnd"/>) 的线段的欧几里得垂直距离，
-    /// 与 <paramref name="tolerance"/>/100 阈值比较。
-    /// </para>
-    /// <para>当 <paramref name="nextBeat"/> 到达或超过 <paramref name="intervalEnd"/> 时强制返回 <see langword="true"/>。</para>
+    /// 出站语义：取 <paramref name="beat"/> 时刻即将结束的事件插值（用于段终点）。
+    /// 与 <c>FatherUnbindHelpers.GetValOut</c> 等价，O(log N) 二分查找。
+    /// <para>找到最后一个 StartBeat &lt; beat（严格小于）的事件：若其 EndBeat &gt;= beat 则插值，否则取 EndValue。
+    /// 严格小于确保子区间起点使用新事件，终点使用旧事件，保持相邻子区间边界的连续性。</para>
     /// </summary>
-    /// <param name="segmentStart">当前分段的起始拍。</param>
-    /// <param name="nextBeat">待评估的拍点。</param>
-    /// <param name="intervalEnd">所在重叠区间的结束拍。</param>
-    /// <param name="segmentStartSum">当前分段起点处两轨道叠加值。</param>
-    /// <param name="sumAtNext"><paramref name="nextBeat"/> 处两轨道叠加值。</param>
-    /// <param name="sumAtEnd"><paramref name="intervalEnd"/> 处两轨道叠加值。</param>
-    /// <param name="tolerance">允许的线性近似误差百分比（0–100）；负值按 0 处理。</param>
-    /// <returns>垂直距离超过阈值或到达区间终点时返回 <see langword="true"/>，否则返回 <see langword="false"/>。</returns>
-    private static bool ShouldSplitAdaptiveSegment(
-        Beat segmentStart, Beat nextBeat, Beat intervalEnd,
-        TPayload? segmentStartSum, TPayload? sumAtNext, TPayload? sumAtEnd, double tolerance)
+    private static TPayload? GetValueOut(List<Kpc.Event<TPayload>> events, Beat beat)
     {
-        if (nextBeat >= intervalEnd) return true;
-        if (nextBeat <= segmentStart) return false;
-
-        var dtTotal = (double)(intervalEnd - segmentStart);
-        var dtLocal = (double)(nextBeat - segmentStart);
-        if (dtTotal <= 1e-12 || dtLocal <= 1e-12) return false;
-
-        var p = Math.Clamp(dtLocal / dtTotal, 0.0, 1.0);
-
-        var startNum = ToDouble(segmentStartSum);
-        var nextNum = ToDouble(sumAtNext);
-        var endNum = ToDouble(sumAtEnd);
-
-        // 归一化比例尺：避免量纲混用
-        var scale = Math.Max(Math.Max(Math.Abs(startNum), Math.Abs(endNum)), 1e-9);
-
-        // 归一化 (时间, 值) 空间中的垂直距离：
-        //   A'=(0, 0), C'=(1, dvNorm), 测试点 B'=(p, byNorm)
-        //   d = |byNorm − dvNorm·p| / sqrt(1 + dvNorm²)
-        // 当 dvNorm≈0（水平段）退化为纯值域偏差，当 dvNorm 很大（陡峭段）退化为时间偏差，
-        // 两者通过欧几里得范数自然融合，无需手动加权。
-        var dvNorm = (endNum - startNum) / scale;
-        var byNorm = (nextNum - startNum) / scale;
-        var det = byNorm - dvNorm * p;
-        var len = Math.Sqrt(1.0 + dvNorm * dvNorm);
-        var normalizedDist = Math.Abs(det) / len;
-
-        return normalizedDist > Math.Max(0d, tolerance) / 100.0;
+        if (events.Count == 0) return default;
+        int lo = 0, hi = events.Count - 1, idx = -1;
+        while (lo <= hi)
+        {
+            var mid = (lo + hi) >> 1;
+            if (events[mid].StartBeat < beat) { idx = mid; lo = mid + 1; }
+            else hi = mid - 1;
+        }
+        if (idx < 0) return default;
+        var e = events[idx];
+        return e.EndBeat >= beat ? e.GetValueAtBeat(beat) : e.EndValue;
     }
+
+    /// <summary>
+    /// 返回两轨道在 <paramref name="beat"/> 时刻的入站叠加值（对应解绑的 <c>absPosIn</c>）。
+    /// </summary>
+    private static TPayload GetSumIn(
+        List<Kpc.Event<TPayload>> toEvents, List<Kpc.Event<TPayload>> fromEvents, Beat beat)
+        => AddValues(GetValueIn(toEvents, beat), GetValueIn(fromEvents, beat));
+
+    /// <summary>
+    /// 返回两轨道在 <paramref name="beat"/> 时刻的出站叠加值（对应解绑的 <c>absPosOut</c>）。
+    /// </summary>
+    private static TPayload GetSumOut(
+        List<Kpc.Event<TPayload>> toEvents, List<Kpc.Event<TPayload>> fromEvents, Beat beat)
+        => AddValues(GetValueOut(toEvents, beat), GetValueOut(fromEvents, beat));
 
     /// <summary>
     /// 将 <paramref name="value"/> 安全地转换为 <see cref="double"/>。
@@ -955,31 +965,6 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     private static TPayload AddValues(TPayload? left, TPayload? right)
         => (dynamic?)left + (dynamic?)right;
 
-    /// <summary>
-    /// 将一个由两轨道起/终值叠加得到的分段事件追加到 <paramref name="target"/>。
-    /// 起点值为 <paramref name="startToValue"/> + <paramref name="startFormValue"/>，
-    /// 终点值为 <paramref name="endToValue"/> + <paramref name="endFormValue"/>。
-    /// 不复制缓动属性，生成的事件为纯线性段。
-    /// </summary>
-    /// <param name="target">目标事件列表。</param>
-    /// <param name="startBeat">分段起始拍。</param>
-    /// <param name="endBeat">分段结束拍。</param>
-    /// <param name="startToValue">目标轨道在起点处的值。</param>
-    /// <param name="startFormValue">来源轨道在起点处的值。</param>
-    /// <param name="endToValue">目标轨道在终点处的值。</param>
-    /// <param name="endFormValue">来源轨道在终点处的值。</param>
-    private static void AddSegmentEvent(
-        List<Kpc.Event<TPayload>> target, Beat startBeat, Beat endBeat,
-        TPayload? startToValue, TPayload? startFormValue, TPayload? endToValue, TPayload? endFormValue)
-    {
-        target.Add(new Kpc.Event<TPayload>
-        {
-            StartBeat = startBeat,
-            EndBeat = endBeat,
-            StartValue = AddValues(startToValue, startFormValue),
-            EndValue = AddValues(endToValue, endFormValue),
-        });
-    }
 
     #endregion
 }

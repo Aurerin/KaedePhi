@@ -9,6 +9,7 @@ using KaedePhi.Tool.Converter.KaedePhi;
 using KaedePhi.Tool.Converter.PhiEdit;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Converter.Phigros.v3;
+using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Converter.RePhiEdit;
 using KaedePhi.Tool.Converter.RePhiEdit.Model;
 using KaedePhi.Tool.Event.KaedePhi;
@@ -146,6 +147,20 @@ public sealed class GuiChartService
                 else
                 {
                     await File.WriteAllTextAsync(outputPath, await peChart.ExportAsync(), ct);
+                }
+                break;
+            }
+            case ChartType.PhigrosV3:
+            {
+                var phigrosChart = new PhigrosV3Converter().FromKpc(chart, new KpcToPhigrosV3ConvertOptions());
+                if (stream)
+                {
+                    await using var s = new FileStream(outputPath, FileMode.Create);
+                    await phigrosChart.ExportToJsonStreamAsync(s, indented);
+                }
+                else
+                {
+                    await File.WriteAllTextAsync(outputPath, await phigrosChart.ExportToJsonAsync(indented), ct);
                 }
                 break;
             }

@@ -28,8 +28,17 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
         var midValueStart = Convert.ToDouble(cur.StartValue);
         var endValue = Convert.ToDouble(cur.EndValue);
 
-        var scale = Math.Max(Math.Max(Math.Abs(startValue), Math.Abs(midValueEnd)),
-            Math.Max(Math.Abs(endValue), 1e-3));
+        // 以两个子段各自运动范围的最大值为归一化尺度：
+        //   rangeFirst = |B-A|（第一段），rangeSecond = |C-B|（第二段）
+        //   scale = max(rangeFirst, rangeSecond, 1e-3)
+        //
+        // 不使用总净变化量 |C-A|（rangeTotal）的原因：
+        //   对于跨越零点的信号（如 A=-0.4, B=0, C=+0.4），|C-A|=0.8 远大于旧代码
+        //   max(|A|,|C|)=0.4，使得容差被虚增一倍，导致本不应合并的非线性段被合并。
+        //   用子段范围可以保持与旧代码同等严格，同时对大直流偏置小幅运动更敏感。
+        var rangeFirst = Math.Abs(midValueEnd - startValue);
+        var rangeSecond = Math.Abs(endValue - midValueStart);
+        var scale = Math.Max(Math.Max(rangeFirst, rangeSecond), 1e-3);
 
         if (Math.Abs(midValueEnd - midValueStart) / scale > relTol)
             return false;
@@ -58,8 +67,11 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
         var midValueStart = Convert.ToDouble(cur.StartValue);
         var endValue = Convert.ToDouble(cur.EndValue);
 
-        var scale = Math.Max(Math.Max(Math.Abs(startValue), Math.Abs(midValueEnd)),
-            Math.Max(Math.Abs(endValue), 1e-3));
+        // 同 TryMergeSqrt：以两个子段各自运动范围的最大值为归一化尺度，
+        // 避免跨零点信号因 rangeTotal 虚增而被过度合并。
+        var rangeFirst = Math.Abs(midValueEnd - startValue);
+        var rangeSecond = Math.Abs(endValue - midValueStart);
+        var scale = Math.Max(Math.Max(rangeFirst, rangeSecond), 1e-3);
 
         if (Math.Abs(midValueEnd - midValueStart) / scale > relTol)
             return false;
