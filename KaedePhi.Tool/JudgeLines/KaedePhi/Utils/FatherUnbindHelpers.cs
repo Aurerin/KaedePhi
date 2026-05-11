@@ -255,9 +255,7 @@ public static class FatherUnbindHelpers
 
         if (line.EventLayers.Count == 0)
             line.EventLayers.Add(new EventLayer());
-
-        // 使用单轴独立压缩。CompressXYPosition 已实现联合 2D 屏幕距离压缩，
-        // 但属于独立优化，保留为可选项，待单独测试后启用。
+        
         line.EventLayers[0].MoveXEvents = newXEvents;
         line.EventLayers[0].MoveYEvents = newYEvents;
 
@@ -269,131 +267,6 @@ public static class FatherUnbindHelpers
 
         line.Father = -1;
     }
-
-    /*
-    /// <summary>
-    /// 对 X/Y 位置通道进行联合压缩。
-    /// <para>
-    /// 采用逐轴独立误差检测：分别计算屏幕空间 X/Y 轴误差，各轴以自身位移尺度归一化，
-    /// 任一轴超过容差即拒绝合并。避免欧几里得距离将细小轴偏差淹没在主运动轴中。
-    /// 误差阈值 = <paramref name="tolerance"/>% × 合并段的各轴局部屏幕位移尺度。
-    /// 使用局部尺度可避免远离原点时阈值被放大，从而产生位置相关的外偏/内偏。
-    /// </para>
-    /// <para>
-    /// 若 X/Y 长度不一致（对齐失败），退回到各自调用 <see cref="EventCompressor{T}"/>。
-    /// </para>
-    /// </summary>
-    /// <param name="xEvents">X 通道事件列表（与 yEvents 按拍对齐）。</param>
-    /// <param name="yEvents">Y 通道事件列表（与 xEvents 按拍对齐）。</param>
-    /// <param name="tolerance">误差容差百分比。</param>
-    /// <returns>压缩后的 (X, Y) 事件列表对。</returns>
-    private static (List<Kpc.Event<double>> X, List<Kpc.Event<double>> Y) CompressXYPosition(
-        List<Kpc.Event<double>> xEvents,
-        List<Kpc.Event<double>> yEvents,
-        double tolerance)
-    {
-        // 若 X/Y 未对齐，退回独立 1D 压缩
-        if (xEvents.Count != yEvents.Count || xEvents.Count == 0)
-        {
-            var compressor = new EventCompressor<double>();
-            return (compressor.EventListCompressSqrt(xEvents, tolerance),
-                compressor.EventListCompressSqrt(yEvents, tolerance));
-        }
-
-        var compX = new List<Kpc.Event<double>> { xEvents[0] };
-        var compY = new List<Kpc.Event<double>> { yEvents[0] };
-        var relTol = tolerance / 100.0;
-        var profile = CurrentRenderProfile;
-
-        for (var i = 1; i < xEvents.Count; i++)
-        {
-            var lastX = compX[^1];
-            var lastY = compY[^1];
-            var curX = xEvents[i];
-            var curY = yEvents[i];
-
-            // 仅合并相邻线性段，且 X/Y 拍边界需一致
-            if (lastX.Easing != 1 || lastY.Easing != 1 ||
-                curX.Easing != 1 || curY.Easing != 1 ||
-                lastX.EndBeat != curX.StartBeat ||
-                lastY.EndBeat != curY.StartBeat)
-            {
-                compX.Add(curX);
-                compY.Add(curY);
-                continue;
-            }
-
-            // 逐轴屏幕空间位移尺度，避免离原点越远阈值越大而导致过度压缩。
-            var mergedDx = CoordinateGeometry.GetKpcScreenDistance(
-                (curX.EndValue, lastY.StartValue), (lastX.StartValue, lastY.StartValue), profile);
-            var mergedDy = CoordinateGeometry.GetKpcScreenDistance(
-                (lastX.StartValue, curY.EndValue), (lastX.StartValue, lastY.StartValue), profile);
-            var firstDx = CoordinateGeometry.GetKpcScreenDistance(
-                (lastX.EndValue, lastY.StartValue), (lastX.StartValue, lastY.StartValue), profile);
-            var firstDy = CoordinateGeometry.GetKpcScreenDistance(
-                (lastX.StartValue, lastY.EndValue), (lastX.StartValue, lastY.StartValue), profile);
-
-            var thresholdX = relTol * Math.Max(Math.Max(mergedDx, firstDx), 1e-9);
-            var thresholdY = relTol * Math.Max(Math.Max(mergedDy, firstDy), 1e-9);
-
-            // 检查交界处连续性（逐轴屏幕空间间距）
-            var junctionGapX = CoordinateGeometry.GetKpcScreenDistance(
-                (lastX.EndValue, lastY.EndValue), (curX.StartValue, lastY.EndValue), profile);
-            var junctionGapY = CoordinateGeometry.GetKpcScreenDistance(
-                (lastX.EndValue, lastY.EndValue), (lastX.EndValue, curY.StartValue), profile);
-
-            if (junctionGapX > thresholdX || junctionGapY > thresholdY)
-            {
-                compX.Add(curX);
-                compY.Add(curY);
-                continue;
-            }
-
-            var tA = (double)lastX.StartBeat;
-            var tB = (double)lastX.EndBeat;
-            var tC = (double)curX.EndBeat;
-            var tSpan = tC - tA;
-
-            bool canMerge;
-            if (tSpan < 1e-12)
-            {
-                // 零长度合并段，连续性已通过，直接合并
-                canMerge = true;
-            }
-            else
-            {
-                var p = (tB - tA) / tSpan;
-
-                // 合并段在交界拍的线性插值预测位置
-                var predX = lastX.StartValue + (curX.EndValue - lastX.StartValue) * p;
-                var predY = lastY.StartValue + (curY.EndValue - lastY.StartValue) * p;
-
-                // 逐轴屏幕空间偏差：交界实际位置 vs 合并段预测位置
-                var junctionDevX = CoordinateGeometry.GetKpcScreenDistance(
-                    (lastX.EndValue, lastY.EndValue), (predX, lastY.EndValue), profile);
-                var junctionDevY = CoordinateGeometry.GetKpcScreenDistance(
-                    (lastX.EndValue, lastY.EndValue), (lastX.EndValue, predY), profile);
-
-                canMerge = junctionDevX <= thresholdX && junctionDevY <= thresholdY;
-            }
-
-            if (canMerge)
-            {
-                lastX.EndBeat = curX.EndBeat;
-                lastX.EndValue = curX.EndValue;
-                lastY.EndBeat = curY.EndBeat;
-                lastY.EndValue = curY.EndValue;
-            }
-            else
-            {
-                compX.Add(curX);
-                compY.Add(curY);
-            }
-        }
-
-        return (compX, compY);
-    }
-    */
 
     #region 共享数据结构
 

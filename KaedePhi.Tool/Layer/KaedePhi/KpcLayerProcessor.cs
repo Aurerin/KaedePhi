@@ -13,6 +13,7 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     private readonly EventListMerger<double> _doubleMerger = new();
     private readonly EventListMerger<int> _intMerger = new();
     private readonly EventListMerger<float> _floatMerger = new();
+    private readonly EventListMergerSqrt<double> _doubleMergerSqrt = new();
     private readonly EventCutter<double> _doubleCutter = new();
     private readonly EventCutter<int> _intCutter = new();
     private readonly EventCutter<float> _floatCutter = new();
@@ -37,10 +38,10 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
                     _intMerger.EventListMerge(mergedLayer.AlphaEvents, layer.AlphaEvents, precision);
             if (layer.MoveXEvents is { Count: > 0 })
                 mergedLayer.MoveXEvents =
-                    _doubleMerger.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision);
+                    _doubleMergerSqrt.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision);
             if (layer.MoveYEvents is { Count: > 0 })
                 mergedLayer.MoveYEvents =
-                    _doubleMerger.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision);
+                    _doubleMergerSqrt.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision);
             if (layer.RotateEvents is { Count: > 0 })
                 mergedLayer.RotateEvents =
                     _doubleMerger.EventListMerge(mergedLayer.RotateEvents, layer.RotateEvents, precision);
@@ -72,10 +73,10 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
                     _intMerger.EventListMergePlus(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
             if (layer.MoveXEvents is { Count: > 0 })
                 mergedLayer.MoveXEvents =
-                    _doubleMerger.EventListMergePlus(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
+                    _doubleMergerSqrt.EventListMergePlus(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
             if (layer.MoveYEvents is { Count: > 0 })
                 mergedLayer.MoveYEvents =
-                    _doubleMerger.EventListMergePlus(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
+                    _doubleMergerSqrt.EventListMergePlus(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
             if (layer.RotateEvents is { Count: > 0 })
                 mergedLayer.RotateEvents =
                     _doubleMerger.EventListMergePlus(mergedLayer.RotateEvents, layer.RotateEvents, precision, tolerance);
