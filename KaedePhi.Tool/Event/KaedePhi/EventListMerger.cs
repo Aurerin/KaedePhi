@@ -564,7 +564,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="precision">基础采样精度。</param>
     /// <param name="tolerance">分段误差容差。</param>
     /// <returns>合并后的事件列表。</returns>
-    private static List<Kpc.Event<TPayload>> MergeWithOverlapAdaptiveSampling(
+    private List<Kpc.Event<TPayload>> MergeWithOverlapAdaptiveSampling(
         List<Kpc.Event<TPayload>> toEventsForOffsetLookup,
         List<Kpc.Event<TPayload>> toEventsCopy,
         List<Kpc.Event<TPayload>> fromEventsCopy,
@@ -591,7 +591,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="precision">基础采样精度。</param>
     /// <param name="tolerance">分段误差容差。</param>
     /// <returns>所有重叠区间的合并结果。</returns>
-    private static List<Kpc.Event<TPayload>> MergeAdaptiveIntervals(
+    private List<Kpc.Event<TPayload>> MergeAdaptiveIntervals(
         List<Kpc.Event<TPayload>> toEventsCopy,
         List<Kpc.Event<TPayload>> fromEventsCopy,
         List<(Beat Start, Beat End)> overlapIntervals,
@@ -611,6 +611,14 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
 
     /// <summary>
     /// 在单个区间内按误差阈值动态分段，生成近似线性片段。
+    /// <para>
+    /// 先收集区间内所有事件的起止拍作为强制切割关键帧（与
+    /// FatherUnbindHelpers.CollectKeyBeats 等价），再逐子区间调用
+    /// <see cref="AdaptiveSampleSubInterval"/>。
+    /// 关键帧之间的子区间长度等于单个事件的持续时间，使得容差评估中的
+    /// 进度参数 p = (nextBeat − segStart) / (subEnd − segStart)
+    /// 与 Unbind 链路保持同量级，从根本上消除"远端参考点"导致的灵敏度衰减。
+    /// </para>
     /// </summary>
     /// <param name="toEventsCopy">目标事件拷贝。</param>
     /// <param name="fromEventsCopy">来源事件拷贝。</param>
@@ -619,76 +627,129 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="cutLength">基础步长。</param>
     /// <param name="tolerance">误差容差百分比。</param>
     /// <returns>单区间合并后的事件。</returns>
-    private static List<Kpc.Event<TPayload>> MergeAdaptiveSingleInterval(
+    private List<Kpc.Event<TPayload>> MergeAdaptiveSingleInterval(
         List<Kpc.Event<TPayload>> toEventsCopy,
         List<Kpc.Event<TPayload>> fromEventsCopy,
         Beat start, Beat end, Beat cutLength, double tolerance)
     {
         var result = new List<Kpc.Event<TPayload>>();
-        var currentBeat = start;
 
-        var lastToValue = GetPreviousEndValue(toEventsCopy, start);
-        var lastFormValue = GetPreviousEndValue(fromEventsCopy, start);
+        // 收集事件边界关键帧，与 FatherUnbindHelpers.CollectKeyBeats 同构：
+        // 以事件 StartBeat / EndBeat 为强制切割点，将长区间拆成若干短子区间。
+        // 每个子区间内每条轨道至多激活一个事件，容差评估参考端点即为子区间终点，
+        // 而非整个重叠区间终点，避免 p 因参考端点过远而接近 0。
+        var keyBeats = CollectMergeKeyBeats(toEventsCopy, fromEventsCopy, start, end);
 
-        var toEventAtCurrent = GetActiveEventAtBeat(toEventsCopy, currentBeat);
-        var formEventAtCurrent = GetActiveEventAtBeat(fromEventsCopy, currentBeat);
-        var toValAtCurrent = toEventAtCurrent != null ? toEventAtCurrent.GetValueAtBeat(currentBeat) : lastToValue;
-        var formValAtCurrent =
-            formEventAtCurrent != null ? formEventAtCurrent.GetValueAtBeat(currentBeat) : lastFormValue;
-
-        var segmentStart = start;
-        var segmentStartToValue = toValAtCurrent;
-        var segmentStartFormValue = formValAtCurrent;
-        var segmentStartSum = AddValues(segmentStartToValue, segmentStartFormValue);
-
-        while (currentBeat < end)
+        for (var ki = 0; ki < keyBeats.Count - 1; ki++)
         {
-            var nextBeat = currentBeat + cutLength;
-            if (nextBeat > end) nextBeat = end;
+            var subStart = keyBeats[ki];
+            var subEnd   = keyBeats[ki + 1];
+            if (subStart >= subEnd) continue;
 
-            var toEventAtNext = GetActiveEventAtBeat(toEventsCopy, nextBeat);
-            var formEventAtNext = GetActiveEventAtBeat(fromEventsCopy, nextBeat);
-            var crossEvent = !ReferenceEquals(toEventAtNext, toEventAtCurrent) ||
-                             !ReferenceEquals(formEventAtNext, formEventAtCurrent);
-
-            if (crossEvent && currentBeat > segmentStart)
-            {
-                AddSegmentEvent(result, segmentStart, currentBeat,
-                    segmentStartToValue, segmentStartFormValue, toValAtCurrent, formValAtCurrent);
-                segmentStart = currentBeat;
-                segmentStartToValue = toValAtCurrent;
-                segmentStartFormValue = formValAtCurrent;
-                segmentStartSum = AddValues(toValAtCurrent, formValAtCurrent);
-            }
-
-            var (toValueAtNext, toValUpdate) =
-                GetNextBeatValues(toEventsCopy, toEventAtCurrent, toEventAtNext, nextBeat);
-            var (formValueAtNext, formValUpdate) =
-                GetNextBeatValues(fromEventsCopy, formEventAtCurrent, formEventAtNext, nextBeat);
-
-            var sumAtNext = AddValues(toValueAtNext, formValueAtNext);
-            var sumAtEnd = AddValues(GetValueAtBeatOrPreviousEnd(toEventsCopy, end),
-                GetValueAtBeatOrPreviousEnd(fromEventsCopy, end));
-
-            if (crossEvent || ShouldSplitAdaptiveSegment(
-                    segmentStart, nextBeat, end, segmentStartSum, sumAtNext, sumAtEnd, tolerance))
-            {
-                AddSegmentEvent(result, segmentStart, nextBeat,
-                    segmentStartToValue, segmentStartFormValue, toValueAtNext, formValueAtNext);
-                segmentStart = nextBeat;
-                segmentStartToValue = toValUpdate;
-                segmentStartFormValue = formValUpdate;
-                segmentStartSum = AddValues(toValUpdate, formValUpdate);
-            }
-
-            toEventAtCurrent = toEventAtNext;
-            formEventAtCurrent = formEventAtNext;
-            toValAtCurrent = toValUpdate;
-            formValAtCurrent = formValUpdate;
-            currentBeat = nextBeat;
+            result.AddRange(
+                AdaptiveSampleSubInterval(toEventsCopy, fromEventsCopy, subStart, subEnd, cutLength, tolerance));
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 对两相邻事件边界之间的子区间执行自适应采样。
+    /// 容差评估参考端点固定为 <paramref name="subEnd"/>（子区间终点），
+    /// 与 FatherUnbindHelpers.AdaptiveSampleInterval 结构完全对齐。
+    /// </summary>
+    /// <param name="toEventsCopy">目标事件拷贝。</param>
+    /// <param name="fromEventsCopy">来源事件拷贝。</param>
+    /// <param name="subStart">子区间起始拍。</param>
+    /// <param name="subEnd">子区间结束拍（事件边界）。</param>
+    /// <param name="cutLength">基础步长。</param>
+    /// <param name="tolerance">误差容差百分比。</param>
+    /// <returns>子区间内的合并事件。</returns>
+    private List<Kpc.Event<TPayload>> AdaptiveSampleSubInterval(
+        List<Kpc.Event<TPayload>> toEventsCopy,
+        List<Kpc.Event<TPayload>> fromEventsCopy,
+        Beat subStart, Beat subEnd, Beat cutLength, double tolerance)
+    {
+        var result = new List<Kpc.Event<TPayload>>();
+
+        var lastToValue   = GetPreviousEndValue(toEventsCopy,   subStart);
+        var lastFormValue = GetPreviousEndValue(fromEventsCopy, subStart);
+
+        var toEventAtCurrent   = GetActiveEventAtBeat(toEventsCopy,   subStart);
+        var formEventAtCurrent = GetActiveEventAtBeat(fromEventsCopy, subStart);
+        var toValAtCurrent   = toEventAtCurrent   != null ? toEventAtCurrent.GetValueAtBeat(subStart)   : lastToValue;
+        var formValAtCurrent = formEventAtCurrent != null ? formEventAtCurrent.GetValueAtBeat(subStart) : lastFormValue;
+
+        var segmentStart          = subStart;
+        var segmentStartToValue   = toValAtCurrent;
+        var segmentStartFormValue = formValAtCurrent;
+        var segmentStartSum       = AddValues(toValAtCurrent, formValAtCurrent);
+
+        // 子区间终点合并值（仅计算一次作为容差参考，与 Unbind 的 `end = absPosOut(iEnd)` 等价）
+        var subEndSum = AddValues(
+            GetValueAtBeatOrPreviousEnd(toEventsCopy,   subEnd),
+            GetValueAtBeatOrPreviousEnd(fromEventsCopy, subEnd));
+
+        for (var cur = subStart; cur < subEnd;)
+        {
+            var nextBeat = cur + cutLength;
+            if (nextBeat > subEnd) nextBeat = subEnd;
+            var isLast = nextBeat >= subEnd;
+
+            var toEventAtNext   = GetActiveEventAtBeat(toEventsCopy,   nextBeat);
+            var formEventAtNext = GetActiveEventAtBeat(fromEventsCopy, nextBeat);
+
+            var (toValueAtNext,   toValUpdate)   = GetNextBeatValues(toEventsCopy,   toEventAtCurrent,   toEventAtNext,   nextBeat);
+            var (formValueAtNext, formValUpdate) = GetNextBeatValues(fromEventsCopy, formEventAtCurrent, formEventAtNext, nextBeat);
+
+            var sumAtNext = AddValues(toValueAtNext, formValueAtNext);
+
+            // 参考端点为子区间终点 subEnd，与 NeedsAdaptiveCut(seg, nextPos, end, segStart, iEnd, next, tol) 对齐
+            if (isLast || ShouldSplitAdaptiveSegment(
+                    segmentStart, nextBeat, subEnd, segmentStartSum, sumAtNext, subEndSum, tolerance))
+            {
+                AddSegmentEvent(result, segmentStart, nextBeat,
+                    segmentStartToValue, segmentStartFormValue, toValueAtNext, formValueAtNext);
+                segmentStart          = nextBeat;
+                segmentStartToValue   = toValUpdate;
+                segmentStartFormValue = formValUpdate;
+                segmentStartSum       = AddValues(toValUpdate, formValUpdate);
+            }
+
+            toEventAtCurrent   = toEventAtNext;
+            formEventAtCurrent = formEventAtNext;
+            cur = nextBeat;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 收集两组事件在区间内的所有起止拍，作为自适应采样的强制切割关键帧。
+    /// 与 FatherUnbindHelpers.CollectKeyBeats 等价。
+    /// </summary>
+    /// <param name="toEvents">目标事件列表。</param>
+    /// <param name="fromEvents">来源事件列表。</param>
+    /// <param name="start">区间起始拍。</param>
+    /// <param name="end">区间结束拍。</param>
+    /// <returns>按拍升序排列、去重的关键帧列表（包含 start 和 end）。</returns>
+    private static List<Beat> CollectMergeKeyBeats(
+        List<Kpc.Event<TPayload>> toEvents,
+        List<Kpc.Event<TPayload>> fromEvents,
+        Beat start, Beat end)
+    {
+        var beats = new List<Beat> { start, end };
+        foreach (var e in toEvents)
+        {
+            if (e.StartBeat > start && e.StartBeat < end) beats.Add(e.StartBeat);
+            if (e.EndBeat   > start && e.EndBeat   < end) beats.Add(e.EndBeat);
+        }
+        foreach (var e in fromEvents)
+        {
+            if (e.StartBeat > start && e.StartBeat < end) beats.Add(e.StartBeat);
+            if (e.EndBeat   > start && e.EndBeat   < end) beats.Add(e.EndBeat);
+        }
+        return beats.Distinct().OrderBy(b => b).ToList();
     }
 
     /// <summary>
@@ -749,22 +810,26 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     }
 
     /// <summary>
-    /// 使用归一化 (时间, 值) 空间中的欧几里得垂直距离判断当前自适应分段是否需要切分。
+    /// 判断当前自适应分段是否需要切分（基类默认实现：子区间 swing 为比例尺 + 欧氏垂直距离）。
     /// <para>
-    /// 将时间归一化到 [0, 1]、值归一化到以最大绝对值为比例尺的无量纲空间，
-    /// 计算测试点到理想线段的垂直距离（不混用量纲），避免原公式 sqrt(dx²+dy²)−dx 
-    /// 因时间单位（拍）与值单位不同而导致的失真。
+    /// <paramref name="intervalEnd"/> 由调用方 AdaptiveSampleSubInterval 传入，
+    /// 代表当前<b>子区间</b>（两相邻事件边界之间）的终点拍；
+    /// 距离度量使用欧氏垂直距离，即 <c>|det| / sqrt(1 + dvNorm²)</c>。
+    /// </para>
+    /// <para>
+    /// 子类可通过覆盖本方法切换至其他算法（如 EventListMergerSqrt 的子段 swing
+    /// 或 EventListMergerSlope 的斜率差方案）。
     /// </para>
     /// </summary>
     /// <param name="segmentStart">分段起始拍。</param>
     /// <param name="nextBeat">待评估拍点。</param>
-    /// <param name="intervalEnd">区间结束拍。</param>
+    /// <param name="intervalEnd">子区间结束拍（即当前事件边界），非整个重叠区间终点。</param>
     /// <param name="segmentStartSum">分段起点和轨道值。</param>
     /// <param name="sumAtNext">下一拍点和轨道值。</param>
-    /// <param name="sumAtEnd">区间终点和轨道值。</param>
+    /// <param name="sumAtEnd">子区间终点和轨道值。</param>
     /// <param name="tolerance">允许误差百分比。</param>
-    /// <returns>垂直距离超限或到达区间末尾时返回 <see langword="true"/>。</returns>
-    private static bool ShouldSplitAdaptiveSegment(
+    /// <returns>垂直距离超限或到达子区间末尾时返回 <see langword="true"/>。</returns>
+    protected virtual bool ShouldSplitAdaptiveSegment(
         Beat segmentStart, Beat nextBeat, Beat intervalEnd,
         TPayload? segmentStartSum, TPayload? sumAtNext, TPayload? sumAtEnd, double tolerance)
     {
@@ -781,14 +846,11 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         var nextNum = ToDouble(sumAtNext);
         var endNum = ToDouble(sumAtEnd);
 
-        // 归一化比例尺：避免量纲混用
-        var scale = Math.Max(Math.Max(Math.Abs(startNum), Math.Abs(endNum)), 1e-9);
+        // 比例尺：区间剩余运动幅度（swing），不使用端点绝对值（避免偏置影响灵敏度）。
+        // 兜底 1e-3 防止静态段因浮点噪声频繁触发切割。
+        var scale = Math.Max(Math.Abs(endNum - startNum), 1e-3);
 
-        // 归一化 (时间, 值) 空间中的垂直距离：
-        //   A'=(0, 0), C'=(1, dvNorm), 测试点 B'=(p, byNorm)
-        //   d = |byNorm − dvNorm·p| / sqrt(1 + dvNorm²)
-        // 当 dvNorm≈0（水平段）退化为纯值域偏差，当 dvNorm 很大（陡峭段）退化为时间偏差，
-        // 两者通过欧几里得范数自然融合，无需手动加权。
+        // 欧氏归一化垂直距离：在 (时间[0,1], 值/scale) 空间中测量测试点到参考线的几何距离。
         var dvNorm = (endNum - startNum) / scale;
         var byNorm = (nextNum - startNum) / scale;
         var det = byNorm - dvNorm * p;
@@ -803,7 +865,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// </summary>
     /// <param name="value">待转换数值。</param>
     /// <returns>转换后的双精度值。</returns>
-    private static double ToDouble(dynamic? value)
+    protected static double ToDouble(dynamic? value)
     {
         if (value == null)
             throw new InvalidOperationException("Unexpected null numeric value.");
