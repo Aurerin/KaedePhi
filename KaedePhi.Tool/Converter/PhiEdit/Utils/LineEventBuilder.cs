@@ -509,9 +509,26 @@ public class LineEventBuilder
     private static Kpc.Event<double>? FindActiveEvent(List<Kpc.Event<double>> events, Beat beat)
     {
         var beatValue = (double)beat;
-        return events.FirstOrDefault(e =>
-            beatValue + FloatEpsilon >= (double)e.StartBeat
-            && beatValue < (double)e.EndBeat - FloatEpsilon);
+        // 二分查找：找到最后一个 StartBeat <= beatValue + FloatEpsilon 的事件
+        var lo = 0;
+        var hi = events.Count - 1;
+        var candidate = -1;
+        while (lo <= hi)
+        {
+            var mid = (lo + hi) >>> 1;
+            if ((double)events[mid].StartBeat <= beatValue + FloatEpsilon)
+            {
+                candidate = mid;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid - 1;
+            }
+        }
+        if (candidate < 0) return null;
+        var ev = events[candidate];
+        return beatValue < (double)ev.EndBeat - FloatEpsilon ? ev : null;
     }
 
     private int SafeConvertEasingToInt(KpcEasing easing, string context)
