@@ -216,8 +216,8 @@ public class LineEventBuilder
                                   && (int)activeX.Easing == (int)activeY.Easing;
         // 只有一轴活跃时（另一轴为 null），无论该轴是否精确覆盖当前区间，均可直接映射。
         // 跨越边界时用 GetValueAtBeat 取正确插值，保留原始缓动曲线，避免不必要的线性化切段。
-        var canDirectMap = (activeX != null && activeY == null)
-                           || (activeY != null && activeX == null)
+        var canDirectMap = (activeX is not null && activeY is null)
+                           || (activeY is not null && activeX is null)
                            || sameEasing;
 
         if (canDirectMap)
@@ -251,6 +251,7 @@ public class LineEventBuilder
             startXv = lastX;
             endXv = lastX;
         }
+
         if (activeY != null)
         {
             var yAligned = IsExactlyCovering(activeY, start, end);
@@ -262,6 +263,7 @@ public class LineEventBuilder
             startYv = lastY;
             endYv = lastY;
         }
+
         int easing;
         if (activeX != null)
             easing = SafeConvertEasingToInt(activeX.Easing, $"移动@{start:F3}");
@@ -481,6 +483,7 @@ public class LineEventBuilder
             cutter = new EventCutter<T>();
             _eventCutters[type] = cutter;
         }
+
         return (EventCutter<T>)cutter;
     }
 
@@ -509,13 +512,6 @@ public class LineEventBuilder
         return events.FirstOrDefault(e =>
             beatValue + FloatEpsilon >= (double)e.StartBeat
             && beatValue < (double)e.EndBeat - FloatEpsilon);
-    }
-
-    private static Kpc.Event<double>? FindSegment(List<Kpc.Event<double>> events, float start, float end)
-    {
-        return events.FirstOrDefault(e =>
-            Math.Abs((double)e.StartBeat - start) <= FloatEpsilon
-            && Math.Abs((double)e.EndBeat - end) <= FloatEpsilon);
     }
 
     private int SafeConvertEasingToInt(KpcEasing easing, string context)

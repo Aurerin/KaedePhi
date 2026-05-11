@@ -1,4 +1,5 @@
 ﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Converter.PhiEdit.Utils;
 using KaedePhi.Tool.Converter.RePhiEdit.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 
@@ -9,8 +10,6 @@ public static class Event
     private static readonly EventCutter<float> FloatCutter = new();
     private static readonly EventCutter<double> DoubleCutter = new();
     private static readonly EventCutter<int> IntCutter = new();
-
-    #region RpeToKpc
 
     public static Kpc.Event<T> ConvertEvent<T>(Rpe.Event<T> src, Func<T, T>? valueCopier = null,
         Func<T, T>? valueTransformer = null)
@@ -24,6 +23,26 @@ public static class Event
             EasingLeft = src.EasingLeft,
             EasingRight = src.EasingRight,
             Easing = Easing.ConvertEasing(src.Easing),
+            StartValue = valueTransformer(valueCopier(src.StartValue)),
+            EndValue = valueTransformer(valueCopier(src.EndValue)),
+            StartBeat = new Beat((int[])src.StartBeat),
+            EndBeat = new Beat((int[])src.EndBeat),
+            Font = src.Font
+        };
+    }
+
+    public static Rpe.Event<T> ConvertEvent<T>(Kpc.Event<T> src,
+        Func<T, T>? valueCopier = null, Func<T, T>? valueTransformer = null)
+    {
+        valueCopier ??= v => v;
+        valueTransformer ??= v => v;
+        return new Rpe.Event<T>
+        {
+            IsBezier = src.IsBezier,
+            BezierPoints = src.BezierPoints.ToArray(),
+            EasingLeft = src.EasingLeft,
+            EasingRight = src.EasingRight,
+            Easing = Easing.ConvertEasing(src.Easing, src.IsBezier),
             StartValue = valueTransformer(valueCopier(src.StartValue)),
             EndValue = valueTransformer(valueCopier(src.EndValue)),
             StartBeat = new Beat((int[])src.StartBeat),
@@ -65,33 +84,19 @@ public static class Event
         return ConvertEvent(src);
     }
 
+    public static Rpe.Event<string> ConvertStringEvent(Kpc.Event<string> src)
+    {
+        return ConvertEvent(src);
+    }
+
     public static Kpc.Event<byte[]> ConvertByteArrayEvent(Rpe.Event<byte[]> src)
     {
         return ConvertEvent(src, v => v.ToArray());
     }
 
-    #endregion
-
-    #region KpcToRpe
-
-    public static Rpe.Event<T> ConvertEvent<T>(Kpc.Event<T> src,
-        Func<T, T>? valueCopier = null, Func<T, T>? valueTransformer = null)
+    public static Rpe.Event<byte[]> ConvertByteArrayEvent(Kpc.Event<byte[]> src)
     {
-        valueCopier ??= v => v;
-        valueTransformer ??= v => v;
-        return new Rpe.Event<T>
-        {
-            IsBezier = src.IsBezier,
-            BezierPoints = src.BezierPoints.ToArray(),
-            EasingLeft = src.EasingLeft,
-            EasingRight = src.EasingRight,
-            Easing = Easing.ConvertEasing(src.Easing, src.IsBezier),
-            StartValue = valueTransformer(valueCopier(src.StartValue)),
-            EndValue = valueTransformer(valueCopier(src.EndValue)),
-            StartBeat = new Beat((int[])src.StartBeat),
-            EndBeat = new Beat((int[])src.EndBeat),
-            Font = src.Font
-        };
+        return ConvertEvent(src, v => v.ToArray());
     }
 
     public static List<Rpe.Event<float>> ConvertFloatEventExpanding(Kpc.Event<float> src,
@@ -101,7 +106,7 @@ public static class Event
         {
             return [ConvertEvent(src)];
         }
-        catch (Easing.EasingNotSupportedException)
+        catch (EasingConverter.EasingNotSupportedException)
         {
             return FloatCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
@@ -116,8 +121,8 @@ public static class Event
         }
     }
 
-    public static List<Rpe.Event<float>> ConvertDoubleEventExpanding(
-        Kpc.Event<double> src, ConvertOption.CuttingOptions options, Func<double, double>? valueTransformer = null)
+    public static List<Rpe.Event<float>> ConvertDoubleEventExpanding(Kpc.Event<double> src,
+        ConvertOption.CuttingOptions options, Func<double, double>? valueTransformer = null)
     {
         valueTransformer ??= v => v;
         try
@@ -139,7 +144,7 @@ public static class Event
                 }
             ];
         }
-        catch (Easing.EasingNotSupportedException)
+        catch (EasingConverter.EasingNotSupportedException)
         {
             return DoubleCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
@@ -161,7 +166,7 @@ public static class Event
         {
             return [ConvertEvent(src)];
         }
-        catch (Easing.EasingNotSupportedException)
+        catch (EasingConverter.EasingNotSupportedException)
         {
             return IntCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
@@ -175,11 +180,4 @@ public static class Event
                 });
         }
     }
-    
-    public static Rpe.Event<string> ConvertStringEvent(Kpc.Event<string> src) => ConvertEvent(src);
-
-    public static Rpe.Event<byte[]> ConvertByteArrayEvent(Kpc.Event<byte[]> src) =>
-        ConvertEvent(src, v => v.ToArray());
-
-    #endregion
 }

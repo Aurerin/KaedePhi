@@ -217,6 +217,19 @@
     <data name="render_err_render_failed" xml:space="preserve">
         <value>渲染时发生错误：{0}</value>
     </data>
+    <data name="err_workspace_id_null" xml:space="preserve">
+        <value>工作区 ID 不能为空或空白。</value>
+    </data>
+    <data name="err_workspace_id_invalid_chars" xml:space="preserve">
+        <value>工作区 ID 包含非法字符，只允许字母、数字、下划线和连字符。</value>
+    </data>
+    <data name="err_workspace_id_path_traversal" xml:space="preserve">
+        <value>工作区 ID 解析到工作区根目录以外的路径。</value>
+    </data>
+    <data name="err_workspace_not_found" xml:space="preserve">
+        <value>未找到工作区 '{0}'。</value>
+        <comment>{0} = 工作区名</comment>
+    </data>
     <!-- ── misc ──────────────────────────────────────────────────────────────── -->
     <data name="project_link" xml:space="preserve">
         <value>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</value>

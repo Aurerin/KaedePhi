@@ -2,7 +2,7 @@
 
 namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
-public class EventLayer
+public static class EventLayer
 {
     #region RpeToKpc
 

@@ -25,17 +25,17 @@ public sealed class WorkspaceService
     private string ValidateAndResolveId(string id)
     {
         if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentException("Workspace ID cannot be null or whitespace.", nameof(id));
+            throw new ArgumentException(CliLocalizationString.err_workspace_id_null, nameof(id));
 
         // 只允许字母、数字、下划线、连字符
         if (!id.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-'))
             throw new ArgumentException(
-                "Workspace ID contains invalid characters. Only alphanumeric, underscore, and hyphen are allowed.",
+                CliLocalizationString.err_workspace_id_invalid_chars,
                 nameof(id));
 
         var dir = Path.GetFullPath(Path.Combine(_rootDir, id));
         if (!dir.StartsWith(Path.GetFullPath(_rootDir), StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("Workspace ID resolves to a path outside the workspace root.", nameof(id));
+            throw new ArgumentException(CliLocalizationString.err_workspace_id_path_traversal, nameof(id));
 
         return dir;
     }
@@ -73,7 +73,8 @@ public sealed class WorkspaceService
     public async Task SaveAsync(string id, string outputPath)
     {
         var file = GetChartPath(id)
-                   ?? throw new InvalidOperationException($"Workspace '{id}' not found");
+                   ?? throw new InvalidOperationException(
+                       string.Format(CliLocalizationString.err_workspace_not_found, id));
         await using var src = new FileStream(file, FileMode.Open, FileAccess.Read,
             FileShare.Read, bufferSize: 65536, useAsync: true);
         await using var dst = new FileStream(outputPath, FileMode.Create, FileAccess.Write,

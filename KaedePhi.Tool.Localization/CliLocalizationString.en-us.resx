@@ -133,6 +133,19 @@
         <value>The output might be a bit large~ Try adding the "--stream" option to reduce memory usage! If this doesn't solve your problem, please send the following information to https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues, and we'll fix the issue as soon as possible!
 {0}</value>
     </data>
+    <data name="err_workspace_id_null" xml:space="preserve">
+        <value>Workspace ID cannot be null or whitespace.</value>
+    </data>
+    <data name="err_workspace_id_invalid_chars" xml:space="preserve">
+        <value>Workspace ID contains invalid characters. Only alphanumeric, underscore, and hyphen are allowed.</value>
+    </data>
+    <data name="err_workspace_id_path_traversal" xml:space="preserve">
+        <value>Workspace ID resolves to a path outside the workspace root.</value>
+    </data>
+    <data name="err_workspace_not_found" xml:space="preserve">
+        <value>Workspace '{0}' not found.</value>
+        <comment>{0} = workspace name</comment>
+    </data>
     <!-- ── misc ──────────────────────────────────────────────────────────────── -->
     <data name="project_link" xml:space="preserve">
         <value>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</value>
