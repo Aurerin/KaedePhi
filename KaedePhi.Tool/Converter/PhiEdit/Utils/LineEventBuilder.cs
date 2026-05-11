@@ -355,10 +355,10 @@ public class LineEventBuilder
             var xSeg = FindActiveEvent(cutX, new Beat(segStart));
             var ySeg = FindActiveEvent(cutY, new Beat(segStart));
 
-            var startXv = xSeg != null ? xSeg.GetValueAtBeat(new Beat(segStart)) : lastX;
-            var endXv = xSeg != null ? xSeg.GetValueAtBeat(new Beat(segEnd)) : lastX;
-            var startYv = ySeg != null ? ySeg.GetValueAtBeat(new Beat(segStart)) : lastY;
-            var endYv = ySeg != null ? ySeg.GetValueAtBeat(new Beat(segEnd)) : lastY;
+            var startXv = xSeg?.GetValueAtBeat(new Beat(segStart)) ?? lastX;
+            var endXv = xSeg?.GetValueAtBeat(new Beat(segEnd)) ?? lastX;
+            var startYv = ySeg?.GetValueAtBeat(new Beat(segStart)) ?? lastY;
+            var endYv = ySeg?.GetValueAtBeat(new Beat(segEnd)) ?? lastY;
 
             target.MoveFrames.Add(new Pe.MoveFrame
             {
