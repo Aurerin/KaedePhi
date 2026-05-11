@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
@@ -182,83 +183,92 @@ namespace KaedePhi.Core.KaedePhi
         public T GetValueAtBeat(Beat beat)
         {
             var t = (beat - StartBeat) / (EndBeat - StartBeat);
-            if (t <= 0)
-                return StartValue;
-            if (t >= 1)
-                return EndValue;
+            if (t <= 0) return StartValue;
+            if (t >= 1) return EndValue;
+            return IsBezier ? InterpolateBezier(t) : InterpolateEasing(t);
+        }
 
-            // 如果启用了贝塞尔曲线,使用 Bezier.Do
-            if (IsBezier)
-            {
-                // 针对已知类型优化，避免Convert装箱开销
-                if (typeof(T) == typeof(float))
-                    return (T)(object)Bezier.Do(BezierPoints, t, GetStartValueAsSingle(),
-                        GetEndValueAsSingle(), EasingLeft, EasingRight);
-                else if (typeof(T) == typeof(double))
-                    return (T)(object)Bezier.Do(BezierPoints, t, GetStartValueAsDouble(),
-                        GetEndValueAsDouble(), EasingLeft, EasingRight);
-                else if (typeof(T) == typeof(int))
-                    return (T)(object)Bezier.Do(BezierPoints, t, GetStartValueAsInt32(),
-                        GetEndValueAsInt32(), EasingLeft, EasingRight);
-                else if (typeof(T) == typeof(byte[]))
-                {
-                    byte[] startBytes = StartValue as byte[];
-                    byte[] endBytes = EndValue as byte[];
-                    if (startBytes == null || endBytes == null)
-                        throw new InvalidOperationException("Start or End is not a byte array, or is null.");
-                    if (startBytes.Length != endBytes.Length)
-                        throw new InvalidOperationException(
-                            "Byte arrays must be of the same length for interpolation.");
-                    byte[] result = new byte[startBytes.Length];
-                    for (int i = 0; i < startBytes.Length; i++)
-                        result[i] = Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i], EasingLeft, EasingRight);
-                    return (T)(object)result;
-                }
-                else
-                    throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
-            }
-
-            // 针对已知类型优化，避免Convert装箱开销
+        /// <summary>
+        /// 使用贝塞尔曲线对已知类型进行插值。
+        /// </summary>
+        /// <param name="t">归一化时间 (0, 1)。</param>
+        /// <returns>插值结果。</returns>
+        /// <exception cref="NotSupportedException">不支持的类型 <typeparamref name="T"/>。</exception>
+        private T InterpolateBezier(double t)
+        {
+            var ft = (float)t;
             if (typeof(T) == typeof(float))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(),
-                    GetEndValueAsSingle(), t);
-            else if (typeof(T) == typeof(double))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(),
-                    GetEndValueAsDouble(), t);
-            else if (typeof(T) == typeof(int))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(),
-                    GetEndValueAsInt32(), t);
-            else if (typeof(T) == typeof(byte[]))
-            {
-                byte[] startBytes = StartValue as byte[];
-                byte[] endBytes = EndValue as byte[];
-                if (startBytes == null || endBytes == null)
-                    throw new InvalidOperationException("Start or End is not a byte array, or is null.");
-                if (startBytes.Length != endBytes.Length)
-                    throw new InvalidOperationException(
-                        "Byte arrays must be of the same length for interpolation.");
-                byte[] result = new byte[startBytes.Length];
-                for (int i = 0; i < startBytes.Length; i++)
-                    result[i] = Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
-                return (T)(object)result;
-            }
-            else
-                throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
+                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsSingle(), GetEndValueAsSingle(), EasingLeft, EasingRight);
+            if (typeof(T) == typeof(double))
+                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsDouble(), GetEndValueAsDouble(), EasingLeft, EasingRight);
+            if (typeof(T) == typeof(int))
+                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsInt32(), GetEndValueAsInt32(), EasingLeft, EasingRight);
+            if (typeof(T) == typeof(byte[]))
+                return InterpolateByteArray(t, useBezier: true);
+            throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
+        }
+
+        /// <summary>
+        /// 使用缓动函数对已知类型进行插值。
+        /// </summary>
+        /// <param name="t">归一化时间 (0, 1)。</param>
+        /// <returns>插值结果。</returns>
+        /// <exception cref="NotSupportedException">不支持的类型 <typeparamref name="T"/>。</exception>
+        private T InterpolateEasing(double t)
+        {
+            if (typeof(T) == typeof(float))
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
+            if (typeof(T) == typeof(double))
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t);
+            if (typeof(T) == typeof(int))
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
+            if (typeof(T) == typeof(byte[]))
+                return InterpolateByteArray(t, useBezier: false);
+            throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
+        }
+
+        /// <summary>
+        /// 对 <c>byte[]</c> 类型按分量进行插值（贝塞尔或缓动）。
+        /// </summary>
+        /// <param name="t">归一化时间 (0, 1)。</param>
+        /// <param name="useBezier">为 <see langword="true"/> 时使用贝塞尔曲线，否则使用缓动函数。</param>
+        /// <returns>逐分量插值后的 <c>byte[]</c> 结果，包装为 <typeparamref name="T"/>。</returns>
+        /// <exception cref="InvalidOperationException">
+        /// <see cref="Event{T}.StartValue"/> 或 <see cref="Event{T}.EndValue"/> 不是有效的字节数组，
+        /// 或两者长度不一致时抛出。
+        /// </exception>
+        private T InterpolateByteArray(double t, bool useBezier)
+        {
+            var ft = (float)t;
+            var startBytes = StartValue as byte[]
+                ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
+            var endBytes = EndValue as byte[]
+                ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
+            if (startBytes.Length != endBytes.Length)
+                throw new InvalidOperationException("Byte arrays must be of the same length for interpolation.");
+
+            var result = new byte[startBytes.Length];
+            for (var i = 0; i < startBytes.Length; i++)
+                if (useBezier)
+                    result[i] = Bezier.Do(BezierPoints, ft, startBytes[i], endBytes[i], EasingLeft, EasingRight);
+                else
+                    result[i] = (byte)Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
+            return (T)(object)result;
         }
 
         /// <summary>
         /// 针对已知T类型（int/byte/byte[]/string/float/double）的DeepClone实现
         /// 完全避免反射，直接处理已知类型
         /// </summary>
-        private TValue DeepClone<TValue>(TValue value)
+        private static TValue DeepClone<TValue>(TValue value)
         {
-            if (value == null)
+            if (Equals(value, default(T)))
                 return default;
 
             var type = typeof(TValue);
 
             // 值类型：int, float, double, byte
-            if (type == typeof(int) || type == typeof(float) || 
+            if (type == typeof(int) || type == typeof(float) ||
                 type == typeof(double) || type == typeof(byte))
                 return value;
 
@@ -297,8 +307,9 @@ namespace KaedePhi.Core.KaedePhi
             }
 
             // 针对已知T类型优化：int/float/double/byte直接赋值，byte[]/string特殊处理
-            if (typeof(T) == typeof(int) || typeof(T) == typeof(float) || 
-                typeof(T) == typeof(double) || typeof(T) == typeof(byte))
+            if (typeof(T) == typeof(int) || typeof(T) == typeof(float) ||
+                typeof(T) == typeof(double) || typeof(T) == typeof(byte) ||
+                typeof(T) == typeof(string))
             {
                 // 值类型直接赋值，无开销
                 clone.StartValue = StartValue;
@@ -307,14 +318,12 @@ namespace KaedePhi.Core.KaedePhi
             else if (typeof(T) == typeof(byte[]))
             {
                 // byte[]需要深拷贝
-                clone.StartValue = StartValue != null ? (T)(object)((byte[])(object)StartValue).ToArray() : default;
-                clone.EndValue = EndValue != null ? (T)(object)((byte[])(object)EndValue).ToArray() : default;
-            }
-            else if (typeof(T) == typeof(string))
-            {
-                // string是不可变类型，直接赋值
-                clone.StartValue = StartValue;
-                clone.EndValue = EndValue;
+                clone.StartValue = EqualityComparer<T>.Default.Equals(StartValue, default)
+                    ? (T)(object)((byte[])(object)StartValue).ToArray()
+                    : default;
+                clone.EndValue = EqualityComparer<T>.Default.Equals(EndValue, default)
+                    ? (T)(object)((byte[])(object)EndValue).ToArray()
+                    : default;
             }
             else
             {

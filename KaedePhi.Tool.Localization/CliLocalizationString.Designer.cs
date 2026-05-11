@@ -204,7 +204,8 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 输出的结果可能有些大哦~请试着添加&quot;--stream&quot;选项来减少内存占用！....
+        ///   Looks up a localized string similar to 输出的结果可能有些大哦~请试着添加&quot;--stream&quot;选项来减少内存占用！若这没有解决你的问题，请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues，我们会尽快修复这个问题！
+        ///{0}.
         /// </summary>
         public static string err_out_of_memory {
             get {
@@ -222,20 +223,12 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to すみません！软件遇到了未知错误！....
+        ///   Looks up a localized string similar to すみません！软件遇到了未知错误！请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues 我们会尽快修复这个问题！
+        ///{0}.
         /// </summary>
         public static string err_ukerr {
             get {
                 return ResourceManager.GetString("err_ukerr", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 咦？是写错命令了吗？.
-        /// </summary>
-        public static string err_unknown {
-            get {
-                return ResourceManager.GetString("err_unknown", resourceCulture);
             }
         }
         
@@ -249,11 +242,56 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 咦？是写错命令了吗？.
+        /// </summary>
+        public static string err_unknown {
+            get {
+                return ResourceManager.GetString("err_unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工作区 ID 包含非法字符，只允许字母、数字、下划线和连字符。.
+        /// </summary>
+        public static string err_workspace_id_invalid_chars {
+            get {
+                return ResourceManager.GetString("err_workspace_id_invalid_chars", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工作区 ID 不能为空或空白。.
+        /// </summary>
+        public static string err_workspace_id_null {
+            get {
+                return ResourceManager.GetString("err_workspace_id_null", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工作区 ID 解析到工作区根目录以外的路径。.
+        /// </summary>
+        public static string err_workspace_id_path_traversal {
+            get {
+                return ResourceManager.GetString("err_workspace_id_path_traversal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 没有找到工作区 {0} 喵....
         /// </summary>
         public static string err_workspace_missing {
             get {
                 return ResourceManager.GetString("err_workspace_missing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 未找到工作区 '{0}'。.
+        /// </summary>
+        public static string err_workspace_not_found {
+            get {
+                return ResourceManager.GetString("err_workspace_not_found", resourceCulture);
             }
         }
         
