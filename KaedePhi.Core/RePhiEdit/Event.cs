@@ -87,13 +87,13 @@ namespace KaedePhi.Core.RePhiEdit
                 // 检查 T 的类型并调用相应的方法
                 if (typeof(T) == typeof(float))
                     return (T)(object)Bezier.Do(BezierPoints, t, Convert.ToSingle(StartValue),
-                        Convert.ToSingle(EndValue), EasingLeft, EasingRight);
+                        Convert.ToSingle(EndValue));
                 else if (typeof(T) == typeof(double))
                     return (T)(object)Bezier.Do(BezierPoints, t, Convert.ToDouble(StartValue),
-                        Convert.ToDouble(EndValue), EasingLeft, EasingRight);
+                        Convert.ToDouble(EndValue));
                 else if (typeof(T) == typeof(int))
                     return (T)(object)Bezier.Do(BezierPoints, t, Convert.ToInt32(StartValue),
-                        Convert.ToInt32(EndValue), EasingLeft, EasingRight);
+                        Convert.ToInt32(EndValue));
                 else if (typeof(T) == typeof(byte[]))
                 {
                     byte[] startBytes = StartValue as byte[];
@@ -105,7 +105,7 @@ namespace KaedePhi.Core.RePhiEdit
                             "Byte arrays must be of the same length for interpolation.");
                     byte[] result = new byte[startBytes.Length];
                     for (int i = 0; i < startBytes.Length; i++)
-                        result[i] = Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i], EasingLeft, EasingRight);
+                        result[i] = Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i]);
                     return (T)(object)result;
                 }
                 else
