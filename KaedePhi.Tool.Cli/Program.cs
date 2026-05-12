@@ -4,9 +4,8 @@ using KaedePhi.Tool.Cli.Commands.Test;
 using KaedePhi.Tool.Cli.Commands.WorkSpace;
 using KaedePhi.Tool.Cli.Infrastructure;
 
-var writer = new ConsoleWriter();
 #if !Release
-writer.Warn(string.Format(CliLocalizationString.warn_unstable_version,CliLocalizationString.project_link));
+ConsoleWriter.Warn(string.Format(CliLocalizationString.warn_unstable_version,CliLocalizationString.project_link));
 #endif
 
 var app = new CommandApp();
@@ -27,19 +26,19 @@ app.Configure(config =>
         // 未知命令/参数：引导用户使用 --help
         if (ex is CommandParseException)
         {
-            writer.Error(CliLocalizationString.err_unknown);
-            writer.Info(CliLocalizationString.hit_help);
+            ConsoleWriter.Error(CliLocalizationString.err_unknown);
+            ConsoleWriter.Info(CliLocalizationString.hit_help);
             return 1;
         }
 
         // 如果是out of memory这种错误，应该提示使用--stream选项，而不是让其反馈
         if (ex is OutOfMemoryException)
         {
-            new ConsoleWriter().Error(string.Format(CliLocalizationString.err_out_of_memory, ex));
+            ConsoleWriter.Error(string.Format(CliLocalizationString.err_out_of_memory, ex));
             return 1;
         }
 
-        new ConsoleWriter().Error(string.Format(CliLocalizationString.err_ukerr, ex));
+        ConsoleWriter.Error(string.Format(CliLocalizationString.err_ukerr, ex));
         return 1;
     });
 

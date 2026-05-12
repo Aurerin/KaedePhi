@@ -76,27 +76,7 @@ namespace KaedePhi.Core.KaedePhi
             _easingNumber = easingNumber;
         }
 
-        private int _easingNumber;
-
-        /// <inheritdoc cref="Interpolate(float,float,float,float,float)"/>
-        [Obsolete("请使用 Interpolate 方法")]
-        public float Do(float minLim, float maxLim, float start, float end, float t)
-            => Interpolate(minLim, maxLim, start, end, t);
-
-        /// <inheritdoc cref="Interpolate(float,float,float,float,float)"/>
-        [Obsolete("请使用 Interpolate 方法")]
-        public double Do(float minLim, float maxLim, double start, double end, double t)
-            => Interpolate(minLim, maxLim, start, end, t);
-
-        /// <inheritdoc cref="Interpolate(float,float,float,float,float)"/>
-        [Obsolete("请使用 Interpolate 方法")]
-        public int Do(float minLim, float maxLim, int start, int end, float t)
-            => Interpolate(minLim, maxLim, start, end, t);
-        
-        /// <inheritdoc cref="Interpolate(float,float,float,float,float)"/>
-        [Obsolete("请使用 Interpolate 方法")]
-        public byte Do(float minLim, float maxLim, byte start, byte end, float t)
-            => Interpolate(minLim, maxLim, start, end, t);
+        private readonly int _easingNumber;
 
         /// <summary>
         /// 在指定缓动函数的 minLim 和 maxLim 之间对 [start, end] 区间在 t 处进行插值

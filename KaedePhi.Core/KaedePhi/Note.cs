@@ -41,17 +41,6 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 音符宽度倍率
         /// </summary>
-        [Obsolete("想出用Size代表Width的已经很神人了，我不应该忘记删这里，总之，请改用WidthRatio。",true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public float Size
-        {
-            get => WidthRatio;
-            set => WidthRatio = value;
-        } // 宽度倍率
-
-        /// <summary>
-        /// 音符宽度倍率（正式命名）
-        /// </summary>
         public float WidthRatio { get; set; } = 1.0f;
 
         /// <summary>

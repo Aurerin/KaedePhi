@@ -25,21 +25,21 @@ namespace KaedePhi.Core.Utils
             float x2 = points[2], y2 = points[3];
 
             // t → 映射到参数区间
-            float mappedT = left + t * (right - left);
+            var mappedT = left + t * (right - left);
 
             // 边界快速返回
             if (mappedT <= 0f) return startValue;
             if (mappedT >= 1f) return endValue;
 
             // 从 x(u) = mappedT 反解参数 u
-            float u = SolveU(x1, x2, mappedT);
+            var u = SolveU(x1, x2, mappedT);
 
             // ★ 核心修正：不 Clamp，保留过冲/欠冲
-            float easing = SampleCurveY(u, y1, y2);
+            var easing = SampleCurveY(u, y1, y2);
 
-            double start = Convert.ToDouble(startValue);
-            double end   = Convert.ToDouble(endValue);
-            double result = start + easing * (end - start);
+            var start = Convert.ToDouble(startValue);
+            var end   = Convert.ToDouble(endValue);
+            var result = start + easing * (end - start);
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
@@ -51,83 +51,84 @@ namespace KaedePhi.Core.Utils
         /// </summary>
         private static float SolveU(float x1, float x2, float targetX)
         {
-            float u = targetX;
+            if (TryNewtonIterate(x1, x2, targetX, out var u))
+                return Math.Clamp(u, 0f, 1f);
 
-            // --- 第一阶段：牛顿迭代（快速收敛） ---
-            bool converged = false;
-            for (int i = 0; i < 8; i++)
+            var (uLo, uHi) = FindBracket(x1, x2, targetX);
+            return RefineByBisection(x1, x2, targetX, uLo, uHi);
+        }
+
+        /// <summary>
+        /// 第一阶段：牛顿迭代快速收敛。导数过小时提前退出。
+        /// </summary>
+        private static bool TryNewtonIterate(float x1, float x2, float targetX, out float u)
+        {
+            u = targetX;
+            for (var i = 0; i < 8; i++)
             {
-                float xU = SampleCurveX(u, x1, x2);
-                float err = xU - targetX;
+                var err = SampleCurveX(u, x1, x2) - targetX;
+                if (MathF.Abs(err) < 1e-7f) return true;
 
-                if (MathF.Abs(err) < 1e-7f)
-                {
-                    converged = true;
-                    break;
-                }
-
-                float deriv = SampleCurveXDerivative(u, x1, x2);
-
-                // 导数太小 → 牛顿不稳定，切二分
-                if (MathF.Abs(deriv) < 1e-7f)
-                    break;
+                var deriv = SampleCurveXDerivative(u, x1, x2);
+                if (MathF.Abs(deriv) < 1e-7f) return false; // 导数太小 → 切二分
 
                 u -= err / deriv;
             }
+            return false;
+        }
 
-            // --- 第二阶段：二分法兜底 ---
-            if (!converged)
+        /// <summary>
+        /// 第二阶段（上）：在 [0,1] 上均匀采样，定位跨越 targetX 的最右侧区间。
+        /// </summary>
+        private static (float uLo, float uHi) FindBracket(float x1, float x2, float targetX)
+        {
+            const int subdivisions = 32;
+            var step = 1f / subdivisions;
+            float uLo = 0f, uHi = 1f;
+            var prevX = 0f;
+
+            for (var i = 1; i <= subdivisions; i++)
             {
-                // 在 [0, 1] 上搜索最后一个满足 x(u) ≤ targetX 的区间
-                // 保证取到"前进方向"上的解
-                const int subdivisions = 32;
-                float step = 1f / subdivisions;
+                var ui = step * i;
+                var xi = SampleCurveX(ui, x1, x2);
 
-                float uLo = 0f, uHi = 1f;
-                float prevX = 0f;
-
-                for (int i = 1; i <= subdivisions; i++)
+                var crosses = (prevX <= targetX && xi >= targetX)
+                              || (prevX >= targetX && xi <= targetX);
+                if (crosses)
                 {
-                    float ui = step * i;
-                    float xi = SampleCurveX(ui, x1, x2);
-
-                    // 找到跨越 targetX 的最后一段（取最右侧的根）
-                    if ((prevX <= targetX && xi >= targetX) ||
-                        (prevX >= targetX && xi <= targetX))
-                    {
-                        uLo = step * (i - 1);
-                        uHi = ui;
-                    }
-
-                    prevX = xi;
+                    uLo = step * (i - 1);
+                    uHi = ui;
                 }
 
-                // 在定位到的区间内做精确二分
-                for (int i = 0; i < 20; i++)
-                {
-                    u = (uLo + uHi) * 0.5f;
-                    float xU = SampleCurveX(u, x1, x2);
-                    float err = xU - targetX;
-
-                    if (MathF.Abs(err) < 1e-7f)
-                        break;
-
-                    if (err < 0f)
-                        uLo = u;
-                    else
-                        uHi = u;
-                }
-
-                u = (uLo + uHi) * 0.5f;
+                prevX = xi;
             }
 
-            return Math.Clamp(u, 0f, 1f);
+            return (uLo, uHi);
+        }
+
+        /// <summary>
+        /// 第二阶段（下）：在已知区间内做精确二分，返回 Clamp 后的结果。
+        /// </summary>
+        private static float RefineByBisection(float x1, float x2, float targetX, float uLo, float uHi)
+        {
+            for (var i = 0; i < 20; i++)
+            {
+                var u = (uLo + uHi) * 0.5f;
+                var err = SampleCurveX(u, x1, x2) - targetX;
+
+                if (MathF.Abs(err) < 1e-7f) break;
+
+                if (err < 0f) uLo = u;
+                else          uHi = u;
+            }
+
+            return Math.Clamp((uLo + uHi) * 0.5f, 0f, 1f);
         }
 
         // x(u) = 3(1−u)²u·x1 + 3(1−u)u²·x2 + u³
         private static float SampleCurveX(float u, float x1, float x2)
         {
-            float omu = 1f - u;
+            var omu = 1f - u;
             return 3f * omu * omu * u   * x1
                  + 3f * omu * u   * u   * x2
                  + u   * u   * u;
@@ -136,7 +137,7 @@ namespace KaedePhi.Core.Utils
         // y(u) = 3(1−u)²u·y1 + 3(1−u)u²·y2 + u³
         private static float SampleCurveY(float u, float y1, float y2)
         {
-            float omu = 1f - u;
+            var omu = 1f - u;
             return 3f * omu * omu * u   * y1
                  + 3f * omu * u   * u   * y2
                  + u   * u   * u;
@@ -145,7 +146,7 @@ namespace KaedePhi.Core.Utils
         // x'(u) = 3(1−u)²·x1 + 6(1−u)u·(x2−x1) + 3u²·(1−x2)
         private static float SampleCurveXDerivative(float u, float x1, float x2)
         {
-            float omu = 1f - u;
+            var omu = 1f - u;
             return 3f * omu * omu           * x1
                  + 6f * omu * u             * (x2 - x1)
                  + 3f * u   * u             * (1f - x2);

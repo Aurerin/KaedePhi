@@ -61,10 +61,9 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         s.SamplesPerEvent ??= c.SamplesPerEvent;
         s.BeatSubdivisions ??= c.BeatSubdivisions;
 
-        var writer = new ConsoleWriter();
         var svc = new ChartService();
         var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (nrc == null) { writer.Error(CliLocalizationString.render_err_load_failed); return 1; }
+        if (nrc == null) { ConsoleWriter.Error(CliLocalizationString.render_err_load_failed); return 1; }
 
         string? outputDir;
         if (!string.IsNullOrWhiteSpace(s.Output))
@@ -74,7 +73,7 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
                 ? Path.Combine(Path.GetDirectoryName(s.Input) ?? ".", "render_output")
                 : Path.Combine(Directory.GetCurrentDirectory(), "render_output");
 
-        writer.Info(string.Format(CliLocalizationString.render_msg_start, outputDir));
+        ConsoleWriter.Info(string.Format(CliLocalizationString.render_msg_start, outputDir));
 
         var opts = new KpcRenderOptions
         {
@@ -90,17 +89,17 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         };
 
         var exporter = new KpcChartRenderExporter();
-        exporter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error);
+        exporter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error);
 
         try
         {
             var files = exporter.ExportChart(nrc, outputDir, opts, s.LineIndex, s.LayerIndex);
-            if (files.Count == 0) writer.Warn(CliLocalizationString.render_warn_nothing);
-            else writer.Info(string.Format(CliLocalizationString.render_msg_done, files.Count, outputDir));
+            if (files.Count == 0) ConsoleWriter.Warn(CliLocalizationString.render_warn_nothing);
+            else ConsoleWriter.Info(string.Format(CliLocalizationString.render_msg_done, files.Count, outputDir));
         }
         catch (Exception ex)
         {
-            writer.Error(string.Format(CliLocalizationString.render_err_render_failed, ex.Message));
+            ConsoleWriter.Error(string.Format(CliLocalizationString.render_err_render_failed, ex.Message));
             return 2;
         }
 

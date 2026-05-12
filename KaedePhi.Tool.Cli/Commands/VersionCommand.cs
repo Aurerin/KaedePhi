@@ -21,7 +21,7 @@ public sealed class VersionCommand : AsyncCommand<VersionCommand.Settings>
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion;
 #endif
-        new ConsoleWriter().Info($"{CliLocalizationString.app_title} v{ver}");
+        ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
         return Task.FromResult(0);
     }
 }
