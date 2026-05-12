@@ -198,11 +198,11 @@ namespace KaedePhi.Core.KaedePhi
         {
             var ft = (float)t;
             if (typeof(T) == typeof(float))
-                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsSingle(), GetEndValueAsSingle(), EasingLeft, EasingRight);
+                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsSingle(), GetEndValueAsSingle());
             if (typeof(T) == typeof(double))
-                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsDouble(), GetEndValueAsDouble(), EasingLeft, EasingRight);
+                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsDouble(), GetEndValueAsDouble());
             if (typeof(T) == typeof(int))
-                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsInt32(), GetEndValueAsInt32(), EasingLeft, EasingRight);
+                return (T)(object)Bezier.Do(BezierPoints, ft, GetStartValueAsInt32(), GetEndValueAsInt32());
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: true);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -217,11 +217,14 @@ namespace KaedePhi.Core.KaedePhi
         private T InterpolateEasing(double t)
         {
             if (typeof(T) == typeof(float))
-                return (T)(object)(float)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
+                return (T)(object)(float)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(),
+                    GetEndValueAsSingle(), t);
             if (typeof(T) == typeof(double))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t);
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(),
+                    GetEndValueAsDouble(), t);
             if (typeof(T) == typeof(int))
-                return (T)(object)(int)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
+                return (T)(object)(int)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(),
+                    GetEndValueAsInt32(), t);
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -241,9 +244,9 @@ namespace KaedePhi.Core.KaedePhi
         {
             var ft = (float)t;
             var startBytes = StartValue as byte[]
-                ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
+                             ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
             var endBytes = EndValue as byte[]
-                ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
+                           ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
             if (startBytes.Length != endBytes.Length)
                 throw new InvalidOperationException("Byte arrays must be of the same length for interpolation.");
 

@@ -256,11 +256,11 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         {
             var iv = overlapIntervals[i];
             if (!(mergedStart < iv.End && mergedEnd > iv.Start)) continue;
-            
+
             // 扩展合并区间的边界
             if (iv.Start < mergedStart) mergedStart = iv.Start;
             if (iv.End > mergedEnd) mergedEnd = iv.End;
-            
+
             // 标记该区间为待删除
             indicesToRemove.Add(i);
         }
@@ -309,7 +309,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         var (cutTo, cutFrom) =
             CutAndRemoveOverlapEvents(toEventsCopy, fromEventsCopy, overlapIntervals, cutLength);
         newEvents.AddRange(
-            MergeCutOverlapSegments(toEventsForOffsetLookup, fromEventsCopy, cutTo, cutFrom, overlapIntervals, cutLength));
+            MergeCutOverlapSegments(toEventsForOffsetLookup, fromEventsCopy, cutTo, cutFrom, overlapIntervals,
+                cutLength));
 
         SortByStartBeat(newEvents);
         return newEvents;
@@ -643,7 +644,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         for (var ki = 0; ki < keyBeats.Count - 1; ki++)
         {
             var subStart = keyBeats[ki];
-            var subEnd   = keyBeats[ki + 1];
+            var subEnd = keyBeats[ki + 1];
             if (subStart >= subEnd) continue;
 
             result.AddRange(
@@ -672,22 +673,22 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     {
         var result = new List<Kpc.Event<TPayload>>();
 
-        var lastToValue   = GetPreviousEndValue(toEventsCopy,   subStart);
+        var lastToValue = GetPreviousEndValue(toEventsCopy, subStart);
         var lastFormValue = GetPreviousEndValue(fromEventsCopy, subStart);
 
-        var toEventAtCurrent   = GetActiveEventAtBeat(toEventsCopy,   subStart);
+        var toEventAtCurrent = GetActiveEventAtBeat(toEventsCopy, subStart);
         var formEventAtCurrent = GetActiveEventAtBeat(fromEventsCopy, subStart);
-        var toValAtCurrent   = toEventAtCurrent   != null ? toEventAtCurrent.GetValueAtBeat(subStart)   : lastToValue;
+        var toValAtCurrent = toEventAtCurrent != null ? toEventAtCurrent.GetValueAtBeat(subStart) : lastToValue;
         var formValAtCurrent = formEventAtCurrent != null ? formEventAtCurrent.GetValueAtBeat(subStart) : lastFormValue;
 
-        var segmentStart          = subStart;
-        var segmentStartToValue   = toValAtCurrent;
+        var segmentStart = subStart;
+        var segmentStartToValue = toValAtCurrent;
         var segmentStartFormValue = formValAtCurrent;
-        var segmentStartSum       = AddValues(toValAtCurrent, formValAtCurrent);
+        var segmentStartSum = AddValues(toValAtCurrent, formValAtCurrent);
 
         // 子区间终点合并值（仅计算一次作为容差参考，与 Unbind 的 `end = absPosOut(iEnd)` 等价）
         var subEndSum = AddValues(
-            GetValueAtBeatOrPreviousEnd(toEventsCopy,   subEnd),
+            GetValueAtBeatOrPreviousEnd(toEventsCopy, subEnd),
             GetValueAtBeatOrPreviousEnd(fromEventsCopy, subEnd));
 
         for (var cur = subStart; cur < subEnd;)
@@ -696,11 +697,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             if (nextBeat > subEnd) nextBeat = subEnd;
             var isLast = nextBeat >= subEnd;
 
-            var toEventAtNext   = GetActiveEventAtBeat(toEventsCopy,   nextBeat);
+            var toEventAtNext = GetActiveEventAtBeat(toEventsCopy, nextBeat);
             var formEventAtNext = GetActiveEventAtBeat(fromEventsCopy, nextBeat);
 
-            var (toValueAtNext,   toValUpdate)   = GetNextBeatValues(toEventsCopy,   toEventAtCurrent,   toEventAtNext,   nextBeat);
-            var (formValueAtNext, formValUpdate) = GetNextBeatValues(fromEventsCopy, formEventAtCurrent, formEventAtNext, nextBeat);
+            var (toValueAtNext, toValUpdate) =
+                GetNextBeatValues(toEventsCopy, toEventAtCurrent, toEventAtNext, nextBeat);
+            var (formValueAtNext, formValUpdate) =
+                GetNextBeatValues(fromEventsCopy, formEventAtCurrent, formEventAtNext, nextBeat);
 
             var sumAtNext = AddValues(toValueAtNext, formValueAtNext);
 
@@ -710,13 +713,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             {
                 AddSegmentEvent(result, segmentStart, nextBeat,
                     segmentStartToValue, segmentStartFormValue, toValueAtNext, formValueAtNext);
-                segmentStart          = nextBeat;
-                segmentStartToValue   = toValUpdate;
+                segmentStart = nextBeat;
+                segmentStartToValue = toValUpdate;
                 segmentStartFormValue = formValUpdate;
-                segmentStartSum       = AddValues(toValUpdate, formValUpdate);
+                segmentStartSum = AddValues(toValUpdate, formValUpdate);
             }
 
-            toEventAtCurrent   = toEventAtNext;
+            toEventAtCurrent = toEventAtNext;
             formEventAtCurrent = formEventAtNext;
             cur = nextBeat;
         }
@@ -742,13 +745,15 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         foreach (var e in toEvents)
         {
             if (e.StartBeat > start && e.StartBeat < end) beats.Add(e.StartBeat);
-            if (e.EndBeat   > start && e.EndBeat   < end) beats.Add(e.EndBeat);
+            if (e.EndBeat > start && e.EndBeat < end) beats.Add(e.EndBeat);
         }
+
         foreach (var e in fromEvents)
         {
             if (e.StartBeat > start && e.StartBeat < end) beats.Add(e.StartBeat);
-            if (e.EndBeat   > start && e.EndBeat   < end) beats.Add(e.EndBeat);
+            if (e.EndBeat > start && e.EndBeat < end) beats.Add(e.EndBeat);
         }
+
         return beats.Distinct().OrderBy(b => b).ToList();
     }
 
@@ -800,10 +805,10 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         Beat nextBeat)
     {
         var prevEnd = GetPreviousEndValue(events, nextBeat);
-        var outgoing = (eventAtCurrent != null && eventAtCurrent.EndBeat >= nextBeat)
+        var outgoing = (eventAtCurrent is not null && eventAtCurrent.EndBeat >= nextBeat)
             ? eventAtCurrent.GetValueAtBeat(nextBeat)
             : prevEnd;
-        var incoming = eventAtNext != null
+        var incoming = eventAtNext is not null
             ? eventAtNext.GetValueAtBeat(nextBeat)
             : prevEnd;
         return (outgoing, incoming);
