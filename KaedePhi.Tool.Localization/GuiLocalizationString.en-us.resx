@@ -271,4 +271,172 @@
   <data name="status_loaded_lines" xml:space="preserve">
     <value>Loaded {0} judge lines.</value>
   </data>
+  <data name="app_subtitle" xml:space="preserve">
+    <value>Open-source fan-made chart toolset</value>
+  </data>
+  <data name="settings_title" xml:space="preserve">
+    <value>Default Settings</value>
+  </data>
+  <data name="settings_max_log_files" xml:space="preserve">
+    <value>Max Log Files</value>
+  </data>
+  <data name="settings_unbind" xml:space="preserve">
+    <value>Father Unbind</value>
+  </data>
+  <data name="settings_layermerge" xml:space="preserve">
+    <value>Layer Merge</value>
+  </data>
+  <data name="settings_cut" xml:space="preserve">
+    <value>Cut Events</value>
+  </data>
+  <data name="settings_fit" xml:space="preserve">
+    <value>Fit Events</value>
+  </data>
+  <data name="settings_render" xml:space="preserve">
+    <value>Render</value>
+  </data>
+  <data name="settings_convert" xml:space="preserve">
+    <value>Conversion</value>
+  </data>
+  <data name="settings_saved" xml:space="preserve">
+    <value>Settings saved.</value>
+  </data>
+  <data name="settings_reset" xml:space="preserve">
+    <value>Settings reset to defaults.</value>
+  </data>
+  <data name="option_segment_penalty" xml:space="preserve">
+    <value>Segment Penalty</value>
+  </data>
+  <data name="option_keep_original_penalty" xml:space="preserve">
+    <value>Keep Original Penalty</value>
+  </data>
+  <data name="option_full_search_threshold" xml:space="preserve">
+    <value>Full Search Threshold</value>
+  </data>
+  <data name="option_long_run_window" xml:space="preserve">
+    <value>Long Run Window</value>
+  </data>
+  <data name="option_phase_epsilon" xml:space="preserve">
+    <value>Phase Detection Epsilon</value>
+  </data>
+  <data name="option_range_padding_ratio" xml:space="preserve">
+    <value>Range Padding Ratio</value>
+  </data>
+  <data name="option_range_samples" xml:space="preserve">
+    <value>Range Samples</value>
+  </data>
+  <data name="option_segment_group_tolerance" xml:space="preserve">
+    <value>Segment Group Tolerance</value>
+  </data>
+  <data name="option_min_value_range_half" xml:space="preserve">
+    <value>Min Value Range Half</value>
+  </data>
+  <data name="option_min_value_range_half_ratio" xml:space="preserve">
+    <value>Min Value Range Half Ratio</value>
+  </data>
+  <data name="convert_options_title" xml:space="preserve">
+    <value>Conversion Options</value>
+  </data>
+  <data name="convert_pe_options" xml:space="preserve">
+    <value>PhiEdit Conversion Options</value>
+  </data>
+  <data name="convert_phigros_options" xml:space="preserve">
+    <value>PhigrosV3 Conversion Options</value>
+  </data>
+  <data name="convert_speed_ratio" xml:space="preserve">
+    <value>Speed Conversion Ratio</value>
+  </data>
+  <data name="convert_easing_precision" xml:space="preserve">
+    <value>Easing Cut Precision</value>
+  </data>
+  <data name="convert_alpha_precision" xml:space="preserve">
+    <value>Alpha Cut Precision</value>
+  </data>
+  <data name="convert_alpha_tolerance" xml:space="preserve">
+    <value>Alpha Tolerance %</value>
+  </data>
+  <data name="convert_speed_precision" xml:space="preserve">
+    <value>Speed Cut Precision</value>
+  </data>
+  <data name="convert_default_bpm" xml:space="preserve">
+    <value>Default BPM</value>
+  </data>
+  <data name="convert_common_options" xml:space="preserve">
+    <value>Common Options</value>
+  </data>
+  <data name="convert_unbind_section" xml:space="preserve">
+    <value>Father Line Unbind</value>
+  </data>
+  <data name="convert_unbind_precision" xml:space="preserve">
+    <value>Unbind Precision</value>
+  </data>
+  <data name="convert_unbind_tolerance" xml:space="preserve">
+    <value>Unbind Tolerance %</value>
+  </data>
+  <data name="convert_unbind_classic" xml:space="preserve">
+    <value>Unbind Classic Mode</value>
+  </data>
+  <data name="convert_unbind_compress" xml:space="preserve">
+    <value>Compress After Unbind</value>
+  </data>
+  <data name="convert_merge_section" xml:space="preserve">
+    <value>Multi-Layer Merge</value>
+  </data>
+  <data name="convert_merge_precision" xml:space="preserve">
+    <value>Merge Precision</value>
+  </data>
+  <data name="convert_merge_tolerance" xml:space="preserve">
+    <value>Merge Tolerance %</value>
+  </data>
+  <data name="convert_merge_classic" xml:space="preserve">
+    <value>Merge Classic Mode</value>
+  </data>
+  <data name="convert_merge_compress" xml:space="preserve">
+    <value>Compress After Merge</value>
+  </data>
+  <data name="convert_line_filter" xml:space="preserve">
+    <value>Line Filter</value>
+  </data>
+  <data name="convert_remove_attach_ui" xml:space="preserve">
+    <value>Remove Lines with AttachUI</value>
+  </data>
+  <data name="convert_remove_texture" xml:space="preserve">
+    <value>Remove Lines with Custom Texture</value>
+  </data>
+  <data name="btn_back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="btn_reset_defaults" xml:space="preserve">
+    <value>Reset Defaults</value>
+  </data>
+  <data name="btn_save_settings" xml:space="preserve">
+    <value>Save Settings</value>
+  </data>
+  <data name="btn_settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="import_file_picker_title" xml:space="preserve">
+    <value>Select Chart File</value>
+  </data>
+  <data name="file_type_json" xml:space="preserve">
+    <value>JSON Files</value>
+  </data>
+  <data name="file_type_all" xml:space="preserve">
+    <value>All Files</value>
+  </data>
+  <data name="file_type_pe_chart" xml:space="preserve">
+    <value>PhiEdit Chart</value>
+  </data>
+  <data name="file_type_rpe_json" xml:space="preserve">
+    <value>RePhiEdit JSON</value>
+  </data>
+  <data name="file_type_phigros_json" xml:space="preserve">
+    <value>Phigros v3 JSON</value>
+  </data>
+  <data name="file_type_phifans_json" xml:space="preserve">
+    <value>PhiFans JSON</value>
+  </data>
+  <data name="file_type_phichain_json" xml:space="preserve">
+    <value>PhiChain JSON</value>
+  </data>
 </root>

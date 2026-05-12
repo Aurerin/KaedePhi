@@ -86,7 +86,7 @@
     <value>精度</value>
   </data>
   <data name="option_tolerance" xml:space="preserve">
-    <value>容差 (%)</value>
+    <value>容差 (百分比)</value>
   </data>
   <data name="option_classic_mode" xml:space="preserve">
     <value>经典模式</value>
@@ -209,7 +209,7 @@
     <value>已检测到格式: {0}</value>
   </data>
   <data name="log_step_converting" xml:space="preserve">
-    <value>正在转换为 KPC...</value>
+    <value>正在转换为中间格式...</value>
   </data>
   <data name="log_step_saved" xml:space="preserve">
     <value>已保存至工作区。</value>
@@ -273,5 +273,170 @@
   </data>
   <data name="status_loaded_lines" xml:space="preserve">
     <value>已加载 {0} 条判定线。</value>
+  </data>
+  <data name="settings_title" xml:space="preserve">
+    <value>默认设置</value>
+  </data>
+  <data name="settings_max_log_files" xml:space="preserve">
+    <value>最大日志文件数</value>
+  </data>
+  <data name="settings_unbind" xml:space="preserve">
+    <value>判定线解绑</value>
+  </data>
+  <data name="settings_layermerge" xml:space="preserve">
+    <value>层级合并</value>
+  </data>
+  <data name="settings_cut" xml:space="preserve">
+    <value>事件切割</value>
+  </data>
+  <data name="settings_fit" xml:space="preserve">
+    <value>事件拟合</value>
+  </data>
+  <data name="settings_render" xml:space="preserve">
+    <value>谱面渲染</value>
+  </data>
+  <data name="settings_convert" xml:space="preserve">
+    <value>格式转换</value>
+  </data>
+  <data name="settings_saved" xml:space="preserve">
+    <value>配置已保存。</value>
+  </data>
+  <data name="settings_reset" xml:space="preserve">
+    <value>已恢复默认设置。</value>
+  </data>
+  <data name="option_segment_penalty" xml:space="preserve">
+    <value>段惩罚</value>
+  </data>
+  <data name="option_keep_original_penalty" xml:space="preserve">
+    <value>保留原事件偏置</value>
+  </data>
+  <data name="option_full_search_threshold" xml:space="preserve">
+    <value>全搜索长度阈值</value>
+  </data>
+  <data name="option_long_run_window" xml:space="preserve">
+    <value>长段回看窗口</value>
+  </data>
+  <data name="option_phase_epsilon" xml:space="preserve">
+    <value>相位检测精度</value>
+  </data>
+  <data name="option_range_padding_ratio" xml:space="preserve">
+    <value>值域填充比例</value>
+  </data>
+  <data name="option_range_samples" xml:space="preserve">
+    <value>值域采样点数</value>
+  </data>
+  <data name="option_segment_group_tolerance" xml:space="preserve">
+    <value>段分组容差</value>
+  </data>
+  <data name="option_min_value_range_half" xml:space="preserve">
+    <value>最小值域半宽</value>
+  </data>
+  <data name="option_min_value_range_half_ratio" xml:space="preserve">
+    <value>最小值域半宽比例</value>
+  </data>
+  <data name="convert_options_title" xml:space="preserve">
+    <value>转换选项</value>
+  </data>
+  <data name="convert_pe_options" xml:space="preserve">
+    <value>转换到 PhiEdit 选项</value>
+  </data>
+  <data name="convert_phigros_options" xml:space="preserve">
+    <value>转换到 PhigrosV3 选项</value>
+  </data>
+  <data name="convert_speed_ratio" xml:space="preserve">
+    <value>速度事件值转换比率</value>
+  </data>
+  <data name="convert_easing_precision" xml:space="preserve">
+    <value>缓动切割精度</value>
+  </data>
+  <data name="convert_alpha_precision" xml:space="preserve">
+    <value>Alpha事件切割精度</value>
+  </data>
+  <data name="convert_alpha_tolerance" xml:space="preserve">
+    <value>Alpha事件容差百分比</value>
+  </data>
+  <data name="convert_speed_precision" xml:space="preserve">
+    <value>速度事件切割精度</value>
+  </data>
+  <data name="convert_default_bpm" xml:space="preserve">
+    <value>默认BPM</value>
+  </data>
+  <data name="convert_common_options" xml:space="preserve">
+    <value>通用选项</value>
+  </data>
+  <data name="convert_unbind_section" xml:space="preserve">
+    <value>父子线解绑</value>
+  </data>
+  <data name="convert_unbind_precision" xml:space="preserve">
+    <value>解绑父线精度</value>
+  </data>
+  <data name="convert_unbind_tolerance" xml:space="preserve">
+    <value>解绑父线容差百分比</value>
+  </data>
+  <data name="convert_unbind_classic" xml:space="preserve">
+    <value>解绑父线经典模式</value>
+  </data>
+  <data name="convert_unbind_compress" xml:space="preserve">
+    <value>解绑父线后压缩</value>
+  </data>
+  <data name="convert_merge_section" xml:space="preserve">
+    <value>多层级合并</value>
+  </data>
+  <data name="convert_merge_precision" xml:space="preserve">
+    <value>合并层级精度</value>
+  </data>
+  <data name="convert_merge_tolerance" xml:space="preserve">
+    <value>合并层级容差百分比</value>
+  </data>
+  <data name="convert_merge_classic" xml:space="preserve">
+    <value>合并层级经典模式</value>
+  </data>
+  <data name="convert_merge_compress" xml:space="preserve">
+    <value>合并层级后压缩</value>
+  </data>
+  <data name="convert_line_filter" xml:space="preserve">
+    <value>判定线过滤</value>
+  </data>
+  <data name="convert_remove_attach_ui" xml:space="preserve">
+    <value>移除绑定UI的判定线</value>
+  </data>
+  <data name="convert_remove_texture" xml:space="preserve">
+    <value>移除带有自定义材质的判定线</value>
+  </data>
+  <data name="btn_back" xml:space="preserve">
+    <value>返回</value>
+  </data>
+  <data name="btn_reset_defaults" xml:space="preserve">
+    <value>恢复默认</value>
+  </data>
+  <data name="btn_save_settings" xml:space="preserve">
+    <value>保存设置</value>
+  </data>
+  <data name="btn_settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="import_file_picker_title" xml:space="preserve">
+    <value>选择谱面文件</value>
+  </data>
+  <data name="file_type_json" xml:space="preserve">
+    <value>JSON 文件</value>
+  </data>
+  <data name="file_type_all" xml:space="preserve">
+    <value>所有文件</value>
+  </data>
+  <data name="file_type_pe_chart" xml:space="preserve">
+    <value>PhiEdit 谱面</value>
+  </data>
+  <data name="file_type_rpe_json" xml:space="preserve">
+    <value>RePhiEdit JSON</value>
+  </data>
+  <data name="file_type_phigros_json" xml:space="preserve">
+    <value>Phigros v3 JSON</value>
+  </data>
+  <data name="file_type_phifans_json" xml:space="preserve">
+    <value>PhiFans JSON</value>
+  </data>
+  <data name="file_type_phichain_json" xml:space="preserve">
+    <value>PhiChain JSON</value>
   </data>
 </root>

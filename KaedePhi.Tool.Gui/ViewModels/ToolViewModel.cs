@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Gui.Models;
 using static KaedePhi.Tool.Gui.Models.FontAwesome;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
@@ -10,35 +11,42 @@ namespace KaedePhi.Tool.Gui.ViewModels;
 
 public sealed class ToolViewModel : INotifyPropertyChanged
 {
-    private string _currentFileName = string.Empty;
-    private string _detectedFormat = string.Empty;
-    private ToolOption? _selectedTool;
-    private double _precision = 64;
-    private double _tolerance = 0.1;
-    private bool _classicMode;
-    private bool _disableCompress;
-    private int _pixelsPerBeat = 100;
-    private int _channelWidth = 150;
-    private int _samplesPerEvent = 64;
-    private int _beatSubdivisions = 2;
-    private string _statusText = string.Empty;
-    private bool _isProcessing;
-
     public string CurrentFileName
     {
-        get => _currentFileName;
-        set { _currentFileName = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     public string DetectedFormat
     {
-        get => _detectedFormat;
-        set { _detectedFormat = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// 导入文件的原始格式（ChartType 枚举值）
+    /// </summary>
+    public ChartType SourceChartType
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
-    public List<ToolOption> Tools { get; } = new()
-    {
-        new ToolOption
+    public List<ToolOption> Tools { get; } =
+    [
+        new()
         {
             Name = tool_unbind_name,
             Description = tool_unbind_desc,
@@ -49,7 +57,8 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             HasClassicMode = true,
             HasDisableCompress = true
         },
-        new ToolOption
+
+        new()
         {
             Name = tool_layermerge_name,
             Description = tool_layermerge_desc,
@@ -60,7 +69,8 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             HasClassicMode = true,
             HasDisableCompress = true
         },
-        new ToolOption
+
+        new()
         {
             Name = tool_cut_name,
             Description = tool_cut_desc,
@@ -70,16 +80,19 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             HasTolerance = true,
             HasDisableCompress = true
         },
-        new ToolOption
+
+        new()
         {
             Name = tool_fit_name,
             Description = tool_fit_desc,
             IconGlyph = Fix,
             ToolId = "fit",
             HasTolerance = true,
+            HasFitOptions = true,
             DefaultTolerance = 0.5
         },
-        new ToolOption
+
+        new()
         {
             Name = tool_render_name,
             Description = tool_render_desc,
@@ -87,14 +100,14 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             ToolId = "render",
             HasRenderOptions = true
         }
-    };
+    ];
 
     public ToolOption? SelectedTool
     {
-        get => _selectedTool;
+        get;
         set
         {
-            _selectedTool = value;
+            field = value;
             if (value != null)
             {
                 Precision = value.DefaultPrecision;
@@ -102,73 +115,165 @@ public sealed class ToolViewModel : INotifyPropertyChanged
                 ClassicMode = false;
                 DisableCompress = false;
             }
+
             OnPropertyChanged();
             OnPropertyChanged(nameof(ShowPrecision));
             OnPropertyChanged(nameof(ShowTolerance));
             OnPropertyChanged(nameof(ShowClassicMode));
             OnPropertyChanged(nameof(ShowDisableCompress));
             OnPropertyChanged(nameof(ShowRenderOptions));
+            OnPropertyChanged(nameof(ShowFitOptions));
         }
     }
 
     public double Precision
     {
-        get => _precision;
-        set { _precision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64;
 
     public double Tolerance
     {
-        get => _tolerance;
-        set { _tolerance = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.1;
 
     public bool ClassicMode
     {
-        get => _classicMode;
-        set { _classicMode = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool DisableCompress
     {
-        get => _disableCompress;
-        set { _disableCompress = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public int PixelsPerBeat
     {
-        get => _pixelsPerBeat;
-        set { _pixelsPerBeat = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 100;
 
     public int ChannelWidth
     {
-        get => _channelWidth;
-        set { _channelWidth = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 150;
 
     public int SamplesPerEvent
     {
-        get => _samplesPerEvent;
-        set { _samplesPerEvent = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64;
 
     public int BeatSubdivisions
     {
-        get => _beatSubdivisions;
-        set { _beatSubdivisions = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 2;
+
+    public double SegmentPenalty
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 1.0;
+
+    public double KeepOriginalPenalty
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 1.02;
+
+    public int FullSearchRunLengthThreshold
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 160;
+
+    public int LongRunSearchWindow
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 160;
+
+    public double PhaseDetectionEpsilon
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.015;
 
     public string StatusText
     {
-        get => _statusText;
-        set { _statusText = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     public bool IsProcessing
     {
-        get => _isProcessing;
-        set { _isProcessing = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool ShowPrecision => SelectedTool?.HasPrecision == true;
@@ -176,6 +281,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
     public bool ShowClassicMode => SelectedTool?.HasClassicMode == true;
     public bool ShowDisableCompress => SelectedTool?.HasDisableCompress == true;
     public bool ShowRenderOptions => SelectedTool?.HasRenderOptions == true;
+    public bool ShowFitOptions => SelectedTool?.HasFitOptions == true;
 
     public event Action? RequestRun;
     public event Action? RequestExport;
@@ -210,6 +316,11 @@ public sealed class ToolViewModel : INotifyPropertyChanged
                 break;
             case "fit":
                 Tolerance = config.Fit.Tolerance;
+                SegmentPenalty = config.Fit.SegmentPenalty;
+                KeepOriginalPenalty = config.Fit.KeepOriginalPenalty;
+                FullSearchRunLengthThreshold = config.Fit.FullSearchRunLengthThreshold;
+                LongRunSearchWindow = config.Fit.LongRunSearchWindow;
+                PhaseDetectionEpsilon = config.Fit.PhaseDetectionEpsilon;
                 break;
             case "render":
                 PixelsPerBeat = config.Render.PixelsPerBeat;

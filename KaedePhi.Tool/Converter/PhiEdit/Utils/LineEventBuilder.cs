@@ -50,7 +50,7 @@ public class LineEventBuilder
                 {
                     var layer = _layerProcessor.LayerMerge(layers,
                         _options.MultiLayerMerge.Precision);
-                    _layerProcessor.LayerEventsCompress(layer, 0.1d);
+                    _layerProcessor.LayerEventsCompress(layer, _options.MultiLayerMerge.Tolerance);
                     primaryLayer = layer;
                 }
                 else

@@ -78,6 +78,15 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 返回.
+        /// </summary>
+        public static string btn_back {
+            get {
+                return ResourceManager.GetString("btn_back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 返回导入.
         /// </summary>
         public static string btn_back_to_import {
@@ -114,11 +123,245 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 恢复默认.
+        /// </summary>
+        public static string btn_reset_defaults {
+            get {
+                return ResourceManager.GetString("btn_reset_defaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 运行工具.
         /// </summary>
         public static string btn_run_tool {
             get {
                 return ResourceManager.GetString("btn_run_tool", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 保存设置.
+        /// </summary>
+        public static string btn_save_settings {
+            get {
+                return ResourceManager.GetString("btn_save_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 设置.
+        /// </summary>
+        public static string btn_settings {
+            get {
+                return ResourceManager.GetString("btn_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alpha事件切割精度.
+        /// </summary>
+        public static string convert_alpha_precision {
+            get {
+                return ResourceManager.GetString("convert_alpha_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alpha事件容差百分比.
+        /// </summary>
+        public static string convert_alpha_tolerance {
+            get {
+                return ResourceManager.GetString("convert_alpha_tolerance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 通用选项.
+        /// </summary>
+        public static string convert_common_options {
+            get {
+                return ResourceManager.GetString("convert_common_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 默认BPM.
+        /// </summary>
+        public static string convert_default_bpm {
+            get {
+                return ResourceManager.GetString("convert_default_bpm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 缓动切割精度.
+        /// </summary>
+        public static string convert_easing_precision {
+            get {
+                return ResourceManager.GetString("convert_easing_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 判定线过滤.
+        /// </summary>
+        public static string convert_line_filter {
+            get {
+                return ResourceManager.GetString("convert_line_filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 合并层级经典模式.
+        /// </summary>
+        public static string convert_merge_classic {
+            get {
+                return ResourceManager.GetString("convert_merge_classic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 合并层级后压缩.
+        /// </summary>
+        public static string convert_merge_compress {
+            get {
+                return ResourceManager.GetString("convert_merge_compress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 合并层级精度.
+        /// </summary>
+        public static string convert_merge_precision {
+            get {
+                return ResourceManager.GetString("convert_merge_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 多层级合并.
+        /// </summary>
+        public static string convert_merge_section {
+            get {
+                return ResourceManager.GetString("convert_merge_section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 合并层级容差百分比.
+        /// </summary>
+        public static string convert_merge_tolerance {
+            get {
+                return ResourceManager.GetString("convert_merge_tolerance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 转换选项.
+        /// </summary>
+        public static string convert_options_title {
+            get {
+                return ResourceManager.GetString("convert_options_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 转换到 PhiEdit 选项.
+        /// </summary>
+        public static string convert_pe_options {
+            get {
+                return ResourceManager.GetString("convert_pe_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 转换到 PhigrosV3 选项.
+        /// </summary>
+        public static string convert_phigros_options {
+            get {
+                return ResourceManager.GetString("convert_phigros_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 移除绑定UI的判定线.
+        /// </summary>
+        public static string convert_remove_attach_ui {
+            get {
+                return ResourceManager.GetString("convert_remove_attach_ui", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 移除带有自定义材质的判定线.
+        /// </summary>
+        public static string convert_remove_texture {
+            get {
+                return ResourceManager.GetString("convert_remove_texture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 速度事件切割精度.
+        /// </summary>
+        public static string convert_speed_precision {
+            get {
+                return ResourceManager.GetString("convert_speed_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 速度事件值转换比率.
+        /// </summary>
+        public static string convert_speed_ratio {
+            get {
+                return ResourceManager.GetString("convert_speed_ratio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 解绑父线经典模式.
+        /// </summary>
+        public static string convert_unbind_classic {
+            get {
+                return ResourceManager.GetString("convert_unbind_classic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 解绑父线后压缩.
+        /// </summary>
+        public static string convert_unbind_compress {
+            get {
+                return ResourceManager.GetString("convert_unbind_compress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 解绑父线精度.
+        /// </summary>
+        public static string convert_unbind_precision {
+            get {
+                return ResourceManager.GetString("convert_unbind_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 父子线解绑.
+        /// </summary>
+        public static string convert_unbind_section {
+            get {
+                return ResourceManager.GetString("convert_unbind_section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 解绑父线容差百分比.
+        /// </summary>
+        public static string convert_unbind_tolerance {
+            get {
+                return ResourceManager.GetString("convert_unbind_tolerance", resourceCulture);
             }
         }
         
@@ -159,6 +402,69 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 所有文件.
+        /// </summary>
+        public static string file_type_all {
+            get {
+                return ResourceManager.GetString("file_type_all", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JSON 文件.
+        /// </summary>
+        public static string file_type_json {
+            get {
+                return ResourceManager.GetString("file_type_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PhiEdit 谱面.
+        /// </summary>
+        public static string file_type_pe_chart {
+            get {
+                return ResourceManager.GetString("file_type_pe_chart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PhiChain JSON.
+        /// </summary>
+        public static string file_type_phichain_json {
+            get {
+                return ResourceManager.GetString("file_type_phichain_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PhiFans JSON.
+        /// </summary>
+        public static string file_type_phifans_json {
+            get {
+                return ResourceManager.GetString("file_type_phifans_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phigros v3 JSON.
+        /// </summary>
+        public static string file_type_phigros_json {
+            get {
+                return ResourceManager.GetString("file_type_phigros_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RePhiEdit JSON.
+        /// </summary>
+        public static string file_type_rpe_json {
+            get {
+                return ResourceManager.GetString("file_type_rpe_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 文件:.
         /// </summary>
         public static string header_file {
@@ -182,6 +488,15 @@ namespace KaedePhi.Tool.Localization {
         public static string import_button {
             get {
                 return ResourceManager.GetString("import_button", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 选择谱面文件.
+        /// </summary>
+        public static string import_file_picker_title {
+            get {
+                return ResourceManager.GetString("import_file_picker_title", resourceCulture);
             }
         }
         
@@ -303,7 +618,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 正在转换为 KPC....
+        ///   Looks up a localized string similar to 正在转换为中间格式....
         /// </summary>
         public static string log_step_converting {
             get {
@@ -402,6 +717,60 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 全搜索长度阈值.
+        /// </summary>
+        public static string option_full_search_threshold {
+            get {
+                return ResourceManager.GetString("option_full_search_threshold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 保留原事件偏置.
+        /// </summary>
+        public static string option_keep_original_penalty {
+            get {
+                return ResourceManager.GetString("option_keep_original_penalty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 长段回看窗口.
+        /// </summary>
+        public static string option_long_run_window {
+            get {
+                return ResourceManager.GetString("option_long_run_window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 最小值域半宽.
+        /// </summary>
+        public static string option_min_value_range_half {
+            get {
+                return ResourceManager.GetString("option_min_value_range_half", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 最小值域半宽比例.
+        /// </summary>
+        public static string option_min_value_range_half_ratio {
+            get {
+                return ResourceManager.GetString("option_min_value_range_half_ratio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 相位检测精度.
+        /// </summary>
+        public static string option_phase_epsilon {
+            get {
+                return ResourceManager.GetString("option_phase_epsilon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 每拍像素.
         /// </summary>
         public static string option_pixels_per_beat {
@@ -420,6 +789,24 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 值域填充比例.
+        /// </summary>
+        public static string option_range_padding_ratio {
+            get {
+                return ResourceManager.GetString("option_range_padding_ratio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 值域采样点数.
+        /// </summary>
+        public static string option_range_samples {
+            get {
+                return ResourceManager.GetString("option_range_samples", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 每事件采样数.
         /// </summary>
         public static string option_samples_per_event {
@@ -429,7 +816,25 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 容差 (%).
+        ///   Looks up a localized string similar to 段分组容差.
+        /// </summary>
+        public static string option_segment_group_tolerance {
+            get {
+                return ResourceManager.GetString("option_segment_group_tolerance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 段惩罚.
+        /// </summary>
+        public static string option_segment_penalty {
+            get {
+                return ResourceManager.GetString("option_segment_penalty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 容差 (百分比).
         /// </summary>
         public static string option_tolerance {
             get {
@@ -470,6 +875,96 @@ namespace KaedePhi.Tool.Localization {
         public static string processing_title {
             get {
                 return ResourceManager.GetString("processing_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 格式转换.
+        /// </summary>
+        public static string settings_convert {
+            get {
+                return ResourceManager.GetString("settings_convert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 事件切割.
+        /// </summary>
+        public static string settings_cut {
+            get {
+                return ResourceManager.GetString("settings_cut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 事件拟合.
+        /// </summary>
+        public static string settings_fit {
+            get {
+                return ResourceManager.GetString("settings_fit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 层级合并.
+        /// </summary>
+        public static string settings_layermerge {
+            get {
+                return ResourceManager.GetString("settings_layermerge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 最大日志文件数.
+        /// </summary>
+        public static string settings_max_log_files {
+            get {
+                return ResourceManager.GetString("settings_max_log_files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 谱面渲染.
+        /// </summary>
+        public static string settings_render {
+            get {
+                return ResourceManager.GetString("settings_render", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 已恢复默认设置。.
+        /// </summary>
+        public static string settings_reset {
+            get {
+                return ResourceManager.GetString("settings_reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 配置已保存。.
+        /// </summary>
+        public static string settings_saved {
+            get {
+                return ResourceManager.GetString("settings_saved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 默认设置.
+        /// </summary>
+        public static string settings_title {
+            get {
+                return ResourceManager.GetString("settings_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 判定线解绑.
+        /// </summary>
+        public static string settings_unbind {
+            get {
+                return ResourceManager.GetString("settings_unbind", resourceCulture);
             }
         }
         

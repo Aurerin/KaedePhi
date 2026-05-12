@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using KaedePhi.Tool.Gui.ViewModels;
+using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
 namespace KaedePhi.Tool.Gui.Views;
 
@@ -26,12 +27,12 @@ public partial class ImportPage : UserControl
 
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Select Chart File",
+                Title = import_file_picker_title,
                 AllowMultiple = false,
                 FileTypeFilter = new[]
                 {
-                    new FilePickerFileType("JSON Files") { Patterns = new[] { "*.json" } },
-                    new FilePickerFileType("All Files") { Patterns = new[] { "*.*" } }
+                    new FilePickerFileType(file_type_json) { Patterns = new[] { "*.json" } },
+                    new FilePickerFileType(file_type_all) { Patterns = new[] { "*.*" } }
                 }
             });
 

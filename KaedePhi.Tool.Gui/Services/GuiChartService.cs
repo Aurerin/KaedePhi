@@ -86,24 +86,35 @@ public sealed class GuiChartService
             case ChartType.RePhiEdit:
             {
                 var rpeChart = Core.RePhiEdit.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
+                var rpeConverter = new RePhiEditConverter();
+                rpeConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                var kpcConverter = new KaedePhiConverter();
+                kpcConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
                 return ChartPipeline
-                    .From(rpeChart, new RePhiEditConverter(), null)
-                    .To(new KaedePhiConverter(), null);
+                    .From(rpeChart, rpeConverter, null)
+                    .To(kpcConverter, null);
             }
             case ChartType.PhiEdit:
             {
                 var peChart = Core.PhiEdit.Chart.LoadAsync(text).GetAwaiter().GetResult();
                 var peConverter = new PhiEditConverter();
+                peConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                var kpcConverter = new KaedePhiConverter();
+                kpcConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
                 return ChartPipeline
                     .From(peChart, peConverter, new PhiEditToKpcConvertOptions())
-                    .To(new KaedePhiConverter(), null);
+                    .To(kpcConverter, null);
             }
             case ChartType.PhigrosV3:
             {
                 var v3Chart = Core.Phigros.v3.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
+                var v3Converter = new PhigrosV3Converter();
+                v3Converter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                var kpcConverter = new KaedePhiConverter();
+                kpcConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
                 return ChartPipeline
-                    .From(v3Chart, new PhigrosV3Converter(), null)
-                    .To(new KaedePhiConverter(), null);
+                    .From(v3Chart, v3Converter, null)
+                    .To(kpcConverter, null);
             }
             default:
                 throw new NotSupportedException($"Unsupported chart format: {sourceType}");
@@ -124,7 +135,9 @@ public sealed class GuiChartService
         {
             case ChartType.RePhiEdit:
             {
-                var rpeChart = new RePhiEditConverter().FromKpc(chart, new ConvertOption());
+                var rpeConverter = new RePhiEditConverter();
+                rpeConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                var rpeChart = rpeConverter.FromKpc(chart, new ConvertOption());
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
@@ -138,7 +151,9 @@ public sealed class GuiChartService
             }
             case ChartType.PhiEdit:
             {
-                var peChart = new PhiEditConverter().FromKpc(chart, new KpcToPhiEditConvertOptions());
+                var peConverter = new PhiEditConverter();
+                peConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                var peChart = peConverter.FromKpc(chart, new KpcToPhiEditConvertOptions());
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
@@ -152,7 +167,9 @@ public sealed class GuiChartService
             }
             case ChartType.PhigrosV3:
             {
-                var phigrosChart = new PhigrosV3Converter().FromKpc(chart, new KpcToPhigrosV3ConvertOptions());
+                var v3Converter = new PhigrosV3Converter();
+                v3Converter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                var phigrosChart = v3Converter.FromKpc(chart, new KpcToPhigrosV3ConvertOptions());
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
@@ -177,6 +194,7 @@ public sealed class GuiChartService
     {
         _log.Info(string.Format(log_running_tool, tool_unbind_name));
         var unbinder = new KpcJudgeLineUnbinder();
+        unbinder.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         var linesToProcess = new List<int>();
         for (var i = 0; i < chart.JudgeLineList.Count; i++)
         {
@@ -207,6 +225,7 @@ public sealed class GuiChartService
     {
         _log.Info(string.Format(log_running_tool, tool_layermerge_name));
         var processor = new KpcLayerProcessor();
+        processor.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         var totalLines = chart.JudgeLineList.Count;
         for (var li = 0; li < totalLines; li++)
         {
@@ -240,6 +259,7 @@ public sealed class GuiChartService
     {
         _log.Info(string.Format(log_running_tool, tool_cut_name));
         var processor = new KpcLayerProcessor();
+        processor.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         var totalLines = chart.JudgeLineList.Count;
         for (var li = 0; li < totalLines; li++)
         {
@@ -267,14 +287,17 @@ public sealed class GuiChartService
         progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    public void RunFitEvent(Chart chart, double tolerance, IProgress<ToolProgress>? progress = null)
+    public void RunFitEvent(Chart chart, double tolerance, EventFitOptions? fitOptions = null, IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_fit_name));
         var degree = Environment.ProcessorCount;
         var totalLines = chart.JudgeLineList.Count;
-        var doubleFit = new EventFit<double>();
-        var intFit = new EventFit<int>();
-        var floatFit = new EventFit<float>();
+        var doubleFit = new EventFit<double>(fitOptions);
+        var intFit = new EventFit<int>(fitOptions);
+        var floatFit = new EventFit<float>(fitOptions);
+        doubleFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+        intFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+        floatFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
 
         for (var li = 0; li < totalLines; li++)
         {
@@ -332,6 +355,7 @@ public sealed class GuiChartService
             BeatSubdivisions = beatSubdivisions
         };
         var exporter = new KpcChartRenderExporter();
+        exporter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s));
         return exporter.ExportChart(chart, outputDir, options, progress: progress);
     }
 }

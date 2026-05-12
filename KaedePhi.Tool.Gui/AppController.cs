@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
@@ -87,11 +88,14 @@ internal sealed class AppController
 
     private void NavigateToExport()
     {
+        // 直接使用导入时已检测的格式，避免重复加载导致死锁
+        _exportVm.SourceFormat = _toolVm.SourceChartType;
         _exportVm.SelectedFormat = ChartType.RePhiEdit;
         _exportVm.UseStream = false;
         _exportVm.IndentedOutput = false;
         _exportVm.StatusText = string.Empty;
         _exportVm.IsExporting = false;
+        _exportVm.ApplyConversionDefaults(_config.Config.Convert);
         _main.CurrentPage = _exportVm;
     }
 
@@ -137,6 +141,7 @@ internal sealed class AppController
 
             _toolVm.CurrentFileName = System.IO.Path.GetFileName(filePath);
             _toolVm.DetectedFormat = detectedType.ToString();
+            _toolVm.SourceChartType = detectedType;
             _toolVm.SelectedTool = null;
             _toolVm.StatusText = string.Empty;
 
@@ -200,7 +205,14 @@ internal sealed class AppController
                             _toolVm.DisableCompress, toolProgress);
                         break;
                     case "fit":
-                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, toolProgress);
+                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, new EventFitOptions
+                        {
+                            SegmentPenalty = _toolVm.SegmentPenalty,
+                            KeepOriginalPenalty = _toolVm.KeepOriginalPenalty,
+                            FullSearchRunLengthThreshold = _toolVm.FullSearchRunLengthThreshold,
+                            LongRunSearchWindow = _toolVm.LongRunSearchWindow,
+                            PhaseDetectionEpsilon = _toolVm.PhaseDetectionEpsilon
+                        }, toolProgress);
                         break;
                     case "render":
                         _chart.RunRender(kpcChart, _toolVm.PixelsPerBeat,
@@ -242,12 +254,12 @@ internal sealed class AppController
     /// </summary>
     private static (string Extension, string TypeLabel) GetFormatFileInfo(ChartType format) => format switch
     {
-        ChartType.PhiEdit   => ("pec",  "PhiEdit Chart"),
-        ChartType.RePhiEdit => ("json", "RePhiEdit JSON"),
-        ChartType.PhigrosV3 => ("json", "Phigros v3 JSON"),
-        ChartType.PhiFans   => ("json", "PhiFans JSON"),
-        ChartType.PhiChain  => ("json", "PhiChain JSON"),
-        _                   => ("json", "JSON Files")
+        ChartType.PhiEdit   => ("pec",  file_type_pe_chart),
+        ChartType.RePhiEdit => ("json", file_type_rpe_json),
+        ChartType.PhigrosV3 => ("json", file_type_phigros_json),
+        ChartType.PhiFans   => ("json", file_type_phifans_json),
+        ChartType.PhiChain  => ("json", file_type_phichain_json),
+        _                   => ("json", file_type_json)
     };
 
     private async void OnExportExecute()

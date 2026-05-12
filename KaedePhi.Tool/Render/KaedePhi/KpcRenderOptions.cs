@@ -39,6 +39,21 @@ public class KpcRenderOptions
     /// <summary>通道之间的间距</summary>
     public int ChannelPadding { get; set; } = 4;
 
+    /// <summary>采样范围填充比例（用于自动计算值域范围的上下边距）</summary>
+    public double RangePaddingRatio { get; set; } = 0.10;
+
+    /// <summary>每个事件用于值域探测的采样点数</summary>
+    public int RangeSamplesPerEvent { get; set; } = 16;
+
+    /// <summary>段分组容差（相邻事件端点小于此值时视为连续）</summary>
+    public double SegmentGroupTolerance { get; set; } = 1e-6;
+
+    /// <summary>最小值域半宽（当值域接近零时的兜底值）</summary>
+    public double MinValueRangeHalf { get; set; } = 0.1;
+
+    /// <summary>最小值域半宽比例（相对于中心值的比例）</summary>
+    public double MinValueRangeHalfRatio { get; set; } = 0.15;
+
     /// <summary>背景颜色</summary>
     public SKColor BackgroundColor { get; set; } = new(22, 22, 30);
 
