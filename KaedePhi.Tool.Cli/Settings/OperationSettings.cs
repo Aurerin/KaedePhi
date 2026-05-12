@@ -76,15 +76,20 @@ public class OperationSettings : CommandSettings
 
     private static AppConfig LoadOrCreateConfig()
     {
+        AppConfig config;
         if (File.Exists("config.yaml"))
         {
             var text = File.ReadAllText("config.yaml");
-            return YamlDeserializer.Deserialize<AppConfig>(text);
+            config = YamlDeserializer.Deserialize<AppConfig>(text);
+        }
+        else
+        {
+            config = new AppConfig();
+            var yaml = YamlSerializer.Serialize(config);
+            File.WriteAllText("config.yaml", yaml);
         }
 
-        var config = new AppConfig();
-        var yaml = YamlSerializer.Serialize(config);
-        File.WriteAllText("config.yaml", yaml);
+        ConsoleWriter.LogLevel = config.LogLevel;
         return config;
     }
 }

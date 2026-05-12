@@ -28,21 +28,19 @@ namespace KaedePhi.Core.RePhiEdit
                     var eventLayer = judgeLine.EventLayers[index];
                     eventLayer.Anticipation();
                     // 若事件层级0上Alpha事件类别完全为空，则创建一个垫底事件
-                    if (index == 0 && judgeLine.EventLayers.Count == 1)
+                    if (index == 0 && judgeLine.EventLayers.Count == 1 &&
+                        (eventLayer.AlphaEvents is null || eventLayer.AlphaEvents.Count == 0))
                     {
-                        if (eventLayer.AlphaEvents is null || eventLayer.AlphaEvents.Count == 0)
+                        eventLayer.AlphaEvents = new List<Event<int>>
                         {
-                            eventLayer.AlphaEvents = new List<Event<int>>
+                            new()
                             {
-                                new()
-                                {
-                                    StartBeat = new Beat(0),
-                                    EndBeat = new Beat(1),
-                                    StartValue = 0,
-                                    EndValue = 0
-                                }
-                            };
-                        }
+                                StartBeat = new Beat(0),
+                                EndBeat = new Beat(1),
+                                StartValue = 0,
+                                EndValue = 0
+                            }
+                        };
                     }
 
                     eventLayer.Sort();
@@ -51,17 +49,22 @@ namespace KaedePhi.Core.RePhiEdit
                 judgeLine.Extended.Anticipation();
 
                 // 如果判定线上有任何类型的Control组为空或null，则设定一个默认值
-                if (judgeLine.AlphaControls is null || judgeLine.AlphaControls.Count == 0)
+                if (ControlsIsNullOrEmpty(judgeLine.AlphaControls.Cast<ControlBase>().ToList()))
                     judgeLine.AlphaControls = AlphaControl.Default;
-                if (judgeLine.PositionControls is null || judgeLine.PositionControls.Count == 0)
+                if (ControlsIsNullOrEmpty(judgeLine.PositionControls.Cast<ControlBase>().ToList()))
                     judgeLine.PositionControls = XControl.Default;
-                if (judgeLine.SizeControls is null || judgeLine.SizeControls.Count == 0)
+                if (ControlsIsNullOrEmpty(judgeLine.SizeControls.Cast<ControlBase>().ToList()))
                     judgeLine.SizeControls = SizeControl.Default;
-                if (judgeLine.SkewControls is null || judgeLine.SkewControls.Count == 0)
+                if (ControlsIsNullOrEmpty(judgeLine.SkewControls.Cast<ControlBase>().ToList()))
                     judgeLine.SkewControls = SkewControl.Default;
-                if (judgeLine.YControls is null || judgeLine.YControls.Count == 0)
+                if (ControlsIsNullOrEmpty(judgeLine.YControls.Cast<ControlBase>().ToList()))
                     judgeLine.YControls = YControl.Default;
             }
+        }
+
+        private static bool ControlsIsNullOrEmpty(List<ControlBase> controls)
+        {
+            return controls is null || controls.Count == 0;
         }
 
         /// <summary>
@@ -136,13 +139,12 @@ namespace KaedePhi.Core.RePhiEdit
             var chart = JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings) ??
                         throw new InvalidOperationException(
                             "Failed to deserialize Chart from JSON.");
-            foreach (var judgeLine in chart.JudgeLineList)
-            {
-                // 如果这个判定线层级上有null层级，移除它们
-                judgeLine.EventLayers.RemoveAll(layer => layer is null);
-                foreach (var eventLayer in judgeLine.EventLayers)
-                    eventLayer.Sort();
-            }
+            foreach (var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
+                     {
+                         judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                         return judgeLine.EventLayers;
+                     }))
+                eventLayer.Sort();
 
             return chart;
         }
@@ -175,13 +177,12 @@ namespace KaedePhi.Core.RePhiEdit
                         throw new InvalidOperationException(
                             "Failed to deserialize Chart from stream.");
 
-            foreach (var judgeLine in chart.JudgeLineList)
-            {
-                // 如果这个判定线层级上有null层级，移除它们
-                judgeLine.EventLayers.RemoveAll(layer => layer is null);
-                foreach (var eventLayer in judgeLine.EventLayers)
-                    eventLayer.Sort();
-            }
+            foreach (var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
+                     {
+                         judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                         return judgeLine.EventLayers;
+                     }))
+                eventLayer.Sort();
 
             return chart;
         }
@@ -208,13 +209,12 @@ namespace KaedePhi.Core.RePhiEdit
                             throw new InvalidOperationException(
                                 "Failed to deserialize Chart from stream.");
 
-                foreach (var judgeLine in chart.JudgeLineList)
-                {
-                    // 如果这个判定线层级上有null层级，移除它们
-                    judgeLine.EventLayers.RemoveAll(layer => layer is null);
-                    foreach (var eventLayer in judgeLine.EventLayers)
-                        eventLayer.Sort();
-                }
+                foreach (var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
+                         {
+                             judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                             return judgeLine.EventLayers;
+                         }))
+                    eventLayer.Sort();
 
                 return Task.FromResult(chart);
             }

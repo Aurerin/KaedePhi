@@ -10,7 +10,7 @@ namespace KaedePhi.Tool.Converter.RePhiEdit;
 /// </summary>
 public class RePhiEditConverter : LoggableBase, IChartConverter<Rpe.Chart, Unit?, ConvertOption>
 {
-    public Kpc.Chart ToKpc(Rpe.Chart source, Unit? _ = null) => new()
+    public Kpc.Chart ToKpc(Rpe.Chart source, Unit? _) => new()
     {
         BpmList = source.BpmList.ConvertAll(ConvertBpmItem),
         Meta = Meta.ConvertMeta(source.Meta),

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
@@ -321,10 +320,10 @@ namespace KaedePhi.Core.KaedePhi
             else if (typeof(T) == typeof(byte[]))
             {
                 // byte[]需要深拷贝
-                clone.StartValue = EqualityComparer<T>.Default.Equals(StartValue, default)
+                clone.StartValue = !Equals(StartValue, default(T))
                     ? (T)(object)((byte[])(object)StartValue).ToArray()
                     : default;
-                clone.EndValue = EqualityComparer<T>.Default.Equals(EndValue, default)
+                clone.EndValue = !Equals(EndValue, default(T))
                     ? (T)(object)((byte[])(object)EndValue).ToArray()
                     : default;
             }

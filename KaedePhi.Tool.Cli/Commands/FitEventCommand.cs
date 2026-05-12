@@ -35,12 +35,11 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
         s.Tolerance ??= c.Tolerance;
         s.DryRun ??= c.DryRun;
 
-        var writer = new ConsoleWriter();
         var svc = new ChartService();
         var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
         if (nrc == null)
         {
-            writer.Error(CliLocalizationString.err_unimplemented);
+            ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
             return 1;
         }
 
@@ -59,10 +58,10 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
         var myFitter = new EventFit<double>(fitOptions);
         var alFitter = new EventFit<int>(fitOptions);
         var roFitter = new EventFit<double>(fitOptions);
-        mxFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
-        myFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
-        alFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
-        roFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
+        mxFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
+        myFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
+        alFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
+        roFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
 
         var degree = Math.Max(1, Environment.ProcessorCount);
         var tol = s.Tolerance ?? 0.5d;
@@ -90,7 +89,7 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 
         var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
             s.DryRun ?? false, cancellationToken);
-        writer.Info(string.Format(CliLocalizationString.msg_written, output));
+        ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
         return 0;
     }
 }

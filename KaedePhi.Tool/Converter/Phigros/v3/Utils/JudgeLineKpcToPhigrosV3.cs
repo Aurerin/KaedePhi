@@ -97,11 +97,13 @@ public class JudgeLineKpcToPhigrosV3
 
     private void WarnIfUnsupportedJudgeLineFields(KpcJudgeLine src)
     {
+        var textureRemoveHint  = _options.LineFilter.RemoveTextureLine  ? "判定线将被自动移除。" : "";
+        var attachUiRemoveHint = _options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "";
+
         if (!string.Equals(src.Name, "Untitled", StringComparison.Ordinal))
             Warn($"PhigrosV3 不支持 JudgeLine.Name（值='{src.Name}'）");
         if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
-            Warn(
-                $"PhigrosV3 不支持 JudgeLine.Texture（值='{src.Texture}'），{(_options.LineFilter.RemoveTextureLine ? "判定线将被自动移除。" : "")}");
+            Warn($"PhigrosV3 不支持 JudgeLine.Texture（值='{src.Texture}'），{textureRemoveHint}");
         if (!IsDefaultAnchor(src.Anchor))
             Warn($"PhigrosV3 不支持 JudgeLine.Anchor（值='[{string.Join(", ", src.Anchor)}]'）");
         if (src.Father != -1)
@@ -111,13 +113,20 @@ public class JudgeLineKpcToPhigrosV3
         if (src.ZOrder != 0)
             Warn($"PhigrosV3 不支持 JudgeLine.ZOrder（值={src.ZOrder}）");
         if (src.AttachUi.HasValue)
-            Warn(
-                $"PhigrosV3 不支持 JudgeLine.AttachUi（值={(int)src.AttachUi.Value}）{(_options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "")}");
+            Warn($"PhigrosV3 不支持 JudgeLine.AttachUi（值={(int)src.AttachUi.Value}）{attachUiRemoveHint}");
         if (src.IsGif)
             Warn($"PhigrosV3 不支持 JudgeLine.IsGif（值={src.IsGif}）");
         if (src.RotateWithFather)
             Warn($"PhigrosV3 不支持 JudgeLine.RotateWithFather（值={src.RotateWithFather}）");
 
+        WarnIfUnsupportedControlFields(src);
+    }
+
+    /// <summary>
+    /// 检查判定线中 PhigrosV3 不支持的控件字段，并逐项告警。
+    /// </summary>
+    private void WarnIfUnsupportedControlFields(KpcJudgeLine src)
+    {
         if (HasNonDefaultExtendLayer(src.Extended))
             Warn("PhigrosV3 不支持 JudgeLine.Extended（包含非默认数据）");
         if (!IsDefaultControls(src.PositionControls))
@@ -132,7 +141,7 @@ public class JudgeLineKpcToPhigrosV3
             Warn("PhigrosV3 不支持 JudgeLine.YControls（包含非默认数据）");
     }
 
-    private static bool HasNonDefaultExtendLayer(global::KaedePhi.Core.KaedePhi.ExtendLayer? layer)
+    private static bool HasNonDefaultExtendLayer(Kpc.ExtendLayer? layer)
         => layer != null
            && ((layer.ColorEvents?.Count ?? 0) > 0
                || (layer.ScaleXEvents?.Count ?? 0) > 0

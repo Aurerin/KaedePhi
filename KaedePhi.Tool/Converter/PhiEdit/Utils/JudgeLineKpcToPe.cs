@@ -48,7 +48,6 @@ public class JudgeLineKpcToPe
 
         if (trueSrc.Father != -1)
         {
-            Warn($"PE 不支持 JudgeLine.Father（值={src.Father}），将自动解除父子绑定");
             var unbinder = new KpcJudgeLineUnbinder();
             if (_options.FatherLineUnbind.ClassicMode)
             {
@@ -73,11 +72,11 @@ public class JudgeLineKpcToPe
     /// </summary>
     private void WarnIfUnsupportedJudgeLineFields(KpcJudgeLine src)
     {
-        if (!string.Equals(src.Name, "Untitled", StringComparison.Ordinal))
-            Warn($"PE 不支持 JudgeLine.Name（值='{src.Name}'）");
+        var textureRemoveHint  = _options.LineFilter.RemoveTextureLine  ? "，判定线将被自动移除。" : "。";
+        var attachUiRemoveHint = _options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "。";
+
         if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
-            Warn(
-                $"PE 不支持 JudgeLine.Texture（值='{src.Texture}'），{(_options.LineFilter.RemoveTextureLine ? "，判定线将被自动移除。" : "。")}");
+            Warn($"PE 不支持 JudgeLine.Texture（值='{src.Texture}'），{textureRemoveHint}");
         if (!IsDefaultAnchor(src.Anchor))
             Warn($"PE 不支持 JudgeLine.Anchor（值='[{string.Join(", ", src.Anchor)}]'）");
         if (src.Father != -1)
@@ -87,14 +86,20 @@ public class JudgeLineKpcToPe
         if (src.ZOrder != 0)
             Warn($"PE 不支持 JudgeLine.ZOrder（值={src.ZOrder}）");
         if (src.AttachUi.HasValue)
-            Warn(
-                $"PE 不支持 JudgeLine.AttachUi（值={(int)src.AttachUi.Value}）{(_options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "。")}"
-            );
+            Warn($"PE 不支持 JudgeLine.AttachUi（值={(int)src.AttachUi.Value}）{attachUiRemoveHint}");
         if (src.IsGif)
             Warn($"PE 不支持 JudgeLine.IsGif（值={src.IsGif}）");
         if (Math.Abs(src.BpmFactor - 1f) > FloatEpsilon)
             Warn($"PE 不支持 JudgeLine.BpmFactor（值={src.BpmFactor}）");
 
+        WarnIfUnsupportedControlFields(src);
+    }
+
+    /// <summary>
+    /// 检查判定线中 PE 不支持的控件字段，并逐项告警。
+    /// </summary>
+    private void WarnIfUnsupportedControlFields(KpcJudgeLine src)
+    {
         if (HasNonDefaultExtendLayer(src.Extended))
             Warn("PE 不支持 JudgeLine.Extended（包含非默认数据）");
         if (!IsDefaultXControls(src.PositionControls))

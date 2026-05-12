@@ -23,7 +23,8 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
             Meta = Meta.ConvertMeta(input),
             JudgeLineList = input.JudgeLineList?
                 .Select((j, i) =>
-                    JudgeLine.ConvertJudgeLine(j, i, input.JudgeLineList.Count > 0 ? input.JudgeLineList[0].Bpm : DefaultPhigrosBpm))
+                    JudgeLine.ConvertJudgeLine(j, i,
+                        input.JudgeLineList.Count > 0 ? input.JudgeLineList[0].Bpm : DefaultPhigrosBpm))
                 .ToList() ?? []
         };
     }
@@ -52,29 +53,20 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
     {
         var maxBeat = 0d;
 
-        if (input.JudgeLineList is { Count: > 0 })
+        if (input.JudgeLineList is not { Count: > 0 }) return (float)(maxBeat * 32) + 1f;
+        foreach (var line in input.JudgeLineList)
         {
-            foreach (var line in input.JudgeLineList)
-            {
-                if (line.Notes is { Count: > 0 })
-                {
-                    foreach (var note in line.Notes)
-                    {
-                        maxBeat = Math.Max(maxBeat, (double)note.EndBeat);
-                    }
-                }
+            if (line.Notes is { Count: > 0 })
+                maxBeat = line.Notes.Select(note => (double)note.EndBeat).Prepend(maxBeat).Max();
 
-                if (line.EventLayers is { Count: > 0 })
-                {
-                    foreach (var layer in line.EventLayers)
-                    {
-                        maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.MoveXEvents));
-                        maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.MoveYEvents));
-                        maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.RotateEvents));
-                        maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.AlphaEvents));
-                        maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.SpeedEvents));
-                    }
-                }
+            if (line.EventLayers is not { Count: > 0 }) continue;
+            foreach (var layer in line.EventLayers)
+            {
+                maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.MoveXEvents));
+                maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.MoveYEvents));
+                maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.RotateEvents));
+                maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.AlphaEvents));
+                maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.SpeedEvents));
             }
         }
 

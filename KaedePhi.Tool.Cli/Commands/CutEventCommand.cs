@@ -19,12 +19,11 @@ public sealed class CutEventCommand : AsyncCommand<CutEventCommand.Settings>
         s.DisableCompress ??= c.DisableCompress;
         s.DryRun ??= c.DryRun;
 
-        var writer = new ConsoleWriter();
         var svc = new ChartService();
         var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
         if (nrc == null)
         {
-            writer.Error(CliLocalizationString.err_unimplemented);
+            ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
             return 1;
         }
 
@@ -48,7 +47,7 @@ public sealed class CutEventCommand : AsyncCommand<CutEventCommand.Settings>
 
         var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
             s.DryRun ?? false, cancellationToken);
-        writer.Info(string.Format(CliLocalizationString.msg_written, output));
+        ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
         return 0;
     }
 }

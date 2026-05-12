@@ -131,11 +131,10 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         s.FormatOutput ??= c.FormatOutput;
         s.DryRun ??= c.DryRun;
 
-        var writer = new ConsoleWriter();
         var svc = new ChartService();
 
         var kpc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (kpc == null) { writer.Error(CliLocalizationString.err_unimplemented); return 1; }
+        if (kpc == null) { ConsoleWriter.Error(CliLocalizationString.err_unimplemented); return 1; }
 
         var output = svc.ResolveOutputPath(s.Input, s.Output, s.Workspace);
 
@@ -224,11 +223,17 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         };
 
         var result = await ChartService.SaveAsAsync(kpc, output, s.TargetType ?? ChartType.RePhiEdit,
-            s.StreamOutput ?? false, s.FormatOutput ?? false, s.DryRun ?? false, cancellationToken,
-            peOptions, phigrosOptions);
+            new SaveAsOptions
+            {
+                Stream = s.StreamOutput ?? false,
+                Format = s.FormatOutput ?? false,
+                DryRun = s.DryRun ?? false,
+                PhiEditOptions = peOptions,
+                PhigrosOptions = phigrosOptions
+            }, cancellationToken);
 
-        if (result == null) { writer.Warn(CliLocalizationString.warn_rpe_convert); return 2; }
-        writer.Info(string.Format(CliLocalizationString.msg_written, result));
+        if (result == null) { ConsoleWriter.Warn(CliLocalizationString.warn_rpe_convert); return 2; }
+        ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, result));
         return 0;
     }
 }

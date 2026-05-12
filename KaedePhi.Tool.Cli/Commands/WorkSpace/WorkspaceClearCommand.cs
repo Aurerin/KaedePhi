@@ -13,10 +13,9 @@ public sealed class WorkspaceClearCommand : Command<WorkspaceClearCommand.Settin
 
     protected override int Execute(CommandContext context, Settings settings,CancellationToken cancellationToken)
     {
-        var writer = new ConsoleWriter();
         var ws = new WorkspaceService();
         ws.Clear(settings.Id);
-        writer.Info(CliLocalizationString.msg_cleared);
+        ConsoleWriter.Info(CliLocalizationString.msg_cleared);
         return 0;
     }
 }

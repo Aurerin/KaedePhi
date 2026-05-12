@@ -1,5 +1,4 @@
-﻿using System;
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.RePhiEdit
@@ -8,14 +7,6 @@ namespace KaedePhi.Core.RePhiEdit
     {
         [JsonProperty("bpm")]
         public float Bpm { get; set; } = 120f;
-
-        [JsonIgnore]
-        [Obsolete("拍与时间容易产生歧义，未来将会改为StartBeat", false)]
-        public Beat StartTime
-        {
-            get => StartBeat;
-            set => StartBeat = value;
-        }
 
         [JsonProperty("startTime")] 
         public Beat StartBeat { get; set; } = new(BeatArray);
@@ -29,10 +20,5 @@ namespace KaedePhi.Core.RePhiEdit
                 StartBeat = new Beat((int[])StartBeat)
             };
         }
-    }
-
-    [Obsolete("由于Bpm类名容易产生争议，请改用BpmItem", false)]
-    public class Bpm : BpmItem
-    {
     }
 }

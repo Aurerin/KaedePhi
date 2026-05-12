@@ -12,6 +12,27 @@ using Chart = KaedePhi.Core.KaedePhi.Chart;
 namespace KaedePhi.Tool.Cli.Infrastructure;
 
 /// <summary>
+/// <see cref="ChartService.SaveAsAsync"/> 的导出选项。
+/// </summary>
+public sealed record SaveAsOptions
+{
+    /// <summary>是否使用流式写入（适合大文件）。</summary>
+    public bool Stream { get; init; }
+
+    /// <summary>是否格式化 JSON 输出。</summary>
+    public bool Format { get; init; }
+
+    /// <summary>演习模式：不实际写文件，仅返回目标路径。</summary>
+    public bool DryRun { get; init; }
+
+    /// <summary>PhiEdit 转换选项（仅 <see cref="ChartType.PhiEdit"/> 时生效）。</summary>
+    public KpcToPhiEditConvertOptions? PhiEditOptions { get; init; }
+
+    /// <summary>Phigros v3 转换选项（仅 <see cref="ChartType.PhigrosV3"/> 时生效）。</summary>
+    public KpcToPhigrosV3ConvertOptions? PhigrosOptions { get; init; }
+}
+
+/// <summary>
 /// 谱面加载、格式检测与导出服务。
 /// </summary>
 public sealed class ChartService
@@ -75,7 +96,7 @@ public sealed class ChartService
                     .To(kaedePhiConverter, null);
             }
 
-        
+
             default:
                 return null;
         }
@@ -106,33 +127,33 @@ public sealed class ChartService
 
     /// <summary>将 KPC 谱面导出为目标格式并写入。</summary>
     public static async Task<string?> SaveAsAsync(Chart chart, string outputPath, ChartType target,
-        bool stream, bool format, bool dryRun, CancellationToken ct = default,
-        KpcToPhiEditConvertOptions? peOptions = null,
-        KpcToPhigrosV3ConvertOptions? phigrosOptions = null)
+        SaveAsOptions options, CancellationToken ct = default)
     {
+        if (options.DryRun)
+            return target is ChartType.RePhiEdit or ChartType.PhiEdit or ChartType.PhigrosV3 ? outputPath : null;
         switch (target)
         {
             case ChartType.RePhiEdit:
             {
                 var rpeChart = new RePhiEditConverter().FromKpc(chart, new ConvertOption());
-                if (dryRun) return outputPath;
-                if (stream)
+
+                if (options.Stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
-                    await rpeChart.ExportToJsonStreamAsync(s, format);
+                    await rpeChart.ExportToJsonStreamAsync(s, options.Format);
                 }
                 else
                 {
-                    await File.WriteAllTextAsync(outputPath, await rpeChart.ExportToJsonAsync(format), ct);
+                    await File.WriteAllTextAsync(outputPath, await rpeChart.ExportToJsonAsync(options.Format), ct);
                 }
 
                 return outputPath;
             }
             case ChartType.PhiEdit:
             {
-                var peChart = new PhiEditConverter().FromKpc(chart, peOptions ?? new KpcToPhiEditConvertOptions());
-                if (dryRun) return outputPath;
-                if (stream)
+                var peChart = new PhiEditConverter().FromKpc(chart,
+                    options.PhiEditOptions ?? new KpcToPhiEditConvertOptions());
+                if (options.Stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
                     await peChart.ExportToStreamAsync(s);
@@ -146,16 +167,16 @@ public sealed class ChartService
             }
             case ChartType.PhigrosV3:
             {
-                var phigrosChart = new PhigrosV3Converter().FromKpc(chart, phigrosOptions ?? new KpcToPhigrosV3ConvertOptions());
-                if (dryRun) return outputPath;
-                if (stream)
+                var phigrosChart = new PhigrosV3Converter().FromKpc(chart,
+                    options.PhigrosOptions ?? new KpcToPhigrosV3ConvertOptions());
+                if (options.Stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
-                    await phigrosChart.ExportToJsonStreamAsync(s, format);
+                    await phigrosChart.ExportToJsonStreamAsync(s, options.Format);
                 }
                 else
                 {
-                    await File.WriteAllTextAsync(outputPath, await phigrosChart.ExportToJsonAsync(format), ct);
+                    await File.WriteAllTextAsync(outputPath, await phigrosChart.ExportToJsonAsync(options.Format), ct);
                 }
 
                 return outputPath;

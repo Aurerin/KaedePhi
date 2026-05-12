@@ -16,14 +16,13 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
         s.Classic ??= c.ClassicMode;
         s.DryRun ??= c.DryRun;
 
-        var writer = new ConsoleWriter();
         var svc = new ChartService();
         var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (nrc == null) { writer.Error(CliLocalizationString.err_unimplemented); return 1; }
+        if (nrc == null) { ConsoleWriter.Error(CliLocalizationString.err_unimplemented); return 1; }
 
         var nrcCopy = nrc.Clone();
         var unbinder = new KpcJudgeLineUnbinder();
-        unbinder.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
+        unbinder.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
 
         for (var i = 0; i < nrc.JudgeLineList.Count; i++)
         {
@@ -34,7 +33,7 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
         }
 
         var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace), s.DryRun ?? false, cancellationToken);
-        writer.Info(string.Format(CliLocalizationString.msg_written, output));
+        ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
         return 0;
     }
 }
