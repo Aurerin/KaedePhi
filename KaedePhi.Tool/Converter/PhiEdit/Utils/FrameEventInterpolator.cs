@@ -9,13 +9,14 @@ namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 /// </summary>
 public class FrameEventInterpolator
 {
-    private const double TrailingBeatPadding = 1d / 64d;
+    private readonly double _trailingBeatPadding;
     private readonly double _frameDurationBeat;
     private const double BeatComparisonEpsilon = 1e-6d;
 
     public FrameEventInterpolator(PhiEditToKpcConvertOptions options)
     {
         _frameDurationBeat = options.FrameDurationBeat;
+        _trailingBeatPadding = options.TrailingBeatPadding;
     }
 
     /// <summary>
@@ -36,7 +37,7 @@ public class FrameEventInterpolator
             GetMaxBeat(src.RotateEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })));
         maxBeat = Math.Max(maxBeat,
             GetMaxBeat(src.AlphaEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })));
-        return maxBeat + TrailingBeatPadding;
+        return maxBeat + _trailingBeatPadding;
     }
 
     /// <summary>
@@ -174,7 +175,7 @@ public class FrameEventInterpolator
         foreach (var beat in eventBoundaries) boundaries.Add(beat);
         if (boundaries.Count == 0) return [];
 
-        boundaries.Add(Math.Max(horizonBeat, boundaries.Max + TrailingBeatPadding));
+        boundaries.Add(Math.Max(horizonBeat, boundaries.Max + _trailingBeatPadding));
         return boundaries.ToList();
     }
 

@@ -78,20 +78,21 @@ public static class KpcEventChannelRenderer
     {
         return
         [
-            BuildChannel("MoveX", opts.MoveXColor, layer.MoveXEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b))),
-            BuildChannel("MoveY", opts.MoveYColor, layer.MoveYEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b))),
-            BuildChannel("Rotate", opts.RotateColor, layer.RotateEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b))),
-            BuildChannel("Alpha", opts.AlphaColor, layer.AlphaEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b))),
-            BuildChannel("Speed", opts.SpeedColor, layer.SpeedEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b))),
+            BuildChannel("MoveX", opts.MoveXColor, layer.MoveXEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
+            BuildChannel("MoveY", opts.MoveYColor, layer.MoveYEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
+            BuildChannel("Rotate", opts.RotateColor, layer.RotateEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
+            BuildChannel("Alpha", opts.AlphaColor, layer.AlphaEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
+            BuildChannel("Speed", opts.SpeedColor, layer.SpeedEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
         ];
     }
 
     private static ChannelData BuildChannel<T>(
         string name, SKColor color,
         List<Kpc.Event<T>>? events,
-        Func<Kpc.Event<T>, Beat, double> getValue)
+        Func<Kpc.Event<T>, Beat, double> getValue,
+        KpcRenderOptions opts)
     {
-        var (minVal, maxVal) = SampleEventRange(events, getValue);
+        var (minVal, maxVal) = SampleEventRange(events, getValue, opts);
         var list = new List<(double, double, Func<double, double>)>();
         if (events != null)
         {
@@ -109,8 +110,7 @@ public static class KpcEventChannelRenderer
     private static (double min, double max) SampleEventRange<T>(
         List<Kpc.Event<T>>? events,
         Func<Kpc.Event<T>, Beat, double> getValue,
-        double paddingRatio = 0.10,
-        int samplesPerEvent = 16)
+        KpcRenderOptions opts)
     {
         if (events == null || events.Count == 0) return (-1.0, 1.0);
 
@@ -121,9 +121,9 @@ public static class KpcEventChannelRenderer
             double sb = evt.StartBeat, eb = evt.EndBeat;
             if (eb <= sb) continue;
 
-            for (var i = 0; i <= samplesPerEvent; i++)
+            for (var i = 0; i <= opts.RangeSamplesPerEvent; i++)
             {
-                var t = (double)i / samplesPerEvent;
+                var t = (double)i / opts.RangeSamplesPerEvent;
                 var val = getValue(evt, new Beat(sb + t * (eb - sb)));
                 if (val < mn) mn = val;
                 if (val > mx) mx = val;
@@ -134,11 +134,11 @@ public static class KpcEventChannelRenderer
 
         if (mx - mn < 1e-9)
         {
-            double c = (mn + mx) / 2.0, half = Math.Max(Math.Abs(c) * 0.15, 0.1);
+            double c = (mn + mx) / 2.0, half = Math.Max(Math.Abs(c) * opts.MinValueRangeHalfRatio, opts.MinValueRangeHalf);
             return (c - half, c + half);
         }
 
-        var pad = (mx - mn) * paddingRatio;
+        var pad = (mx - mn) * opts.RangePaddingRatio;
         return (mn - pad, mx + pad);
     }
 
@@ -171,7 +171,7 @@ public static class KpcEventChannelRenderer
 
     private static List<Segment> GroupSegments(
         List<(double Start, double End, Func<double, double> GetValue)> events,
-        double tolerance = 1e-6)
+        KpcRenderOptions opts)
     {
         var result = new List<Segment>();
         if (events.Count == 0) return result;
@@ -180,24 +180,21 @@ public static class KpcEventChannelRenderer
 
         for (var i = 1; i < events.Count; i++)
         {
-            if (Math.Abs(events[i - 1].End - events[i].Start) < tolerance)
+            if (Math.Abs(events[i - 1].End - events[i].Start) < opts.SegmentGroupTolerance)
                 group.Add(events[i]);
             else
             {
-                result.Add(BuildSegment(group));
+                result.Add(BuildSegment(group, opts));
                 group = [events[i]];
             }
         }
 
-        result.Add(BuildSegment(group));
+        result.Add(BuildSegment(group, opts));
         return result;
     }
 
-    private static Segment BuildSegment(List<(double Start, double End, Func<double, double> GetValue)> group)
+    private static Segment BuildSegment(List<(double Start, double End, Func<double, double> GetValue)> group, KpcRenderOptions opts)
     {
-        const double paddingRatio = 0.10;
-        const int samplesPerEvent = 16;
-
         double epMn = double.MaxValue, epMx = double.MinValue;
         double smMn = double.MaxValue, smMx = double.MinValue;
 
@@ -210,9 +207,9 @@ public static class KpcEventChannelRenderer
             if (v2 > epMx) epMx = v2;
 
             if (e <= s) continue;
-            for (var i = 0; i <= samplesPerEvent; i++)
+            for (var i = 0; i <= opts.RangeSamplesPerEvent; i++)
             {
-                var val = get(s + (double)i / samplesPerEvent * (e - s));
+                var val = get(s + (double)i / opts.RangeSamplesPerEvent * (e - s));
                 if (val < smMn) smMn = val;
                 if (val > smMx) smMx = val;
             }
@@ -225,13 +222,13 @@ public static class KpcEventChannelRenderer
         double renderMin, renderMax;
         if (smRange < 1e-9)
         {
-            double c = (smMn + smMx) / 2.0, half = Math.Max(Math.Abs(c) * 0.15, 0.1);
+            double c = (smMn + smMx) / 2.0, half = Math.Max(Math.Abs(c) * opts.MinValueRangeHalfRatio, opts.MinValueRangeHalf);
             renderMin = c - half;
             renderMax = c + half;
         }
         else
         {
-            var pad = smRange * paddingRatio;
+            var pad = smRange * opts.RangePaddingRatio;
             renderMin = smMn - pad;
             renderMax = smMx + pad;
         }
@@ -323,7 +320,7 @@ public static class KpcEventChannelRenderer
     {
         if (ch.Events.Count == 0) return;
 
-        var segments = GroupSegments(ch.Events);
+        var segments = GroupSegments(ch.Events, opts);
 
         using var blockPaint = new SKPaint();
         blockPaint.Color = opts.EventBlockColor;

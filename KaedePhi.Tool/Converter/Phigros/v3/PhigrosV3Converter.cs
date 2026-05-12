@@ -8,6 +8,11 @@ namespace KaedePhi.Tool.Converter.Phigros.v3;
 
 public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Unit?, KpcToPhigrosV3ConvertOptions>
 {
+    /// <summary>
+    /// Phigros 格式默认 BPM（当谱面未提供 BPM 时使用）。
+    /// </summary>
+    private const float DefaultPhigrosBpm = 120f;
+
     public Kpc.Chart ToKpc(PhigrosChart input, Unit? options)
     {
         ArgumentNullException.ThrowIfNull(input);
@@ -18,7 +23,7 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
             Meta = Meta.ConvertMeta(input),
             JudgeLineList = input.JudgeLineList?
                 .Select((j, i) =>
-                    JudgeLine.ConvertJudgeLine(j, i, input.JudgeLineList.Count > 0 ? input.JudgeLineList[0].Bpm : 120))
+                    JudgeLine.ConvertJudgeLine(j, i, input.JudgeLineList.Count > 0 ? input.JudgeLineList[0].Bpm : DefaultPhigrosBpm))
                 .ToList() ?? []
         };
     }
@@ -30,7 +35,7 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
 
         WarnIfUnsupportedMeta(input.Meta);
 
-        var globalBpm = input.BpmList is { Count: > 0 } ? input.BpmList[0].Bpm : 120f;
+        var globalBpm = input.BpmList is { Count: > 0 } ? input.BpmList[0].Bpm : options.DefaultBpm;
         var chartEndBeat = CalculateChartEndBeat(input);
 
         var judgeLineConverter = new JudgeLineKpcToPhigrosV3(options, globalBpm, chartEndBeat, OnWarning);

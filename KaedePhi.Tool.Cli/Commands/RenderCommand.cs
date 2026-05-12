@@ -31,6 +31,26 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         [CommandOption("--layer <INDEX>")]
         [LocalizedDescription("render_opt_layer")]
         public int? LayerIndex { get; set; }
+
+        [CommandOption("--range-padding-ratio <N>")]
+        [LocalizedDescription("render_opt_range_padding_ratio")]
+        public double? RangePaddingRatio { get; set; }
+
+        [CommandOption("--range-samples <N>")]
+        [LocalizedDescription("render_opt_range_samples")]
+        public int? RangeSamplesPerEvent { get; set; }
+
+        [CommandOption("--segment-tolerance <N>")]
+        [LocalizedDescription("render_opt_segment_tolerance")]
+        public double? SegmentGroupTolerance { get; set; }
+
+        [CommandOption("--min-range-half <N>")]
+        [LocalizedDescription("render_opt_min_range_half")]
+        public double? MinValueRangeHalf { get; set; }
+
+        [CommandOption("--min-range-half-ratio <N>")]
+        [LocalizedDescription("render_opt_min_range_half_ratio")]
+        public double? MinValueRangeHalfRatio { get; set; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
@@ -62,6 +82,11 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
             ChannelWidth = s.ChannelWidth ?? 150,
             SamplesPerEvent = s.SamplesPerEvent ?? 64,
             BeatSubdivisions = s.BeatSubdivisions ?? 2,
+            RangePaddingRatio = s.RangePaddingRatio ?? c.RangePaddingRatio,
+            RangeSamplesPerEvent = s.RangeSamplesPerEvent ?? c.RangeSamplesPerEvent,
+            SegmentGroupTolerance = s.SegmentGroupTolerance ?? c.SegmentGroupTolerance,
+            MinValueRangeHalf = s.MinValueRangeHalf ?? c.MinValueRangeHalf,
+            MinValueRangeHalfRatio = s.MinValueRangeHalfRatio ?? c.MinValueRangeHalfRatio
         };
 
         var exporter = new KpcChartRenderExporter();

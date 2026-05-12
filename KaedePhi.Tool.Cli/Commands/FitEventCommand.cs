@@ -6,7 +6,28 @@ namespace KaedePhi.Tool.Cli.Commands;
 
 public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 {
-    public sealed class Settings : OperationSettings;
+    public sealed class Settings : OperationSettings
+    {
+        [CommandOption("--segment-penalty <N>")]
+        [LocalizedDescription("fit_opt_segment_penalty")]
+        public double? SegmentPenalty { get; set; }
+
+        [CommandOption("--keep-original-penalty <N>")]
+        [LocalizedDescription("fit_opt_keep_original_penalty")]
+        public double? KeepOriginalPenalty { get; set; }
+
+        [CommandOption("--full-search-threshold <N>")]
+        [LocalizedDescription("fit_opt_full_search_threshold")]
+        public int? FullSearchRunLengthThreshold { get; set; }
+
+        [CommandOption("--search-window <N>")]
+        [LocalizedDescription("fit_opt_search_window")]
+        public int? LongRunSearchWindow { get; set; }
+
+        [CommandOption("--phase-epsilon <N>")]
+        [LocalizedDescription("fit_opt_phase_epsilon")]
+        public double? PhaseDetectionEpsilon { get; set; }
+    }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
     {
@@ -25,10 +46,19 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 
         var nrcCopy = nrc.Clone();
 
-        var mxFitter = new EventFit<double>();
-        var myFitter = new EventFit<double>();
-        var alFitter = new EventFit<int>();
-        var roFitter = new EventFit<double>();
+        var fitOptions = new EventFitOptions
+        {
+            SegmentPenalty = s.SegmentPenalty ?? c.SegmentPenalty,
+            KeepOriginalPenalty = s.KeepOriginalPenalty ?? c.KeepOriginalPenalty,
+            FullSearchRunLengthThreshold = s.FullSearchRunLengthThreshold ?? c.FullSearchRunLengthThreshold,
+            LongRunSearchWindow = s.LongRunSearchWindow ?? c.LongRunSearchWindow,
+            PhaseDetectionEpsilon = s.PhaseDetectionEpsilon ?? c.PhaseDetectionEpsilon
+        };
+
+        var mxFitter = new EventFit<double>(fitOptions);
+        var myFitter = new EventFit<double>(fitOptions);
+        var alFitter = new EventFit<int>(fitOptions);
+        var roFitter = new EventFit<double>(fitOptions);
         mxFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
         myFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);
         alFitter.SubscribeLog(info: writer.Info, warning: writer.Warn, error: writer.Error, debug: writer.Info);

@@ -4,36 +4,42 @@ public class KpcToPhigrosV3ConvertOptions
 {
     public const double DefaultPrecision = 64d;
     public const double DefaultTolerancePercent = 0.1d;
+    public const float DefaultGlobalBpm = 120f;
+
+    /// <summary>
+    /// 当谱面 BPM 列表为空时使用的默认全局 BPM。
+    /// </summary>
+    public float DefaultBpm { get; set; } = DefaultGlobalBpm;
 
     /// <summary>
     /// 事件切割相关配置
     /// </summary>
-    public CuttingOptions Cutting { get; } = new();
+    public CuttingOptions Cutting { get; set; } = new();
 
     /// <summary>
     /// Alpha 事件相关配置
     /// </summary>
-    public AlphaOptions Alpha { get; } = new();
+    public AlphaOptions Alpha { get; set; } = new();
 
     /// <summary>
     /// 速度事件相关配置
     /// </summary>
-    public SpeedOptions Speed { get; } = new();
+    public SpeedOptions Speed { get; set; } = new();
 
     /// <summary>
     /// 父子线解绑相关配置
     /// </summary>
-    public FatherLineUnbindOptions FatherLineUnbind { get; } = new();
+    public FatherLineUnbindOptions FatherLineUnbind { get; set; } = new();
 
     /// <summary>
     /// 多层级合并相关配置
     /// </summary>
-    public MultiLayerMergeOptions MultiLayerMerge { get; } = new();
+    public MultiLayerMergeOptions MultiLayerMerge { get; set; } = new();
 
     /// <summary>
     /// 判定线过滤相关配置
     /// </summary>
-    public LineFilterOptions LineFilter { get; } = new();
+    public LineFilterOptions LineFilter { get; set; } = new();
 
     public class CuttingOptions
     {

@@ -5,9 +5,11 @@ namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 public class EventLayerConverter
 {
     private readonly FrameEventInterpolator _frameEventInterpolator;
+    private readonly PhiEditToKpcConvertOptions _options;
 
     public EventLayerConverter(PhiEditToKpcConvertOptions options)
     {
+        _options = options;
         _frameEventInterpolator = new FrameEventInterpolator(options);
     }
     /// <summary>
@@ -25,6 +27,6 @@ public class EventLayerConverter
             src.AlphaFrames, src.AlphaEvents, horizonBeat,
             value => Math.Clamp((int)Math.Round(value), 0, 255)),
         SpeedEvents = _frameEventInterpolator.BuildScalarEvents(
-            src.SpeedFrames, [], horizonBeat, value => (float)(value / (14d / 9d)))
+            src.SpeedFrames, [], horizonBeat, value => (float)(value / _options.SpeedConversionRatio))
     };
 }

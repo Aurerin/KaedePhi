@@ -8,32 +8,43 @@ public class KpcToPhiEditConvertOptions
     /// <summary>
     /// 事件切割相关配置
     /// </summary>
-    public CuttingOptions Cutting { get; } = new();
+    public CuttingOptions Cutting { get; set; } = new();
 
     /// <summary>
     /// Alpha 事件相关配置
     /// </summary>
-    public AlphaOptions Alpha { get; } = new();
+    public AlphaOptions Alpha { get; set; } = new();
 
     /// <summary>
     /// 速度事件相关配置
     /// </summary>
-    public SpeedOptions Speed { get; } = new();
+    public SpeedOptions Speed { get; set; } = new();
 
     /// <summary>
     /// 父子线解绑相关配置
     /// </summary>
-    public FatherLineUnbindOptions FatherLineUnbind { get; } = new();
+    public FatherLineUnbindOptions FatherLineUnbind { get; set; } = new();
 
     /// <summary>
     /// 多层级合并相关配置
     /// </summary>
-    public MultiLayerMergeOptions MultiLayerMerge { get; } = new();
+    public MultiLayerMergeOptions MultiLayerMerge { get; set; } = new();
 
     /// <summary>
     /// 判定线过滤相关配置
     /// </summary>
-    public LineFilterOptions LineFilter { get; } = new();
+    public LineFilterOptions LineFilter { get; set; } = new();
+
+    /// <summary>
+    /// PE 速度帧值到 KPC 速度事件值的转换比率。
+    /// PE 速度值 = KPC 速度值 * SpeedConversionRatio。
+    /// </summary>
+    public double SpeedConversionRatio { get; set; } = 14d / 9d;
+
+    /// <summary>
+    /// 尾部拍填充量（拍），用于确保事件覆盖到判定线时间范围末端。
+    /// </summary>
+    public double TrailingBeatPadding { get; set; } = 1d / 64d;
 
     public class CuttingOptions
     {

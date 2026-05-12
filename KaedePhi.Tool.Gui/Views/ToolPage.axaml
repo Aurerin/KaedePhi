@@ -6,7 +6,7 @@
              x:Class="KaedePhi.Tool.Gui.Views.ToolPage"
              x:DataType="vm:ToolViewModel">
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
         <!-- Header: file info -->
         <Border Grid.Row="0" Background="{DynamicResource SystemAccentColor}" Padding="16,10">
             <StackPanel Orientation="Horizontal" Spacing="16">
@@ -27,9 +27,9 @@
         </Border>
 
         <!-- Tool cards -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16">
-            <StackPanel Spacing="12">
-                <TextBlock Text="{x:Static loc:GuiLocalizationString.tool_select_title}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <Border Grid.Row="1" Padding="16,12,16,0">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{x:Static loc:GuiLocalizationString.tool_select_title}" FontSize="18" FontWeight="SemiBold"/>
 
                 <ListBox ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}"
                          SelectionMode="Single" Background="Transparent" BorderThickness="0" Padding="0">
@@ -73,12 +73,16 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+            </StackPanel>
+        </Border>
 
-                <!-- Selected tool indicator -->
-                <Border IsVisible="{Binding SelectedTool, Converter={x:Static ObjectConverters.IsNotNull}}"
-                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+        <!-- Tool options (scrollable) -->
+        <Border Grid.Row="2" Padding="16,8"
+                IsVisible="{Binding SelectedTool, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,8,0,0">
+                        BorderThickness="1" CornerRadius="8" Padding="16,12">
                     <StackPanel Spacing="8">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="&#xf1de;" Classes="fa-icon"
@@ -139,13 +143,42 @@
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
+
+                        <!-- Fit options -->
+                        <StackPanel IsVisible="{Binding ShowFitOptions}" Spacing="8">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_segment_penalty}" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding SegmentPenalty}" Minimum="0" Maximum="100"
+                                               Increment="0.01" FormatString="F3" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_keep_original_penalty}" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding KeepOriginalPenalty}" Minimum="0" Maximum="100"
+                                               Increment="0.01" FormatString="F3" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_full_search_threshold}" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding FullSearchRunLengthThreshold}" Minimum="1" Maximum="10000"
+                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_long_run_window}" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding LongRunSearchWindow}" Minimum="1" Maximum="10000"
+                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_phase_epsilon}" FontSize="12" Opacity="0.7"/>
+                                <NumericUpDown Value="{Binding PhaseDetectionEpsilon}" Minimum="0" Maximum="1"
+                                               Increment="0.001" FormatString="F4" Width="200" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
-            </StackPanel>
-        </ScrollViewer>
+            </ScrollViewer>
+        </Border>
 
         <!-- Status bar -->
-        <Border Grid.Row="2" Padding="16,8"
+        <Border Grid.Row="3" Padding="16,8"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
                 BorderThickness="0,1,0,0">
@@ -153,7 +186,7 @@
         </Border>
 
         <!-- Bottom buttons -->
-        <Border Grid.Row="3" Padding="16,12"
+        <Border Grid.Row="4" Padding="16,12"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
             <Grid ColumnDefinitions="Auto,*">
                 <Button Grid.Column="0" Padding="12,8" Click="OnSettingsClick"
@@ -161,7 +194,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="&#xf013;" Classes="fa-icon"
                                    FontSize="14" VerticalAlignment="Center"/>
-                        <TextBlock Text="设置" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_settings}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
