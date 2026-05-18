@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-// STJ 特性使用完全限定名
-
 namespace KaedePhi.Core.KaedePhi
 {
     public class ExtendLayer

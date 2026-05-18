@@ -3,8 +3,6 @@ using KaedePhi.Core.Common;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
 
-// STJ 特性均使用完全限定名，避免命名冲突
-
 namespace KaedePhi.Core.RePhiEdit
 {
     public class Note

@@ -2,8 +2,6 @@
 using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
-// STJ 特性使用完全限定名
-
 namespace KaedePhi.Core.RePhiEdit
 {
     public class EventLayer

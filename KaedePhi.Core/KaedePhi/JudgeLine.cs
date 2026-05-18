@@ -62,12 +62,12 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 当前判定线相对于当前BPM的因子。判定线BPM = 谱面BPM / BpmFactor
         /// </summary>
-        public float BpmFactor { get; set; } = 1.0f; // BPM因子
+        public float BpmFactor { get; set; } = 1.0f;
 
         /// <summary>
         /// 是否跟随父线旋转
         /// </summary>
-        public bool RotateWithFather { get; set; } // 是否随父级旋转
+        public bool RotateWithFather { get; set; }
 
         /// <summary>
         /// Position（X） Control 控制点列表
