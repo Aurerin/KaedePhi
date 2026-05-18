@@ -46,12 +46,22 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 事件开始拍
         /// </summary>
-        public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 }); // 开始时间
+        public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 });
 
+        /// <summary>
+        /// 模拟器保留字段
+        /// </summary>
+        public float StartTime { get; set; }
+        
         /// <summary>
         /// 事件结束拍
         /// </summary>
-        public Beat EndBeat { get; set; } = new(new[] { 1, 0, 1 }); // 结束时间
+        public Beat EndBeat { get; set; } = new(new[] { 1, 0, 1 });
+        
+        /// <summary>
+        /// 模拟器保留字段
+        /// </summary>
+        public float EndTime { get; set; }
 
         /// <summary>
         /// 当此事件为文字事件时，此值为字体文件相对路径，默认cmdysj.ttf
@@ -59,6 +69,11 @@ namespace KaedePhi.Core.KaedePhi
 #nullable enable
         public string? Font { get; set; }
 #nullable disable
+        
+        /// <summary>
+        /// 保留字段
+        /// </summary>
+        public float FloorPosition { get; set; }
         /// <summary>
         /// 获取某个拍在这个事件中的值（返回double，避免装箱和类型检查）
         /// 专为EventFit等需要频繁调用的场景优化
