@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.RePhiEdit
@@ -58,6 +59,12 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         [JsonProperty("multiScale")]
         public float MultiScale { get; set; } = 1.0f;
+        
+        /// <summary>
+        /// RPE右上角进度条显示的标记
+        /// </summary>
+        [JsonProperty("timeTags")]
+        public List<BeatTag> BeatTags { get; set; } = new();
 
         /// <summary>
         /// XY事件是否一一对应
