@@ -18,6 +18,9 @@
         <Configurations>Debug;Release;PreRelease</Configurations>
         <Platforms>x64</Platforms>
         <LangVersion>9</LangVersion>
+        <Nullable>enable</Nullable>
+        <!-- 存量 nullable 警告待逐步修复，详见各 #nullable disable 文件 -->
+        <NoWarn>$(NoWarn);CS8618;CS8625;CS8604;CS8619;CS8765;CS8600;CS8601;CS8603;CS8767</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

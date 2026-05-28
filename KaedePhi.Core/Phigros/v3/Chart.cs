@@ -18,7 +18,7 @@ namespace KaedePhi.Core.Phigros.v3
         /// <summary>
         /// 判定线列表
         /// </summary>
-        [JsonProperty("judgeLineList")] public List<JudgeLine> JudgeLineList { get; set; }
+        [JsonProperty("judgeLineList")] public List<JudgeLine> JudgeLineList { get; set; } = new();
         
         /// <summary>
         /// 坐标系边界

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tool.Localization"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tool.Gui", "KaedePhi.Tool.Gui\KaedePhi.Tool.Gui.csproj", "{13894E81-CE42-46E3-905B-25C651960D2F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tests", "KaedePhi.Tests\KaedePhi.Tests.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -47,5 +49,11 @@ Global
 		{13894E81-CE42-46E3-905B-25C651960D2F}.Release|x64.Build.0 = Release|Any CPU
 		{13894E81-CE42-46E3-905B-25C651960D2F}.PreRelease|x64.ActiveCfg = Debug|Any CPU
 		{13894E81-CE42-46E3-905B-25C651960D2F}.PreRelease|x64.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|x64.ActiveCfg = Debug|x64
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|x64.Build.0 = Debug|x64
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|x64.ActiveCfg = Release|x64
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|x64.Build.0 = Release|x64
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.PreRelease|x64.ActiveCfg = Debug|x64
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.PreRelease|x64.Build.0 = Debug|x64
 	EndGlobalSection
 EndGlobal

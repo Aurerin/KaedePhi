@@ -22,7 +22,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// BPM列表
         /// </summary>
         [JsonProperty("BPMList")]
-        public List<BpmItem> BpmList { get; set; }
+        public List<BpmItem> BpmList { get; set; } = new();
 
         /// <summary>
         /// 元数据
@@ -34,7 +34,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 判定线列表
         /// </summary>
         [JsonProperty("judgeLineList")]
-        public List<JudgeLine> JudgeLineList { get; set; }
+        public List<JudgeLine> JudgeLineList { get; set; } = new();
 
         /// <summary>
         /// 制谱时长（秒）

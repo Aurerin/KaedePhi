@@ -19,41 +19,7 @@ namespace KaedePhi.Core.RePhiEdit
         // Overload, using int to specify the corresponding EasingFunction
         public static double Evaluate(int easingType, double start, double end, double t)
         {
-            EasingFunction function = easingType switch
-            {
-                1 => Linear,
-                2 => EaseOutSine,
-                3 => EaseInSine,
-                4 => EaseOutQuad,
-                5 => EaseInQuad,
-                6 => EaseInOutSine,
-                7 => EaseInOutQuad,
-                8 => EaseOutCubic,
-                9 => EaseInCubic,
-                10 => EaseOutQuart,
-                11 => EaseInQuart,
-                12 => EaseInOutCubic,
-                13 => EaseInOutQuart,
-                14 => EaseOutQuint,
-                15 => EaseInQuint,
-                16 => EaseOutExpo,
-                17 => EaseInExpo,
-                18 => EaseOutCirc,
-                19 => EaseInCirc,
-                20 => EaseOutBack,
-                21 => EaseInBack,
-                22 => EaseInOutCirc,
-                23 => EaseInOutBack,
-                24 => EaseOutElastic,
-                25 => EaseInElastic,
-                26 => EaseOutBounce,
-                27 => EaseInBounce,
-                28 => EaseInOutBounce,
-                29 => EaseInOutElastic,
-                _ => Linear
-            };
-
-            return Evaluate(function, start, end, t);
+            return Evaluate(GetFunction(easingType), start, end, t);
         }
     }
 
