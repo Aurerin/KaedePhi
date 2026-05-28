@@ -19,7 +19,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// BPM列表
         /// </summary>
-        public List<BpmItem> BpmList { get; set; }
+        public List<BpmItem> BpmList { get; set; } = new();
 
         /// <summary>
         /// 元数据
@@ -29,6 +29,6 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 判定线列表
         /// </summary>
-        public List<JudgeLine> JudgeLineList { get; set; }
+        public List<JudgeLine> JudgeLineList { get; set; } = new();
     }
 }

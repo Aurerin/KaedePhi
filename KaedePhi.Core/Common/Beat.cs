@@ -235,10 +235,29 @@ namespace KaedePhi.Core.Common
         }
 
         // 定义两个Beat对象的比较运算符，强行使用double作为比较依据，float有精度问题
-        public static bool operator <(Beat a, Beat b) => a._curBeatDouble < b._curBeatDouble;
-        public static bool operator >(Beat a, Beat b) => a._curBeatDouble > b._curBeatDouble;
-        public static bool operator <=(Beat a, Beat b) => a._curBeatDouble <= b._curBeatDouble;
-        public static bool operator >=(Beat a, Beat b) => a._curBeatDouble >= b._curBeatDouble;
+        public static bool operator <(Beat a, Beat b)
+        {
+            if (a is null || b is null) return false;
+            return a._curBeatDouble < b._curBeatDouble;
+        }
+
+        public static bool operator >(Beat a, Beat b)
+        {
+            if (a is null || b is null) return false;
+            return a._curBeatDouble > b._curBeatDouble;
+        }
+
+        public static bool operator <=(Beat a, Beat b)
+        {
+            if (a is null || b is null) return a is null && b is null;
+            return a._curBeatDouble <= b._curBeatDouble;
+        }
+
+        public static bool operator >=(Beat a, Beat b)
+        {
+            if (a is null || b is null) return a is null && b is null;
+            return a._curBeatDouble >= b._curBeatDouble;
+        }
 
         public static bool operator ==(Beat a, Beat b)
         {
