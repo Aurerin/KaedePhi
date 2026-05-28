@@ -139,13 +139,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     {
         var newEvents = (from toEvent in toEventsCopy
             let prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat)
-            let formOffset = prevForm is null ? default : prevForm.EndValue
+            let formOffset = prevForm is null ? default! : prevForm.EndValue
             select new Kpc.Event<TPayload>
             {
                 StartBeat = toEvent.StartBeat,
                 EndBeat = toEvent.EndBeat,
-                StartValue = (dynamic?)toEvent.StartValue + (dynamic?)formOffset,
-                EndValue = (dynamic?)toEvent.EndValue + (dynamic?)formOffset,
+                StartValue = NumericHelper.Add(toEvent.StartValue, formOffset),
+                EndValue = NumericHelper.Add(toEvent.EndValue, formOffset),
                 BezierPoints = toEvent.BezierPoints,
                 Easing = toEvent.Easing,
                 EasingLeft = toEvent.EasingLeft,
@@ -160,8 +160,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             {
                 StartBeat = formEvent.StartBeat,
                 EndBeat = formEvent.EndBeat,
-                StartValue = (dynamic?)formEvent.StartValue + (dynamic?)toEventValue,
-                EndValue = (dynamic?)formEvent.EndValue + (dynamic?)toEventValue,
+                StartValue = NumericHelper.Add(formEvent.StartValue, toEventValue),
+                EndValue = NumericHelper.Add(formEvent.EndValue, toEventValue),
                 BezierPoints = formEvent.BezierPoints,
                 Easing = formEvent.Easing,
                 EasingLeft = formEvent.EasingLeft,
@@ -338,13 +338,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             {
                 // 整条事件在重叠区间外，直接输出（原逻辑）
                 var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat);
-                var formOffset = prevForm != null ? prevForm.EndValue : default;
+                var formOffset = prevForm != null ? prevForm.EndValue : default!;
                 newEvents.Add(new Kpc.Event<TPayload>
                 {
                     StartBeat = toEvent.StartBeat,
                     EndBeat = toEvent.EndBeat,
-                    StartValue = (dynamic?)toEvent.StartValue + (dynamic?)formOffset,
-                    EndValue = (dynamic?)toEvent.EndValue + (dynamic?)formOffset,
+                    StartValue = NumericHelper.Add(toEvent.StartValue, formOffset),
+                    EndValue = NumericHelper.Add(toEvent.EndValue, formOffset),
                     BezierPoints = toEvent.BezierPoints,
                     Easing = toEvent.Easing,
                     EasingLeft = toEvent.EasingLeft,
@@ -362,13 +362,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
                 foreach (var (gapStart, gapEnd) in GapsOutsideOverlap(toEvent))
                 {
                     var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= gapStart);
-                    var formOffset = prevForm != null ? prevForm.EndValue : default;
+                    var formOffset = prevForm != null ? prevForm.EndValue : default!;
                     newEvents.Add(new Kpc.Event<TPayload>
                     {
                         StartBeat = gapStart,
                         EndBeat = gapEnd,
-                        StartValue = (dynamic?)toEvent.GetValueAtBeat(gapStart) + (dynamic?)formOffset,
-                        EndValue = (dynamic?)toEvent.GetValueAtBeat(gapEnd) + (dynamic?)formOffset,
+                        StartValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapStart), formOffset),
+                        EndValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapEnd), formOffset),
                         Easing = new Kpc.Easing(1), // linear — see comment above
                         IsBezier = false,
                     });
@@ -381,13 +381,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             if (!TouchesAnyOverlap(formEvent))
             {
                 var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= formEvent.StartBeat);
-                var toEventValue = prevTo != null ? prevTo.EndValue : default;
+                var toEventValue = prevTo != null ? prevTo.EndValue : default!;
                 newEvents.Add(new Kpc.Event<TPayload>
                 {
                     StartBeat = formEvent.StartBeat,
                     EndBeat = formEvent.EndBeat,
-                    StartValue = (dynamic?)formEvent.StartValue + (dynamic?)toEventValue,
-                    EndValue = (dynamic?)formEvent.EndValue + (dynamic?)toEventValue,
+                    StartValue = NumericHelper.Add(formEvent.StartValue, toEventValue),
+                    EndValue = NumericHelper.Add(formEvent.EndValue, toEventValue),
                     BezierPoints = formEvent.BezierPoints,
                     Easing = formEvent.Easing,
                     EasingLeft = formEvent.EasingLeft,
@@ -401,13 +401,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
                 foreach (var (gapStart, gapEnd) in GapsOutsideOverlap(formEvent))
                 {
                     var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= gapStart);
-                    var toEventValue = prevTo != null ? prevTo.EndValue : default;
+                    var toEventValue = prevTo != null ? prevTo.EndValue : default!;
                     newEvents.Add(new Kpc.Event<TPayload>
                     {
                         StartBeat = gapStart,
                         EndBeat = gapEnd,
-                        StartValue = (dynamic?)formEvent.GetValueAtBeat(gapStart) + (dynamic?)toEventValue,
-                        EndValue = (dynamic?)formEvent.GetValueAtBeat(gapEnd) + (dynamic?)toEventValue,
+                        StartValue = NumericHelper.Add(formEvent.GetValueAtBeat(gapStart), toEventValue),
+                        EndValue = NumericHelper.Add(formEvent.GetValueAtBeat(gapEnd), toEventValue),
                         Easing = new Kpc.Easing(1), // linear — see comment above
                         IsBezier = false,
                     });
@@ -496,8 +496,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         {
             var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= start);
             var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= start);
-            var toLastEnd = prevTo != null ? prevTo.EndValue : default;
-            var formLastEnd = prevForm != null ? prevForm.EndValue : default;
+            var toLastEnd = prevTo != null ? prevTo.EndValue : default!;
+            var formLastEnd = prevForm != null ? prevForm.EndValue : default!;
             allCutEvents.AddRange(
                 MergeSingleOverlapInterval(cutTo, cutFrom, start, end, cutLength, toLastEnd, formLastEnd));
         }
@@ -540,8 +540,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             {
                 StartBeat = currentBeat,
                 EndBeat = nextBeat,
-                StartValue = (dynamic?)toStart + (dynamic?)formStart,
-                EndValue = (dynamic?)toEnd + (dynamic?)formEnd,
+                StartValue = NumericHelper.Add(toStart, formStart),
+                EndValue = NumericHelper.Add(toEnd, formEnd),
             });
 
             if (toEvent != null) toLastEndValue = toEvent.EndValue;
@@ -775,7 +775,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     private static TPayload? GetPreviousEndValue(List<Kpc.Event<TPayload>> events, Beat beat)
     {
         var prev = events.FindLast(e => e.EndBeat <= beat);
-        return prev != null ? prev.EndValue : default;
+        return prev != null ? prev.EndValue : default!;
     }
 
     /// <summary>
@@ -866,26 +866,25 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     }
 
     /// <summary>
-    /// 将动态数值安全转换为 <see cref="double"/>。
+    /// 将数值安全转换为 <see cref="double"/>，避免 dynamic/装箱开销。
     /// </summary>
     /// <param name="value">待转换数值。</param>
     /// <returns>转换后的双精度值。</returns>
-    protected static double ToDouble(dynamic? value)
+    protected static double ToDouble(TPayload? value)
     {
         if (value == null)
             throw new InvalidOperationException("Unexpected null numeric value.");
-        return (double)value;
+        return NumericHelper.ToDouble(value);
     }
 
     /// <summary>
-    /// 对两个可空数值执行动态加法。
+    /// 对两个数值执行类型安全加法，避免 dynamic/装箱开销。
     /// </summary>
-    /// <typeparam name="TPayload">事件值类型。</typeparam>
     /// <param name="left">左值。</param>
     /// <param name="right">右值。</param>
     /// <returns>加法结果。</returns>
     private static TPayload AddValues(TPayload? left, TPayload? right)
-        => (dynamic?)left + (dynamic?)right;
+        => NumericHelper.Add(left!, right!);
 
     /// <summary>
     /// 向目标列表追加一个由两轨道叠加得到的分段事件。

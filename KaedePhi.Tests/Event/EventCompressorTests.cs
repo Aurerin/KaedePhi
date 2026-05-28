@@ -169,7 +169,7 @@ public class EventCompressorTests
         var progressReports = new List<ToolProgress>();
         var progressMock = new Mock<IProgress<ToolProgress>>();
         progressMock.Setup(p => p.Report(It.IsAny<ToolProgress>()))
-            .Callback<ToolProgress>(p => progressReports.Add(p));
+            .Callback<ToolProgress>(progressReports.Add);
 
         _doubleCompressor.EventListCompressSqrt(events, 10, progressMock.Object);
 
