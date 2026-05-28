@@ -78,11 +78,11 @@ public static class KpcEventChannelRenderer
     {
         return
         [
-            BuildChannel("MoveX", opts.MoveXColor, layer.MoveXEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
-            BuildChannel("MoveY", opts.MoveYColor, layer.MoveYEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
-            BuildChannel("Rotate", opts.RotateColor, layer.RotateEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
-            BuildChannel("Alpha", opts.AlphaColor, layer.AlphaEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
-            BuildChannel("Speed", opts.SpeedColor, layer.SpeedEvents, (e, b) => Convert.ToDouble(e.GetValueAtBeat(b)), opts),
+            BuildChannel("MoveX", opts.MoveXColor, layer.MoveXEvents, (e, b) => e.GetValueAtBeatAsDouble(b), opts),
+            BuildChannel("MoveY", opts.MoveYColor, layer.MoveYEvents, (e, b) => e.GetValueAtBeatAsDouble(b), opts),
+            BuildChannel("Rotate", opts.RotateColor, layer.RotateEvents, (e, b) => e.GetValueAtBeatAsDouble(b), opts),
+            BuildChannel("Alpha", opts.AlphaColor, layer.AlphaEvents, (e, b) => e.GetValueAtBeatAsDouble(b), opts),
+            BuildChannel("Speed", opts.SpeedColor, layer.SpeedEvents, (e, b) => e.GetValueAtBeatAsDouble(b), opts),
         ];
     }
 

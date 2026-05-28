@@ -37,11 +37,31 @@ namespace KaedePhi.Core.Utils
             // ★ 核心修正：不 Clamp，保留过冲/欠冲
             var easing = SampleCurveY(u, y1, y2);
 
-            var start = Convert.ToDouble(startValue);
-            var end   = Convert.ToDouble(endValue);
-            var result = start + easing * (end - start);
-
-            return (T)Convert.ChangeType(result, typeof(T));
+            if (type == typeof(float))
+            {
+                var s = (float)(object)startValue;
+                var e = (float)(object)endValue;
+                return (T)(object)(float)(s + easing * (e - s));
+            }
+            if (type == typeof(double))
+            {
+                var s = (double)(object)startValue;
+                var e = (double)(object)endValue;
+                return (T)(object)(s + easing * (e - s));
+            }
+            if (type == typeof(int))
+            {
+                var s = (int)(object)startValue;
+                var e = (int)(object)endValue;
+                return (T)(object)(int)(s + easing * (e - s));
+            }
+            if (type == typeof(byte))
+            {
+                var s = (byte)(object)startValue;
+                var e = (byte)(object)endValue;
+                return (T)(object)(byte)(s + easing * (e - s));
+            }
+            throw new NotSupportedException("T must be float, double, int, or byte");
         }
 
         #region 核心数学

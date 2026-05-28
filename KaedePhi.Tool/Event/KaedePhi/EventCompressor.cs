@@ -23,10 +23,10 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
         var startBeat = (double)last.StartBeat;
         var midBeat = (double)last.EndBeat;
         var endBeat = (double)cur.EndBeat;
-        var startValue = Convert.ToDouble(last.StartValue);
-        var midValueEnd = Convert.ToDouble(last.EndValue);
-        var midValueStart = Convert.ToDouble(cur.StartValue);
-        var endValue = Convert.ToDouble(cur.EndValue);
+        var startValue = NumericHelper.ToDouble(last.StartValue);
+        var midValueEnd = NumericHelper.ToDouble(last.EndValue);
+        var midValueStart = NumericHelper.ToDouble(cur.StartValue);
+        var endValue = NumericHelper.ToDouble(cur.EndValue);
 
         // 以两个子段各自运动范围的最大值为归一化尺度：
         //   rangeFirst = |B-A|（第一段），rangeSecond = |C-B|（第二段）
@@ -62,10 +62,10 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
         var startBeat = (double)last.StartBeat;
         var midBeat = (double)last.EndBeat;
         var endBeat = (double)cur.EndBeat;
-        var startValue = Convert.ToDouble(last.StartValue);
-        var midValueEnd = Convert.ToDouble(last.EndValue);
-        var midValueStart = Convert.ToDouble(cur.StartValue);
-        var endValue = Convert.ToDouble(cur.EndValue);
+        var startValue = NumericHelper.ToDouble(last.StartValue);
+        var midValueEnd = NumericHelper.ToDouble(last.EndValue);
+        var midValueStart = NumericHelper.ToDouble(cur.StartValue);
+        var endValue = NumericHelper.ToDouble(cur.EndValue);
 
         // 同 TryMergeSqrt：以两个子段各自运动范围的最大值为归一化尺度，
         // 避免跨零点信号因 rangeTotal 虚增而被过度合并。
