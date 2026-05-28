@@ -770,7 +770,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
         if (!string.Equals(previousEvent.Font, currentEvent.Font, StringComparison.Ordinal))
             return false;
 
-        return AreClose(Convert.ToDouble(previousEvent.EndValue), Convert.ToDouble(currentEvent.StartValue), tolerance);
+        return AreClose(NumericHelper.ToDouble(previousEvent.EndValue), NumericHelper.ToDouble(currentEvent.StartValue), tolerance);
     }
 
     private static bool AreClose(double left, double right, double tolerance)
