@@ -204,7 +204,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 输出的结果可能有些大哦~请试着添加&quot;--stream&quot;选项来减少内存占用！若这没有解决你的问题，请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues，我们会尽快修复这个问题！
+        ///   Looks up a localized string similar to 输出的结果可能有些大哦~请试着添加&quot;--stream&quot;选项来减少内存占用！若这没有解决你的问题，请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/KaedePhi/issues，我们会尽快修复这个问题！
         ///{0}.
         /// </summary>
         public static string err_out_of_memory {
@@ -223,7 +223,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to すみません！软件遇到了未知错误！请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues 我们会尽快修复这个问题！
+        ///   Looks up a localized string similar to すみません！软件遇到了未知错误！请将以下信息发送到https://github.com/NuanRMxi-Lazy-Team/KaedePhi/issues 我们会尽快修复这个问题！
         ///{0}.
         /// </summary>
         public static string err_ukerr {

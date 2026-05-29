@@ -19,12 +19,7 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
 
     public List<string> Steps { get; } = new()
     {
-        step_loading,
-        step_detecting,
-        step_to_kpc,
-        step_running_tool,
-        step_from_kpc,
-        step_saving
+        step_running_tool
     };
 
     public double Progress
@@ -91,7 +86,7 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
         CurrentStep = Steps[index];
         StatusMessage = string.IsNullOrEmpty(detail) ? Steps[index] : detail;
         Progress = (double)(index + 1) / Steps.Count * 100;
-        if (index != 3) ToolProgressValue = 0;
+        if (index != 0) ToolProgressValue = 0;
     }
 
     public void SetToolProgress(double toolProgress, double overallProgress, string? detail = null)
@@ -99,7 +94,7 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
         ToolProgressValue = Math.Clamp(toolProgress, 0, 1) * 100;
         if (overallProgress >= 0)
         {
-            const int toolStepIndex = 3;
+            const int toolStepIndex = 0;
             var stepStart = (double)toolStepIndex / Steps.Count * 100;
             var stepEnd = (double)(toolStepIndex + 1) / Steps.Count * 100;
             Progress = stepStart + Math.Clamp(overallProgress, 0, 1) * (stepEnd - stepStart);

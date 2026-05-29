@@ -35,7 +35,7 @@ public class App : Application
             desktop.Exit += (_, _) =>
             {
                 LogService.Info(log_shutdown);
-                ChartService.ClearWorkspace();
+                ChartService.Clear();
             };
         }
 

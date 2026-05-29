@@ -15,7 +15,7 @@ namespace KaedePhi.Core.PhiChain.v6
         public NoteKind Kind { get; set; } = NoteKind.Drag;
 
         [JsonProperty("hold_beat", NullValueHandling = NullValueHandling.Ignore)]
-        public Beat HoldBeat { get; set; }
+        public Beat? HoldBeat { get; set; }
 
         [JsonProperty("density")]
         public uint Density { get; set; } = 16;

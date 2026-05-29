@@ -16,7 +16,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// </para>
 /// </summary>
 /// <typeparam name="TPayload">事件值类型（<see langword="int"/>、<see langword="float"/> 或 <see langword="double"/>）。</typeparam>
-public class EventListMergerSqrt<TPayload> : EventListMerger<TPayload>
+public class EventListMergerSqrt<TPayload> : EventListMergerPlus<TPayload>
 {
     /// <inheritdoc/>
     protected override bool ShouldSplitAdaptiveSegment(

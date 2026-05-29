@@ -3,7 +3,7 @@
 namespace KaedePhi.Tool.Render.KaedePhi;
 
 /// <summary>
-/// NRC 谱面事件通道渲染配置。
+/// KPC 谱面事件通道渲染配置。
 /// </summary>
 public class KpcRenderOptions
 {

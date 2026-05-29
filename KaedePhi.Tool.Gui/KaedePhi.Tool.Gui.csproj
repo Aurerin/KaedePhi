@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <ApplicationIcon>..\PhiFanmadeToolIcon.ico</ApplicationIcon>
+        <ApplicationIcon>..\KaedePhiIcon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="..\PhiFanmadeToolIcon.png" Link="Assets\PhiFanmadeToolIcon.png" />
+        <AvaloniaResource Include="..\KaedePhiIcon.png" Link="Assets\KaedePhiIcon.png" />
         <AvaloniaResource Include="Assets\Fonts\fa-solid-900.ttf" />
     </ItemGroup>
 </Project>

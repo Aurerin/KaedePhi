@@ -314,14 +314,14 @@ public class RePhiEditSerializationTests
     {
         return new Chart
         {
-            BpmList = new List<BpmItem>
-            {
-                new()
+            BpmList =
+            [
+                new BpmItem
                 {
                     Bpm = 120,
-                    StartBeat = new Beat(new[] { 0, 0, 1 })
+                    StartBeat = new Beat([0, 0, 1])
                 }
-            },
+            ],
             Meta = new Meta
             {
                 Name = "Test Chart",
@@ -329,13 +329,13 @@ public class RePhiEditSerializationTests
                 Charter = "Test",
                 Level = "HD"
             },
-            JudgeLineList = new List<JudgeLine>
-            {
-                new()
+            JudgeLineList =
+            [
+                new JudgeLine
                 {
-                    EventLayers = new List<EventLayer> { new() }
+                    EventLayers = [new EventLayer()]
                 }
-            },
+            ],
             ChartTime = 60
         };
     }
@@ -344,17 +344,14 @@ public class RePhiEditSerializationTests
     {
         return new Chart
         {
-            BpmList = new List<BpmItem>
-            {
-                new() { Bpm = 120, StartBeat = new Beat(new[] { 0, 0, 1 }) }
-            },
+            BpmList = [new BpmItem { Bpm = 120, StartBeat = new Beat([0, 0, 1]) }],
             Meta = new Meta { Name = "Multi Line Chart" },
-            JudgeLineList = new List<JudgeLine>
-            {
-                new() { EventLayers = new List<EventLayer> { new() } },
-                new() { EventLayers = new List<EventLayer> { new() } },
-                new() { EventLayers = new List<EventLayer> { new() } }
-            }
+            JudgeLineList =
+            [
+                new JudgeLine { EventLayers = [new EventLayer()] },
+                new JudgeLine { EventLayers = [new EventLayer()] },
+                new JudgeLine { EventLayers = [new EventLayer()] }
+            ]
         };
     }
 
@@ -362,24 +359,21 @@ public class RePhiEditSerializationTests
     {
         return new Chart
         {
-            BpmList = new List<BpmItem>
-            {
-                new() { Bpm = 120, StartBeat = new Beat(new[] { 0, 0, 1 }) }
-            },
+            BpmList = [new BpmItem { Bpm = 120, StartBeat = new Beat([0, 0, 1]) }],
             Meta = new Meta { Name = "Empty Alpha Chart" },
-            JudgeLineList = new List<JudgeLine>
-            {
-                new()
+            JudgeLineList =
+            [
+                new JudgeLine
                 {
-                    EventLayers = new List<EventLayer>
-                    {
-                        new()
+                    EventLayers =
+                    [
+                        new EventLayer
                         {
-                            AlphaEvents = new List<Event<int>>()
+                            AlphaEvents = []
                         }
-                    }
+                    ]
                 }
-            }
+            ]
         };
     }
 
@@ -387,23 +381,20 @@ public class RePhiEditSerializationTests
     {
         return new Chart
         {
-            BpmList = new List<BpmItem>
-            {
-                new() { Bpm = 120, StartBeat = new Beat(new[] { 0, 0, 1 }) }
-            },
+            BpmList = [new BpmItem { Bpm = 120, StartBeat = new Beat([0, 0, 1]) }],
             Meta = new Meta { Name = "Null Controls Chart" },
-            JudgeLineList = new List<JudgeLine>
-            {
-                new()
+            JudgeLineList =
+            [
+                new JudgeLine
                 {
-                    EventLayers = new List<EventLayer> { new() },
+                    EventLayers = [new EventLayer()],
                     AlphaControls = null,
                     PositionControls = null,
                     SizeControls = null,
                     SkewControls = null,
                     YControls = null
                 }
-            }
+            ]
         };
     }
 

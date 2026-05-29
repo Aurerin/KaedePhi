@@ -48,14 +48,14 @@ public class JudgeLineKpcToPe
 
         if (trueSrc.Father != -1)
         {
-            var unbinder = new KpcJudgeLineUnbinder();
+            var unbinder = new JudgeLineUnbinder();
             if (_options.FatherLineUnbind.ClassicMode)
             {
                 trueSrc = unbinder.FatherUnbind(allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
                     allLine, _options.FatherLineUnbind.Precision);
             }
             else
-                trueSrc = unbinder.FatherUnbindPlus(
+                trueSrc = unbinder.FatherUnbind(
                     allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
                     allLine, _options.FatherLineUnbind.Precision, _options.FatherLineUnbind.Tolerance);
         }

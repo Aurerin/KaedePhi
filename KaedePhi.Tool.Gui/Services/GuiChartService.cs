@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,61 +23,89 @@ namespace KaedePhi.Tool.Gui.Services;
 public sealed class GuiChartService
 {
     private readonly LogService _log;
-    private const string WorkspaceId = "gui_session";
-    private const string WorkspaceFileName = "chart.json";
-    private readonly string _workspaceDir;
-    private readonly string _workspaceFilePath;
 
     public GuiChartService(LogService log)
     {
         _log = log;
-        var workspaceRoot = AppPaths.GetDirectory("workspaces");
-        _workspaceDir = Path.Combine(workspaceRoot, WorkspaceId);
-        _workspaceFilePath = Path.Combine(_workspaceDir, WorkspaceFileName);
-        Directory.CreateDirectory(_workspaceDir);
     }
 
-    public string WorkspaceDir => _workspaceDir;
-    public string WorkspaceFilePath => _workspaceFilePath;
+    /// <summary>
+    /// 当前加载的 KPC 图表（内存中）
+    /// </summary>
+    public Chart? CurrentChart { get; private set; }
 
-    public void ClearWorkspace()
-    {
-        if (Directory.Exists(_workspaceDir))
-        {
-            Directory.Delete(_workspaceDir, true);
-            Directory.CreateDirectory(_workspaceDir);
-        }
-        _log.Info(log_workspace_cleared);
-    }
+    /// <summary>
+    /// 源文件的格式类型
+    /// </summary>
+    public ChartType SourceFormat { get; private set; }
 
-    public async Task CopyToWorkspaceAsync(string sourceFilePath, bool stream, CancellationToken ct)
+    /// <summary>
+    /// 源文件路径
+    /// </summary>
+    public string? SourceFilePath { get; private set; }
+
+    /// <summary>
+    /// 是否已加载图表
+    /// </summary>
+    public bool IsLoaded => CurrentChart != null;
+
+    /// <summary>
+    /// 从文件加载图表并转换为 KPC 格式存储在内存中
+    /// </summary>
+    public async Task<(Chart Chart, ChartType DetectedType)> LoadChartAsync(string filePath, bool stream, CancellationToken ct)
     {
-        _log.Info(string.Format(log_file_selected, sourceFilePath, stream));
+        _log.Info(string.Format(log_file_selected, filePath, stream));
+
+        string text;
         if (stream)
         {
-            await using var src = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read,
-                FileShare.Read, 65536, true);
-            await using var dst = new FileStream(_workspaceFilePath, FileMode.Create, FileAccess.Write,
-                FileShare.None, 65536, true);
-            await src.CopyToAsync(dst, ct);
+            using var reader = new StreamReader(filePath);
+            text = await reader.ReadToEndAsync(ct);
         }
         else
         {
-            File.Copy(sourceFilePath, _workspaceFilePath, true);
+            text = await File.ReadAllTextAsync(filePath, ct);
         }
-        _log.Info(log_step_saved);
-    }
 
-    public async Task<(string Text, ChartType DetectedType)> LoadAndDetectFromWorkspaceAsync(CancellationToken ct)
-    {
-        _log.Info(log_step_loading);
-        var text = await File.ReadAllTextAsync(_workspaceFilePath, ct);
         var detectedType = ChartGetType.GetType(text);
         _log.Info(string.Format(log_step_detected, detectedType));
-        return (text, detectedType);
+
+        _log.Info(log_step_converting);
+        // 在后台线程执行耗时的格式转换
+        var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType), ct);
+
+        CurrentChart = kpcChart;
+        SourceFormat = detectedType;
+        SourceFilePath = filePath;
+
+        _log.Info(log_step_saved);
+        return (kpcChart, detectedType);
     }
 
-    public Chart ConvertToKpc(string text, ChartType sourceType)
+    /// <summary>
+    /// 将当前 KPC 图表导出到指定格式和路径
+    /// </summary>
+    public async Task ExportChartAsync(ChartType targetType, string outputPath, bool stream, bool indented, CancellationToken ct)
+    {
+        if (CurrentChart == null)
+            throw new InvalidOperationException("No chart loaded");
+
+        _log.Info(string.Format(log_exporting_to, outputPath, targetType));
+        await ConvertFromKpcAndSaveAsync(CurrentChart, targetType, outputPath, stream, indented, ct);
+        _log.Info(log_export_done);
+    }
+
+    /// <summary>
+    /// 清除当前加载的图表
+    /// </summary>
+    public void Clear()
+    {
+        CurrentChart = null;
+        SourceFormat = default;
+        SourceFilePath = null;
+    }
+
+    private Chart ConvertToKpc(string text, ChartType sourceType)
     {
         _log.Info(log_step_converting);
         switch (sourceType)
@@ -121,13 +148,7 @@ public sealed class GuiChartService
         }
     }
 
-    public async Task SaveKpcToWorkspaceAsync(Chart chart, ChartType originalType, bool stream, CancellationToken ct)
-    {
-        await ConvertFromKpcAndSaveAsync(chart, originalType, _workspaceFilePath, stream, false, ct);
-        _log.Info(log_step_saved);
-    }
-
-    public async Task<string> ConvertFromKpcAndSaveAsync(
+    private async Task ConvertFromKpcAndSaveAsync(
         Chart chart, ChartType targetType, string outputPath, bool stream, bool indented, CancellationToken ct)
     {
         _log.Info(string.Format(log_exporting_to, outputPath, targetType));
@@ -186,16 +207,15 @@ public sealed class GuiChartService
         }
 
         _log.Info(log_export_done);
-        return outputPath;
     }
 
     public void RunFatherUnbind(Chart chart, double precision, double tolerance, bool classic, bool disableCompress,
         IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_unbind_name));
-        var unbinder = new KpcJudgeLineUnbinder();
+        var unbinder = new JudgeLineUnbinder();
         unbinder.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
-        var linesToProcess = new List<int>();
+        var linesToProcess = new System.Collections.Generic.List<int>();
         for (var i = 0; i < chart.JudgeLineList.Count; i++)
         {
             if (chart.JudgeLineList[i].Father != -1)
@@ -214,7 +234,7 @@ public sealed class GuiChartService
             });
             chart.JudgeLineList[i] = classic
                 ? unbinder.FatherUnbind(i, chart.JudgeLineList, precision, lineProgress)
-                : unbinder.FatherUnbindPlus(i, chart.JudgeLineList, precision, tolerance, lineProgress);
+                : unbinder.FatherUnbind(i, chart.JudgeLineList, precision, tolerance, lineProgress);
         }
 
         progress?.Report(new ToolProgress(1.0, 1.0));
@@ -342,11 +362,12 @@ public sealed class GuiChartService
             layer.SpeedEvents = floatFit.EventListFit(layer.SpeedEvents, tolerance, degree, progress);
     }
 
-    public IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions,
+    public System.Collections.Generic.IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions,
         IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_render_name));
-        var outputDir = Path.Combine(_workspaceDir, "render_output");
+        var outputDir = Path.Combine(Path.GetTempPath(), "kaedephi_render_" + Guid.NewGuid().ToString("N")[..8]);
+        Directory.CreateDirectory(outputDir);
         var options = new KpcRenderOptions
         {
             PixelsPerBeat = pixelsPerBeat,

@@ -13,7 +13,7 @@
         /// <summary>
         /// 谱师
         /// </summary>
-        public string Author { get; set; } = "PhiFanmadeCore"; // 谱师
+        public string Author { get; set; } = "KaedePhiCore"; // 谱师
 
         /// <summary>
         /// 谱面音乐作者
@@ -33,7 +33,7 @@
         /// <summary>
         /// 谱面名称
         /// </summary>
-        public string Name { get; set; } = "PhiFanmadeCore by NuanR_Star Ciallo Team"; // 曲名
+        public string Name { get; set; } = "KaedePhiCore by NuanR_Star Ciallo Team"; // 曲名
 
         /// <summary>
         /// 谱面偏移，单位为毫秒

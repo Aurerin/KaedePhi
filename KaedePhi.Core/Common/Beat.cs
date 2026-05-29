@@ -5,43 +5,49 @@ using Newtonsoft.Json;
 namespace KaedePhi.Core.Common
 {
     /// <summary>
-    /// 标准节拍格式，表示为 beat[0]:beat[1]/beat[2]
-    /// 使用float或double隐式转换时，返回 CurBeat = beat[1] / beat[2] + beat[0]
-    /// 使用int[]隐式转换时，返回原始数组
+    /// 标准节拍格式，表示为 beat[0]:beat[1]/beat[2]。
+    /// 使用 float 或 double 隐式转换时，返回 CurBeat = beat[1] / beat[2] + beat[0]。
+    /// 使用 int[] 隐式转换时，返回包含三个元素的新数组。
     /// </summary>
     [JsonConverter(typeof(BeatJsonConverter))]
-    public class Beat : IComparable<Beat>
+    public readonly struct Beat : IComparable<Beat>, IEquatable<Beat>
     {
-        [JsonIgnore] private readonly int[] _beat;
+        private readonly int _whole;
+        private readonly int _numerator;
+        private readonly int _denominator;
+        private readonly double _curBeatDouble;
+        private readonly float _curBeatFloat;
 
         public Beat(int[] beatArray)
         {
-            _beat = beatArray ?? new[] { 0, 0, 1 };
-            if (_beat.Length != 3)
+            if (beatArray == null || beatArray.Length != 3)
                 throw new ArgumentException("Beat array must have exactly 3 elements.", nameof(beatArray));
-            if (_beat[2] == 0)
+            if (beatArray[2] == 0)
                 throw new ArgumentException("Beat denominator (beat[2]) cannot be zero.", nameof(beatArray));
-            // calculate curBeat
-            _curBeatDouble = (double)_beat[1] / _beat[2] + _beat[0];
+
+            _whole = beatArray[0];
+            _numerator = beatArray[1];
+            _denominator = beatArray[2];
+            _curBeatDouble = (double)_numerator / _denominator + _whole;
             _curBeatFloat = (float)_curBeatDouble;
         }
 
         public Beat(double beat)
         {
-            // set curBeat
             _curBeatDouble = beat;
             _curBeatFloat = (float)beat;
-            // 将 double 转换为 Beat 结构，使用连分数算法获得最佳分数近似
+
             var wholePart = (int)Math.Floor(beat);
             var fractionalPart = beat - wholePart;
 
             if (Math.Abs(fractionalPart) < 1e-9)
             {
-                _beat = new[] { wholePart, 0, 1 };
+                _whole = wholePart;
+                _numerator = 0;
+                _denominator = 1;
                 return;
             }
 
-            // 使用连分数算法找到最佳分数表示（限制分母最大为1000）
             int numerator = 1, denominator = 0;
             int prevNumerator = 0, prevDenominator = 1;
             var remaining = fractionalPart;
@@ -68,7 +74,6 @@ namespace KaedePhi.Core.Common
                 remaining = 1.0 / remaining;
             }
 
-            // 如果连分数算法没有找到好的近似，使用简单的四舍五入方法
             if (denominator == 0)
             {
                 denominator = 1000;
@@ -78,15 +83,20 @@ namespace KaedePhi.Core.Common
                 denominator /= gcd;
             }
 
-            _beat = new[] { wholePart, numerator, denominator };
+            _whole = wholePart;
+            _numerator = numerator;
+            _denominator = denominator;
         }
 
-        /// <summary>
-        /// 获得最大公约数
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns>最大公约数</returns>
+        private Beat(int whole, int numerator, int denominator)
+        {
+            _whole = whole;
+            _numerator = numerator;
+            _denominator = denominator;
+            _curBeatDouble = (double)numerator / denominator + whole;
+            _curBeatFloat = (float)_curBeatDouble;
+        }
+
         private static int Gcd(int a, int b)
         {
             while (b != 0)
@@ -111,53 +121,31 @@ namespace KaedePhi.Core.Common
             return a;
         }
 
-        public int this[int index]
+        public int this[int index] => index switch
         {
-            get
-            {
-                if (index is < 0 or > 2)
-                    throw new ArgumentOutOfRangeException(nameof(index), index,
-                        "RePhiEdit Beat index must be between 0 and 2.");
-                return _beat[index];
-            }
-            set
-            {
-                if (index is < 0 or > 2)
-                    throw new ArgumentOutOfRangeException(nameof(index), index,
-                        "RePhiEdit Beat index must be between 0 and 2.");
-                if (index == 2 && value == 0)
-                    throw new ArgumentException("Beat denominator (beat[2]) cannot be zero.", nameof(index));
-                _beat[index] = value;
-                // recalculate curBeat
-                _curBeatDouble = (double)_beat[1] / _beat[2] + _beat[0];
-                _curBeatFloat = (float)_curBeatDouble;
-            }
-        }
+            0 => _whole,
+            1 => _numerator,
+            2 => _denominator,
+            _ => throw new ArgumentOutOfRangeException(nameof(index), index,
+                "Beat index must be between 0 and 2.")
+        };
 
-        private double _curBeatDouble;
-
-        private float _curBeatFloat;
-
-        // 隐式转换为 float，返回 CurBeat
+        // 隐式转换为 float
         public static implicit operator float(Beat beat) => beat._curBeatFloat;
 
-        // 隐式转换为 double，返回 CurBeat
+        // 隐式转换为 double
         public static implicit operator double(Beat beat) => beat._curBeatDouble;
 
-        // 隐式转换为 int[]，返回 _beat 的副本
-        public static implicit operator int[](Beat beat) => (int[])beat._beat.Clone();
+        // 隐式转换为 int[]，返回新数组
+        public static implicit operator int[](Beat beat) => new[] { beat._whole, beat._numerator, beat._denominator };
 
-        // 定义两个Beat对象的加法运算符
         public static Beat operator +(Beat a, Beat b)
         {
-            // 基于Beat = beat[1] / beat[2] + beat[0]的定义进行加法运算
-            var wholePart = a[0] + b[0];
+            var wholePart = a._whole + b._whole;
 
-            // 使用 long 防止中间计算溢出
-            var numerator = (long)a[1] * b[2] + (long)b[1] * a[2];
-            var denominator = (long)a[2] * b[2];
+            var numerator = (long)a._numerator * b._denominator + (long)b._numerator * a._denominator;
+            var denominator = (long)a._denominator * b._denominator;
 
-            // 处理进位
             if (numerator >= denominator)
             {
                 var carry = numerator / denominator;
@@ -165,7 +153,6 @@ namespace KaedePhi.Core.Common
                 numerator %= denominator;
             }
 
-            // 处理负数情况
             if (numerator < 0)
             {
                 var borrowCount = (-numerator + denominator - 1) / denominator;
@@ -173,39 +160,26 @@ namespace KaedePhi.Core.Common
                 numerator += borrowCount * denominator;
             }
 
-            // 如果分子为0,直接返回简化的Beat
             if (numerator == 0)
-            {
-                return new Beat(new[] { wholePart, 0, 1 });
-            }
+                return new Beat(wholePart, 0, 1);
 
-            // 约分
             var gcd = Gcd(Math.Abs(numerator), denominator);
             numerator /= gcd;
             denominator /= gcd;
 
-            // 检查是否超出 int 范围
             if (numerator > int.MaxValue || denominator > int.MaxValue)
-            {
-                throw new OverflowException(
-                    "Beat calculation resulted in values too large for int representation.");
-            }
+                throw new OverflowException("Beat calculation resulted in values too large for int representation.");
 
-            return new Beat(new[] { wholePart, (int)numerator, (int)denominator });
+            return new Beat(wholePart, (int)numerator, (int)denominator);
         }
 
-
-        // 定义两个Beat对象的减法运算符
         public static Beat operator -(Beat a, Beat b)
         {
-            // 基于Beat = beat[1] / beat[2] + beat[0]的定义进行减法运算
-            var wholePart = a[0] - b[0];
+            var wholePart = a._whole - b._whole;
 
-            // 使用 long 防止中间计算溢出
-            var numerator = (long)a[1] * b[2] - (long)b[1] * a[2];
-            var denominator = (long)a[2] * b[2];
+            var numerator = (long)a._numerator * b._denominator - (long)b._numerator * a._denominator;
+            var denominator = (long)a._denominator * b._denominator;
 
-            // 处理负数情况
             if (numerator < 0)
             {
                 var borrowCount = (-numerator + denominator - 1) / denominator;
@@ -213,109 +187,39 @@ namespace KaedePhi.Core.Common
                 numerator += borrowCount * denominator;
             }
 
-            // 如果分子为0,直接返回简化的Beat
             if (numerator == 0)
-            {
-                return new Beat(new[] { wholePart, 0, 1 });
-            }
+                return new Beat(wholePart, 0, 1);
 
-            // 约分
             var gcd = Gcd(Math.Abs(numerator), denominator);
             numerator /= gcd;
             denominator /= gcd;
 
-            // 检查是否超出 int 范围
             if (numerator > int.MaxValue || denominator > int.MaxValue)
-            {
-                throw new OverflowException(
-                    "Beat calculation resulted in values too large for int representation.");
-            }
+                throw new OverflowException("Beat calculation resulted in values too large for int representation.");
 
-            return new Beat(new[] { wholePart, (int)numerator, (int)denominator });
+            return new Beat(wholePart, (int)numerator, (int)denominator);
         }
 
-        // 定义两个Beat对象的比较运算符，强行使用double作为比较依据，float有精度问题
-        public static bool operator <(Beat a, Beat b)
-        {
-            if (a is null || b is null) return false;
-            return a._curBeatDouble < b._curBeatDouble;
-        }
+        public static bool operator <(Beat a, Beat b) => a._curBeatDouble < b._curBeatDouble;
 
-        public static bool operator >(Beat a, Beat b)
-        {
-            if (a is null || b is null) return false;
-            return a._curBeatDouble > b._curBeatDouble;
-        }
+        public static bool operator >(Beat a, Beat b) => a._curBeatDouble > b._curBeatDouble;
 
-        public static bool operator <=(Beat a, Beat b)
-        {
-            if (a is null || b is null) return a is null && b is null;
-            return a._curBeatDouble <= b._curBeatDouble;
-        }
+        public static bool operator <=(Beat a, Beat b) => a._curBeatDouble <= b._curBeatDouble;
 
-        public static bool operator >=(Beat a, Beat b)
-        {
-            if (a is null || b is null) return a is null && b is null;
-            return a._curBeatDouble >= b._curBeatDouble;
-        }
+        public static bool operator >=(Beat a, Beat b) => a._curBeatDouble >= b._curBeatDouble;
 
-        public static bool operator ==(Beat a, Beat b)
-        {
-            if (ReferenceEquals(a, b)) return true;
-            if (a is null || b is null) return false;
-            return a._curBeatDouble.Equals(b._curBeatDouble);
-        }
+        public static bool operator ==(Beat a, Beat b) => a._curBeatDouble.Equals(b._curBeatDouble);
 
-        public static bool operator !=(Beat a, Beat b) => !(a == b);
+        public static bool operator !=(Beat a, Beat b) => !a._curBeatDouble.Equals(b._curBeatDouble);
 
-        /// <summary>
-        /// 返回 Beat 的字符串表示，格式为 beat[0]:beat[1]/beat[2]
-        /// </summary>
-        /// <returns>beat[0]:beat[1]/beat[2]</returns>
-        public override string ToString()
-        {
-            return $"{this[0]}:{this[1]}/{this[2]}";
-        }
+        public override string ToString() => $"{_whole}:{_numerator}/{_denominator}";
 
-        /// <summary>
-        /// 确定指定的对象是否等于当前 Beat 对象
-        /// </summary>
-        /// <param name="obj">要与当前对象进行比较的对象</param>
-        /// <returns>如果指定的对象等于当前对象，则为 true；否则为 false</returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is Beat other)
-            {
-                return this == other;
-            }
+        public override bool Equals(object obj) => obj is Beat other && Equals(other);
 
-            return false;
-        }
+        public bool Equals(Beat other) => _curBeatDouble.Equals(other._curBeatDouble);
 
-        /// <summary>
-        /// 获取当前 Beat 对象的哈希代码
-        /// </summary>
-        /// <returns>当前对象的哈希代码</returns>
-        public override int GetHashCode()
-        {
-            double value = this;
-            return value.GetHashCode();
-        }
+        public override int GetHashCode() => _curBeatDouble.GetHashCode();
 
-        /// <summary>
-        /// 比较当前 Beat 与另一个 Beat 的大小
-        /// </summary>
-        /// <param name="other">要比较的另一个 Beat 对象</param>
-        /// <returns>如果当前 Beat 小于 other 返回负数，等于返回 0，大于返回正数</returns>
-        public int CompareTo(Beat other)
-        {
-            if (other == null) return 1;
-
-            // 将两个 Beat 转换为 double 进行比较
-            double thisValue = this;
-            double otherValue = other;
-
-            return thisValue.CompareTo(otherValue);
-        }
+        public int CompareTo(Beat other) => _curBeatDouble.CompareTo(other._curBeatDouble);
     }
 }

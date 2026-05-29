@@ -42,6 +42,26 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     private bool _removeAttachUiLine;
     private bool _removeTextureLine;
 
+    /// <summary>
+    /// 获取谱面格式的级别（数值越大级别越高）
+    /// PhiChain > RePhiEdit > PhiEdit > PhiFans > PhigrosV3 > PhigrosV1
+    /// </summary>
+    private static int GetFormatLevel(ChartType format) => format switch
+    {
+        ChartType.PhiChain => 6,
+        ChartType.RePhiEdit => 5,
+        ChartType.PhiEdit => 4,
+        ChartType.PhiFans => 3,
+        ChartType.PhigrosV3 => 2,
+        ChartType.PhigrosV1 => 1,
+        _ => 0
+    };
+
+    /// <summary>
+    /// 判断是否是降级转换（从高级格式转换到低级格式）
+    /// </summary>
+    private bool IsDowngrade => GetFormatLevel(_sourceFormat) > GetFormatLevel(_selectedFormat);
+
     public List<ChartType> AvailableFormats { get; } = new()
     {
         ChartType.RePhiEdit,
@@ -92,9 +112,9 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     };
 
     /// <summary>
-    /// 是否需要显示转换选项（导出格式与导入格式不同）
+    /// 是否需要显示转换选项（仅在降级转换时显示）
     /// </summary>
-    public bool ShowConversionOptions => _sourceFormat != _selectedFormat;
+    public bool ShowConversionOptions => IsDowngrade;
 
     /// <summary>
     /// 目标格式是否为 PhiEdit（显示"转换到 PhiEdit"的选项）

@@ -341,9 +341,9 @@ public class EventTests
         ((double)clone.StartBeat).Should().Be(1.5);
         ((double)clone.EndBeat).Should().Be(3.25);
 
-        // Verify independence
-        clone.StartBeat[0] = 99;
-        original.StartBeat[0].Should().Be(1);
+        // Verify independence: modifying clone doesn't affect original
+        clone.StartBeat = new Beat(new[] { 99, 0, 1 });
+        ((double)original.StartBeat).Should().Be(1.5);
     }
 
     #endregion

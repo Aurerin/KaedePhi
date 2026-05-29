@@ -10,7 +10,7 @@
         <Description>即使身处无人角落，我仍要继续向前，直到我无法前进。但，可曾记得启程的初衷？</Description>
         <PackageProjectUrl>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</PackageProjectUrl>
         <PackageLicenseUrl>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</PackageLicenseUrl>
-        <PackageIcon>PhiFanmadeToolIcon.png</PackageIcon>
+        <PackageIcon>KaedePhiIcon.png</PackageIcon>
         <RepositoryUrl>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</RepositoryUrl>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <Copyright>NuanR_Star Ciallo Copyright © 2025</Copyright>
@@ -33,8 +33,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="PhiFanmadeToolIcon.png" Pack="true" PackagePath="\"/>
-        <None Update="PhiFanmadeToolIcon.png">
+        <None Include="KaedePhiIcon.png" Pack="true" PackagePath="\"/>
+        <None Update="KaedePhiIcon.png">
             <Pack>True</Pack>
             <PackagePath></PackagePath>
         </None>

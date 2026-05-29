@@ -5,7 +5,7 @@ using Chart = KaedePhi.Core.KaedePhi.Chart;
 namespace KaedePhi.Tool.Render.KaedePhi;
 
 /// <summary>
-/// NRC 谱面渲染导出器：将谱面各判定线、各事件层渲染为 PNG 图片并写入目录。
+/// KPC 谱面渲染导出器：将谱面各判定线、各事件层渲染为 PNG 图片并写入目录。
 /// </summary>
 public class KpcChartRenderExporter : LoggableBase, IChartRenderExporter<Chart, KpcRenderOptions>
 {

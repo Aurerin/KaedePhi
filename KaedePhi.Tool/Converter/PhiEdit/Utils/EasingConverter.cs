@@ -6,7 +6,7 @@ public static class EasingConverter
     /// KPC 缓动在 PE 中无对应项时抛出，用于触发切段拟合。
     /// </summary>
     public sealed class EasingNotSupportedException(int nrcEasing)
-        : Exception($"NRC easing {nrcEasing} is unsupported in pe and requires linear slicing");
+        : Exception($"KPC easing {nrcEasing} is unsupported in pe and requires linear slicing");
 
     public static int MapToKpc(int pe) => pe switch
     {

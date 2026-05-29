@@ -9,7 +9,7 @@ public class BeatJsonConverterTests
     [Fact]
     public void Serialize_Beat_ProducesIntArray()
     {
-        var beat = new Beat(new[] { 2, 3, 4 });
+        var beat = new Beat([2, 3, 4]);
 
         var json = JsonConvert.SerializeObject(beat);
 
@@ -32,7 +32,7 @@ public class BeatJsonConverterTests
     [Fact]
     public void RoundTrip_PreservesValues()
     {
-        var original = new Beat(new[] { 5, 7, 8 });
+        var original = new Beat([5, 7, 8]);
 
         var json = JsonConvert.SerializeObject(original);
         var deserialized = JsonConvert.DeserializeObject<Beat>(json);
@@ -72,7 +72,7 @@ public class BeatJsonConverterTests
         var obj = new TestObject
         {
             Name = "test",
-            Beat = new Beat(new[] { 1, 1, 2 })
+            Beat = new Beat([1, 1, 2])
         };
 
         var json = JsonConvert.SerializeObject(obj);
@@ -98,7 +98,7 @@ public class BeatJsonConverterTests
         var original = new TestObject
         {
             Name = "test",
-            Beat = new Beat(new[] { 3, 5, 8 })
+            Beat = new Beat([3, 5, 8])
         };
 
         var json = JsonConvert.SerializeObject(original);
@@ -116,9 +116,8 @@ public class BeatJsonConverterTests
 
         var beat = JsonConvert.DeserializeObject<Beat>(json);
 
-        // Converter handles null gracefully by creating default beat
-        beat.Should().NotBeNull();
-        ((double)beat!).Should().Be(0.0);
+        // Converter returns default(Beat) for null JSON
+        ((double)beat).Should().Be(0.0);
     }
 
     [Fact]
@@ -144,6 +143,6 @@ public class BeatJsonConverterTests
     private class TestObject
     {
         public string Name { get; set; } = string.Empty;
-        public Beat Beat { get; set; } = new(new[] { 0, 0, 1 });
+        public Beat Beat { get; set; } = new([0, 0, 1]);
     }
 }

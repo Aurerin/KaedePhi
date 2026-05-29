@@ -8,7 +8,7 @@
         <IsPackable>false</IsPackable>
         <Configurations>Debug;Release;PreRelease</Configurations>
         <Platforms>x64</Platforms>
-        <ApplicationIcon>..\PhiFanmadeToolIcon.ico</ApplicationIcon>
+        <ApplicationIcon>..\KaedePhiIcon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <PropertyGroup>
