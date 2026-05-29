@@ -126,11 +126,11 @@
         <comment>{0} = workspace name</comment>
     </data>
     <data name="err_ukerr" xml:space="preserve">
-        <value>Sorry! The software encountered an unknown error! Please send the following information to https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues and we will fix it as soon as possible!
+        <value>Sorry! The software encountered an unknown error! Please send the following information to https://github.com/NuanRMxi-Lazy-Team/KaedePhi/issues and we will fix it as soon as possible!
 {0}</value>
     </data>
     <data name="err_out_of_memory" xml:space="preserve">
-        <value>The output might be a bit large~ Try adding the "--stream" option to reduce memory usage! If this doesn't solve your problem, please send the following information to https://github.com/NuanRMxi-Lazy-Team/PhiFanmadeTool/issues, and we'll fix the issue as soon as possible!
+        <value>The output might be a bit large~ Try adding the "--stream" option to reduce memory usage! If this doesn't solve your problem, please send the following information to https://github.com/NuanRMxi-Lazy-Team/KaedePhi/issues, and we'll fix the issue as soon as possible!
 {0}</value>
     </data>
     <data name="err_workspace_id_null" xml:space="preserve">

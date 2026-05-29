@@ -123,6 +123,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ShowDisableCompress));
             OnPropertyChanged(nameof(ShowRenderOptions));
             OnPropertyChanged(nameof(ShowFitOptions));
+            OnPropertyChanged(nameof(CanRun));
         }
     }
 
@@ -273,6 +274,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             field = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(CanRun));
         }
     }
 
@@ -283,13 +285,17 @@ public sealed class ToolViewModel : INotifyPropertyChanged
     public bool ShowRenderOptions => SelectedTool?.HasRenderOptions == true;
     public bool ShowFitOptions => SelectedTool?.HasFitOptions == true;
 
+    public bool CanRun => SelectedTool != null && !IsProcessing;
+
     public event Action? RequestRun;
     public event Action? RequestExport;
     public event Action? RequestSettings;
+    public event Action? RequestReturnToImport;
 
     public void OnRunClicked() => RequestRun?.Invoke();
     public void OnExportClicked() => RequestExport?.Invoke();
     public void OnSettingsClicked() => RequestSettings?.Invoke();
+    public void OnReturnToImportClicked() => RequestReturnToImport?.Invoke();
 
     public void ApplyConfigDefaults(GuiAppConfig config)
     {

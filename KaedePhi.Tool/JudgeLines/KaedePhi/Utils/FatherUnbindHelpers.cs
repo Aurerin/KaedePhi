@@ -10,7 +10,7 @@ using JudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
 
 /// <summary>
-/// NRC 父子解绑共用辅助方法：缓存表、坐标计算、通道合并、范围统计、采样算法、结果写回。
+/// KPC 父子解绑共用辅助方法：缓存表、坐标计算、通道合并、范围统计、采样算法、结果写回。
 /// </summary>
 public static class FatherUnbindHelpers
 {
@@ -234,7 +234,7 @@ public static class FatherUnbindHelpers
     public static (Beat Min, Beat Max) GetEventRange(List<Kpc.Event<double>> events)
         => events.Count == 0
             ? (new Beat(0), new Beat(0))
-            : (events.Min(e => e.StartBeat) ?? new Beat(0), events.Max(e => e.EndBeat) ?? new Beat(0));
+            : (events.Min(e => e.StartBeat), events.Max(e => e.EndBeat));
 
     /// <summary>
     /// 将计算结果写回判定线：清除第 1 层及以上的 X/Y 事件，将结果写入第 0 层。

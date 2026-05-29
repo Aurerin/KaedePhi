@@ -1201,5 +1201,59 @@ namespace KaedePhi.Tool.Localization {
                 return ResourceManager.GetString("tool_unbind_name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 正在加载谱面....
+        /// </summary>
+        public static string import_loading {
+            get {
+                return ResourceManager.GetString("import_loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工具运行成功.
+        /// </summary>
+        public static string tool_success_title {
+            get {
+                return ResourceManager.GetString("tool_success_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 工具运行失败.
+        /// </summary>
+        public static string tool_error_title {
+            get {
+                return ResourceManager.GetString("tool_error_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 导出成功.
+        /// </summary>
+        public static string export_success_title {
+            get {
+                return ResourceManager.GetString("export_success_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 导出失败.
+        /// </summary>
+        public static string export_error_title {
+            get {
+                return ResourceManager.GetString("export_error_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 加载失败.
+        /// </summary>
+        public static string load_error_title {
+            get {
+                return ResourceManager.GetString("load_error_title", resourceCulture);
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@
 namespace KaedePhi.Tool.Event.KaedePhi;
 
 /// <summary>
-/// NRC 事件压缩器：合并变化率相近的相邻线性事件，以及移除无意义的默认值事件。
+/// KPC 事件压缩器：合并变化率相近的相邻线性事件，以及移除无意义的默认值事件。
 /// </summary>
 public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Event<TPayload>>
 {

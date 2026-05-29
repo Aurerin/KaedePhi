@@ -30,26 +30,4 @@ public interface IEventListMerger<TEvent> : ILoggable
         List<TEvent>? toEvents,
         List<TEvent>? fromEvents,
         double precision);
-
-    /// <summary>
-    /// 将 <paramref name="fromEvents"/> 叠加到 <paramref name="toEvents"/> 上，返回合并后的新事件列表。
-    /// <para>
-    /// 对于两轨道无时间重叠的区段，以对方轨道最近一个已结束事件的终值作为常量偏移；
-    /// 对于重叠区段，以 <paramref name="precision"/> 为最大切片粒度进行自适应采样：
-    /// 仅在两轨道的事件边界处或叠加值偏离线性近似超过 <paramref name="tolerance"/> 容差时才插入新分段，
-    /// 在保证精度的前提下减少冗余事件数量。
-    /// </para>
-    /// <para>任意一个输入列表为 <see langword="null"/> 或空时直接返回另一列表的深拷贝；两者均为空时返回空列表。</para>
-    /// </summary>
-    /// <param name="toEvents">目标轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="fromEvents"/> 的克隆。</param>
-    /// <param name="fromEvents">来源轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="toEvents"/> 的克隆。</param>
-    /// <param name="precision">重叠区段自适应采样的最大切片粒度（每拍切片数）。</param>
-    /// <param name="tolerance">允许的线性近似误差百分比（0–100）；值越小结果越精确但分段越多。</param>
-    /// <returns>叠加后的新事件列表，已按起始拍升序排序。</returns>
-    List<TEvent> EventListMergePlus(
-        List<TEvent>? toEvents,
-        List<TEvent>? fromEvents,
-        double precision,
-        double tolerance);
-
 }

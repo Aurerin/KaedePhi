@@ -439,4 +439,22 @@
   <data name="file_type_phichain_json" xml:space="preserve">
     <value>PhiChain JSON</value>
   </data>
+  <data name="import_loading" xml:space="preserve">
+    <value>正在加载谱面...</value>
+  </data>
+  <data name="tool_success_title" xml:space="preserve">
+    <value>工具运行成功</value>
+  </data>
+  <data name="tool_error_title" xml:space="preserve">
+    <value>工具运行失败</value>
+  </data>
+  <data name="export_success_title" xml:space="preserve">
+    <value>导出成功</value>
+  </data>
+  <data name="export_error_title" xml:space="preserve">
+    <value>导出失败</value>
+  </data>
+  <data name="load_error_title" xml:space="preserve">
+    <value>加载失败</value>
+  </data>
 </root>

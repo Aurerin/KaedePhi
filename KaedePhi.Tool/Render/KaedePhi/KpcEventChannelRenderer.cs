@@ -5,7 +5,7 @@ using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
 namespace KaedePhi.Tool.Render.KaedePhi;
 
 /// <summary>
-/// 将 NRC EventLayer 中各通道事件渲染为图片。
+/// 将 KPC EventLayer 中各通道事件渲染为图片。
 /// 布局：时间（拍）沿 Y 轴向上（beat 0 在底部），通道值沿各通道 X 轴。
 /// 五个通道（MoveX / MoveY / Rotate / Alpha / Speed）横向排列。
 /// </summary>

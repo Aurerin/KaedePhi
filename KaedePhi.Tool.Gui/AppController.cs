@@ -8,6 +8,7 @@ using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
+using KaedePhi.Tool.Gui.Views;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
 namespace KaedePhi.Tool.Gui;
@@ -57,6 +58,7 @@ internal sealed class AppController
         _toolVm.RequestRun += OnToolRun;
         _toolVm.RequestExport += OnToolExport;
         _toolVm.RequestSettings += NavigateToSettings;
+        _toolVm.RequestReturnToImport += OnReturnToImport;
         _toolVm.PropertyChanged += OnToolVmPropertyChanged;
         _exportVm.RequestExport += OnExportExecute;
         _exportVm.RequestReturnToImport += OnReturnToImport;
@@ -74,7 +76,7 @@ internal sealed class AppController
 
     private void NavigateToImport()
     {
-        _chart.ClearWorkspace();
+        _chart.Clear();
         _importVm.UseStream = false;
         _main.CurrentPage = _importVm;
         _log.Info(log_navigate_import);
@@ -132,12 +134,11 @@ internal sealed class AppController
     {
         if (_isFileProcessing) return;
         _isFileProcessing = true;
+        _importVm.IsLoading = true;
 
         try
         {
-            await _chart.CopyToWorkspaceAsync(filePath, useStream, CancellationToken.None);
-
-            var (_, detectedType) = await _chart.LoadAndDetectFromWorkspaceAsync(CancellationToken.None);
+            var (_, detectedType) = await _chart.LoadChartAsync(filePath, useStream, CancellationToken.None);
 
             _toolVm.CurrentFileName = System.IO.Path.GetFileName(filePath);
             _toolVm.DetectedFormat = detectedType.ToString();
@@ -150,16 +151,19 @@ internal sealed class AppController
         catch (Exception ex)
         {
             _log.Error(log_load_failed, ex);
+            MessageDialog.ShowError(_window, load_error_title, ex.Message);
         }
         finally
         {
             _isFileProcessing = false;
+            _importVm.IsLoading = false;
         }
     }
 
     private async void OnToolRun()
     {
         if (_toolVm.SelectedTool == null || _toolVm.IsProcessing) return;
+        if (_chart.CurrentChart == null) return;
 
         _toolVm.IsProcessing = true;
         _toolVm.StatusText = status_processing;
@@ -170,19 +174,11 @@ internal sealed class AppController
             var toolId = _toolVm.SelectedTool.ToolId;
             NavigateToProcessing();
 
-            // Step 0: Load from workspace
-            _processingVm.SetStep(0, log_step_loading);
-            var (text, detectedType) = await _chart.LoadAndDetectFromWorkspaceAsync(_cts.Token);
+            // 直接使用内存中的 KPC 图表，无需加载和转换
+            var kpcChart = _chart.CurrentChart;
 
-            // Step 1: Detect format
-            _processingVm.SetStep(1, string.Format(log_step_detected, detectedType));
-
-            // Step 2: Convert to KPC
-            _processingVm.SetStep(2, log_step_converting);
-            var kpcChart = await Task.Run(() => _chart.ConvertToKpc(text, detectedType), _cts.Token);
-
-            // Step 3: Run tool
-            _processingVm.SetStep(3, string.Format(log_running_tool, toolId));
+            // Run tool
+            _processingVm.SetStep(0, string.Format(log_running_tool, toolId));
             var toolProgress = new Progress<ToolProgress>(p =>
             {
                 var overall = p.OverallPercentage >= 0 ? p.OverallPercentage : p.Percentage;
@@ -221,20 +217,19 @@ internal sealed class AppController
                 }
             }, _cts.Token);
 
-            // Step 4: Convert back to original format
-            _processingVm.SetStep(4, step_from_kpc);
-
-            // Step 5: Save back to workspace
-            _processingVm.SetStep(5, step_saving);
-            await _chart.SaveKpcToWorkspaceAsync(kpcChart, detectedType, false, _cts.Token);
-
-            _processingVm.SetCompleted(string.Format(log_tool_completed, toolId));
             _log.Info(string.Format(log_tool_completed, toolId));
+
+            // 返回工具页面并显示成功对话框
+            NavigateToTool();
+            MessageDialog.ShowSuccess(_window, tool_success_title, string.Format(log_tool_completed, toolId));
         }
         catch (Exception ex)
         {
             _log.Error(log_tool_failed, ex);
-            _processingVm.SetError(ex.Message, _log.CurrentLogFile);
+
+            // 返回工具页面并显示失败对话框
+            NavigateToTool();
+            MessageDialog.ShowError(_window, tool_error_title, ex.Message);
         }
         finally
         {
@@ -301,16 +296,12 @@ internal sealed class AppController
                     if (!outputPath.EndsWith(expectedExt, StringComparison.OrdinalIgnoreCase))
                         outputPath = outputPath + expectedExt;
 
-                    _log.Info(string.Format(log_exporting_to, outputPath, targetFormat));
-
-                    // Read current workspace, detect, convert to KPC, then export as target
-                    var (text, detectedType) = await _chart.LoadAndDetectFromWorkspaceAsync(CancellationToken.None);
-                    var kpcChart = _chart.ConvertToKpc(text, detectedType);
-                    await _chart.ConvertFromKpcAndSaveAsync(
-                        kpcChart, targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, CancellationToken.None);
+                    // 直接从内存中的 KPC 图表导出，无需重新加载
+                    await _chart.ExportChartAsync(targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, CancellationToken.None);
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
                     _log.Info(log_export_done);
+                    MessageDialog.ShowSuccess(_window, export_success_title, string.Format(status_exported_to, outputPath));
                 }
             }
             else
@@ -323,6 +314,7 @@ internal sealed class AppController
         {
             _log.Error(log_export_failed, ex);
             _exportVm.StatusText = string.Format(status_error_with_log, ex.Message, _log.CurrentLogFile);
+            MessageDialog.ShowError(_window, export_error_title, ex.Message);
         }
         finally
         {

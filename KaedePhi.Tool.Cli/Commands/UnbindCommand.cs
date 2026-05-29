@@ -21,7 +21,7 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
         if (nrc == null) { ConsoleWriter.Error(CliLocalizationString.err_unimplemented); return 1; }
 
         var nrcCopy = nrc.Clone();
-        var unbinder = new KpcJudgeLineUnbinder();
+        var unbinder = new JudgeLineUnbinder();
         unbinder.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
 
         for (var i = 0; i < nrc.JudgeLineList.Count; i++)
@@ -29,7 +29,7 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
             if (nrc.JudgeLineList[i].Father != -1)
                 nrcCopy.JudgeLineList[i] = s.Classic == true
                     ? unbinder.FatherUnbind(i, nrc.JudgeLineList, s.Precision ?? 64d)
-                    : unbinder.FatherUnbindPlus(i, nrc.JudgeLineList, s.Precision ?? 64d, s.Tolerance ?? 5d);
+                    : unbinder.FatherUnbind(i, nrc.JudgeLineList, s.Precision ?? 64d, s.Tolerance ?? 5d);
         }
 
         var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace), s.DryRun ?? false, cancellationToken);

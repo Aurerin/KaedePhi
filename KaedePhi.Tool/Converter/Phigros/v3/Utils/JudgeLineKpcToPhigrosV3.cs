@@ -46,14 +46,14 @@ public class JudgeLineKpcToPhigrosV3
         if (trueSrc.Father != -1)
         {
             Warn($"PhigrosV3 不支持 JudgeLine.Father（值={src.Father}），将自动解除父子绑定");
-            var unbinder = new KpcJudgeLineUnbinder();
+            var unbinder = new JudgeLineUnbinder();
             if (_options.FatherLineUnbind.ClassicMode)
             {
                 trueSrc = unbinder.FatherUnbind(allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
                     allLine, _options.FatherLineUnbind.Precision);
             }
             else
-                trueSrc = unbinder.FatherUnbindPlus(
+                trueSrc = unbinder.FatherUnbind(
                     allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
                     allLine, _options.FatherLineUnbind.Precision, _options.FatherLineUnbind.Tolerance);
         }

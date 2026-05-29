@@ -189,18 +189,27 @@
         <Border Grid.Row="4" Padding="16,12"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
             <Grid ColumnDefinitions="Auto,*">
-                <Button Grid.Column="0" Padding="12,8" Click="OnSettingsClick"
-                        IsEnabled="{Binding !IsProcessing}">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="&#xf013;" Classes="fa-icon"
-                                   FontSize="14" VerticalAlignment="Center"/>
-                        <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_settings}" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                    <Button Padding="12,8" Click="OnReturnClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="&#xf060;" Classes="fa-icon"
+                                       FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Padding="12,8" Click="OnSettingsClick"
+                            IsEnabled="{Binding !IsProcessing}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="&#xf013;" Classes="fa-icon"
+                                       FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_settings}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
                     <Button Content="{x:Static loc:GuiLocalizationString.btn_run_tool}" Classes="accent" Padding="24,8" FontSize="14"
                             Click="OnRunClick"
-                            IsEnabled="{Binding !IsProcessing}"/>
+                            IsEnabled="{Binding CanRun}"/>
                     <Button Content="{x:Static loc:GuiLocalizationString.btn_export_chart}" Padding="24,8" FontSize="14"
                             Click="OnExportClick"
                             IsEnabled="{Binding !IsProcessing}"/>

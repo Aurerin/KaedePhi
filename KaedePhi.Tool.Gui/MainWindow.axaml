@@ -7,7 +7,7 @@
         Width="900" Height="640"
         MinWidth="700" MinHeight="500"
         WindowStartupLocation="CenterScreen"
-        Icon="/Assets/PhiFanmadeToolIcon.png">
+        Icon="/Assets/KaedePhiIcon.png">
 
     <ContentControl Content="{Binding CurrentPage}"/>
 </Window>

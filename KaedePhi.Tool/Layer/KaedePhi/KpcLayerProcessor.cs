@@ -6,7 +6,7 @@ using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
 namespace KaedePhi.Tool.Layer.KaedePhi;
 
 /// <summary>
-/// NRC（KaedePhi）谱面事件层处理器。
+/// KPC（KaedePhi）谱面事件层处理器。
 /// </summary>
 public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
 {
@@ -14,6 +14,10 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     private readonly EventListMerger<int> _intMerger = new();
     private readonly EventListMerger<float> _floatMerger = new();
     private readonly EventListMergerSqrt<double> _doubleMergerSqrt = new();
+    private readonly EventListMergerPlus<double> _doubleMergerPlus = new();
+    private readonly EventListMergerPlus<int> _intMergerPlus = new();
+    private readonly EventListMergerPlus<float> _floatMergerPlus = new();
+    private readonly EventListMergerSqrt<double> _doubleMergerSqrtPlus = new();
     private readonly EventCutter<double> _doubleCutter = new();
     private readonly EventCutter<int> _intCutter = new();
     private readonly EventCutter<float> _floatCutter = new();
@@ -70,19 +74,19 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
             var layer = layers[li];
             if (layer.AlphaEvents is { Count: > 0 })
                 mergedLayer.AlphaEvents =
-                    _intMerger.EventListMergePlus(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
+                    _intMergerPlus.EventListMerge(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
             if (layer.MoveXEvents is { Count: > 0 })
                 mergedLayer.MoveXEvents =
-                    _doubleMergerSqrt.EventListMergePlus(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
+                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
             if (layer.MoveYEvents is { Count: > 0 })
                 mergedLayer.MoveYEvents =
-                    _doubleMergerSqrt.EventListMergePlus(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
+                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
             if (layer.RotateEvents is { Count: > 0 })
                 mergedLayer.RotateEvents =
-                    _doubleMerger.EventListMergePlus(mergedLayer.RotateEvents, layer.RotateEvents, precision, tolerance);
+                    _doubleMergerPlus.EventListMerge(mergedLayer.RotateEvents, layer.RotateEvents, precision, tolerance);
             if (layer.SpeedEvents is { Count: > 0 })
                 mergedLayer.SpeedEvents =
-                    _floatMerger.EventListMergePlus(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
+                    _floatMergerPlus.EventListMerge(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
 
             progress?.Report(new ToolProgress((double)(li + 1) / totalLayers));
         }
@@ -104,36 +108,36 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         if (layer.AlphaEvents is { Count: > 0 })
             cutEventLayer.AlphaEvents = _intCutter.CutEventsInRange(
                 layer.AlphaEvents,
-                layer.AlphaEvents.Min(e => e.StartBeat) ?? new Beat(0),
-                layer.AlphaEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+                layer.AlphaEvents.Min(e => e.StartBeat),
+                layer.AlphaEvents.Max(e => e.EndBeat), cutLength);
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveXEvents is { Count: > 0 })
             cutEventLayer.MoveXEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveXEvents,
-                layer.MoveXEvents.Min(e => e.StartBeat) ?? new Beat(0),
-                layer.MoveXEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+                layer.MoveXEvents.Min(e => e.StartBeat),
+                layer.MoveXEvents.Max(e => e.EndBeat), cutLength);
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveYEvents is { Count: > 0 })
             cutEventLayer.MoveYEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveYEvents,
-                layer.MoveYEvents.Min(e => e.StartBeat) ?? new Beat(0),
-                layer.MoveYEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+                layer.MoveYEvents.Min(e => e.StartBeat),
+                layer.MoveYEvents.Max(e => e.EndBeat), cutLength);
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.RotateEvents is { Count: > 0 })
             cutEventLayer.RotateEvents = _doubleCutter.CutEventsInRange(
                 layer.RotateEvents,
-                layer.RotateEvents.Min(e => e.StartBeat) ?? new Beat(0),
-                layer.RotateEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+                layer.RotateEvents.Min(e => e.StartBeat),
+                layer.RotateEvents.Max(e => e.EndBeat), cutLength);
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.SpeedEvents is { Count: > 0 })
             cutEventLayer.SpeedEvents = _floatCutter.CutEventsInRange(
                 layer.SpeedEvents,
-                layer.SpeedEvents.Min(e => e.StartBeat) ?? new Beat(0),
-                layer.SpeedEvents.Max(e => e.EndBeat) ?? new Beat(0), cutLength);
+                layer.SpeedEvents.Min(e => e.StartBeat),
+                layer.SpeedEvents.Max(e => e.EndBeat), cutLength);
         progress?.Report(new ToolProgress(1.0));
 
         return cutEventLayer;

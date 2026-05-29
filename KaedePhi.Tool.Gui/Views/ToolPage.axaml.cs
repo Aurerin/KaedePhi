@@ -28,4 +28,10 @@ public partial class ToolPage : UserControl
         if (DataContext is ToolViewModel vm)
             vm.OnSettingsClicked();
     }
+
+    private void OnReturnClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ToolViewModel vm)
+            vm.OnReturnToImportClicked();
+    }
 }

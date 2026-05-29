@@ -24,6 +24,16 @@ namespace KaedePhi.Core.PhiEdit
         private readonly int _easingNumber;
         private readonly EasingFunction _function;
 
+        private static readonly Easing[] Cache = new Easing[30];
+
+        /// <summary>获取缓存的 Easing 实例，避免重复创建。</summary>
+        public static Easing Get(int easingNumber)
+        {
+            if (easingNumber is >= 1 and <= 29)
+                return Cache[easingNumber] ??= new Easing(easingNumber);
+            return new Easing(easingNumber);
+        }
+
         public Easing(int easingNumber)
         {
             _easingNumber = easingNumber;
@@ -47,6 +57,6 @@ namespace KaedePhi.Core.PhiEdit
         }
 
         public static implicit operator int(Easing easing) => easing._easingNumber;
-        public static implicit operator Easing(int easingNumber) => new(easingNumber);
+        public static implicit operator Easing(int easingNumber) => Get(easingNumber);
     }
 }

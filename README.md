@@ -59,20 +59,6 @@ KaedePhi.Tool.Localization: .NET8.0, .NET10.0
 [GNU LESSER GENERAL PUBLIC LICENSE 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
 
 ## Copyright
-NuanR_Mxi Copyright © 2026 PhiFanmadeTool Project.  
-NuanR_Star Copyright © 2026 PhiFanmadeTool Project.  
-Kaede HikariN Copyright © 2026 PhiFanmadeTool Project.  
-Kaede NuanR_Mxi Copyright © 2026 PhiFanmadeTool Project.  
-Kaede NuanR_Star Copyright © 2026 PhiFanmadeTool Project.  
-枫暖日明曦 Copyright © 2026 PhiFanmadeTool Project.  
-枫暖日星辉 Copyright © 2026 PhiFanmadeTool Project.  
-暖日明曦 Copyright © 2026 PhiFanmadeTool Project.  
-暖日星辉 Copyright © 2026 PhiFanmadeTool Project.  
-暖日 Copyright © 2026 PhiFanmadeTool Project.  
-暖星 Copyright © 2026 PhiFanmadeTool Project.  
-NuanR_Mxi Lazy Team Copyright © 2026 PhiFanmadeTool Project.  
-NuanR_Star Lazy Team Copyright © 2026 PhiFanmadeTool Project.  
-NuanR_Star Ciallo Team Copyright © 2026 PhiFanmadeTool Project.  
 NuanR_Mxi Copyright © 2026 KaedePhi Project.  
 NuanR_Star Copyright © 2026 KaedePhi Project.  
 Kaede HikariN Copyright © 2026 KaedePhi Project.  

@@ -29,13 +29,11 @@ public class BeatTests
     }
 
     [Fact]
-    public void Constructor_WithNullArray_UsesDefault()
+    public void Constructor_WithNullArray_ThrowsArgumentException()
     {
-        var beat = new Beat((int[])null!);
+        var act = () => new Beat((int[])null!);
 
-        beat[0].Should().Be(0);
-        beat[1].Should().Be(0);
-        beat[2].Should().Be(1);
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -134,35 +132,22 @@ public class BeatTests
     }
 
     [Fact]
-    public void Indexer_Set_ValidIndex_UpdatesValue()
+    public void Indexer_Get_ValidIndex_ReturnsCorrectValues()
     {
-        var beat = new Beat(new[] { 1, 0, 1 });
+        var beat = new Beat(new[] { 1, 3, 4 });
 
-        beat[1] = 3;
-        beat[2] = 4;
-
+        beat[0].Should().Be(1);
         beat[1].Should().Be(3);
         beat[2].Should().Be(4);
         ((double)beat).Should().Be(1.75);
     }
 
     [Fact]
-    public void Indexer_Set_DenominatorToZero_ThrowsArgumentException()
+    public void Indexer_Get_InvalidIndex_ThrowsArgumentOutOfRangeException()
     {
         var beat = new Beat(new[] { 1, 0, 1 });
 
-        var act = () => beat[2] = 0;
-
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("*denominator*cannot be zero*");
-    }
-
-    [Fact]
-    public void Indexer_Set_InvalidIndex_ThrowsArgumentOutOfRangeException()
-    {
-        var beat = new Beat(new[] { 1, 0, 1 });
-
-        var act = () => beat[-1] = 5;
+        var act = () => { var _ = beat[-1]; };
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -411,14 +396,6 @@ public class BeatTests
         var b = new Beat(new[] { 1, 1, 2 });
 
         a.GetHashCode().Should().Be(b.GetHashCode());
-    }
-
-    [Fact]
-    public void CompareTo_WithNull_ReturnsPositive()
-    {
-        var a = new Beat(new[] { 1, 1, 2 });
-
-        a.CompareTo(null).Should().BePositive();
     }
 
     [Fact]

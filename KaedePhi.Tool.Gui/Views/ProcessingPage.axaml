@@ -5,21 +5,20 @@
              x:Class="KaedePhi.Tool.Gui.Views.ProcessingPage"
              x:DataType="vm:ProcessingViewModel">
 
-    <Grid>
+    <Grid Background="#80000000">
         <Border HorizontalAlignment="Center" VerticalAlignment="Center"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1" CornerRadius="12" Padding="48,36" MinWidth="480">
+                BorderThickness="1" CornerRadius="12" Padding="48,36" MinWidth="360">
             <StackPanel Spacing="20">
 
-                <!-- Header -->
-                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                    <!-- Processing spinner (animated) -->
-                    <TextBlock Text="&#xf110;" Classes="fa-icon" Name="SpinnerIcon"
-                               FontSize="24" VerticalAlignment="Center"
-                               IsVisible="{Binding !IsCompleted}">
+                <!-- Header with spinner -->
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <TextBlock Text="&#xf110;" Classes="fa-icon"
+                               FontSize="28" VerticalAlignment="Center"
+                               Foreground="{DynamicResource SystemAccentColor}">
                         <TextBlock.Styles>
-                            <Style Selector="TextBlock#SpinnerIcon">
+                            <Style Selector="TextBlock">
                                 <Style.Animations>
                                     <Animation Duration="0:0:1" IterationCount="Infinite">
                                         <KeyFrame Cue="0%">
@@ -33,26 +32,18 @@
                             </Style>
                         </TextBlock.Styles>
                     </TextBlock>
-                    <!-- Success icon (completed without error) -->
-                    <TextBlock Text="&#xf058;" Classes="fa-icon"
-                               FontSize="24" VerticalAlignment="Center" Foreground="Green"
-                               IsVisible="{Binding ShowSuccessIcon}"/>
-                    <!-- Error icon (completed with error) -->
-                    <TextBlock Text="&#xf057;" Classes="fa-icon"
-                               FontSize="24" VerticalAlignment="Center" Foreground="Red"
-                               IsVisible="{Binding HasError}"/>
-                    <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_title}" FontSize="22" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_title}"
+                               FontSize="20" FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Progress bar -->
-                <ProgressBar Value="{Binding Progress}" Maximum="100" Height="8"
-                             CornerRadius="4"/>
+                <ProgressBar Value="{Binding Progress}" Maximum="100" Height="6"
+                             CornerRadius="3"/>
 
                 <!-- Tool sub-progress bar -->
-                <StackPanel IsVisible="{Binding !IsCompleted}" Spacing="4">
-                    <ProgressBar Value="{Binding ToolProgressValue}" Maximum="100" Height="4"
-                                 CornerRadius="2" Opacity="0.7"/>
-                </StackPanel>
+                <ProgressBar Value="{Binding ToolProgressValue}" Maximum="100" Height="3"
+                             CornerRadius="1" Opacity="0.7"/>
 
                 <!-- Current step -->
                 <StackPanel Spacing="4" HorizontalAlignment="Center">
@@ -60,61 +51,6 @@
                                HorizontalAlignment="Center"/>
                     <TextBlock Text="{Binding StatusMessage}" FontSize="12" Opacity="0.6"
                                HorizontalAlignment="Center"/>
-                </StackPanel>
-
-                <!-- Error display -->
-                <Border IsVisible="{Binding HasError}"
-                        Background="#33FF0000" CornerRadius="8" Padding="16,12">
-                    <StackPanel Spacing="8">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="&#xf06a;" Classes="fa-icon"
-                                       FontSize="16" Foreground="Red" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_error}" FontWeight="SemiBold" FontSize="14" Foreground="Red"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding ErrorMessage}" FontSize="12" TextWrapping="Wrap"
-                                   Foreground="Red"/>
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="{x:Static loc:GuiLocalizationString.processing_log_file}" FontSize="11" Opacity="0.7" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding LogFilePath}" FontSize="11"
-                                       Foreground="{DynamicResource SystemAccentColor}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- Completion buttons -->
-                <StackPanel IsVisible="{Binding IsCompleted}" Spacing="8" HorizontalAlignment="Center">
-                    <TextBlock IsVisible="{Binding !HasError}"
-                               Text="{x:Static loc:GuiLocalizationString.processing_success}"
-                               Foreground="Green" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-                        <!-- Success: Back to Tools + Export -->
-                        <Button Padding="20,8" Click="OnReturnToToolsClick"
-                                IsVisible="{Binding !HasError}">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="&#xf060;" Classes="fa-icon"
-                                           FontSize="13" VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_tools}"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Padding="20,8" Click="OnGoToExportClick"
-                                IsVisible="{Binding !HasError}">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="&#xf56e;" Classes="fa-icon"
-                                           FontSize="13" VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_export_chart}"/>
-                            </StackPanel>
-                        </Button>
-                        <!-- Error: Back to Import -->
-                        <Button Padding="20,8" Click="OnReturnToImportClick"
-                                IsVisible="{Binding HasError}">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="&#xf07c;" Classes="fa-icon"
-                                           FontSize="13" VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Border>
