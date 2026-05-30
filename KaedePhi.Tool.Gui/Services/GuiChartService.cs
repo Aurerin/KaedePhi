@@ -307,14 +307,13 @@ public sealed class GuiChartService
         progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    public void RunFitEvent(Chart chart, double tolerance, EventFitOptions? fitOptions = null, IProgress<ToolProgress>? progress = null)
+    public void RunFitEvent(Chart chart, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_fit_name));
-        var degree = Environment.ProcessorCount;
         var totalLines = chart.JudgeLineList.Count;
-        var doubleFit = new EventFit<double>(fitOptions);
-        var intFit = new EventFit<int>(fitOptions);
-        var floatFit = new EventFit<float>(fitOptions);
+        var doubleFit = new EventFit<double>();
+        var intFit = new EventFit<int>();
+        var floatFit = new EventFit<float>();
         doubleFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         intFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         floatFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
@@ -338,7 +337,7 @@ public sealed class GuiChartService
                     var overall = (capturedLi + (double)capturedEi / totalLayers) / totalLines;
                     progress?.Report(new ToolProgress(p.Percentage, overall, p.Detail));
                 });
-                FitLayer(line.EventLayers[ei], doubleFit, intFit, floatFit, tolerance, degree, layerProgress);
+                FitLayer(line.EventLayers[ei], doubleFit, intFit, floatFit, tolerance, layerProgress);
             }
         }
 
@@ -347,19 +346,20 @@ public sealed class GuiChartService
 
     private static void FitLayer(Core.KaedePhi.EventLayer layer,
         EventFit<double> doubleFit, EventFit<int> intFit, EventFit<float> floatFit,
-        double tolerance, int degree,
+        double tolerance,
         IProgress<ToolProgress>? progress)
     {
         if (layer.MoveXEvents is { Count: > 0 })
-            layer.MoveXEvents = doubleFit.EventListFit(layer.MoveXEvents, tolerance, degree, progress);
+            layer.MoveXEvents = doubleFit.FitEvents(layer.MoveXEvents, tolerance);
         if (layer.MoveYEvents is { Count: > 0 })
-            layer.MoveYEvents = doubleFit.EventListFit(layer.MoveYEvents, tolerance, degree, progress);
+            layer.MoveYEvents = doubleFit.FitEvents(layer.MoveYEvents, tolerance);
         if (layer.RotateEvents is { Count: > 0 })
-            layer.RotateEvents = doubleFit.EventListFit(layer.RotateEvents, tolerance, degree, progress);
+            layer.RotateEvents = doubleFit.FitEvents(layer.RotateEvents, tolerance);
         if (layer.AlphaEvents is { Count: > 0 })
-            layer.AlphaEvents = intFit.EventListFit(layer.AlphaEvents, tolerance, degree, progress);
+            layer.AlphaEvents = intFit.FitEvents(layer.AlphaEvents, tolerance);
         if (layer.SpeedEvents is { Count: > 0 })
-            layer.SpeedEvents = floatFit.EventListFit(layer.SpeedEvents, tolerance, degree, progress);
+            layer.SpeedEvents = floatFit.FitEvents(layer.SpeedEvents, tolerance);
+        progress?.Report(new ToolProgress(1.0));
     }
 
     public System.Collections.Generic.IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions,

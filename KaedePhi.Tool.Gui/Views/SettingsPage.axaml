@@ -82,32 +82,7 @@
                             <StackPanel Spacing="4">
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.option_tolerance}" FontSize="12" Opacity="0.7"/>
                                 <NumericUpDown Value="{Binding FitTolerance}" Minimum="0" Maximum="100"
-                                               Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
-                            </StackPanel>
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_segment_penalty}" FontSize="12" Opacity="0.7"/>
-                                <NumericUpDown Value="{Binding FitSegmentPenalty}" Minimum="0" Maximum="100"
-                                               Increment="0.01" FormatString="F3" Width="200" HorizontalAlignment="Left"/>
-                            </StackPanel>
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_keep_original_penalty}" FontSize="12" Opacity="0.7"/>
-                                <NumericUpDown Value="{Binding FitKeepOriginalPenalty}" Minimum="0" Maximum="100"
-                                               Increment="0.01" FormatString="F3" Width="200" HorizontalAlignment="Left"/>
-                            </StackPanel>
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_full_search_threshold}" FontSize="12" Opacity="0.7"/>
-                                <NumericUpDown Value="{Binding FitFullSearchRunLengthThreshold}" Minimum="1" Maximum="10000"
-                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
-                            </StackPanel>
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_long_run_window}" FontSize="12" Opacity="0.7"/>
-                                <NumericUpDown Value="{Binding FitLongRunSearchWindow}" Minimum="1" Maximum="10000"
-                                               Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
-                            </StackPanel>
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{x:Static loc:GuiLocalizationString.option_phase_epsilon}" FontSize="12" Opacity="0.7"/>
-                                <NumericUpDown Value="{Binding FitPhaseDetectionEpsilon}" Minimum="0" Maximum="1"
-                                               Increment="0.001" FormatString="F4" Width="200" HorizontalAlignment="Left"/>
+                                               Increment="0.5" FormatString="F1" Width="200" HorizontalAlignment="Left"/>
                             </StackPanel>
                         </StackPanel>
                     </Expander>

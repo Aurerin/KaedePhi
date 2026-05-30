@@ -8,25 +8,6 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 {
     public sealed class Settings : OperationSettings
     {
-        [CommandOption("--segment-penalty <N>")]
-        [LocalizedDescription("fit_opt_segment_penalty")]
-        public double? SegmentPenalty { get; set; }
-
-        [CommandOption("--keep-original-penalty <N>")]
-        [LocalizedDescription("fit_opt_keep_original_penalty")]
-        public double? KeepOriginalPenalty { get; set; }
-
-        [CommandOption("--full-search-threshold <N>")]
-        [LocalizedDescription("fit_opt_full_search_threshold")]
-        public int? FullSearchRunLengthThreshold { get; set; }
-
-        [CommandOption("--search-window <N>")]
-        [LocalizedDescription("fit_opt_search_window")]
-        public int? LongRunSearchWindow { get; set; }
-
-        [CommandOption("--phase-epsilon <N>")]
-        [LocalizedDescription("fit_opt_phase_epsilon")]
-        public double? PhaseDetectionEpsilon { get; set; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
@@ -45,26 +26,18 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 
         var nrcCopy = nrc.Clone();
 
-        var fitOptions = new EventFitOptions
-        {
-            SegmentPenalty = s.SegmentPenalty ?? c.SegmentPenalty,
-            KeepOriginalPenalty = s.KeepOriginalPenalty ?? c.KeepOriginalPenalty,
-            FullSearchRunLengthThreshold = s.FullSearchRunLengthThreshold ?? c.FullSearchRunLengthThreshold,
-            LongRunSearchWindow = s.LongRunSearchWindow ?? c.LongRunSearchWindow,
-            PhaseDetectionEpsilon = s.PhaseDetectionEpsilon ?? c.PhaseDetectionEpsilon
-        };
-
-        var mxFitter = new EventFit<double>(fitOptions);
-        var myFitter = new EventFit<double>(fitOptions);
-        var alFitter = new EventFit<int>(fitOptions);
-        var roFitter = new EventFit<double>(fitOptions);
+        var mxFitter = new EventFit<double>();
+        var myFitter = new EventFit<double>();
+        var alFitter = new EventFit<int>();
+        var roFitter = new EventFit<double>();
+        var spFitter = new EventFit<float>();
         mxFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
         myFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
         alFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
         roFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
+        spFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
 
-        var degree = Math.Max(1, Environment.ProcessorCount);
-        var tol = s.Tolerance ?? 0.5d;
+        var tolerance = s.Tolerance ?? 0.1d;
 
         for (var i = 0; i < nrc.JudgeLineList.Count; i++)
         {
@@ -74,16 +47,17 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
                 if (el == null) continue;
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // 使用顺序执行避免嵌套并行导致线程池抖动
-                var mxResult = mxFitter.EventListFit(el.MoveXEvents, tol, degree);
-                var myResult = myFitter.EventListFit(el.MoveYEvents, tol, degree);
-                var alResult = alFitter.EventListFit(el.AlphaEvents, tol, degree);
-                var roResult = roFitter.EventListFit(el.RotateEvents, tol, degree);
+                var mxResult = mxFitter.FitEvents(el.MoveXEvents, tolerance);
+                var myResult = myFitter.FitEvents(el.MoveYEvents, tolerance);
+                var alResult = alFitter.FitEvents(el.AlphaEvents, tolerance);
+                var roResult = roFitter.FitEvents(el.RotateEvents, tolerance);
+                var spResult = spFitter.FitEvents(el.SpeedEvents, tolerance);
 
                 nrcCopy.JudgeLineList[i].EventLayers[j].MoveXEvents = mxResult;
                 nrcCopy.JudgeLineList[i].EventLayers[j].MoveYEvents = myResult;
                 nrcCopy.JudgeLineList[i].EventLayers[j].AlphaEvents = alResult;
                 nrcCopy.JudgeLineList[i].EventLayers[j].RotateEvents = roResult;
+                nrcCopy.JudgeLineList[i].EventLayers[j].SpeedEvents = spResult;
             }
         }
 

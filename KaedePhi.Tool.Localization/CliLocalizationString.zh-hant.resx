@@ -42,6 +42,16 @@
     <data name="cmd_rpe_convert_desc" xml:space="preserve">
         <value>將 RPE 譜面轉換為其他格式（尚未完整實現）</value>
     </data>
+    <data name="branch_config_desc" xml:space="preserve">
+        <value>配置管理</value>
+    </data>
+    <data name="cmd_config_reset_desc" xml:space="preserve">
+        <value>重置配置檔案為預設值</value>
+    </data>
+    <data name="msg_config_reset_done" xml:space="preserve">
+        <value>配置檔案已重置為預設值：{0}</value>
+        <comment>{0} = 配置檔案路徑</comment>
+    </data>
     <!-- ── option descriptions ───────────────────────────────────────────────── -->
     <data name="opt_input_phiedit_desc" xml:space="preserve">
         <value>輸入的 RPE/PhiEdit 譜面檔案路徑</value>

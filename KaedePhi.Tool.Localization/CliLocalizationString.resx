@@ -62,6 +62,16 @@
     <data name="convert_command_desc" xml:space="preserve">
         <value>转换输入谱面到目标谱面格式</value>
     </data>
+    <data name="branch_config_desc" xml:space="preserve">
+        <value>配置管理</value>
+    </data>
+    <data name="cmd_config_reset_desc" xml:space="preserve">
+        <value>重置配置文件为默认值</value>
+    </data>
+    <data name="msg_config_reset_done" xml:space="preserve">
+        <value>配置文件已重置为默认值：{0}</value>
+        <comment>{0} = 配置文件路径</comment>
+    </data>
     <data name="convert_command_opt_target" xml:space="preserve">
         <value>目标格式（如：RePhiEdit、PhiEdit、PhigrosV3）</value>
     </data>

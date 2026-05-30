@@ -56,7 +56,7 @@ KaedePhi.Tool.Localization: .NET8.0, .NET10.0
 
 
 ## 开源许可证
-[GNU LESSER GENERAL PUBLIC LICENSE 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+[GNU LESSER GENERAL PUBLIC LICENSE 3.0](https://www.gnu.org/licenses/lgpl-3.0.html)
 
 ## Copyright
 NuanR_Mxi Copyright © 2026 KaedePhi Project.  
