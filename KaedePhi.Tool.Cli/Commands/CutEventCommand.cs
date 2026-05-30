@@ -28,7 +28,7 @@ public sealed class CutEventCommand : AsyncCommand<CutEventCommand.Settings>
         }
 
         var nrcCopy = nrc.Clone();
-        var layerProcessor = new KpcLayerProcessor();
+        var layerProcessor = new LayerProcessor();
         var doubleCompressor = new EventCompressor<double>();
         var intCompressor = new EventCompressor<int>();
 

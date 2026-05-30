@@ -21,7 +21,7 @@ public class EventKpcToPhigrosV3
     private readonly EventCutter<double> _eventCutterDouble = new();
     private readonly EventCutter<int> _eventCutterInt = new();
     private readonly EventCutter<float> _eventCutterFloat = new();
-    private readonly KpcLayerProcessor _layerProcessor = new();
+    private readonly LayerProcessor _layerProcessor = new();
 
     public EventKpcToPhigrosV3(KpcToPhigrosV3ConvertOptions options, Action<string>? warnLogger)
     {

@@ -6,9 +6,9 @@ using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
 namespace KaedePhi.Tool.Layer.KaedePhi;
 
 /// <summary>
-/// KPC（KaedePhi）谱面事件层处理器。
+/// KPC 谱面事件层处理器。
 /// </summary>
-public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
+public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
 {
     private readonly EventListMerger<double> _doubleMerger = new();
     private readonly EventListMerger<int> _intMerger = new();
@@ -61,7 +61,8 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     }
 
     /// <inheritdoc/>
-    public EventLayer LayerMergePlus(List<EventLayer> layers, double precision, double tolerance, IProgress<ToolProgress>? progress = null)
+    public EventLayer LayerMergePlus(List<EventLayer> layers, double precision, double tolerance,
+        IProgress<ToolProgress>? progress = null)
     {
         layers.RemoveAll(layer => (object?)layer is null);
         if (layers.Count <= 1) return layers.FirstOrDefault() ?? new EventLayer();
@@ -77,13 +78,16 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
                     _intMergerPlus.EventListMerge(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
             if (layer.MoveXEvents is { Count: > 0 })
                 mergedLayer.MoveXEvents =
-                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision, tolerance);
+                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision,
+                        tolerance);
             if (layer.MoveYEvents is { Count: > 0 })
                 mergedLayer.MoveYEvents =
-                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision, tolerance);
+                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision,
+                        tolerance);
             if (layer.RotateEvents is { Count: > 0 })
                 mergedLayer.RotateEvents =
-                    _doubleMergerPlus.EventListMerge(mergedLayer.RotateEvents, layer.RotateEvents, precision, tolerance);
+                    _doubleMergerPlus.EventListMerge(mergedLayer.RotateEvents, layer.RotateEvents, precision,
+                        tolerance);
             if (layer.SpeedEvents is { Count: > 0 })
                 mergedLayer.SpeedEvents =
                     _floatMergerPlus.EventListMerge(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
@@ -144,7 +148,8 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     }
 
     /// <inheritdoc/>
-    public List<EventLayer> CutLayerEvents(List<EventLayer> layers, double precision, IProgress<ToolProgress>? progress = null)
+    public List<EventLayer> CutLayerEvents(List<EventLayer> layers, double precision,
+        IProgress<ToolProgress>? progress = null)
     {
         layers.RemoveAll(layer => (object?)layer is null);
         layers = RemoveUnlessLayer(layers) ?? layers;
@@ -192,10 +197,10 @@ public class KpcLayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         var layersCopy = layers.Select(l => l.Clone()).ToList();
         foreach (var layer in layersCopy)
         {
-            layer.AlphaEvents = _intCompressor.RemoveUselessEvent(layer.AlphaEvents);
-            layer.MoveXEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents);
-            layer.MoveYEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents);
-            layer.RotateEvents = _doubleCompressor.RemoveUselessEvent(layer.RotateEvents);
+            layer.AlphaEvents = _intCompressor.RemoveUselessEvent(layer.AlphaEvents) ?? throw new InvalidOperationException();
+            layer.MoveXEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents) ?? throw new InvalidOperationException();
+            layer.MoveYEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents) ?? throw new InvalidOperationException();
+            layer.RotateEvents = _doubleCompressor.RemoveUselessEvent(layer.RotateEvents) ?? throw new InvalidOperationException();
         }
 
         return layersCopy;

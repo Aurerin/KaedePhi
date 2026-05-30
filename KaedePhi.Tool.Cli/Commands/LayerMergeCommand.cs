@@ -28,7 +28,7 @@ public sealed class LayerMergeCommand : AsyncCommand<LayerMergeCommand.Settings>
         if (nrc == null) { ConsoleWriter.Error(CliLocalizationString.err_unimplemented); return 1; }
 
         var nrcCopy = nrc.Clone();
-        var processor = new KpcLayerProcessor();
+        var processor = new LayerProcessor();
         foreach (var line in nrcCopy.JudgeLineList)
         {
             if (line.EventLayers is not { Count: > 1 }) continue;

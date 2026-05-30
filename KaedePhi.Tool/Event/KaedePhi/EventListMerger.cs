@@ -196,11 +196,6 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             return false;
         }
 
-        // Overlap bounds must be the UNION: [min(start), max(end)].
-        // Using intersection here would leave protruding portions of each event as gap segments
-        // with the original easing applied to a sub-interval, producing wrong intermediate values
-        // (the "残根" bug). With UNION every event that caused the overlap is fully contained
-        // inside the interval and therefore gets cut into tiny linear segments uniformly.
         start = fe.StartBeat < te.StartBeat ? fe.StartBeat : te.StartBeat;
         end = fe.EndBeat > te.EndBeat ? fe.EndBeat : te.EndBeat;
         return true;
@@ -338,13 +333,15 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
                 foreach (var (gapStart, gapEnd) in GapsOutsideOverlap(toEvent))
                 {
                     var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= gapStart);
-                    var formOffset = prevForm != null ? prevForm.EndValue : default!;
+                    var formOffset = prevForm != null ? prevForm.EndValue : default;
                     newEvents.Add(new Kpc.Event<TPayload>
                     {
                         StartBeat = gapStart,
                         EndBeat = gapEnd,
-                        StartValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapStart), formOffset),
-                        EndValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapEnd), formOffset),
+                        StartValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapStart), formOffset) ??
+                                     throw new InvalidOperationException("进行加法运算时遇到了意外的null"),
+                        EndValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapEnd), formOffset) ??
+                                   throw new InvalidOperationException("进行加法运算时遇到了意外的null"),
                         Easing = new Kpc.Easing(1), // linear — see comment above
                         IsBezier = false,
                     });
