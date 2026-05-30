@@ -207,56 +207,6 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         }
     } = 2;
 
-    public double SegmentPenalty
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 1.0;
-
-    public double KeepOriginalPenalty
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 1.02;
-
-    public int FullSearchRunLengthThreshold
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 160;
-
-    public int LongRunSearchWindow
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 160;
-
-    public double PhaseDetectionEpsilon
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 0.015;
-
     public string StatusText
     {
         get;
@@ -322,11 +272,6 @@ public sealed class ToolViewModel : INotifyPropertyChanged
                 break;
             case "fit":
                 Tolerance = config.Fit.Tolerance;
-                SegmentPenalty = config.Fit.SegmentPenalty;
-                KeepOriginalPenalty = config.Fit.KeepOriginalPenalty;
-                FullSearchRunLengthThreshold = config.Fit.FullSearchRunLengthThreshold;
-                LongRunSearchWindow = config.Fit.LongRunSearchWindow;
-                PhaseDetectionEpsilon = config.Fit.PhaseDetectionEpsilon;
                 break;
             case "render":
                 PixelsPerBeat = config.Render.PixelsPerBeat;

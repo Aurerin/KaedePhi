@@ -73,6 +73,13 @@ app.Configure(config =>
         .WithAlias("render")
         .WithDescription(CliLocalizationString.render_command_desc);
 
+    config.AddBranch("config", cfg =>
+    {
+        cfg.SetDescription(CliLocalizationString.branch_config_desc);
+        cfg.AddCommand<ConfigResetCommand>("reset")
+            .WithDescription(CliLocalizationString.cmd_config_reset_desc);
+    });
+
     config.AddBranch("workspace", ws =>
     {
         ws.SetDescription(CliLocalizationString.branch_workspace_desc);

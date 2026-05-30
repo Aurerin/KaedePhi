@@ -30,12 +30,10 @@ public sealed class ToolDefaultsConfig
 
 public sealed class FitDefaultsConfig
 {
-    public double Tolerance { get; set; } = 0.5;
-    public double SegmentPenalty { get; set; } = 1.0d;
-    public double KeepOriginalPenalty { get; set; } = 1.02d;
-    public int FullSearchRunLengthThreshold { get; set; } = 160;
-    public int LongRunSearchWindow { get; set; } = 160;
-    public double PhaseDetectionEpsilon { get; set; } = 0.015d;
+    /// <summary>
+    /// 容差百分比，取值范围 [0, 100]。默认值 0.1（即 0.1%）。
+    /// </summary>
+    public double Tolerance { get; set; } = 0.1;
 }
 
 public sealed class RenderDefaultsConfig

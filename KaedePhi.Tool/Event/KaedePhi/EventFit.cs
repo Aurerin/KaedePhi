@@ -1,831 +1,297 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
 
+/// <summary>
+/// 将连续的线性事件序列拟合为带缓动函数的单一事件。
+/// </summary>
 public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
 {
-    private const int MinEasingId = 1;
-    private const int MaxEasingId = 31;
-
-    private readonly EventFitOptions _options;
-
-    public EventFit(EventFitOptions? options = null)
-    {
-        _options = options ?? new EventFitOptions();
-    }
+    private static readonly int[] AllEasingIds = Enumerable.Range(1, 31).ToArray();
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> EventListFit(
-        List<Kpc.Event<TPayload>>? events,
-        double tolerance,
-        IProgress<ToolProgress>? progress = null)
-        => EventListFitCore(events, tolerance, null, CancellationToken.None, progress);
-
-    /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> EventListFit(
-        List<Kpc.Event<TPayload>>? events,
-        double tolerance,
-        int? maxDegreeOfParallelism,
-        IProgress<ToolProgress>? progress = null)
-        => EventListFitCore(events, tolerance, maxDegreeOfParallelism, CancellationToken.None, progress);
-
-    private List<Kpc.Event<TPayload>> EventListFitCore(
-        List<Kpc.Event<TPayload>>? events,
-        double tolerance,
-        int? maxDegreeOfParallelism,
-        CancellationToken cancellationToken,
-        IProgress<ToolProgress>? progress = null)
+    public List<Kpc.Event<TPayload>> FitEvents(
+        List<Kpc.Event<TPayload>>? events, double tolerance)
     {
-        if (tolerance is > 100 or < 0)
-            throw new ArgumentOutOfRangeException(nameof(tolerance), "Tolerance must be between 0 and 100.");
-
         EnsureSupportedNumericType();
 
         if (events == null || events.Count == 0)
             return [];
 
-        var degree = ResolveMaxDegreeOfParallelism(maxDegreeOfParallelism);
-        LogInfo($"EventListFit: 开始拟合，共 {events.Count} 个事件，容差={tolerance}% ，并行度={degree}");
-
         var sortedEvents = events
-            .Select(e => e.Clone())
             .OrderBy(e => e.StartBeat)
-            .ThenBy(e => e.EndBeat)
             .ToList();
 
-        var units = BuildFitUnits(sortedEvents, tolerance);
-        var outputs = new List<Kpc.Event<TPayload>>[units.Count];
-        var completedUnits = 0;
+        return FitEventsCore(sortedEvents, tolerance);
+    }
 
-        if (units is [{ NeedsFit: true }])
+    /// <summary>
+    /// 遍历已排序的事件序列，将连续的同方向线性事件分组后贪心拟合；
+    /// 常量事件和非线性事件直接原样写入输出。
+    /// </summary>
+    private static List<Kpc.Event<TPayload>> FitEventsCore(
+        List<Kpc.Event<TPayload>> sortedEvents, double tolerance)
+    {
+        var result = new List<Kpc.Event<TPayload>>();
+        var i = 0;
+
+        while (i < sortedEvents.Count)
         {
-            // 单个超长 run 时，把所有核心预算给 run 内部 DP 并行。
-            outputs[0] = FitLinearRun(
-                sortedEvents,
-                units[0].Start,
-                units[0].EndExclusive,
-                tolerance,
-                degree,
-                cancellationToken);
-            progress?.Report(new ToolProgress(1.0));
-        }
-        else
-        {
-            // 多个 run 时并行 run，避免 run 内外嵌套并行导致线程池抖动。
-            var options = new ParallelOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = degree
-            };
+            var current = sortedEvents[i];
 
-            Parallel.For(0, units.Count, options, unitIndex =>
+            // 常量事件或非线性事件不参与拟合，直接输出
+            if (IsNumericConstant(current) || !IsLinear(current))
             {
-                var unit = units[unitIndex];
-                if (!unit.NeedsFit)
-                {
-                    outputs[unitIndex] = [sortedEvents[unit.Start].Clone()];
-                }
-                else
-                {
-                    outputs[unitIndex] = FitLinearRun(
-                        sortedEvents,
-                        unit.Start,
-                        unit.EndExclusive,
-                        tolerance,
-                        1,
-                        cancellationToken);
-                }
+                result.Add(current.Clone());
+                i++;
+                continue;
+            }
 
-                var done = Interlocked.Increment(ref completedUnits);
-                progress?.Report(new ToolProgress((double)done / units.Count));
-            });
+            var run = CollectRun(sortedEvents, i, out var nextI);
+            FitRunInto(run, result, tolerance);
+            i = nextI;
         }
 
-        var result = new List<Kpc.Event<TPayload>>(sortedEvents.Count);
-        foreach (var t in outputs)
-            result.AddRange(t);
-
-        LogInfo($"EventListFit: 拟合完成，{events.Count} -> {result.Count} 个事件");
         return result;
     }
 
-    private List<FitUnit> BuildFitUnits(List<Kpc.Event<TPayload>> sortedEvents, double tolerance)
+    /// <summary>
+    /// 从指定位置起收集一段时间连续、数值连续、方向一致的线性事件序列（run）。
+    /// </summary>
+    private static List<Kpc.Event<TPayload>> CollectRun(
+        List<Kpc.Event<TPayload>> events, int start, out int nextIndex)
     {
-        var units = new List<FitUnit>(sortedEvents.Count);
+        var run = new List<Kpc.Event<TPayload>> { events[start] };
+        var firstDir = GetDirection(
+            events[start].GetStartValueAsDouble(),
+            events[start].GetEndValueAsDouble());
 
-        for (var index = 0; index < sortedEvents.Count;)
+        nextIndex = start + 1;
+        while (nextIndex < events.Count)
         {
-            if (!CanParticipateInFit(sortedEvents[index]))
-            {
-                units.Add(new FitUnit(index, index + 1, false));
-                index++;
-                continue;
-            }
+            var next = events[nextIndex];
+            if (IsNumericConstant(next)) break;
+            if (!IsLinear(next)) break;
+            if (!IsContiguous(run[^1], next)) break;
+            if (GetDirection(next.GetStartValueAsDouble(), next.GetEndValueAsDouble()) != firstDir) break;
 
-            var runEnd = index + 1;
-            while (runEnd < sortedEvents.Count &&
-                   CanAppendToFitRun(sortedEvents[runEnd - 1], sortedEvents[runEnd], tolerance))
-            {
-                runEnd++;
-            }
-
-            if (runEnd - index < 2)
-            {
-                units.Add(new FitUnit(index, index + 1, false));
-                index++;
-                continue;
-            }
-
-            LogInfo(
-                $"EventListFit: 发现可拟合线性段 [{sortedEvents[index].StartBeat} -> {sortedEvents[runEnd - 1].EndBeat}]，共 {runEnd - index} 个事件");
-            units.Add(new FitUnit(index, runEnd, true));
-            index = runEnd;
+            run.Add(next);
+            nextIndex++;
         }
 
-        return units;
+        return run;
     }
 
     /// <summary>
-    /// 对单个连续线性 run 执行拟合：并行预计算候选段，随后顺序 DP 选择最优分段。
+    /// 对 run 中的事件序列进行贪心迭代拟合：
+    /// 优先尝试整段拟合，失败后逐步缩短前缀，直到每段都能拟合或退化为单个事件。
+    /// 使用迭代替代递归以避免深层调用栈。
     /// </summary>
-    private List<Kpc.Event<TPayload>> FitLinearRun(
-        List<Kpc.Event<TPayload>> runEvents,
-        int startIndex,
-        int endExclusive,
-        double tolerance,
-        int degree,
-        CancellationToken cancellationToken)
-    {
-        var runLength = endExclusive - startIndex;
-        var window = runLength <= _options.FullSearchRunLengthThreshold ? runLength : _options.LongRunSearchWindow;
-
-        if (runLength > _options.FullSearchRunLengthThreshold)
-            LogInfo(
-                $"EventListFit: 长线性段优化模式启用，长度={runLength}，回看窗口={window}");
-
-        // ---- Phase 1: 并行预计算所有候选段 ----
-        // 所有 (start, end) 候选段的拟合结果完全独立于 DP 状态，可以一次性完全并行。
-        // 避免旧方案"DP 步骤内反复启动并行任务"的线程池抖动，以及
-        // ConcurrentDictionary.GetOrAdd 对同一 key 多次调用 factory 的冗余计算。
-        var pairs = BuildSegmentPairs(runLength, window, startIndex);
-        var fitResults = new FittedSegment?[pairs.Length];
-
-        Parallel.For(0, pairs.Length, new ParallelOptions
-        {
-            CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = degree
-        }, i =>
-        {
-            var (absStart, absEnd) = pairs[i];
-            fitResults[i] = CreateFittedSegment(runEvents, absStart, absEnd, tolerance);
-        });
-
-        // 将并行结果整理为普通字典，Phase 2 顺序查找无锁开销
-        var fitCache = new Dictionary<(int Start, int End), FittedSegment?>(pairs.Length);
-        for (var i = 0; i < pairs.Length; i++)
-            fitCache[pairs[i]] = fitResults[i];
-
-        // ---- Phase 2: 顺序 DP，全部命中缓存，速度极快 ----
-        var dpCost = new double[runLength + 1];
-        var dpSegments = new int[runLength + 1];
-        var prev = new int[runLength + 1];
-        var chosen = new Kpc.Event<TPayload>?[runLength + 1];
-
-        dpCost[0] = 0d;
-        dpSegments[0] = 0;
-        prev[0] = -1;
-        chosen[0] = null;
-
-        for (var i = 1; i <= runLength; i++)
-        {
-            dpCost[i] = double.PositiveInfinity;
-            dpSegments[i] = int.MaxValue;
-            prev[i] = -1;
-            chosen[i] = null;
-        }
-
-        for (var endLocal = 1; endLocal <= runLength; endLocal++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var bestPlan = CreateKeepPlan(runEvents, startIndex, endLocal, dpCost, dpSegments);
-            bestPlan = ImprovePlanByFittedSegments(
-                fitCache,
-                startIndex,
-                endLocal,
-                window,
-                dpCost,
-                dpSegments,
-                bestPlan);
-
-            dpCost[endLocal] = bestPlan.Cost;
-            dpSegments[endLocal] = bestPlan.Segments;
-            prev[endLocal] = bestPlan.Prev;
-            chosen[endLocal] = bestPlan.Event;
-        }
-
-        var reversed = new List<Kpc.Event<TPayload>>();
-        for (var cursor = runLength; cursor > 0; cursor = prev[cursor])
-        {
-            var evt = chosen[cursor];
-            if (evt == null)
-                break;
-            reversed.Add(evt);
-        }
-
-        reversed.Reverse();
-        return reversed;
-    }
-
-    /// <summary>
-    /// 以“保留最后一个原事件”作为 DP 初始方案。
-    /// </summary>
-    private PlanChoice CreateKeepPlan(
-        List<Kpc.Event<TPayload>> runEvents,
-        int startIndex,
-        int endLocal,
-        double[] dpCost,
-        int[] dpSegments)
-    {
-        var absoluteEnd = startIndex + endLocal - 1;
-        return new PlanChoice(
-            dpCost[endLocal - 1] + _options.KeepOriginalPenalty,
-            dpSegments[endLocal - 1] + 1,
-            endLocal - 1,
-            runEvents[absoluteEnd].Clone());
-    }
-
-    /// <summary>
-    /// 通过缓存的拟合段尝试改进当前最佳方案。
-    /// </summary>
-    private PlanChoice ImprovePlanByFittedSegments(
-        IReadOnlyDictionary<(int Start, int End), FittedSegment?> fitCache,
-        int startIndex,
-        int endLocal,
-        int window,
-        double[] dpCost,
-        int[] dpSegments,
-        PlanChoice currentBest)
-    {
-        var absoluteEnd = startIndex + endLocal - 1;
-        var startMin = Math.Max(0, endLocal - window);
-
-        for (var startLocal = startMin; startLocal < endLocal - 1; startLocal++)
-        {
-            var absoluteStart = startIndex + startLocal;
-            if (!fitCache.TryGetValue((absoluteStart, absoluteEnd), out var fitted) || fitted is null)
-                continue;
-
-            var candidate = new PlanChoice(
-                dpCost[startLocal] + _options.SegmentPenalty + fitted.Value.Score,
-                dpSegments[startLocal] + 1,
-                startLocal,
-                fitted.Value.Event);
-
-            if (IsBetterPlan(candidate, currentBest))
-                currentBest = candidate;
-        }
-
-        return currentBest;
-    }
-
-    /// <summary>
-    /// 枚举回看窗口内所有需要预计算的候选段对 (absoluteStart, absoluteEnd)。
-    /// 段长至少覆盖 2 个原始事件，方可进行有意义的拟合。
-    /// </summary>
-    private static (int AbsStart, int AbsEnd)[] BuildSegmentPairs(int runLength, int window, int startIndex)
-    {
-        // 先统计总数，一次性分配数组，避免 List 扩容
-        var count = 0;
-        for (var endLocal = 2; endLocal <= runLength; endLocal++)
-        {
-            var startMin = Math.Max(0, endLocal - window);
-            count += endLocal - 1 - startMin; // startLocal 从 startMin 到 endLocal - 2
-        }
-
-        var pairs = new (int AbsStart, int AbsEnd)[count];
-        var idx = 0;
-        for (var endLocal = 2; endLocal <= runLength; endLocal++)
-        {
-            var startMin = Math.Max(0, endLocal - window);
-            var absoluteEnd = startIndex + endLocal - 1;
-            for (var startLocal = startMin; startLocal < endLocal - 1; startLocal++)
-                pairs[idx++] = (startIndex + startLocal, absoluteEnd);
-        }
-
-        return pairs;
-    }
-
-    /// <summary>
-    /// 比较两种 DP 方案优先级。
-    /// 优先顺序：总成本 -> 分段数 -> 前驱位置（更长段）-> 缓动编号。
-    /// </summary>
-    private bool IsBetterPlan(PlanChoice candidate, PlanChoice currentBest)
-    {
-        if (candidate.Cost < currentBest.Cost - _options.NumericEpsilon)
-            return true;
-        if (Math.Abs(candidate.Cost - currentBest.Cost) > _options.NumericEpsilon)
-            return false;
-
-        if (candidate.Segments < currentBest.Segments)
-            return true;
-        if (candidate.Segments > currentBest.Segments)
-            return false;
-
-        // 相同代价和段数时优先更长段（更小 prev），保证 deterministic 且更压缩。
-        if (candidate.Prev < currentBest.Prev)
-            return true;
-        if (candidate.Prev > currentBest.Prev)
-            return false;
-
-        return (int)candidate.Event.Easing < (int)currentBest.Event.Easing;
-    }
-
-    /// <summary>
-    /// 构建并评分一个候选拟合段；若无可用缓动则返回 null。
-    /// </summary>
-    private FittedSegment? CreateFittedSegment(
-        List<Kpc.Event<TPayload>> runEvents,
-        int startIndex,
-        int endIndex,
+    private static void FitRunInto(
+        List<Kpc.Event<TPayload>> run,
+        List<Kpc.Event<TPayload>> target,
         double tolerance)
     {
-        if (!TryCreateBestFittedEvent(runEvents, startIndex, endIndex, tolerance, out var fittedEvent, out var score))
-            return null;
+        var remaining = run;
 
-        return new FittedSegment(fittedEvent, score);
+        while (remaining.Count > 0)
+        {
+            if (remaining.Count == 1)
+            {
+                target.Add(remaining[0].Clone());
+                return;
+            }
+
+            // 尝试将当前剩余序列整体拟合为单一缓动事件
+            var fitted = TryFitEasing(remaining, tolerance);
+            if (fitted != null)
+            {
+                target.Add(fitted);
+                return;
+            }
+
+            // 整体拟合失败，寻找可拟合的最长前缀
+            var found = false;
+            for (var split = remaining.Count - 1; split >= 2; split--)
+            {
+                fitted = TryFitEasing(remaining.GetRange(0, split), tolerance);
+                if (fitted != null)
+                {
+                    target.Add(fitted);
+                    remaining = remaining.GetRange(split, remaining.Count - split);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                // 无法拟合任何长度 >= 2 的前缀，输出第一个事件并继续处理剩余
+                target.Add(remaining[0].Clone());
+                remaining = remaining.GetRange(1, remaining.Count - 1);
+            }
+        }
     }
 
     /// <summary>
-    /// 在允许缓动集合中选择分数最低拟合事件。
+    /// 遍历所有支持的缓动函数，返回第一个在容差范围内能覆盖所有事件边界的拟合结果；
+    /// 无法拟合时返回 null。
     /// </summary>
-    private bool TryCreateBestFittedEvent(
-        List<Kpc.Event<TPayload>> runEvents,
-        int startIndex,
-        int endIndex,
-        double tolerance,
-        out Kpc.Event<TPayload> fittedEvent,
-        out double bestScore)
+    private static Kpc.Event<TPayload>? TryFitEasing(
+        List<Kpc.Event<TPayload>> events, double tolerance)
     {
-        var samples = BuildSamples(runEvents, startIndex, endIndex);
-        if (samples.Count < 2)
-        {
-            fittedEvent = runEvents[startIndex].Clone();
-            bestScore = double.PositiveInfinity;
-            return false;
-        }
+        if (events.Count <= 1)
+            return null;
 
-        var sourceProfile = AnalyzeSourceProfile(samples);
-        var errorScale = GetErrorScale(samples);
-
-        var first = runEvents[startIndex];
-        var last = runEvents[endIndex];
+        var first = events[0];
+        var last = events[^1];
+        var startBeat = first.StartBeat;
+        var endBeat = last.EndBeat;
         var startValue = first.GetStartValueAsDouble();
         var endValue = last.GetEndValueAsDouble();
 
-        // 平段仅允许线性，避免无意义的 IN/OUT 噪声。
-        if (Math.Abs(endValue - startValue) <= _options.NumericEpsilon)
+        foreach (var easingId in AllEasingIds)
         {
-            var linear = CreateCandidateEvent(first, last, MinEasingId);
-            if (TryScoreCandidate(linear, samples, sourceProfile, errorScale, tolerance, out bestScore))
-            {
-                fittedEvent = linear;
-                return true;
-            }
+            var candidate = CreateMergedEvent(first, startBeat, startValue, endBeat, endValue, easingId);
 
-            fittedEvent = first.Clone();
-            bestScore = double.PositiveInfinity;
-            return false;
+            if (FitsWithinTolerance(candidate, events, tolerance, startBeat, endBeat, startValue, endValue))
+                return candidate;
         }
 
-        fittedEvent = first.Clone();
-        bestScore = double.PositiveInfinity;
-        var hasCandidate = false;
-
-        for (var easingId = MinEasingId; easingId <= MaxEasingId; easingId++)
-        {
-            var candidatePhase = GetEasingPhase(easingId);
-            if (sourceProfile.Phase is not EasingPhase.Unknown &&
-                sourceProfile.Phase != candidatePhase &&
-                candidatePhase != EasingPhase.Linear)
-            {
-                continue;
-            }
-
-            var candidate = CreateCandidateEvent(first, last, easingId);
-            if (!TryScoreCandidate(candidate, samples, sourceProfile, errorScale, tolerance, out var candidateScore))
-                continue;
-
-            if (!hasCandidate || candidateScore < bestScore - _options.NumericEpsilon ||
-                (Math.Abs(candidateScore - bestScore) <= _options.NumericEpsilon &&
-                 (int)candidate.Easing < (int)fittedEvent.Easing))
-            {
-                fittedEvent = candidate;
-                bestScore = candidateScore;
-                hasCandidate = true;
-            }
-        }
-
-        return hasCandidate;
-    }
-
-    private List<SamplePoint> BuildSamples(
-        List<Kpc.Event<TPayload>> runEvents,
-        int startIndex,
-        int endIndex)
-    {
-        var samples = new List<SamplePoint>((endIndex - startIndex + 1) * 3);
-
-        var first = runEvents[startIndex];
-        var last = runEvents[endIndex];
-
-        var globalStart = first.StartBeat;
-        var globalEnd = last.EndBeat;
-        var beatSpan = (double)(globalEnd - globalStart);
-
-        var sourceStartValue = first.GetStartValueAsDouble();
-        var sourceEndValue = last.GetEndValueAsDouble();
-        var valueDelta = sourceEndValue - sourceStartValue;
-
-        for (var i = startIndex; i <= endIndex; i++)
-        {
-            var evt = runEvents[i];
-
-            AddSample(samples, globalStart, beatSpan, sourceStartValue, valueDelta,
-                evt.StartBeat, evt.GetStartValueAsDouble());
-
-            var midBeat = LerpBeat(evt.StartBeat, evt.EndBeat, 0.5d);
-            var midValue = evt.GetValueAtBeatAsDouble(midBeat);
-            AddSample(samples, globalStart, beatSpan, sourceStartValue, valueDelta, midBeat, midValue);
-
-            AddSample(samples, globalStart, beatSpan, sourceStartValue, valueDelta,
-                evt.EndBeat, evt.GetEndValueAsDouble());
-        }
-
-        return samples;
-    }
-
-    private void AddSample(
-        List<SamplePoint> samples,
-        Beat globalStart,
-        double beatSpan,
-        double sourceStartValue,
-        double valueDelta,
-        Beat beat,
-        double value)
-    {
-        var time = beatSpan <= _options.NumericEpsilon ? 0d : ((double)(beat - globalStart)) / beatSpan;
-        var progress = Math.Abs(valueDelta) <= _options.NumericEpsilon ? 0d : (value - sourceStartValue) / valueDelta;
-
-        if (samples.Count != 0 && samples[^1].Beat == beat)
-        {
-            samples[^1] = new SamplePoint(beat, time, value, progress);
-            return;
-        }
-
-        samples.Add(new SamplePoint(beat, time, value, progress));
-    }
-
-    private double GetErrorScale(List<SamplePoint> samples)
-    {
-        if (samples.Count == 0)
-            return 1d;
-
-        var maxAbsValue = samples.Select(t => Math.Abs(t.Value)).Prepend(0d).Max();
-
-        return Math.Max(maxAbsValue, 1d);
+        return null;
     }
 
     /// <summary>
-    /// 在容差约束下对候选事件打分；失败返回 <see langword="false"/>。
+    /// 在所有原始事件的起止边界处采样候选缓动，验证每处的相对误差百分比均不超过容差。
+    /// 相对误差（%）= 绝对偏差 / 整段值域跨度 × 100。
     /// </summary>
-    private bool TryScoreCandidate(
+    private static bool FitsWithinTolerance(
         Kpc.Event<TPayload> candidate,
-        List<SamplePoint> samples,
-        SourceProfile sourceProfile,
-        double errorScale,
+        List<Kpc.Event<TPayload>> events,
         double tolerance,
-        out double score)
+        Beat segStartBeat, Beat segEndBeat,
+        double segStartValue, double segEndValue)
     {
-        if (!TryMeasureCandidateError(candidate, samples, errorScale, tolerance, out var normalizedMaxError,
-                out var normalizedRmse))
+        var segSpan = (double)segEndBeat - (double)segStartBeat;
+        if (segSpan <= 1e-9)
+            return true;
+
+        var valueDelta = segEndValue - segStartValue;
+        var valueRange = Math.Abs(valueDelta);
+
+        // 值域近似为零时无法定义相对误差，视为拟合成功
+        if (valueRange <= 1e-9)
+            return true;
+
+        foreach (var evt in events)
         {
-            score = double.PositiveInfinity;
-            return false;
-        }
+            var evtStart = (double)evt.StartBeat;
+            var evtEnd = (double)evt.EndBeat;
 
-        var candidateProfile = AnalyzeCandidateProfile(candidate, samples);
+            var normStart = (evtStart - (double)segStartBeat) / segSpan;
+            var normEnd = (evtEnd - (double)segStartBeat) / segSpan;
 
-        if (!sourceProfile.HasOvershootValue && candidateProfile.HasOvershootValue)
-        {
-            score = double.PositiveInfinity;
-            return false;
-        }
+            var easedStart = segStartValue + valueDelta * GetEasingValue(candidate.Easing, normStart);
+            var easedEnd = segStartValue + valueDelta * GetEasingValue(candidate.Easing, normEnd);
 
-        if (sourceProfile.IsMonotonicValue && !candidateProfile.IsMonotonicValue)
-        {
-            score = double.PositiveInfinity;
-            return false;
-        }
+            var srcStartVal = evt.GetStartValueAsDouble();
+            var srcEndVal = evt.GetEndValueAsDouble();
 
-        var semanticDistance =
-            Math.Abs(sourceProfile.Progress25 - candidateProfile.Progress25) +
-            Math.Abs(sourceProfile.Progress50 - candidateProfile.Progress50) +
-            Math.Abs(sourceProfile.Progress75 - candidateProfile.Progress75);
-
-        score = normalizedMaxError * 90d + normalizedRmse * 35d + semanticDistance * 8d;
-        return true;
-    }
-
-    private bool TryMeasureCandidateError(
-        Kpc.Event<TPayload> candidate,
-        List<SamplePoint> samples,
-        double errorScale,
-        double tolerance,
-        out double normalizedMaxError,
-        out double normalizedRmse)
-    {
-        var allowedError = tolerance / 100d * errorScale;
-        var maxError = 0d;
-        var sumSquaredError = 0d;
-
-        foreach (var t in samples)
-        {
-            var candidateValue = candidate.GetValueAtBeatAsDouble(t.Beat);
-            var error = Math.Abs(candidateValue - t.Value);
-
-            if (error > allowedError)
-            {
-                normalizedMaxError = double.PositiveInfinity;
-                normalizedRmse = double.PositiveInfinity;
+            // 相对误差（%）：绝对偏差 / 值域 × 100 与容差百分比比较
+            if (Math.Abs(easedStart - srcStartVal) / valueRange * 100.0 > tolerance ||
+                Math.Abs(easedEnd - srcEndVal) / valueRange * 100.0 > tolerance)
                 return false;
-            }
-
-            if (error > maxError)
-                maxError = error;
-            sumSquaredError += error * error;
         }
 
-        normalizedMaxError = maxError / errorScale;
-        normalizedRmse = Math.Sqrt(sumSquaredError / Math.Max(1, samples.Count)) / errorScale;
         return true;
     }
 
-    private SourceProfile AnalyzeSourceProfile(List<SamplePoint> samples)
+    /// <summary>
+    /// 获取指定缓动函数在归一化时间 t 处的输出值（范围 [0, 1]）。
+    /// </summary>
+    private static double GetEasingValue(Kpc.Easing easing, double t)
     {
-        var p25 = GetProgressAtTime(samples, 0.25d);
-        var p50 = GetProgressAtTime(samples, 0.50d);
-        var p75 = GetProgressAtTime(samples, 0.75d);
-
-        // 直接遍历samples检查progress，避免LINQ分配
-        var hasOvershoot = false;
-        var isMonotonic = true;
-        var first = true;
-        var previous = 0d;
-
-        foreach (var progress in samples.Select(t => t.Progress))
-        {
-            // HasOvershoot检查
-            if (progress is < -0.01d or > 1.01d)
-                hasOvershoot = true;
-
-            // IsMonotonic检查
-            if (first)
-            {
-                previous = progress;
-                first = false;
-            }
-            else if (progress + 1e-4d < previous)
-            {
-                isMonotonic = false;
-            }
-            else
-            {
-                previous = progress;
-            }
-        }
-
-        return new SourceProfile(
-            p25,
-            p50,
-            p75,
-            DetectPhase(p25, p75),
-            hasOvershoot,
-            isMonotonic);
+        return Kpc.Easings.Evaluate(easing, 0d, 1d, t);
     }
 
-    private CandidateProfile AnalyzeCandidateProfile(
-        Kpc.Event<TPayload> candidate,
-        List<SamplePoint> samples)
+    /// <summary>
+    /// 判断两个事件是否在时间上首尾相接且数值连续。
+    /// </summary>
+    private static bool IsContiguous(Kpc.Event<TPayload> first, Kpc.Event<TPayload> second)
     {
-        var startValue = candidate.GetStartValueAsDouble();
-        var endValue = candidate.GetEndValueAsDouble();
-        var totalDelta = endValue - startValue;
-
-        // 直接计算progress并内联检查，避免分配progresses列表
-        var p25 = 0d;
-        var p50 = 0d;
-        var p75 = 0d;
-        var hasOvershoot = false;
-        var isMonotonic = true;
-        var first = true;
-        var previous = 0d;
-
-        // 预计算目标时间点的索引
-        var idx25 = 0;
-        var idx50 = 0;
-        var idx75 = 0;
-        for (var i = 0; i < samples.Count; i++)
-        {
-            if (samples[i].Time < 0.25d) idx25 = i;
-            if (samples[i].Time < 0.50d) idx50 = i;
-            if (samples[i].Time < 0.75d) idx75 = i;
-        }
-
-        for (var i = 0; i < samples.Count; i++)
-        {
-            var value = candidate.GetValueAtBeatAsDouble(samples[i].Beat);
-            var progress = Math.Abs(totalDelta) <= _options.NumericEpsilon ? 0d : (value - startValue) / totalDelta;
-
-            // HasOvershoot检查
-            if (progress < -0.01d || progress > 1.01d)
-                hasOvershoot = true;
-
-            // IsMonotonic检查
-            if (first)
-            {
-                previous = progress;
-                first = false;
-            }
-            else if (progress + 1e-4d < previous)
-            {
-                isMonotonic = false;
-            }
-            else
-            {
-                previous = progress;
-            }
-
-            // 计算分位数进度
-            if (i == idx25) p25 = progress;
-            if (i == idx50) p50 = progress;
-            if (i == idx75) p75 = progress;
-        }
-
-        return new CandidateProfile(p25, p50, p75, hasOvershoot, isMonotonic);
+        return first.EndBeat == second.StartBeat &&
+               Math.Abs(first.GetEndValueAsDouble() - second.GetStartValueAsDouble()) < 1e-9;
     }
 
-    private double GetProgressAtTime(List<SamplePoint> samples, double targetTime)
+    /// <summary>
+    /// 判断事件起止值是否相同（常量事件）。
+    /// </summary>
+    private static bool IsNumericConstant(Kpc.Event<TPayload> evt)
     {
-        // 直接从samples读取progress，避免LINQ分配
-        if (samples.Count == 0)
-            return 0d;
-
-        if (targetTime <= samples[0].Time)
-            return samples[0].Progress;
-
-        for (var i = 1; i < samples.Count; i++)
-        {
-            if (samples[i].Time < targetTime)
-                continue;
-
-            var left = samples[i - 1];
-            var right = samples[i];
-            var span = right.Time - left.Time;
-            if (span <= _options.NumericEpsilon)
-                return samples[i].Progress;
-
-            var ratio = (targetTime - left.Time) / span;
-            return samples[i - 1].Progress + (samples[i].Progress - samples[i - 1].Progress) * ratio;
-        }
-
-        return samples[^1].Progress;
+        return Math.Abs(evt.GetStartValueAsDouble() - evt.GetEndValueAsDouble()) < 1e-9;
     }
 
-    private EasingPhase DetectPhase(double p25, double p75)
+    /// <summary>
+    /// 判断事件是否为全范围线性缓动，即可参与拟合的基本条件。
+    /// </summary>
+    private static bool IsLinear(Kpc.Event<TPayload> evt)
     {
-        var epsilon = _options.PhaseDetectionEpsilon;
-
-        var d25 = p25 - 0.25d;
-        var d75 = p75 - 0.75d;
-
-        if (Math.Abs(d25) <= epsilon && Math.Abs(d75) <= epsilon)
-            return EasingPhase.Linear;
-
-        if (d25 < -epsilon && d75 < -epsilon)
-            return EasingPhase.In;
-
-        if (d25 > epsilon && d75 > epsilon)
-            return EasingPhase.Out;
-
-        if (d25 < -epsilon && d75 > epsilon)
-            return EasingPhase.InOut;
-
-        return EasingPhase.Unknown;
+        return (int)evt.Easing == 1 &&
+               Math.Abs(evt.EasingLeft) < 1e-6f &&
+               Math.Abs(evt.EasingRight - 1f) < 1e-6f;
     }
 
-    private static EasingPhase GetEasingPhase(int easingId)
+    /// <summary>
+    /// 返回数值从 start 到 end 的变化方向：递增为 1，递减为 -1，不变为 0。
+    /// </summary>
+    private static int GetDirection(double start, double end)
     {
-        if (easingId <= 1)
-            return EasingPhase.Linear;
-
-        var offset = (easingId - 2) % 3;
-        return offset switch
-        {
-            0 => EasingPhase.In,
-            1 => EasingPhase.Out,
-            2 => EasingPhase.InOut,
-            _ => EasingPhase.Unknown
-        };
+        var diff = end - start;
+        if (Math.Abs(diff) < 1e-9) return 0;
+        return diff > 0 ? 1 : -1;
     }
 
-    private static Kpc.Event<TPayload> CreateCandidateEvent(Kpc.Event<TPayload> first, Kpc.Event<TPayload> last,
+    /// <summary>
+    /// 使用指定缓动函数创建覆盖给定时间区间和值域的新事件。
+    /// Font 字段从模板事件继承，其余字段均为合并后的值。
+    /// </summary>
+    private static Kpc.Event<TPayload> CreateMergedEvent(
+        Kpc.Event<TPayload> template,
+        Beat startBeat, double startValue,
+        Beat endBeat, double endValue,
         int easingId)
-        => new()
+    {
+        var evt = new Kpc.Event<TPayload>
         {
-            StartBeat = new Beat((int[])first.StartBeat),
-            EndBeat = new Beat((int[])last.EndBeat),
-            StartValue = first.StartValue,
-            EndValue = last.EndValue,
+            StartBeat = new Beat((int[])startBeat),
+            EndBeat = new Beat((int[])endBeat),
             Easing = new Kpc.Easing(easingId),
-            Font = first.Font
+            Font = template.Font
         };
 
-    private static Beat LerpBeat(Beat startBeat, Beat endBeat, double t)
-        => new((double)startBeat + ((double)endBeat - (double)startBeat) * t);
+        if (typeof(TPayload) == typeof(double))
+        {
+            evt.StartValue = (TPayload)(object)startValue;
+            evt.EndValue = (TPayload)(object)endValue;
+        }
+        else if (typeof(TPayload) == typeof(float))
+        {
+            evt.StartValue = (TPayload)(object)(float)startValue;
+            evt.EndValue = (TPayload)(object)(float)endValue;
+        }
+        else if (typeof(TPayload) == typeof(int))
+        {
+            evt.StartValue = (TPayload)(object)(int)startValue;
+            evt.EndValue = (TPayload)(object)(int)endValue;
+        }
 
-    private static bool CanParticipateInFit(Kpc.Event<TPayload> evt)
-        => evt.EndBeat > evt.StartBeat && !evt.IsBezier && evt.Easing == 1;
-
-    private static bool CanAppendToFitRun(
-        Kpc.Event<TPayload> previousEvent,
-        Kpc.Event<TPayload> currentEvent,
-        double tolerance)
-    {
-        if (!CanParticipateInFit(currentEvent))
-            return false;
-        if (previousEvent.EndBeat != currentEvent.StartBeat)
-            return false;
-        if (!string.Equals(previousEvent.Font, currentEvent.Font, StringComparison.Ordinal))
-            return false;
-
-        return AreClose(NumericHelper.ToDouble(previousEvent.EndValue), NumericHelper.ToDouble(currentEvent.StartValue), tolerance);
-    }
-
-    private static bool AreClose(double left, double right, double tolerance)
-    {
-        var scale = Math.Max(Math.Max(Math.Abs(left), Math.Abs(right)), 1d);
-        return Math.Abs(left - right) <= tolerance / 100d * scale;
-    }
-
-    private static int ResolveMaxDegreeOfParallelism(int? maxDegreeOfParallelism)
-    {
-        if (maxDegreeOfParallelism is null)
-            return Math.Max(1, Environment.ProcessorCount);
-
-        if (maxDegreeOfParallelism <= 0)
-            throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism),
-                "MaxDegreeOfParallelism must be greater than 0.");
-
-        return maxDegreeOfParallelism.Value;
+        return evt;
     }
 
     private static void EnsureSupportedNumericType()
     {
         if (typeof(TPayload) != typeof(int) && typeof(TPayload) != typeof(float) && typeof(TPayload) != typeof(double))
-            throw new NotSupportedException("EventListFit only supports int, float, and double types.");
-    }
-
-    private readonly record struct SamplePoint(Beat Beat, double Time, double Value, double Progress);
-
-    private readonly record struct SourceProfile(
-        double Progress25,
-        double Progress50,
-        double Progress75,
-        EasingPhase Phase,
-        bool HasOvershootValue,
-        bool IsMonotonicValue);
-
-    private readonly record struct CandidateProfile(
-        double Progress25,
-        double Progress50,
-        double Progress75,
-        bool HasOvershootValue,
-        bool IsMonotonicValue);
-
-    private readonly record struct FittedSegment(Kpc.Event<TPayload> Event, double Score);
-
-    private readonly record struct PlanChoice(double Cost, int Segments, int Prev, Kpc.Event<TPayload> Event);
-
-    private readonly record struct FitUnit(int Start, int EndExclusive, bool NeedsFit);
-
-    private enum EasingPhase
-    {
-        Unknown,
-        Linear,
-        In,
-        Out,
-        InOut
+            throw new NotSupportedException("EventFit only supports int, float, and double types.");
     }
 }

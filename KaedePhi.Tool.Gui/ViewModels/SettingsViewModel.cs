@@ -38,12 +38,7 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     public bool CutDisableCompress { get; set; }
 
     // ---- Fit ----
-    public double FitTolerance { get; set; } = 0.5;
-    public double FitSegmentPenalty { get; set; } = 1.0;
-    public double FitKeepOriginalPenalty { get; set; } = 1.02;
-    public int FitFullSearchRunLengthThreshold { get; set; } = 160;
-    public int FitLongRunSearchWindow { get; set; } = 160;
-    public double FitPhaseDetectionEpsilon { get; set; } = 0.015;
+    public double FitTolerance { get; set; } = 0.1;
 
     // ---- Render ----
     public int RenderPixelsPerBeat { get; set; } = 100;
@@ -112,11 +107,6 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
         c.Cut.DisableCompress = CutDisableCompress;
 
         c.Fit.Tolerance = FitTolerance;
-        c.Fit.SegmentPenalty = FitSegmentPenalty;
-        c.Fit.KeepOriginalPenalty = FitKeepOriginalPenalty;
-        c.Fit.FullSearchRunLengthThreshold = FitFullSearchRunLengthThreshold;
-        c.Fit.LongRunSearchWindow = FitLongRunSearchWindow;
-        c.Fit.PhaseDetectionEpsilon = FitPhaseDetectionEpsilon;
 
         c.Render.PixelsPerBeat = RenderPixelsPerBeat;
         c.Render.ChannelWidth = RenderChannelWidth;
@@ -183,11 +173,6 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
         CutDisableCompress = c.Cut.DisableCompress;
 
         FitTolerance = c.Fit.Tolerance;
-        FitSegmentPenalty = c.Fit.SegmentPenalty;
-        FitKeepOriginalPenalty = c.Fit.KeepOriginalPenalty;
-        FitFullSearchRunLengthThreshold = c.Fit.FullSearchRunLengthThreshold;
-        FitLongRunSearchWindow = c.Fit.LongRunSearchWindow;
-        FitPhaseDetectionEpsilon = c.Fit.PhaseDetectionEpsilon;
 
         RenderPixelsPerBeat = c.Render.PixelsPerBeat;
         RenderChannelWidth = c.Render.ChannelWidth;

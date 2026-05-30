@@ -201,14 +201,7 @@ internal sealed class AppController
                             _toolVm.DisableCompress, toolProgress);
                         break;
                     case "fit":
-                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, new EventFitOptions
-                        {
-                            SegmentPenalty = _toolVm.SegmentPenalty,
-                            KeepOriginalPenalty = _toolVm.KeepOriginalPenalty,
-                            FullSearchRunLengthThreshold = _toolVm.FullSearchRunLengthThreshold,
-                            LongRunSearchWindow = _toolVm.LongRunSearchWindow,
-                            PhaseDetectionEpsilon = _toolVm.PhaseDetectionEpsilon
-                        }, toolProgress);
+                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, toolProgress);
                         break;
                     case "render":
                         _chart.RunRender(kpcChart, _toolVm.PixelsPerBeat,

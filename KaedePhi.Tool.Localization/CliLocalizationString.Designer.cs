@@ -305,6 +305,33 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 配置管理.
+        /// </summary>
+        public static string branch_config_desc {
+            get {
+                return ResourceManager.GetString("branch_config_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 重置配置文件为默认值.
+        /// </summary>
+        public static string cmd_config_reset_desc {
+            get {
+                return ResourceManager.GetString("cmd_config_reset_desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 配置文件已重置为默认值：{0}.
+        /// </summary>
+        public static string msg_config_reset_done {
+            get {
+                return ResourceManager.GetString("msg_config_reset_done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 可以用 --help 查看所有可用命令哦~.
         /// </summary>
         public static string hint_use_help {

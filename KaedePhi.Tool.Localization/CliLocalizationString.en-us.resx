@@ -82,6 +82,17 @@
     <data name="opt_format_desc" xml:space="preserve">
         <value>Format the output</value>
     </data>
+    <!-- ── config ─────────────────────────────────────────────────────────── -->
+    <data name="branch_config_desc" xml:space="preserve">
+        <value>Configuration management</value>
+    </data>
+    <data name="cmd_config_reset_desc" xml:space="preserve">
+        <value>Reset config file to defaults</value>
+    </data>
+    <data name="msg_config_reset_done" xml:space="preserve">
+        <value>Config file has been reset to defaults: {0}</value>
+        <comment>{0} = config file path</comment>
+    </data>
     <!-- ── messages ─────────────────────────────────────────────────────────── -->
     <data name="msg_loaded" xml:space="preserve">
         <value>Successfully loaded the chart into workspace {0}!</value>
