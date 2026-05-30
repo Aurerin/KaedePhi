@@ -19,7 +19,7 @@ public class LineEventBuilder
     private readonly EventCompressor<int> _eventCompressorInt;
     private readonly EventCutter<float> _eventCutterFloat;
     private readonly EventCutter<double> _eventCutterDouble;
-    private readonly KpcLayerProcessor _layerProcessor = new();
+    private readonly LayerProcessor _layerProcessor = new();
     private readonly Dictionary<Type, object> _eventCutters = new();
 
     public LineEventBuilder(KpcToPhiEditConvertOptions options, Action<string>? warnLogger = null)

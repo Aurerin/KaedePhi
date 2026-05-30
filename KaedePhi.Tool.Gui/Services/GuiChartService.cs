@@ -244,7 +244,7 @@ public sealed class GuiChartService
         IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_layermerge_name));
-        var processor = new KpcLayerProcessor();
+        var processor = new LayerProcessor();
         processor.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         var totalLines = chart.JudgeLineList.Count;
         for (var li = 0; li < totalLines; li++)
@@ -278,7 +278,7 @@ public sealed class GuiChartService
         IProgress<ToolProgress>? progress = null)
     {
         _log.Info(string.Format(log_running_tool, tool_cut_name));
-        var processor = new KpcLayerProcessor();
+        var processor = new LayerProcessor();
         processor.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
         var totalLines = chart.JudgeLineList.Count;
         for (var li = 0; li < totalLines; li++)
