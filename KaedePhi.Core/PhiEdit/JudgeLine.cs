@@ -63,17 +63,30 @@ namespace KaedePhi.Core.PhiEdit
         /// </returns>
         private (bool foundExactFrame, (float, float) value, MoveFrame previousFrame) FindExactOrPreviousFrame(float beat)
         {
-            for (int i = MoveFrames.Count - 1; i >= 0; i--)
+            // 二分查找：定位 Beat <= beat 中 index 最大者（最近前置帧或精确帧）
+            int lo = 0, hi = MoveFrames.Count - 1, idx = -1;
+            while (lo <= hi)
             {
-                var frame = MoveFrames[i];
-                if (Math.Abs(frame.Beat - beat) < 0.0001f)
-                    return (true, (frame.XValue, frame.YValue), frame);
-
-                if (frame.Beat < beat)
-                    return (false, default, frame);
+                var mid = (lo + hi) >> 1;
+                if (MoveFrames[mid].Beat <= beat)
+                {
+                    idx = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
             }
 
-            return (false, default, null);
+            if (idx < 0)
+                return (false, default, null);
+
+            var frame = MoveFrames[idx];
+            if (Math.Abs(frame.Beat - beat) < 0.0001f)
+                return (true, (frame.XValue, frame.YValue), frame);
+
+            return (false, default, frame);
         }
 
         /// <summary>
@@ -87,18 +100,30 @@ namespace KaedePhi.Core.PhiEdit
         /// <returns>当前主导且仍活跃的移动事件；若主导事件已结束或无任何事件则为 null。</returns>
         private MoveEvent? FindActiveMoveEvent(float beat)
         {
-            // MoveEvents 已按 StartBeat 升序排列；向后遍历，持续更新为最大 index 候选
-            MoveEvent? dominant = null;
-            for (int i = 0; i < MoveEvents.Count; i++)
+            // 二分查找：定位 StartBeat <= beat + ε 中 index 最大者（主导事件）
+            // 同 StartBeat 时取靠后者（index 更大），满足同起始拍 index 至上规则
+            int lo = 0, hi = MoveEvents.Count - 1, idx = -1;
+            while (lo <= hi)
             {
-                var e = MoveEvents[i];
-                if (e.StartBeat > beat + 0.0001f)
-                    break;
-                dominant = e; // 同 StartBeat 时取靠后者（index 更大）
+                var mid = (lo + hi) >> 1;
+                if (MoveEvents[mid].StartBeat <= beat + 0.0001f)
+                {
+                    idx = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
             }
 
+            if (idx < 0)
+                return null;
+
+            var dominant = MoveEvents[idx];
+
             // 主导事件已结束时不降级——A 被 B 截断后，A 剩余部分完全忽略
-            return dominant != null && beat <= dominant.EndBeat + 0.0001f ? dominant : null;
+            return beat <= dominant.EndBeat + 0.0001f ? dominant : null;
         }
 
         /// <summary>
@@ -109,8 +134,32 @@ namespace KaedePhi.Core.PhiEdit
         /// <returns>主导已结束移动事件；若不存在则返回 null。</returns>
         private MoveEvent? FindPreviousMoveEvent(float beat)
         {
-            // MoveEvents 按 StartBeat 升序；LastOrDefault 取最大 index 中已结束者，即主导已结束事件
-            return MoveEvents.LastOrDefault(ev => beat > ev.EndBeat);
+            // 二分查找主导事件（StartBeat <= beat 中 index 最大者），
+            // 然后向前扫描首个已结束事件——即主导已结束事件。
+            // 由于列表按 StartBeat 升序，一旦遇到已结束事件，其前方所有事件必然也已结束，
+            // 因此首个已结束事件即为 index 最大的已结束事件。
+            int lo = 0, hi = MoveEvents.Count - 1, idx = -1;
+            while (lo <= hi)
+            {
+                var mid = (lo + hi) >> 1;
+                if (MoveEvents[mid].StartBeat <= beat + 0.0001f)
+                {
+                    idx = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
+            }
+
+            for (int i = idx; i >= 0; i--)
+            {
+                if (beat > MoveEvents[i].EndBeat)
+                    return MoveEvents[i];
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -172,13 +221,10 @@ namespace KaedePhi.Core.PhiEdit
         /// </summary>
         private MoveEvent? FindPrecedingDominantMoveEvent(MoveEvent activeEvent)
         {
+            // 列表按 StartBeat 升序，因此 activeEvent 的前驱（index - 1）必然满足
+            // StartBeat <= activeEvent.StartBeat，无需线性扫描。
             int idx = MoveEvents.IndexOf(activeEvent);
-            for (int i = idx - 1; i >= 0; i--)
-            {
-                if (MoveEvents[i].StartBeat <= activeEvent.StartBeat + 0.0001f)
-                    return MoveEvents[i];
-            }
-            return null;
+            return idx > 0 ? MoveEvents[idx - 1] : null;
         }
 
         /// <summary>
@@ -186,13 +232,25 @@ namespace KaedePhi.Core.PhiEdit
         /// </summary>
         private MoveFrame? FindMoveFrameExactAt(float beat)
         {
-            foreach (var frame in MoveFrames)
+            // 二分查找：定位 Beat <= beat 中 index 最大者，再检验是否精确命中
+            int lo = 0, hi = MoveFrames.Count - 1, idx = -1;
+            while (lo <= hi)
             {
-                if (Math.Abs(frame.Beat - beat) < 0.0001f)
-                    return frame;
-                if (frame.Beat > beat + 0.0001f)
-                    break;
+                var mid = (lo + hi) >> 1;
+                if (MoveFrames[mid].Beat <= beat + 0.0001f)
+                {
+                    idx = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
             }
+
+            if (idx >= 0 && Math.Abs(MoveFrames[idx].Beat - beat) < 0.0001f)
+                return MoveFrames[idx];
+
             return null;
         }
 

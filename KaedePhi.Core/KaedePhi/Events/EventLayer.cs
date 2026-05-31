@@ -33,19 +33,27 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// <returns>在指定拍时，指定事件列表的数值</returns>
         public static T GetValueAtBeat<T>(List<Event<T>> events, Beat beat)
         {
-            // 主导事件：StartBeat <= beat 中 index 最大者
-            // 向后遍历并持续覆盖 dominant，使最晚起始（最大 index）的事件胜出
-            // 同 StartBeat 时，靠后者（index 更大）覆盖靠前者（满足同起始拍 index 至上规则）
-            Event<T>? dominant = null;
-            foreach (var e in events)
+            // 二分查找：定位 StartBeat <= beat 中 index 最大者（主导事件）
+            // 同 StartBeat 时取靠后者（index 更大），满足同起始拍 index 至上规则
+            int lo = 0, hi = events.Count - 1, idx = -1;
+            while (lo <= hi)
             {
-                if (beat < e.StartBeat)
-                    break;
-                dominant = e;
+                var mid = (lo + hi) >> 1;
+                if (events[mid].StartBeat <= beat)
+                {
+                    idx = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
             }
 
-            if (dominant is null)
+            if (idx < 0)
                 return default;
+
+            var dominant = events[idx];
 
             // 主导事件仍活跃 → 插值
             if (beat <= dominant.EndBeat)
