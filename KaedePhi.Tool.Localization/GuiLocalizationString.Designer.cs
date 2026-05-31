@@ -717,6 +717,15 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 仅在启用经典模式时可用.
+        /// </summary>
+        public static string option_disable_compress_hint {
+            get {
+                return ResourceManager.GetString("option_disable_compress_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 全搜索长度阈值.
         /// </summary>
         public static string option_full_search_threshold {

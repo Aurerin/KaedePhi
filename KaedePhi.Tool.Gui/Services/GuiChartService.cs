@@ -15,6 +15,7 @@ using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.JudgeLines.KaedePhi;
 using KaedePhi.Tool.Layer.KaedePhi;
 using KaedePhi.Tool.Render.KaedePhi;
+using Serilog;
 using Chart = KaedePhi.Core.KaedePhi.Chart;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
@@ -22,11 +23,11 @@ namespace KaedePhi.Tool.Gui.Services;
 
 public sealed class GuiChartService
 {
-    private readonly LogService _log;
+    private readonly ILogger _log;
 
-    public GuiChartService(LogService log)
+    public GuiChartService(LogService logService)
     {
-        _log = log;
+        _log = logService.ForContext<GuiChartService>();
     }
 
     /// <summary>
@@ -54,7 +55,7 @@ public sealed class GuiChartService
     /// </summary>
     public async Task<(Chart Chart, ChartType DetectedType)> LoadChartAsync(string filePath, bool stream, CancellationToken ct)
     {
-        _log.Info(string.Format(log_file_selected, filePath, stream));
+        _log.Information(log_file_selected, filePath, stream);
 
         string text;
         if (stream)
@@ -68,9 +69,9 @@ public sealed class GuiChartService
         }
 
         var detectedType = ChartGetType.GetType(text);
-        _log.Info(string.Format(log_step_detected, detectedType));
+        _log.Information(log_step_detected, detectedType);
 
-        _log.Info(log_step_converting);
+        _log.Information(log_step_converting);
         // 在后台线程执行耗时的格式转换
         var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType), ct);
 
@@ -78,7 +79,7 @@ public sealed class GuiChartService
         SourceFormat = detectedType;
         SourceFilePath = filePath;
 
-        _log.Info(log_step_saved);
+        _log.Information(log_step_saved);
         return (kpcChart, detectedType);
     }
 
@@ -90,9 +91,9 @@ public sealed class GuiChartService
         if (CurrentChart == null)
             throw new InvalidOperationException("No chart loaded");
 
-        _log.Info(string.Format(log_exporting_to, outputPath, targetType));
+        _log.Information(log_exporting_to, outputPath, targetType);
         await ConvertFromKpcAndSaveAsync(CurrentChart, targetType, outputPath, stream, indented, ct);
-        _log.Info(log_export_done);
+        _log.Information(log_export_done);
     }
 
     /// <summary>
@@ -107,16 +108,23 @@ public sealed class GuiChartService
 
     private Chart ConvertToKpc(string text, ChartType sourceType)
     {
-        _log.Info(log_step_converting);
         switch (sourceType)
         {
             case ChartType.RePhiEdit:
             {
                 var rpeChart = Core.RePhiEdit.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
                 var rpeConverter = new RePhiEditConverter();
-                rpeConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                rpeConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 var kpcConverter = new KaedePhiConverter();
-                kpcConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                kpcConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 return ChartPipeline
                     .From(rpeChart, rpeConverter, null)
                     .To(kpcConverter, null);
@@ -125,9 +133,17 @@ public sealed class GuiChartService
             {
                 var peChart = Core.PhiEdit.Chart.LoadAsync(text).GetAwaiter().GetResult();
                 var peConverter = new PhiEditConverter();
-                peConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                peConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 var kpcConverter = new KaedePhiConverter();
-                kpcConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                kpcConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 return ChartPipeline
                     .From(peChart, peConverter, new PhiEditToKpcConvertOptions())
                     .To(kpcConverter, null);
@@ -136,9 +152,17 @@ public sealed class GuiChartService
             {
                 var v3Chart = Core.Phigros.v3.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
                 var v3Converter = new PhigrosV3Converter();
-                v3Converter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                v3Converter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 var kpcConverter = new KaedePhiConverter();
-                kpcConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                kpcConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 return ChartPipeline
                     .From(v3Chart, v3Converter, null)
                     .To(kpcConverter, null);
@@ -151,13 +175,17 @@ public sealed class GuiChartService
     private async Task ConvertFromKpcAndSaveAsync(
         Chart chart, ChartType targetType, string outputPath, bool stream, bool indented, CancellationToken ct)
     {
-        _log.Info(string.Format(log_exporting_to, outputPath, targetType));
+        _log.Information(log_exporting_to, outputPath, targetType);
         switch (targetType)
         {
             case ChartType.RePhiEdit:
             {
                 var rpeConverter = new RePhiEditConverter();
-                rpeConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                rpeConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 var rpeChart = rpeConverter.FromKpc(chart, new ConvertOption());
                 if (stream)
                 {
@@ -173,7 +201,11 @@ public sealed class GuiChartService
             case ChartType.PhiEdit:
             {
                 var peConverter = new PhiEditConverter();
-                peConverter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                peConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 var peChart = peConverter.FromKpc(chart, new KpcToPhiEditConvertOptions());
                 if (stream)
                 {
@@ -189,7 +221,11 @@ public sealed class GuiChartService
             case ChartType.PhigrosV3:
             {
                 var v3Converter = new PhigrosV3Converter();
-                v3Converter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+                v3Converter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg));
                 var phigrosChart = v3Converter.FromKpc(chart, new KpcToPhigrosV3ConvertOptions());
                 if (stream)
                 {
@@ -206,15 +242,19 @@ public sealed class GuiChartService
                 throw new NotSupportedException($"Cannot export to format: {targetType}");
         }
 
-        _log.Info(log_export_done);
+        _log.Information(log_export_done);
     }
 
     public void RunFatherUnbind(Chart chart, double precision, double tolerance, bool classic, bool disableCompress,
         IProgress<ToolProgress>? progress = null)
     {
-        _log.Info(string.Format(log_running_tool, tool_unbind_name));
+        _log.Information(log_running_tool, tool_unbind_name);
         var unbinder = new JudgeLineUnbinder();
-        unbinder.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+        unbinder.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg),
+            debug: msg => _log.Debug(msg));
         var linesToProcess = new System.Collections.Generic.List<int>();
         for (var i = 0; i < chart.JudgeLineList.Count; i++)
         {
@@ -243,9 +283,13 @@ public sealed class GuiChartService
     public void RunLayerMerge(Chart chart, double precision, double tolerance, bool classic, bool disableCompress,
         IProgress<ToolProgress>? progress = null)
     {
-        _log.Info(string.Format(log_running_tool, tool_layermerge_name));
+        _log.Information(log_running_tool, tool_layermerge_name);
         var processor = new LayerProcessor();
-        processor.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+        processor.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg),
+            debug: msg => _log.Debug(msg));
         var totalLines = chart.JudgeLineList.Count;
         for (var li = 0; li < totalLines; li++)
         {
@@ -277,9 +321,13 @@ public sealed class GuiChartService
     public void RunCutEvent(Chart chart, double precision, double tolerance, bool disableCompress,
         IProgress<ToolProgress>? progress = null)
     {
-        _log.Info(string.Format(log_running_tool, tool_cut_name));
+        _log.Information(log_running_tool, tool_cut_name);
         var processor = new LayerProcessor();
-        processor.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+        processor.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg),
+            debug: msg => _log.Debug(msg));
         var totalLines = chart.JudgeLineList.Count;
         for (var li = 0; li < totalLines; li++)
         {
@@ -309,14 +357,26 @@ public sealed class GuiChartService
 
     public void RunFitEvent(Chart chart, double tolerance, IProgress<ToolProgress>? progress = null)
     {
-        _log.Info(string.Format(log_running_tool, tool_fit_name));
+        _log.Information(log_running_tool, tool_fit_name);
         var totalLines = chart.JudgeLineList.Count;
         var doubleFit = new EventFit<double>();
         var intFit = new EventFit<int>();
         var floatFit = new EventFit<float>();
-        doubleFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
-        intFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
-        floatFit.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s), debug: _log.Info);
+        doubleFit.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg),
+            debug: msg => _log.Debug(msg));
+        intFit.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg),
+            debug: msg => _log.Debug(msg));
+        floatFit.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg),
+            debug: msg => _log.Debug(msg));
 
         for (var li = 0; li < totalLines; li++)
         {
@@ -365,7 +425,7 @@ public sealed class GuiChartService
     public System.Collections.Generic.IReadOnlyList<string> RunRender(Chart chart, int pixelsPerBeat, int channelWidth, int samples, int beatSubdivisions,
         IProgress<ToolProgress>? progress = null)
     {
-        _log.Info(string.Format(log_running_tool, tool_render_name));
+        _log.Information(log_running_tool, tool_render_name);
         var outputDir = Path.Combine(Path.GetTempPath(), "kaedephi_render_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(outputDir);
         var options = new KpcRenderOptions
@@ -376,7 +436,10 @@ public sealed class GuiChartService
             BeatSubdivisions = beatSubdivisions
         };
         var exporter = new KpcChartRenderExporter();
-        exporter.SubscribeLog(info: _log.Info, warning: _log.Warn, error: s => _log.Error(s));
+        exporter.SubscribeLog(
+            info: msg => _log.Information(msg),
+            warning: msg => _log.Warning(msg),
+            error: msg => _log.Error(msg));
         return exporter.ExportChart(chart, outputDir, options, progress: progress);
     }
 }

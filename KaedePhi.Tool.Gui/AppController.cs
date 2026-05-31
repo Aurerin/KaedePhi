@@ -9,6 +9,7 @@ using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
 using KaedePhi.Tool.Gui.Views;
+using Serilog;
 using static KaedePhi.Tool.Localization.GuiLocalizationString;
 
 namespace KaedePhi.Tool.Gui;
@@ -17,7 +18,8 @@ internal sealed class AppController
 {
     private readonly MainViewModel _main;
     private readonly GuiChartService _chart;
-    private readonly LogService _log;
+    private readonly ILogger _log;
+    private readonly LogService _logService;
     private readonly ConfigService _config;
     private readonly Window _window;
 
@@ -30,11 +32,12 @@ internal sealed class AppController
     private CancellationTokenSource? _cts;
     private bool _isFileProcessing;
 
-    public AppController(MainViewModel main, GuiChartService chart, LogService log, ConfigService config, Window window)
+    public AppController(MainViewModel main, GuiChartService chart, LogService logService, ConfigService config, Window window)
     {
         _main = main;
         _chart = chart;
-        _log = log;
+        _logService = logService;
+        _log = logService.ForContext<AppController>();
         _config = config;
         _window = window;
 
@@ -79,7 +82,7 @@ internal sealed class AppController
         _chart.Clear();
         _importVm.UseStream = false;
         _main.CurrentPage = _importVm;
-        _log.Info(log_navigate_import);
+        _log.Information(log_navigate_import);
     }
 
     private void NavigateToTool()
@@ -150,7 +153,7 @@ internal sealed class AppController
         }
         catch (Exception ex)
         {
-            _log.Error(log_load_failed, ex);
+            _log.Error(ex, log_load_failed);
             MessageDialog.ShowError(_window, load_error_title, ex.Message);
         }
         finally
@@ -210,7 +213,7 @@ internal sealed class AppController
                 }
             }, _cts.Token);
 
-            _log.Info(string.Format(log_tool_completed, toolId));
+            _log.Information(log_tool_completed, toolId);
 
             // 返回工具页面并显示成功对话框
             NavigateToTool();
@@ -218,7 +221,7 @@ internal sealed class AppController
         }
         catch (Exception ex)
         {
-            _log.Error(log_tool_failed, ex);
+            _log.Error(ex, log_tool_failed);
 
             // 返回工具页面并显示失败对话框
             NavigateToTool();
@@ -293,20 +296,20 @@ internal sealed class AppController
                     await _chart.ExportChartAsync(targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, CancellationToken.None);
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
-                    _log.Info(log_export_done);
+                    _log.Information(log_export_done);
                     MessageDialog.ShowSuccess(_window, export_success_title, string.Format(status_exported_to, outputPath));
                 }
             }
             else
             {
                 _exportVm.StatusText = status_export_cancelled;
-                _log.Info(log_export_cancelled);
+                _log.Information(log_export_cancelled);
             }
         }
         catch (Exception ex)
         {
-            _log.Error(log_export_failed, ex);
-            _exportVm.StatusText = string.Format(status_error_with_log, ex.Message, _log.CurrentLogFile);
+            _log.Error(ex, log_export_failed);
+            _exportVm.StatusText = string.Format(status_error_with_log, ex.Message, _logService.CurrentLogFile);
             MessageDialog.ShowError(_window, export_error_title, ex.Message);
         }
         finally

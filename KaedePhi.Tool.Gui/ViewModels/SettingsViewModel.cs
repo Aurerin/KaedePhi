@@ -23,14 +23,60 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     // ---- Unbind ----
     public double UnbindPrecision { get; set; } = 64;
     public double UnbindTolerance { get; set; } = 0.1;
-    public bool UnbindClassicMode { get; set; }
-    public bool UnbindDisableCompress { get; set; }
+
+    public bool UnbindClassicMode
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(UnbindDisableCompressEnabled));
+            if (!value) UnbindDisableCompress = false;
+        }
+    }
+
+    public bool UnbindDisableCompress
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>仅在经典模式启用时允许修改"禁用压缩"默认值。</summary>
+    public bool UnbindDisableCompressEnabled => UnbindClassicMode;
 
     // ---- LayerMerge ----
     public double LayerMergePrecision { get; set; } = 64;
     public double LayerMergeTolerance { get; set; } = 0.1;
-    public bool LayerMergeClassicMode { get; set; }
-    public bool LayerMergeDisableCompress { get; set; }
+
+    public bool LayerMergeClassicMode
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(LayerMergeDisableCompressEnabled));
+            if (!value) LayerMergeDisableCompress = false;
+        }
+    }
+
+    public bool LayerMergeDisableCompress
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>仅在经典模式启用时允许修改"禁用压缩"默认值。</summary>
+    public bool LayerMergeDisableCompressEnabled => LayerMergeClassicMode;
 
     // ---- Cut ----
     public double CutPrecision { get; set; } = 64;

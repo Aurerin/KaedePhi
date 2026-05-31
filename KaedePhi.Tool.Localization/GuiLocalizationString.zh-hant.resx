@@ -91,6 +91,9 @@
   <data name="option_disable_compress" xml:space="preserve">
     <value>停用壓縮</value>
   </data>
+  <data name="option_disable_compress_hint" xml:space="preserve">
+    <value>僅在啟用經典模式時可用</value>
+  </data>
   <data name="option_pixels_per_beat" xml:space="preserve">
     <value>每拍像素</value>
   </data>
