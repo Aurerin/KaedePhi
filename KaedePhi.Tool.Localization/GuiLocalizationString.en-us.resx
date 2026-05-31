@@ -211,9 +211,6 @@
   <data name="log_step_converting" xml:space="preserve">
     <value>Converting to KPC...</value>
   </data>
-  <data name="log_step_saved" xml:space="preserve">
-    <value>Saved to workspace.</value>
-  </data>
   <data name="log_chart_ready" xml:space="preserve">
     <value>Chart loaded and ready for processing.</value>
   </data>

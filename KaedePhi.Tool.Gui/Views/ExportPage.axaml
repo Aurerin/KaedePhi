@@ -36,8 +36,8 @@
                         <StackPanel Spacing="12">
                             <TextBlock Text="{x:Static loc:GuiLocalizationString.convert_options_title}" FontSize="14" FontWeight="SemiBold"/>
 
-                            <!-- PE 转换选项（仅当目标格式为 PhiEdit 时显示） -->
-                            <StackPanel Spacing="8" IsVisible="{Binding IsTargetPe}">
+                            <!-- PE 转换选项 -->
+                            <StackPanel Spacing="8" IsVisible="{Binding ShowPeOptions}">
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.convert_pe_options}" FontSize="12" Opacity="0.7"/>
                                 <StackPanel Spacing="6">
                                     <StackPanel Spacing="4">
@@ -63,8 +63,8 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <!-- PhigrosV3 转换选项（仅当目标格式为 PhigrosV3 时显示） -->
-                            <StackPanel Spacing="8" IsVisible="{Binding IsTargetPhigros}">
+                            <!-- PhigrosV3 转换选项 -->
+                            <StackPanel Spacing="8" IsVisible="{Binding ShowPhigrosOptions}">
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.convert_phigros_options}" FontSize="12" Opacity="0.7"/>
                                 <StackPanel Spacing="6">
                                     <StackPanel Spacing="4">

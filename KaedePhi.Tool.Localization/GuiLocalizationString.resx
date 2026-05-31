@@ -214,9 +214,6 @@
   <data name="log_step_converting" xml:space="preserve">
     <value>正在转换为中间格式...</value>
   </data>
-  <data name="log_step_saved" xml:space="preserve">
-    <value>已保存至工作区。</value>
-  </data>
   <data name="log_chart_ready" xml:space="preserve">
     <value>谱面已加载，准备处理。</value>
   </data>

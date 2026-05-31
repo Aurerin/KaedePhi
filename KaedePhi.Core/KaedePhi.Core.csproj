@@ -34,7 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="KaedePhiIcon.png" Pack="true" PackagePath="\"/>
+        <None Include="../KaedePhiIcon.png" Pack="true" PackagePath="\"/>
         <None Update="KaedePhiIcon.png">
             <Pack>True</Pack>
             <PackagePath></PackagePath>

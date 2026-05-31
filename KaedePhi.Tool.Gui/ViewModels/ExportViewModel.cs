@@ -11,45 +11,15 @@ public sealed class ExportViewModel : INotifyPropertyChanged
 {
     private ChartType _selectedFormat;
     private ChartType _sourceFormat;
-    private bool _useStream;
-    private bool _indentedOutput;
-    private bool _isExporting;
-    private string _statusText = string.Empty;
-
-    // 转换选项字段
-    private double _peSpeedConversionRatio = 14d / 9d;
-    private double _peTrailingBeatPadding = 1d / 64d;
-    private double _peUnsupportedEasingPrecision = 64d;
-    private double _peMisalignedXyEventPrecision = 64d;
-    private double _peAlphaCutPrecision = 64d;
-    private double _peAlphaCutTolerance = 0.1d;
-    private double _peSpeedCutPrecision = 64d;
-    private double _peSpeedCutTolerance = 0.1d;
-    private float _phigrosDefaultBpm = 120f;
-    private double _phigrosEasingPrecision = 64d;
-    private double _phigrosMisalignedXyEventPrecision = 64d;
-    private double _phigrosAlphaCutPrecision = 64d;
-    private double _phigrosAlphaCutTolerance = 0.1d;
-    private double _phigrosSpeedCutPrecision = 64d;
-    private double _unbindPrecision = 64d;
-    private double _unbindTolerance = 0.1d;
-    private bool _unbindClassicMode;
-    private bool _unbindCompress = true;
-    private double _multiLayerMergePrecision = 64d;
-    private double _multiLayerMergeTolerance = 0.1d;
-    private bool _multiLayerMergeClassicMode;
-    private bool _multiLayerMergeCompress = true;
-    private bool _removeAttachUiLine;
-    private bool _removeTextureLine;
-
+    
     /// <summary>
     /// 获取谱面格式的级别（数值越大级别越高）
-    /// PhiChain > RePhiEdit > PhiEdit > PhiFans > PhigrosV3 > PhigrosV1
+    /// RePhiEdit > PhiChain > PhiEdit > PhiFans > PhigrosV3 > PhigrosV1
     /// </summary>
     private static int GetFormatLevel(ChartType format) => format switch
     {
-        ChartType.PhiChain => 6,
-        ChartType.RePhiEdit => 5,
+        ChartType.RePhiEdit => 6,
+        ChartType.PhiChain => 5,
         ChartType.PhiEdit => 4,
         ChartType.PhiFans => 3,
         ChartType.PhigrosV3 => 2,
@@ -77,10 +47,8 @@ public sealed class ExportViewModel : INotifyPropertyChanged
             _sourceFormat = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ShowConversionOptions));
-            OnPropertyChanged(nameof(IsTargetPe));
-            OnPropertyChanged(nameof(IsTargetPhigros));
-            OnPropertyChanged(nameof(IsSourcePe));
-            OnPropertyChanged(nameof(IsSourcePhigros));
+            OnPropertyChanged(nameof(ShowPeOptions));
+            OnPropertyChanged(nameof(ShowPhigrosOptions));
         }
     }
 
@@ -93,10 +61,8 @@ public sealed class ExportViewModel : INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsJsonFormat));
             OnPropertyChanged(nameof(ShowConversionOptions));
-            OnPropertyChanged(nameof(IsTargetPe));
-            OnPropertyChanged(nameof(IsTargetPhigros));
-            OnPropertyChanged(nameof(IsSourcePe));
-            OnPropertyChanged(nameof(IsSourcePhigros));
+            OnPropertyChanged(nameof(ShowPeOptions));
+            OnPropertyChanged(nameof(ShowPhigrosOptions));
             if (!IsJsonFormat)
                 IndentedOutput = false;
         }
@@ -117,29 +83,23 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     public bool ShowConversionOptions => IsDowngrade;
 
     /// <summary>
-    /// 目标格式是否为 PhiEdit（显示"转换到 PhiEdit"的选项）
+    /// 是否显示 PhiEdit 专属转换选项（降级且目标为 PhiEdit）
     /// </summary>
-    public bool IsTargetPe => ShowConversionOptions && _selectedFormat == ChartType.PhiEdit;
+    public bool ShowPeOptions => ShowConversionOptions && _selectedFormat == ChartType.PhiEdit;
 
     /// <summary>
-    /// 目标格式是否为 PhigrosV3（显示"转换到 PhigrosV3"的选项）
+    /// 是否显示 PhigrosV3 专属转换选项（降级且目标为 PhigrosV3）
     /// </summary>
-    public bool IsTargetPhigros => ShowConversionOptions && _selectedFormat == ChartType.PhigrosV3;
-
-    /// <summary>
-    /// 源格式是否为 PhiEdit（显示"从 PhiEdit 转换"的选项）
-    /// </summary>
-    public bool IsSourcePe => ShowConversionOptions && _sourceFormat == ChartType.PhiEdit;
-
-    /// <summary>
-    /// 源格式是否为 PhigrosV3（显示"从 PhigrosV3 转换"的选项）
-    /// </summary>
-    public bool IsSourcePhigros => ShowConversionOptions && _sourceFormat == ChartType.PhigrosV3;
+    public bool ShowPhigrosOptions => ShowConversionOptions && _selectedFormat == ChartType.PhigrosV3;
 
     public bool UseStream
     {
-        get => _useStream;
-        set { _useStream = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     /// <summary>
@@ -147,170 +107,278 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// </summary>
     public bool IndentedOutput
     {
-        get => _indentedOutput;
-        set { _indentedOutput = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsExporting
     {
-        get => _isExporting;
-        set { _isExporting = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public string StatusText
     {
-        get => _statusText;
-        set { _statusText = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     // ---- PE 转换选项 ----
 
     public double PeSpeedConversionRatio
     {
-        get => _peSpeedConversionRatio;
-        set { _peSpeedConversionRatio = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 14d / 9d;
 
     public double PeTrailingBeatPadding
     {
-        get => _peTrailingBeatPadding;
-        set { _peTrailingBeatPadding = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 1d / 64d;
 
     public double PeUnsupportedEasingPrecision
     {
-        get => _peUnsupportedEasingPrecision;
-        set { _peUnsupportedEasingPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PeMisalignedXyEventPrecision
     {
-        get => _peMisalignedXyEventPrecision;
-        set { _peMisalignedXyEventPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PeAlphaCutPrecision
     {
-        get => _peAlphaCutPrecision;
-        set { _peAlphaCutPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PeAlphaCutTolerance
     {
-        get => _peAlphaCutTolerance;
-        set { _peAlphaCutTolerance = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.1d;
 
     public double PeSpeedCutPrecision
     {
-        get => _peSpeedCutPrecision;
-        set { _peSpeedCutPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PeSpeedCutTolerance
     {
-        get => _peSpeedCutTolerance;
-        set { _peSpeedCutTolerance = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.1d;
 
     // ---- PhigrosV3 转换选项 ----
 
     public float PhigrosDefaultBpm
     {
-        get => _phigrosDefaultBpm;
-        set { _phigrosDefaultBpm = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 120f;
 
     public double PhigrosEasingPrecision
     {
-        get => _phigrosEasingPrecision;
-        set { _phigrosEasingPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PhigrosMisalignedXyEventPrecision
     {
-        get => _phigrosMisalignedXyEventPrecision;
-        set { _phigrosMisalignedXyEventPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PhigrosAlphaCutPrecision
     {
-        get => _phigrosAlphaCutPrecision;
-        set { _phigrosAlphaCutPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double PhigrosAlphaCutTolerance
     {
-        get => _phigrosAlphaCutTolerance;
-        set { _phigrosAlphaCutTolerance = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.1d;
 
     public double PhigrosSpeedCutPrecision
     {
-        get => _phigrosSpeedCutPrecision;
-        set { _phigrosSpeedCutPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     // ---- 通用选项 ----
 
     public double UnbindPrecision
     {
-        get => _unbindPrecision;
-        set { _unbindPrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double UnbindTolerance
     {
-        get => _unbindTolerance;
-        set { _unbindTolerance = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.1d;
 
     public bool UnbindClassicMode
     {
-        get => _unbindClassicMode;
-        set { _unbindClassicMode = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public double MultiLayerMergePrecision
     {
-        get => _multiLayerMergePrecision;
-        set { _multiLayerMergePrecision = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 64d;
 
     public double MultiLayerMergeTolerance
     {
-        get => _multiLayerMergeTolerance;
-        set { _multiLayerMergeTolerance = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 0.1d;
 
     public bool MultiLayerMergeClassicMode
     {
-        get => _multiLayerMergeClassicMode;
-        set { _multiLayerMergeClassicMode = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool UnbindCompress
     {
-        get => _unbindCompress;
-        set { _unbindCompress = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = true;
 
     public bool MultiLayerMergeCompress
     {
-        get => _multiLayerMergeCompress;
-        set { _multiLayerMergeCompress = value; OnPropertyChanged(); }
-    }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = true;
 
     public bool RemoveAttachUiLine
     {
-        get => _removeAttachUiLine;
-        set { _removeAttachUiLine = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool RemoveTextureLine
     {
-        get => _removeTextureLine;
-        set { _removeTextureLine = value; OnPropertyChanged(); }
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     public event Action? RequestExport;
