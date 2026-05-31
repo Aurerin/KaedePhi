@@ -2,7 +2,7 @@
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using global::KaedePhi.Tool.JudgeLines.KaedePhi;
 using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
-using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Event<float>;
+using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;
 using PhigrosEvent = KaedePhi.Core.Phigros.v3.Event;
 using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
 using PhigrosSpeedEvent = KaedePhi.Core.Phigros.v3.SpeedEvent;
@@ -85,7 +85,7 @@ public class JudgeLineKpcToPhigrosV3
         return phigrosLine;
     }
 
-    private static List<KpcSpeedEvent> CollectSpeedEvents(List<Kpc.EventLayer>? layers)
+    private static List<KpcSpeedEvent> CollectSpeedEvents(List<KpcEvents.EventLayer>? layers)
     {
         if (layers is not { Count: > 0 }) return [];
 
@@ -141,7 +141,7 @@ public class JudgeLineKpcToPhigrosV3
             Warn("PhigrosV3 不支持 JudgeLine.YControls（包含非默认数据）");
     }
 
-    private static bool HasNonDefaultExtendLayer(Kpc.ExtendLayer? layer)
+    private static bool HasNonDefaultExtendLayer(KpcEvents.ExtendLayer? layer)
         => layer != null
            && ((layer.ColorEvents?.Count ?? 0) > 0
                || (layer.ScaleXEvents?.Count ?? 0) > 0

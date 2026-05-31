@@ -11,12 +11,12 @@ public static class Event
     private static readonly EventCutter<double> DoubleCutter = new();
     private static readonly EventCutter<int> IntCutter = new();
 
-    public static Kpc.Event<T> ConvertEvent<T>(Rpe.Event<T> src, Func<T, T>? valueCopier = null,
+    public static KpcEvents.Event<T> ConvertEvent<T>(RpeEvents.Event<T> src, Func<T, T>? valueCopier = null,
         Func<T, T>? valueTransformer = null)
     {
         valueCopier ??= v => v;
         valueTransformer ??= v => v;
-        return new Kpc.Event<T>
+        return new KpcEvents.Event<T>
         {
             IsBezier = src.IsBezier,
             BezierPoints = src.BezierPoints.ToArray(),
@@ -31,12 +31,12 @@ public static class Event
         };
     }
 
-    public static Rpe.Event<T> ConvertEvent<T>(Kpc.Event<T> src,
+    public static RpeEvents.Event<T> ConvertEvent<T>(KpcEvents.Event<T> src,
         Func<T, T>? valueCopier = null, Func<T, T>? valueTransformer = null)
     {
         valueCopier ??= v => v;
         valueTransformer ??= v => v;
-        return new Rpe.Event<T>
+        return new RpeEvents.Event<T>
         {
             IsBezier = src.IsBezier,
             BezierPoints = src.BezierPoints.ToArray(),
@@ -51,10 +51,10 @@ public static class Event
         };
     }
 
-    public static Kpc.Event<double> ConvertFloatToDoubleEvent(Rpe.Event<float> src,
+    public static KpcEvents.Event<double> ConvertFloatToDoubleEvent(RpeEvents.Event<float> src,
         Func<float, double> valueTransformer)
     {
-        return new Kpc.Event<double>
+        return new KpcEvents.Event<double>
         {
             IsBezier = src.IsBezier,
             BezierPoints = src.BezierPoints.ToArray(),
@@ -69,37 +69,37 @@ public static class Event
         };
     }
 
-    public static Kpc.Event<float> ConvertFloatEvent(Rpe.Event<float> src)
+    public static KpcEvents.Event<float> ConvertFloatEvent(RpeEvents.Event<float> src)
     {
         return ConvertEvent(src);
     }
 
-    public static Kpc.Event<int> ConvertIntEvent(Rpe.Event<int> src)
+    public static KpcEvents.Event<int> ConvertIntEvent(RpeEvents.Event<int> src)
     {
         return ConvertEvent(src);
     }
 
-    public static Kpc.Event<string> ConvertStringEvent(Rpe.Event<string> src)
+    public static KpcEvents.Event<string> ConvertStringEvent(RpeEvents.Event<string> src)
     {
         return ConvertEvent(src);
     }
 
-    public static Rpe.Event<string> ConvertStringEvent(Kpc.Event<string> src)
+    public static RpeEvents.Event<string> ConvertStringEvent(KpcEvents.Event<string> src)
     {
         return ConvertEvent(src);
     }
 
-    public static Kpc.Event<byte[]> ConvertByteArrayEvent(Rpe.Event<byte[]> src)
+    public static KpcEvents.Event<byte[]> ConvertByteArrayEvent(RpeEvents.Event<byte[]> src)
     {
         return ConvertEvent(src, v => v.ToArray());
     }
 
-    public static Rpe.Event<byte[]> ConvertByteArrayEvent(Kpc.Event<byte[]> src)
+    public static RpeEvents.Event<byte[]> ConvertByteArrayEvent(KpcEvents.Event<byte[]> src)
     {
         return ConvertEvent(src, v => v.ToArray());
     }
 
-    public static List<Rpe.Event<float>> ConvertFloatEventExpanding(Kpc.Event<float> src,
+    public static List<RpeEvents.Event<float>> ConvertFloatEventExpanding(KpcEvents.Event<float> src,
         ConvertOption.CuttingOptions options)
     {
         try
@@ -110,7 +110,7 @@ public static class Event
         {
             return FloatCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
-                .ConvertAll(e => new Rpe.Event<float>
+                .ConvertAll(e => new RpeEvents.Event<float>
                 {
                     StartBeat = new Beat((int[])e.StartBeat),
                     EndBeat = new Beat((int[])e.EndBeat),
@@ -121,7 +121,7 @@ public static class Event
         }
     }
 
-    public static List<Rpe.Event<float>> ConvertDoubleEventExpanding(Kpc.Event<double> src,
+    public static List<RpeEvents.Event<float>> ConvertDoubleEventExpanding(KpcEvents.Event<double> src,
         ConvertOption.CuttingOptions options, Func<double, double>? valueTransformer = null)
     {
         valueTransformer ??= v => v;
@@ -129,7 +129,7 @@ public static class Event
         {
             return
             [
-                new Rpe.Event<float>
+                new RpeEvents.Event<float>
                 {
                     IsBezier = src.IsBezier,
                     BezierPoints = src.BezierPoints.ToArray(),
@@ -148,7 +148,7 @@ public static class Event
         {
             return DoubleCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
-                .ConvertAll(e => new Rpe.Event<float>
+                .ConvertAll(e => new RpeEvents.Event<float>
                 {
                     StartBeat = new Beat((int[])e.StartBeat),
                     EndBeat = new Beat((int[])e.EndBeat),
@@ -159,7 +159,7 @@ public static class Event
         }
     }
 
-    public static List<Rpe.Event<int>> ConvertIntEventExpanding(Kpc.Event<int> src,
+    public static List<RpeEvents.Event<int>> ConvertIntEventExpanding(KpcEvents.Event<int> src,
         ConvertOption.CuttingOptions options)
     {
         try
@@ -170,7 +170,7 @@ public static class Event
         {
             return IntCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
-                .ConvertAll(e => new Rpe.Event<int>
+                .ConvertAll(e => new RpeEvents.Event<int>
                 {
                     StartBeat = new Beat((int[])e.StartBeat),
                     EndBeat = new Beat((int[])e.EndBeat),

@@ -1,6 +1,6 @@
 ﻿using KaedePhi.Core.Common;
 using SkiaSharp;
-using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
+using EventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 
 namespace KaedePhi.Tool.Render.KaedePhi;
 
@@ -88,8 +88,8 @@ public static class KpcEventChannelRenderer
 
     private static ChannelData BuildChannel<T>(
         string name, SKColor color,
-        List<Kpc.Event<T>>? events,
-        Func<Kpc.Event<T>, Beat, double> getValue,
+        List<KpcEvents.Event<T>>? events,
+        Func<KpcEvents.Event<T>, Beat, double> getValue,
         KpcRenderOptions opts)
     {
         var (minVal, maxVal) = SampleEventRange(events, getValue, opts);
@@ -108,8 +108,8 @@ public static class KpcEventChannelRenderer
     }
 
     private static (double min, double max) SampleEventRange<T>(
-        List<Kpc.Event<T>>? events,
-        Func<Kpc.Event<T>, Beat, double> getValue,
+        List<KpcEvents.Event<T>>? events,
+        Func<KpcEvents.Event<T>, Beat, double> getValue,
         KpcRenderOptions opts)
     {
         if (events == null || events.Count == 0) return (-1.0, 1.0);
@@ -152,7 +152,7 @@ public static class KpcEventChannelRenderer
         Scan(layer.SpeedEvents);
         return max;
 
-        void Scan<T>(List<Kpc.Event<T>>? list)
+        void Scan<T>(List<KpcEvents.Event<T>>? list)
         {
             if (list == null) return;
             var localMax = list.Select(e => (double)e.EndBeat).DefaultIfEmpty(0).Max();

@@ -73,7 +73,7 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
         return (float)(maxBeat * 32) + 1f;
     }
 
-    private static double GetMaxEventEndBeat<T>(List<Kpc.Event<T>>? events)
+    private static double GetMaxEventEndBeat<T>(List<KpcEvents.Event<T>>? events)
     {
         if (events is not { Count: > 0 }) return 0;
         return events.Max(e => (double)e.EndBeat);

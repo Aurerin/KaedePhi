@@ -1,7 +1,7 @@
 ﻿using KaedePhi.Core.Common;
 using KpcNote = KaedePhi.Core.KaedePhi.Note;
 using KpcNoteType = KaedePhi.Core.KaedePhi.NoteType;
-using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Event<float>;
+using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;
 using PhigrosNote = KaedePhi.Core.Phigros.v3.Note;
 using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;
 

@@ -4,7 +4,7 @@ using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
 using System.Runtime.CompilerServices;
 
-namespace KaedePhi.Core.KaedePhi
+namespace KaedePhi.Core.KaedePhi.Events
 {
     public class Event<T>
     {
@@ -279,7 +279,7 @@ namespace KaedePhi.Core.KaedePhi
         /// </summary>
         private static TValue DeepClone<TValue>(TValue value)
         {
-            if (Equals(value, default(T)))
+            if (Equals(value, default(TValue)))
                 return default;
 
             var type = typeof(TValue);

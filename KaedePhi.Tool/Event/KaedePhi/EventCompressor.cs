@@ -5,7 +5,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// <summary>
 /// KPC 事件压缩器：合并变化率相近的相邻线性事件，以及移除无意义的默认值事件。
 /// </summary>
-public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Event<TPayload>>
+public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvents.Event<TPayload>>
 {
     private static void ValidateParams(double tolerance)
     {
@@ -18,7 +18,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
     /// <summary>
     /// 判断两段线性事件能否合并（归一化垂直距离算法）。
     /// </summary>
-    private static bool TryMergeSqrt(Kpc.Event<TPayload> last, Kpc.Event<TPayload> cur, double relTol)
+    private static bool TryMergeSqrt(KpcEvents.Event<TPayload> last, KpcEvents.Event<TPayload> cur, double relTol)
     {
         var startBeat = (double)last.StartBeat;
         var midBeat = (double)last.EndBeat;
@@ -57,7 +57,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
     /// <summary>
     /// 判断两段线性事件能否合并（归一化斜率差算法）。
     /// </summary>
-    private static bool TryMergeSlope(Kpc.Event<TPayload> last, Kpc.Event<TPayload> cur, double relTol)
+    private static bool TryMergeSlope(KpcEvents.Event<TPayload> last, KpcEvents.Event<TPayload> cur, double relTol)
     {
         var startBeat = (double)last.StartBeat;
         var midBeat = (double)last.EndBeat;
@@ -89,13 +89,13 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
     }
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> EventListCompressSqrt(
-        List<Kpc.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
+    public List<KpcEvents.Event<TPayload>> EventListCompressSqrt(
+        List<KpcEvents.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         ValidateParams(tolerance);
         if (events == null || events.Count == 0) return [];
 
-        var compressed = new List<Kpc.Event<TPayload>> { events[0] };
+        var compressed = new List<KpcEvents.Event<TPayload>> { events[0] };
         var relTol = tolerance / 100.0;
 
         for (var i = 1; i < events.Count; i++)
@@ -121,13 +121,13 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
     }
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> EventListCompressSlope(
-        List<Kpc.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
+    public List<KpcEvents.Event<TPayload>> EventListCompressSlope(
+        List<KpcEvents.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
     {
         ValidateParams(tolerance);
         if (events == null || events.Count == 0) return [];
 
-        var compressed = new List<Kpc.Event<TPayload>> { events[0] };
+        var compressed = new List<KpcEvents.Event<TPayload>> { events[0] };
         var relTol = tolerance / 100.0;
 
         for (var i = 1; i < events.Count; i++)
@@ -155,7 +155,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<Kpc.Even
     /// <summary>
     /// 移除无用事件（起始值和结束值都为默认值的事件）。
     /// </summary>
-    public List<Kpc.Event<TPayload>>? RemoveUselessEvent(List<Kpc.Event<TPayload>>? events)
+    public List<KpcEvents.Event<TPayload>>? RemoveUselessEvent(List<KpcEvents.Event<TPayload>>? events)
     {
         var eventsCopy = events?.Select(e => e.Clone()).ToList();
         if (eventsCopy is { Count: 1 } &&

@@ -2,7 +2,7 @@
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
 
-namespace KaedePhi.Core.RePhiEdit
+namespace KaedePhi.Core.RePhiEdit.Events
 {
     public class ExtendLayer
     {
@@ -78,7 +78,7 @@ namespace KaedePhi.Core.RePhiEdit
         }
 
         /// <summary>
-        /// 强行预期化，让层级有与RePhiEdit几乎一致的“出色表现”，兼容按照现行行为的模拟器。
+        /// 强行预期化，让层级有与RePhiEdit几乎一致的"出色表现"，兼容按照现行行为的模拟器。
         /// </summary>
         public void Anticipation()
         {

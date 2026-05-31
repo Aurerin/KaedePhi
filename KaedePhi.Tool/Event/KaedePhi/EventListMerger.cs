@@ -3,16 +3,16 @@ using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
 
-public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Event<TPayload>>
+public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvents.Event<TPayload>>
 {
     protected static readonly EventCutter<TPayload> Cutter = new();
 
     #region 入口
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> EventListMerge(
-        List<Kpc.Event<TPayload>>? toEvents,
-        List<Kpc.Event<TPayload>>? fromEvents,
+    public List<KpcEvents.Event<TPayload>> EventListMerge(
+        List<KpcEvents.Event<TPayload>>? toEvents,
+        List<KpcEvents.Event<TPayload>>? fromEvents,
         double precision)
     {
         if (TryGetMergeEarlyReturn(toEvents, fromEvents, out var earlyReturn)) return earlyReturn;
@@ -41,9 +41,9 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="result">提前返回时的结果列表。</param>
     /// <returns>若命中提前返回条件则为 <see langword="true"/>；否则为 <see langword="false"/>。</returns>
     protected static bool TryGetMergeEarlyReturn(
-        List<Kpc.Event<TPayload>>? toEvents,
-        List<Kpc.Event<TPayload>>? fromEvents,
-        out List<Kpc.Event<TPayload>> result)
+        List<KpcEvents.Event<TPayload>>? toEvents,
+        List<KpcEvents.Event<TPayload>>? fromEvents,
+        out List<KpcEvents.Event<TPayload>> result)
     {
         if (toEvents == null || toEvents.Count == 0)
         {
@@ -79,14 +79,14 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// </summary>
     /// <param name="events">待拷贝的事件列表。</param>
     /// <returns>拷贝后的新列表。</returns>
-    protected static List<Kpc.Event<TPayload>> CloneEventList(List<Kpc.Event<TPayload>> events)
+    protected static List<KpcEvents.Event<TPayload>> CloneEventList(List<KpcEvents.Event<TPayload>> events)
         => events.Select(e => e.Clone()).ToList();
 
     /// <summary>
     /// 按开始拍排序事件列表。
     /// </summary>
     /// <param name="events">待排序的事件列表。</param>
-    protected static void SortByStartBeat(List<Kpc.Event<TPayload>> events)
+    protected static void SortByStartBeat(List<KpcEvents.Event<TPayload>> events)
         => events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
 
     /// <summary>
@@ -95,7 +95,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="toEvents">目标事件列表。</param>
     /// <param name="fromEvents">来源事件列表。</param>
     /// <returns>存在任意重叠区间时返回 <see langword="true"/>。</returns>
-    protected static bool HasOverlap(List<Kpc.Event<TPayload>> toEvents, List<Kpc.Event<TPayload>> fromEvents)
+    protected static bool HasOverlap(List<KpcEvents.Event<TPayload>> toEvents, List<KpcEvents.Event<TPayload>> fromEvents)
         => fromEvents.Any(fe =>
             toEvents.Any(te => fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat));
 
@@ -109,14 +109,14 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="toEventsCopy">目标事件拷贝。</param>
     /// <param name="fromEventsCopy">来源事件拷贝。</param>
     /// <returns>合并后的事件列表。</returns>
-    protected static List<Kpc.Event<TPayload>> MergeWithoutOverlap(
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy)
+    protected static List<KpcEvents.Event<TPayload>> MergeWithoutOverlap(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy)
     {
         var newEvents = (from toEvent in toEventsCopy
             let prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat)
             let formOffset = prevForm is null ? default! : prevForm.EndValue
-            select new Kpc.Event<TPayload>
+            select new KpcEvents.Event<TPayload>
             {
                 StartBeat = toEvent.StartBeat,
                 EndBeat = toEvent.EndBeat,
@@ -132,7 +132,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
         newEvents.AddRange(from formEvent in fromEventsCopy
             let prevTo = toEventsCopy.FindLast(e => e.EndBeat <= formEvent.StartBeat)
             let toEventValue = prevTo != null ? prevTo.EndValue : default
-            select new Kpc.Event<TPayload>
+            select new KpcEvents.Event<TPayload>
             {
                 StartBeat = formEvent.StartBeat,
                 EndBeat = formEvent.EndBeat,
@@ -160,8 +160,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="fromEvents">来源事件列表。</param>
     /// <returns>按开始拍排序后的重叠区间集合。</returns>
     protected static List<(Beat Start, Beat End)> BuildOverlapIntervals(
-        List<Kpc.Event<TPayload>> toEvents,
-        List<Kpc.Event<TPayload>> fromEvents)
+        List<KpcEvents.Event<TPayload>> toEvents,
+        List<KpcEvents.Event<TPayload>> fromEvents)
     {
         var overlapIntervals = new List<(Beat Start, Beat End)>();
         foreach (var fe in fromEvents)
@@ -186,7 +186,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="start">重叠起始拍。</param>
     /// <param name="end">重叠结束拍。</param>
     /// <returns>存在重叠时返回 <see langword="true"/>。</returns>
-    private static bool TryGetOverlapBounds(Kpc.Event<TPayload> fe, Kpc.Event<TPayload> te, out Beat start,
+    private static bool TryGetOverlapBounds(KpcEvents.Event<TPayload> fe, KpcEvents.Event<TPayload> te, out Beat start,
         out Beat end)
     {
         if (fe.StartBeat >= te.EndBeat || fe.EndBeat <= te.StartBeat)
@@ -266,10 +266,10 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="fromEventsCopy">来源事件拷贝。</param>
     /// <param name="precision">每拍切片精度。</param>
     /// <returns>合并后的事件列表。</returns>
-    private static List<Kpc.Event<TPayload>> MergeWithOverlapFixedSampling(
-        List<Kpc.Event<TPayload>> toEventsForOffsetLookup,
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
+    private static List<KpcEvents.Event<TPayload>> MergeWithOverlapFixedSampling(
+        List<KpcEvents.Event<TPayload>> toEventsForOffsetLookup,
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
         double precision)
     {
         var overlapIntervals = BuildOverlapIntervals(toEventsCopy, fromEventsCopy);
@@ -295,13 +295,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="toEventsForOffsetLookup">用于查询偏移的目标事件序列。</param>
     /// <param name="overlapIntervals">重叠区间集合。</param>
     /// <returns>重叠区间外的合并事件。</returns>
-    protected static List<Kpc.Event<TPayload>> BuildBaseEventsOutsideOverlap(
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
-        List<Kpc.Event<TPayload>> toEventsForOffsetLookup,
+    protected static List<KpcEvents.Event<TPayload>> BuildBaseEventsOutsideOverlap(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
+        List<KpcEvents.Event<TPayload>> toEventsForOffsetLookup,
         List<(Beat Start, Beat End)> overlapIntervals)
     {
-        var newEvents = new List<Kpc.Event<TPayload>>();
+        var newEvents = new List<KpcEvents.Event<TPayload>>();
 
         foreach (var toEvent in toEventsCopy)
         {
@@ -310,7 +310,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
                 // 整条事件在重叠区间外，直接输出（原逻辑）
                 var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat);
                 var formOffset = prevForm != null ? prevForm.EndValue : default!;
-                newEvents.Add(new Kpc.Event<TPayload>
+                newEvents.Add(new KpcEvents.Event<TPayload>
                 {
                     StartBeat = toEvent.StartBeat,
                     EndBeat = toEvent.EndBeat,
@@ -334,7 +334,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
                 {
                     var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= gapStart);
                     var formOffset = prevForm != null ? prevForm.EndValue : default;
-                    newEvents.Add(new Kpc.Event<TPayload>
+                    newEvents.Add(new KpcEvents.Event<TPayload>
                     {
                         StartBeat = gapStart,
                         EndBeat = gapEnd,
@@ -355,7 +355,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             {
                 var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= formEvent.StartBeat);
                 var toEventValue = prevTo != null ? prevTo.EndValue : default!;
-                newEvents.Add(new Kpc.Event<TPayload>
+                newEvents.Add(new KpcEvents.Event<TPayload>
                 {
                     StartBeat = formEvent.StartBeat,
                     EndBeat = formEvent.EndBeat,
@@ -375,7 +375,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
                 {
                     var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= gapStart);
                     var toEventValue = prevTo != null ? prevTo.EndValue : default!;
-                    newEvents.Add(new Kpc.Event<TPayload>
+                    newEvents.Add(new KpcEvents.Event<TPayload>
                     {
                         StartBeat = gapStart,
                         EndBeat = gapEnd,
@@ -390,12 +390,12 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
 
         return newEvents;
 
-        bool TouchesAnyOverlap(Kpc.Event<TPayload> evt)
+        bool TouchesAnyOverlap(KpcEvents.Event<TPayload> evt)
             => overlapIntervals.Any(iv => evt.StartBeat < iv.End && evt.EndBeat > iv.Start);
 
         // 返回一个事件在所有重叠区间之外的时间片段列表（即"空隙"）。
         // 例如事件 [223.5, 225.5]、重叠区间 [223.5, 224.0]，空隙为 [(224.0, 225.5)]。
-        List<(Beat Start, Beat End)> GapsOutsideOverlap(Kpc.Event<TPayload> evt)
+        List<(Beat Start, Beat End)> GapsOutsideOverlap(KpcEvents.Event<TPayload> evt)
         {
             var gaps = new List<(Beat Start, Beat End)>();
             var cursor = evt.StartBeat;
@@ -427,14 +427,14 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="overlapIntervals">重叠区间集合。</param>
     /// <param name="cutLength">切片长度。</param>
     /// <returns>目标与来源两组切片事件。</returns>
-    private static (List<Kpc.Event<TPayload>> CutTo, List<Kpc.Event<TPayload>> CutFrom) CutAndRemoveOverlapEvents(
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
+    private static (List<KpcEvents.Event<TPayload>> CutTo, List<KpcEvents.Event<TPayload>> CutFrom) CutAndRemoveOverlapEvents(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
         List<(Beat Start, Beat End)> overlapIntervals,
         Beat cutLength)
     {
-        var cutTo = new List<Kpc.Event<TPayload>>();
-        var cutFrom = new List<Kpc.Event<TPayload>>();
+        var cutTo = new List<KpcEvents.Event<TPayload>>();
+        var cutFrom = new List<KpcEvents.Event<TPayload>>();
         foreach (var (start, end) in overlapIntervals)
         {
             cutTo.AddRange(Cutter.CutEventsInRange(toEventsCopy, start, end, cutLength));
@@ -456,15 +456,15 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="overlapIntervals">重叠区间集合。</param>
     /// <param name="cutLength">切片长度。</param>
     /// <returns>重叠区间合并结果。</returns>
-    private static List<Kpc.Event<TPayload>> MergeCutOverlapSegments(
-        List<Kpc.Event<TPayload>> toEventsForOffsetLookup,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
-        List<Kpc.Event<TPayload>> cutTo,
-        List<Kpc.Event<TPayload>> cutFrom,
+    private static List<KpcEvents.Event<TPayload>> MergeCutOverlapSegments(
+        List<KpcEvents.Event<TPayload>> toEventsForOffsetLookup,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
+        List<KpcEvents.Event<TPayload>> cutTo,
+        List<KpcEvents.Event<TPayload>> cutFrom,
         List<(Beat Start, Beat End)> overlapIntervals,
         Beat cutLength)
     {
-        var allCutEvents = new List<Kpc.Event<TPayload>>();
+        var allCutEvents = new List<KpcEvents.Event<TPayload>>();
         foreach (var (start, end) in overlapIntervals)
         {
             var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= start);
@@ -489,13 +489,13 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
     /// <param name="toLastEndValue">目标轨道进入区间前的终值。</param>
     /// <param name="formLastEndValue">来源轨道进入区间前的终值。</param>
     /// <returns>该区间的合并事件。</returns>
-    private static List<Kpc.Event<TPayload>> MergeSingleOverlapInterval(
-        List<Kpc.Event<TPayload>> cutTo,
-        List<Kpc.Event<TPayload>> cutFrom,
+    private static List<KpcEvents.Event<TPayload>> MergeSingleOverlapInterval(
+        List<KpcEvents.Event<TPayload>> cutTo,
+        List<KpcEvents.Event<TPayload>> cutFrom,
         Beat start, Beat end, Beat cutLength,
         TPayload? toLastEndValue, TPayload? formLastEndValue)
     {
-        var merged = new List<Kpc.Event<TPayload>>();
+        var merged = new List<KpcEvents.Event<TPayload>>();
         var currentBeat = start;
         while (currentBeat < end)
         {
@@ -509,7 +509,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<Kpc.Even
             var toEnd = toEvent != null ? toEvent.EndValue : toLastEndValue;
             var formEnd = formEvent != null ? formEvent.EndValue : formLastEndValue;
 
-            merged.Add(new Kpc.Event<TPayload>
+            merged.Add(new KpcEvents.Event<TPayload>
             {
                 StartBeat = currentBeat,
                 EndBeat = nextBeat,

@@ -344,7 +344,7 @@ public sealed class GuiChartService
         progress?.Report(new ToolProgress(1.0, 1.0));
     }
 
-    private static void FitLayer(Core.KaedePhi.EventLayer layer,
+    private static void FitLayer(Core.KaedePhi.Events.EventLayer layer,
         EventFit<double> doubleFit, EventFit<int> intFit, EventFit<float> floatFit,
         double tolerance,
         IProgress<ToolProgress>? progress)

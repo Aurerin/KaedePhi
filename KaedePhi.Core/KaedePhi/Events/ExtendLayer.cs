@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace KaedePhi.Core.KaedePhi
+namespace KaedePhi.Core.KaedePhi.Events
 {
     public class ExtendLayer
     {

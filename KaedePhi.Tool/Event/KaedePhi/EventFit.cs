@@ -1,4 +1,4 @@
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
@@ -6,13 +6,13 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// <summary>
 /// 将连续的线性事件序列拟合为带缓动函数的单一事件。
 /// </summary>
-public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
+public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPayload>>
 {
     private static readonly int[] AllEasingIds = Enumerable.Range(1, 31).ToArray();
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> FitEvents(
-        List<Kpc.Event<TPayload>>? events, double tolerance)
+    public List<KpcEvents.Event<TPayload>> FitEvents(
+        List<KpcEvents.Event<TPayload>>? events, double tolerance)
     {
         EnsureSupportedNumericType();
 
@@ -30,10 +30,10 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 遍历已排序的事件序列，将连续的同方向线性事件分组后贪心拟合；
     /// 常量事件和非线性事件直接原样写入输出。
     /// </summary>
-    private static List<Kpc.Event<TPayload>> FitEventsCore(
-        List<Kpc.Event<TPayload>> sortedEvents, double tolerance)
+    private static List<KpcEvents.Event<TPayload>> FitEventsCore(
+        List<KpcEvents.Event<TPayload>> sortedEvents, double tolerance)
     {
-        var result = new List<Kpc.Event<TPayload>>();
+        var result = new List<KpcEvents.Event<TPayload>>();
         var i = 0;
 
         while (i < sortedEvents.Count)
@@ -59,10 +59,10 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 从指定位置起收集一段时间连续、数值连续、方向一致的线性事件序列（run）。
     /// </summary>
-    private static List<Kpc.Event<TPayload>> CollectRun(
-        List<Kpc.Event<TPayload>> events, int start, out int nextIndex)
+    private static List<KpcEvents.Event<TPayload>> CollectRun(
+        List<KpcEvents.Event<TPayload>> events, int start, out int nextIndex)
     {
-        var run = new List<Kpc.Event<TPayload>> { events[start] };
+        var run = new List<KpcEvents.Event<TPayload>> { events[start] };
         var firstDir = GetDirection(
             events[start].GetStartValueAsDouble(),
             events[start].GetEndValueAsDouble());
@@ -89,8 +89,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 使用迭代替代递归以避免深层调用栈。
     /// </summary>
     private static void FitRunInto(
-        List<Kpc.Event<TPayload>> run,
-        List<Kpc.Event<TPayload>> target,
+        List<KpcEvents.Event<TPayload>> run,
+        List<KpcEvents.Event<TPayload>> target,
         double tolerance)
     {
         var remaining = run;
@@ -138,8 +138,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 遍历所有支持的缓动函数，返回第一个在容差范围内能覆盖所有事件边界的拟合结果；
     /// 无法拟合时返回 null。
     /// </summary>
-    private static Kpc.Event<TPayload>? TryFitEasing(
-        List<Kpc.Event<TPayload>> events, double tolerance)
+    private static KpcEvents.Event<TPayload>? TryFitEasing(
+        List<KpcEvents.Event<TPayload>> events, double tolerance)
     {
         if (events.Count <= 1)
             return null;
@@ -167,8 +167,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 相对误差（%）= 绝对偏差 / 整段值域跨度 × 100。
     /// </summary>
     private static bool FitsWithinTolerance(
-        Kpc.Event<TPayload> candidate,
-        List<Kpc.Event<TPayload>> events,
+        KpcEvents.Event<TPayload> candidate,
+        List<KpcEvents.Event<TPayload>> events,
         double tolerance,
         Beat segStartBeat, Beat segEndBeat,
         double segStartValue, double segEndValue)
@@ -218,7 +218,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 判断两个事件是否在时间上首尾相接且数值连续。
     /// </summary>
-    private static bool IsContiguous(Kpc.Event<TPayload> first, Kpc.Event<TPayload> second)
+    private static bool IsContiguous(KpcEvents.Event<TPayload> first, KpcEvents.Event<TPayload> second)
     {
         return first.EndBeat == second.StartBeat &&
                Math.Abs(first.GetEndValueAsDouble() - second.GetStartValueAsDouble()) < 1e-9;
@@ -227,7 +227,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 判断事件起止值是否相同（常量事件）。
     /// </summary>
-    private static bool IsNumericConstant(Kpc.Event<TPayload> evt)
+    private static bool IsNumericConstant(KpcEvents.Event<TPayload> evt)
     {
         return Math.Abs(evt.GetStartValueAsDouble() - evt.GetEndValueAsDouble()) < 1e-9;
     }
@@ -235,7 +235,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// <summary>
     /// 判断事件是否为全范围线性缓动，即可参与拟合的基本条件。
     /// </summary>
-    private static bool IsLinear(Kpc.Event<TPayload> evt)
+    private static bool IsLinear(KpcEvents.Event<TPayload> evt)
     {
         return (int)evt.Easing == 1 &&
                Math.Abs(evt.EasingLeft) < 1e-6f &&
@@ -256,13 +256,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<Kpc.Event<TPayload>>
     /// 使用指定缓动函数创建覆盖给定时间区间和值域的新事件。
     /// Font 字段从模板事件继承，其余字段均为合并后的值。
     /// </summary>
-    private static Kpc.Event<TPayload> CreateMergedEvent(
-        Kpc.Event<TPayload> template,
+    private static KpcEvents.Event<TPayload> CreateMergedEvent(
+        KpcEvents.Event<TPayload> template,
         Beat startBeat, double startValue,
         Beat endBeat, double endValue,
         int easingId)
     {
-        var evt = new Kpc.Event<TPayload>
+        var evt = new KpcEvents.Event<TPayload>
         {
             StartBeat = new Beat((int[])startBeat),
             EndBeat = new Beat((int[])endBeat),

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using KaedePhi.Core.Common;
 
-namespace KaedePhi.Core.KaedePhi
+namespace KaedePhi.Core.KaedePhi.Events
 {
     public class EventLayer
     {

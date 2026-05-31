@@ -6,11 +6,11 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// <summary>
 /// KPC 事件切割器：将事件列表按指定拍长切割为等长段。
 /// </summary>
-public class EventCutter<TPayload> : LoggableBase, IEventCutter<Kpc.Event<TPayload>, Beat>
+public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<TPayload>, Beat>
 {
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> CutEventsInRange(
-        List<Kpc.Event<TPayload>> events,
+    public List<KpcEvents.Event<TPayload>> CutEventsInRange(
+        List<KpcEvents.Event<TPayload>> events,
         Beat startBeat,
         Beat endBeat,
         double cutLength)
@@ -20,16 +20,16 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<Kpc.Event<TPaylo
     }
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> CutEventToLiner(
-        Kpc.Event<TPayload> evt, double cutLength)
+    public List<KpcEvents.Event<TPayload>> CutEventToLiner(
+        KpcEvents.Event<TPayload> evt, double cutLength)
         => CutEventToLiner(evt, new Beat(cutLength));
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> CutEventToLiner(
-        Kpc.Event<TPayload> evt,
+    public List<KpcEvents.Event<TPayload>> CutEventToLiner(
+        KpcEvents.Event<TPayload> evt,
         Beat cutLength)
     {
-        var cutEvents = new List<Kpc.Event<TPayload>>();
+        var cutEvents = new List<KpcEvents.Event<TPayload>>();
         // 在evt中均匀采样，并返回
         var nowBeat = evt.StartBeat;
         while (nowBeat < evt.EndBeat)
@@ -40,7 +40,7 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<Kpc.Event<TPaylo
                 segmentEnd = evt.EndBeat;
             }
 
-            cutEvents.Add(new Kpc.Event<TPayload>()
+            cutEvents.Add(new KpcEvents.Event<TPayload>()
             {
                 StartBeat = nowBeat,
                 EndBeat = segmentEnd,
@@ -55,13 +55,13 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<Kpc.Event<TPaylo
     }
 
     /// <inheritdoc/>
-    public List<Kpc.Event<TPayload>> CutEventsInRange(List<Kpc.Event<TPayload>> events, Beat startBeat, Beat endBeat,
+    public List<KpcEvents.Event<TPayload>> CutEventsInRange(List<KpcEvents.Event<TPayload>> events, Beat startBeat, Beat endBeat,
         Beat cutLength)
     {
         if (cutLength <= new Beat(0))
             throw new ArgumentOutOfRangeException(nameof(cutLength), "Cut length must be greater than zero.");
 
-        var cutEvents = new List<Kpc.Event<TPayload>>();
+        var cutEvents = new List<KpcEvents.Event<TPayload>>();
         var eventsToCut = events.Where(e => e.StartBeat < endBeat && e.EndBeat > startBeat).ToList();
 
         foreach (var evt in eventsToCut)
@@ -78,7 +78,7 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<Kpc.Event<TPaylo
                 var segmentEnd = new Beat(cutStart + (cutLength * (i + 1)));
                 if (segmentEnd > cutEnd) segmentEnd = cutEnd;
 
-                cutEvents.Add(new Kpc.Event<TPayload>
+                cutEvents.Add(new KpcEvents.Event<TPayload>
                 {
                     StartBeat = currentBeat,
                     EndBeat = segmentEnd,

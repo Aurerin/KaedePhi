@@ -6,7 +6,7 @@ using KaedePhi.Core.RePhiEdit.JsonConverter;
 using KaedePhi.Core.Utils;
 using Newtonsoft.Json;
 
-namespace KaedePhi.Core.RePhiEdit
+namespace KaedePhi.Core.RePhiEdit.Events
 {
     public class Event<T>
     {
@@ -233,7 +233,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         private static TValue DeepClone<TValue>(TValue value)
         {
-            if (Equals(value, default(T)))
+            if (Equals(value, default(TValue)))
                 return default;
 
             var type = typeof(TValue);

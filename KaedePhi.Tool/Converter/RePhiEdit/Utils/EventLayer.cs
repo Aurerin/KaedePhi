@@ -6,9 +6,9 @@ public static class EventLayer
 {
     #region RpeToKpc
 
-    public static Kpc.EventLayer ConvertEventLayer(Rpe.EventLayer src)
+    public static KpcEvents.EventLayer ConvertEventLayer(RpeEvents.EventLayer src)
     {
-        var result = new Kpc.EventLayer();
+        var result = new KpcEvents.EventLayer();
         if (src.MoveXEvents is not null)
             result.MoveXEvents =
                 src.MoveXEvents.ConvertAll(e => Event.ConvertFloatToDoubleEvent(e, Transform.TransformToKpcX));
@@ -23,10 +23,10 @@ public static class EventLayer
         return result;
     }
 
-    public static Kpc.ExtendLayer? ConvertExtendLayer(Rpe.ExtendLayer? src)
+    public static KpcEvents.ExtendLayer? ConvertExtendLayer(RpeEvents.ExtendLayer? src)
     {
         if (src == null) return null;
-        var result = new Kpc.ExtendLayer();
+        var result = new KpcEvents.ExtendLayer();
         if (src.ColorEvents is not null) result.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
         if (src.ScaleXEvents is not null) result.ScaleXEvents = src.ScaleXEvents.ConvertAll(Event.ConvertFloatEvent);
         if (src.ScaleYEvents is not null) result.ScaleYEvents = src.ScaleYEvents.ConvertAll(Event.ConvertFloatEvent);
@@ -41,9 +41,9 @@ public static class EventLayer
 
     #region KpcToRpe
 
-    public static Rpe.EventLayer ConvertEventLayer(Kpc.EventLayer src, ConvertOption.CuttingOptions options)
+    public static RpeEvents.EventLayer ConvertEventLayer(KpcEvents.EventLayer src, ConvertOption.CuttingOptions options)
     {
-        var rpe = new Rpe.EventLayer();
+        var rpe = new RpeEvents.EventLayer();
         if (src.MoveXEvents is not null)
         {
             rpe.MoveXEvents = [];
@@ -80,10 +80,10 @@ public static class EventLayer
         return rpe;
     }
 
-    public static Rpe.ExtendLayer? ConvertExtendLayer(Kpc.ExtendLayer? src, ConvertOption.CuttingOptions options)
+    public static RpeEvents.ExtendLayer? ConvertExtendLayer(KpcEvents.ExtendLayer? src, ConvertOption.CuttingOptions options)
     {
         if (src is null) return null;
-        var rpe = new Rpe.ExtendLayer();
+        var rpe = new RpeEvents.ExtendLayer();
         if (src.ColorEvents is not null) rpe.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
         if (src.ScaleXEvents is not null)
         {

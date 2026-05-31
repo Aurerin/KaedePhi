@@ -2,7 +2,7 @@
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Layer.KaedePhi;
-using KpcEventLayer = KaedePhi.Core.KaedePhi.EventLayer;
+using KpcEventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 using PhigrosEvent = KaedePhi.Core.Phigros.v3.Event;
 using PhigrosSpeedEvent = KaedePhi.Core.Phigros.v3.SpeedEvent;
 
@@ -92,7 +92,7 @@ public class EventKpcToPhigrosV3
     }
 
     private static List<(float start, float end, double xStart, double xEnd, double yStart, double yEnd)> MergeAndFill(
-        List<Kpc.Event<double>> xEvents, List<Kpc.Event<double>> yEvents, double defaultValue)
+        List<KpcEvents.Event<double>> xEvents, List<KpcEvents.Event<double>> yEvents, double defaultValue)
     {
         var boundaries = new SortedSet<float> { 0f };
         foreach (var ev in xEvents)
@@ -140,7 +140,7 @@ public class EventKpcToPhigrosV3
     /// [<paramref name="start"/>, <paramref name="end"/>] 的事件。
     /// 若不存在则返回 <c>null</c>。
     /// </summary>
-    private static Kpc.Event<T>? BinaryFindEventCovering<T>(List<Kpc.Event<T>> sortedEvents, float start, float end)
+    private static KpcEvents.Event<T>? BinaryFindEventCovering<T>(List<KpcEvents.Event<T>> sortedEvents, float start, float end)
     {
         // 找到 StartBeat <= start + epsilon 的最靠右的候选项
         int lo = 0, hi = sortedEvents.Count - 1, candidate = -1;
@@ -166,7 +166,7 @@ public class EventKpcToPhigrosV3
 
     #region 标量事件（旋转）
 
-    private void ConvertScalarEvents(List<PhigrosEvent> target, List<Kpc.Event<double>>? sourceEvents, Func<double, float> valueTransform)
+    private void ConvertScalarEvents(List<PhigrosEvent> target, List<KpcEvents.Event<double>>? sourceEvents, Func<double, float> valueTransform)
     {
         if (sourceEvents is not { Count: > 0 }) return;
 
@@ -206,7 +206,7 @@ public class EventKpcToPhigrosV3
 
     #region 透明度事件
 
-    private void ConvertAlphaEvents(Core.Phigros.v3.JudgeLine target, List<Kpc.Event<int>>? sourceEvents)
+    private void ConvertAlphaEvents(Core.Phigros.v3.JudgeLine target, List<KpcEvents.Event<int>>? sourceEvents)
     {
         if (sourceEvents is not { Count: > 0 }) return;
 
@@ -248,7 +248,7 @@ public class EventKpcToPhigrosV3
 
     #region 速度事件
 
-    private void ConvertSpeedEvents(Core.Phigros.v3.JudgeLine target, List<Kpc.Event<float>>? sourceEvents)
+    private void ConvertSpeedEvents(Core.Phigros.v3.JudgeLine target, List<KpcEvents.Event<float>>? sourceEvents)
     {
         if (sourceEvents is not { Count: > 0 }) return;
 
@@ -286,14 +286,14 @@ public class EventKpcToPhigrosV3
 
     #region 辅助方法
 
-    private static List<Kpc.Event<T>> FillGaps<T>(List<Kpc.Event<T>> events, T defaultValue)
+    private static List<KpcEvents.Event<T>> FillGaps<T>(List<KpcEvents.Event<T>> events, T defaultValue)
     {
         if (events.Count == 0) return events;
 
         // CutEventToLiner 的输出已按拍数有序；仅在必要时排序（O(n log n) 保底）。
         var sorted = IsSortedByStartBeat(events) ? events : [..events.OrderBy(e => (double)e.StartBeat)];
 
-        var result = new List<Kpc.Event<T>>(sorted.Count * 2);
+        var result = new List<KpcEvents.Event<T>>(sorted.Count * 2);
         var lastEndValue = defaultValue;
         var lastEndBeat = 0f;
 
@@ -304,7 +304,7 @@ public class EventKpcToPhigrosV3
 
             if (startBeat > lastEndBeat + FloatEpsilon && result.Count > 0)
             {
-                result.Add(new Kpc.Event<T>
+                result.Add(new KpcEvents.Event<T>
                 {
                     StartBeat = new Beat(lastEndBeat),
                     EndBeat = new Beat(startBeat),
@@ -325,7 +325,7 @@ public class EventKpcToPhigrosV3
     /// O(n) 检查——若 <paramref name="events"/> 已按 <c>StartBeat</c> 升序排列则返回
     /// <c>true</c>，避免在常规路径下执行 O(n log n) 的 <c>OrderBy</c>。
     /// </summary>
-    private static bool IsSortedByStartBeat<T>(List<Kpc.Event<T>> events)
+    private static bool IsSortedByStartBeat<T>(List<KpcEvents.Event<T>> events)
     {
         for (var i = 1; i < events.Count; i++)
         {

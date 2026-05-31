@@ -1,4 +1,4 @@
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
@@ -7,7 +7,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// 事件列表合并器（自适应采样）。
 /// <para>
 /// 继承 <see cref="EventListMerger{TPayload}"/> 的共享基础设施与固定采样合并，
-/// 新增自适应采样合并入口 <see cref="EventListMerge(Kpc.Event{TPayload}?, Kpc.Event{TPayload}?, double, double)"/>：
+/// 新增自适应采样合并入口 <see cref="EventListMerge(KpcEvents.Event{TPayload}?, KpcEvents.Event{TPayload}?, double, double)"/>：
 /// 仅在两轨道的事件边界处或叠加值偏离线性近似超过容差时才插入新分段，
 /// 在保证精度的前提下减少冗余事件数量。
 /// </para>
@@ -25,9 +25,9 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// 自适应采样合并：以事件边界为强制切割点，仅在误差超过容差时插入新分段。
     /// 相较基类的固定采样可减少冗余事件数量。
     /// </summary>
-    public List<Kpc.Event<TPayload>> EventListMerge(
-        List<Kpc.Event<TPayload>>? toEvents,
-        List<Kpc.Event<TPayload>>? fromEvents,
+    public List<KpcEvents.Event<TPayload>> EventListMerge(
+        List<KpcEvents.Event<TPayload>>? toEvents,
+        List<KpcEvents.Event<TPayload>>? fromEvents,
         double precision,
         double tolerance)
     {
@@ -55,10 +55,10 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// <summary>
     /// 通过自适应采样合并重叠区间，减少冗余切片。
     /// </summary>
-    private List<Kpc.Event<TPayload>> MergeWithOverlapAdaptiveSampling(
-        List<Kpc.Event<TPayload>> toEventsForOffsetLookup,
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
+    private List<KpcEvents.Event<TPayload>> MergeWithOverlapAdaptiveSampling(
+        List<KpcEvents.Event<TPayload>> toEventsForOffsetLookup,
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
         double precision,
         double tolerance)
     {
@@ -76,15 +76,15 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// <summary>
     /// 逐个重叠区间执行自适应合并。
     /// </summary>
-    private List<Kpc.Event<TPayload>> MergeAdaptiveIntervals(
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
+    private List<KpcEvents.Event<TPayload>> MergeAdaptiveIntervals(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
         List<(Beat Start, Beat End)> overlapIntervals,
         double precision,
         double tolerance)
     {
         var cutLength = new Beat(1d / precision);
-        var result = new List<Kpc.Event<TPayload>>();
+        var result = new List<KpcEvents.Event<TPayload>>();
         foreach (var (start, end) in overlapIntervals)
         {
             result.AddRange(
@@ -105,12 +105,12 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// 与 Unbind 链路保持同量级，从根本上消除"远端参考点"导致的灵敏度衰减。
     /// </para>
     /// </summary>
-    private List<Kpc.Event<TPayload>> MergeAdaptiveSingleInterval(
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
+    private List<KpcEvents.Event<TPayload>> MergeAdaptiveSingleInterval(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
         Beat start, Beat end, Beat cutLength, double tolerance)
     {
-        var result = new List<Kpc.Event<TPayload>>();
+        var result = new List<KpcEvents.Event<TPayload>>();
 
         var keyBeats = CollectMergeKeyBeats(toEventsCopy, fromEventsCopy, start, end);
 
@@ -132,12 +132,12 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// 容差评估参考端点固定为 <paramref name="subEnd"/>（子区间终点），
     /// 与 FatherUnbindHelpers.AdaptiveSampleInterval 结构完全对齐。
     /// </summary>
-    private List<Kpc.Event<TPayload>> AdaptiveSampleSubInterval(
-        List<Kpc.Event<TPayload>> toEventsCopy,
-        List<Kpc.Event<TPayload>> fromEventsCopy,
+    private List<KpcEvents.Event<TPayload>> AdaptiveSampleSubInterval(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
         Beat subStart, Beat subEnd, Beat cutLength, double tolerance)
     {
-        var result = new List<Kpc.Event<TPayload>>();
+        var result = new List<KpcEvents.Event<TPayload>>();
 
         var lastToValue = GetPreviousEndValue(toEventsCopy, subStart);
         var lastFormValue = GetPreviousEndValue(fromEventsCopy, subStart);
@@ -199,8 +199,8 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// 收集两组事件在区间内的所有起止拍，作为自适应采样的强制切割关键帧。
     /// </summary>
     private static List<Beat> CollectMergeKeyBeats(
-        List<Kpc.Event<TPayload>> toEvents,
-        List<Kpc.Event<TPayload>> fromEvents,
+        List<KpcEvents.Event<TPayload>> toEvents,
+        List<KpcEvents.Event<TPayload>> fromEvents,
         Beat start, Beat end)
     {
         var beats = new List<Beat> { start, end };
@@ -219,23 +219,23 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         return beats.Distinct().OrderBy(b => b).ToList();
     }
 
-    private static Kpc.Event<TPayload>? GetActiveEventAtBeat(List<Kpc.Event<TPayload>> events, Beat beat)
+    private static KpcEvents.Event<TPayload>? GetActiveEventAtBeat(List<KpcEvents.Event<TPayload>> events, Beat beat)
         => events.Where(e => e.StartBeat <= beat && e.EndBeat >= beat).MaxBy(e => e.StartBeat);
 
-    private static TPayload? GetPreviousEndValue(List<Kpc.Event<TPayload>> events, Beat beat)
+    private static TPayload? GetPreviousEndValue(List<KpcEvents.Event<TPayload>> events, Beat beat)
     {
         var prev = events.FindLast(e => e.EndBeat <= beat);
         return prev != null ? prev.EndValue : default!;
     }
 
-    private static TPayload? GetValueAtBeatOrPreviousEnd(List<Kpc.Event<TPayload>> events, Beat beat)
+    private static TPayload? GetValueAtBeatOrPreviousEnd(List<KpcEvents.Event<TPayload>> events, Beat beat)
     {
         var active = GetActiveEventAtBeat(events, beat);
         return active != null ? active.GetValueAtBeat(beat) : GetPreviousEndValue(events, beat);
     }
 
     private static (TPayload? Outgoing, TPayload? Incoming) GetNextBeatValues(
-        List<Kpc.Event<TPayload>> events, Kpc.Event<TPayload>? eventAtCurrent, Kpc.Event<TPayload>? eventAtNext,
+        List<KpcEvents.Event<TPayload>> events, KpcEvents.Event<TPayload>? eventAtCurrent, KpcEvents.Event<TPayload>? eventAtNext,
         Beat nextBeat)
     {
         var prevEnd = GetPreviousEndValue(events, nextBeat);
@@ -294,10 +294,10 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         => NumericHelper.Add(left!, right!);
 
     private static void AddSegmentEvent(
-        List<Kpc.Event<TPayload>> target, Beat startBeat, Beat endBeat,
+        List<KpcEvents.Event<TPayload>> target, Beat startBeat, Beat endBeat,
         TPayload? startToValue, TPayload? startFormValue, TPayload? endToValue, TPayload? endFormValue)
     {
-        target.Add(new Kpc.Event<TPayload>
+        target.Add(new KpcEvents.Event<TPayload>
         {
             StartBeat = startBeat,
             EndBeat = endBeat,

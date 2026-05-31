@@ -12,7 +12,7 @@ public static class Event
     private const double SpeedValueRatio = 4.5d;
     private const double FloatTolerance = 1e-6;
 
-    public static List<Kpc.Event<T>>? ConvertEvents<T>(
+    public static List<KpcEvents.Event<T>>? ConvertEvents<T>(
         List<PhigrosEvent>? events,
         double horizonBeat,
         Func<float, T> valueTransformer)
@@ -20,7 +20,7 @@ public static class Event
         if (events is not { Count: > 0 }) return null;
 
         var sorted = events.OrderBy(e => e.StartTime).ToList();
-        var result = new List<Kpc.Event<T>>();
+        var result = new List<KpcEvents.Event<T>>();
 
         foreach (var ev in sorted)
         {
@@ -40,7 +40,7 @@ public static class Event
         return result;
     }
 
-    public static List<Kpc.Event<double>>? ConvertMoveAxisEvents(
+    public static List<KpcEvents.Event<double>>? ConvertMoveAxisEvents(
         List<PhigrosEvent>? events,
         double horizonBeat,
         Func<PhigrosEvent, float> startSelector,
@@ -50,7 +50,7 @@ public static class Event
         if (events is not { Count: > 0 }) return null;
 
         var sorted = events.OrderBy(e => e.StartTime).ToList();
-        var result = new List<Kpc.Event<double>>();
+        var result = new List<KpcEvents.Event<double>>();
 
         foreach (var ev in sorted)
         {
@@ -70,14 +70,14 @@ public static class Event
         return result;
     }
 
-    public static List<Kpc.Event<float>>? ConvertSpeedEvents(
+    public static List<KpcEvents.Event<float>>? ConvertSpeedEvents(
         List<PhigrosSpeedEvent>? events,
         double horizonBeat)
     {
         if (events is not { Count: > 0 }) return null;
 
         var sorted = events.OrderBy(e => e.StartTime).ToList();
-        var result = new List<Kpc.Event<float>>();
+        var result = new List<KpcEvents.Event<float>>();
 
         foreach (var ev in sorted)
         {
@@ -124,7 +124,7 @@ public static class Event
         return maxBeat + TrailingBeatPadding;
     }
 
-    private static Kpc.Event<T> CreateLinearEvent<T>(double startBeat, double endBeat, T startValue, T endValue)
+    private static KpcEvents.Event<T> CreateLinearEvent<T>(double startBeat, double endBeat, T startValue, T endValue)
         => new()
         {
             StartBeat = new Beat(startBeat),
@@ -133,7 +133,7 @@ public static class Event
             EndValue = endValue
         };
 
-    private static void AddTrailingEvent<T>(List<Kpc.Event<T>> events, double horizonBeat)
+    private static void AddTrailingEvent<T>(List<KpcEvents.Event<T>> events, double horizonBeat)
     {
         var lastEnd = (double)events[^1].EndBeat;
         var trailingEnd = Math.Max(horizonBeat, lastEnd + TrailingBeatPadding);

@@ -22,7 +22,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 判定线事件层列表
         /// </summary>
-        public List<EventLayer> EventLayers { get; set; } = new(); // 事件层
+        public List<Events.EventLayer> EventLayers { get; set; } = new(); // 事件层
 
         /// <summary>
         /// 父级判定线索引，-1表示无父级
@@ -42,7 +42,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 特殊事件层（故事板）
         /// </summary>
-        public ExtendLayer Extended { get; set; } = new();
+        public Events.ExtendLayer Extended { get; set; } = new Events.ExtendLayer();
 
         /// <summary>
         /// 判定线的Z轴顺序
@@ -72,82 +72,82 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// Position（X） Control 控制点列表
         /// </summary>
-        public List<XControl> PositionControls
+        public List<Controls.XControl> PositionControls
         {
             get
             {
-                _positionControls ??= new List<XControl>();
+                _positionControls ??= new List<Controls.XControl>();
 
                 return _positionControls;
             }
             set => _positionControls = value;
         }
 
-        private List<XControl> _positionControls;
+        private List<Controls.XControl> _positionControls;
 
         /// <summary>
         /// Alpha Control 控制点列表
         /// </summary>
-        public List<AlphaControl> AlphaControls
+        public List<Controls.AlphaControl> AlphaControls
         {
             get
             {
-                _alphaControls ??= new List<AlphaControl>();
+                _alphaControls ??= new List<Controls.AlphaControl>();
 
                 return _alphaControls;
             }
             set => _alphaControls = value;
         }
 
-        private List<AlphaControl> _alphaControls;
+        private List<Controls.AlphaControl> _alphaControls;
 
         /// <summary>
         /// Size Control 控制点列表
         /// </summary>
-        public List<SizeControl> SizeControls
+        public List<Controls.SizeControl> SizeControls
         {
             get
             {
-                _sizeControls ??= new List<SizeControl>();
+                _sizeControls ??= new List<Controls.SizeControl>();
 
                 return _sizeControls;
             }
             set => _sizeControls = value;
         }
 
-        private List<SizeControl> _sizeControls;
+        private List<Controls.SizeControl> _sizeControls;
 
         /// <summary>
         /// Skew Control 控制点列表
         /// </summary>
-        public List<SkewControl> SkewControls
+        public List<Controls.SkewControl> SkewControls
         {
             get
             {
-                _skewControls ??= new List<SkewControl>();
+                _skewControls ??= new List<Controls.SkewControl>();
 
                 return _skewControls;
             }
             set => _skewControls = value;
         }
 
-        private List<SkewControl> _skewControls;
+        private List<Controls.SkewControl> _skewControls;
 
         /// <summary>
         /// Y Control 控制点列表
         /// </summary>
-        public List<YControl> YControls
+        public List<Controls.YControl> YControls
         {
             get
             {
-                _yControls ??= new List<YControl>();
+                _yControls ??= new List<Controls.YControl>();
 
                 return _yControls;
             }
             set => _yControls = value;
         }
 
-        private List<YControl> _yControls;
+        private List<Controls.YControl> _yControls;
 
         public JudgeLine Clone()
         {
@@ -163,14 +163,14 @@ namespace KaedePhi.Core.KaedePhi
                 BpmFactor = BpmFactor,
                 RotateWithFather = RotateWithFather,
                 AttachUi = AttachUi,
-                EventLayers = new List<EventLayer>(),
+                EventLayers = new List<Events.EventLayer>(),
                 Notes = new List<Note>(),
                 Extended = Extended?.Clone(),
-                PositionControls = new List<XControl>(),
-                AlphaControls = new List<AlphaControl>(),
-                SizeControls = new List<SizeControl>(),
-                SkewControls = new List<SkewControl>(),
-                YControls = new List<YControl>()
+                PositionControls = new List<Controls.XControl>(),
+                AlphaControls = new List<Controls.AlphaControl>(),
+                SizeControls = new List<Controls.SizeControl>(),
+                SkewControls = new List<Controls.SkewControl>(),
+                YControls = new List<Controls.YControl>()
             };
 
             // 深拷贝列表
@@ -179,15 +179,15 @@ namespace KaedePhi.Core.KaedePhi
             foreach (var note in Notes)
                 clone.Notes.Add(note.Clone());
             foreach (var control in PositionControls)
-                clone.PositionControls.Add(control.Clone() as XControl);
+                clone.PositionControls.Add(control.Clone() as Controls.XControl);
             foreach (var control in AlphaControls)
-                clone.AlphaControls.Add(control.Clone() as AlphaControl);
+                clone.AlphaControls.Add(control.Clone() as Controls.AlphaControl);
             foreach (var control in SizeControls)
-                clone.SizeControls.Add(control.Clone() as SizeControl);
+                clone.SizeControls.Add(control.Clone() as Controls.SizeControl);
             foreach (var control in SkewControls)
-                clone.SkewControls.Add(control.Clone() as SkewControl);
+                clone.SkewControls.Add(control.Clone() as Controls.SkewControl);
             foreach (var control in YControls)
-                clone.YControls.Add(control.Clone() as YControl);
+                clone.YControls.Add(control.Clone() as Controls.YControl);
 
             return clone;
         }

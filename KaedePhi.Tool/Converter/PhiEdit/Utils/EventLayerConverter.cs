@@ -1,4 +1,4 @@
-using KaedePhi.Tool.Converter.PhiEdit.Model;
+﻿using KaedePhi.Tool.Converter.PhiEdit.Model;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
@@ -15,7 +15,7 @@ public class EventLayerConverter
     /// <summary>
     /// 将 PE 判定线上的各通道帧/事件规范化为 KPC 事件层。
     /// </summary>
-    public Kpc.EventLayer ConvertEventLayer(Pe.JudgeLine src, double horizonBeat) => new()
+    public KpcEvents.EventLayer ConvertEventLayer(Pe.JudgeLine src, double horizonBeat) => new()
     {
         MoveXEvents = _frameEventInterpolator.BuildMoveAxisEvents(
             src.MoveFrames, src.MoveEvents, horizonBeat, point => point.X, Transform.TransformToKpcX),
