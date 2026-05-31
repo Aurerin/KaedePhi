@@ -123,6 +123,7 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ShowDisableCompress));
             OnPropertyChanged(nameof(ShowRenderOptions));
             OnPropertyChanged(nameof(ShowFitOptions));
+            OnPropertyChanged(nameof(DisableCompressEnabled));
             OnPropertyChanged(nameof(CanRun));
         }
     }
@@ -154,8 +155,22 @@ public sealed class ToolViewModel : INotifyPropertyChanged
         {
             field = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(DisableCompressEnabled));
+            // 经典模式关闭时，禁用压缩选项不可用，自动取消
+            if (!value)
+            {
+                DisableCompress = false;
+            }
         }
     }
+
+    /// <summary>
+    /// 仅当工具支持经典模式且当前已启用经典模式时，才允许修改"禁用压缩"选项。
+    /// </summary>
+    public bool DisableCompressEnabled =>
+        SelectedTool is { HasDisableCompress: true, HasClassicMode: true }
+            ? ClassicMode
+            : SelectedTool?.HasDisableCompress == true;
 
     public bool DisableCompress
     {

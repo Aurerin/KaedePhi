@@ -37,7 +37,10 @@
                                                Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
                             </StackPanel>
                             <CheckBox Content="{x:Static loc:GuiLocalizationString.option_classic_mode}" IsChecked="{Binding UnbindClassicMode}"/>
-                            <CheckBox Content="{x:Static loc:GuiLocalizationString.option_disable_compress}" IsChecked="{Binding UnbindDisableCompress}"/>
+                            <CheckBox Content="{x:Static loc:GuiLocalizationString.option_disable_compress}"
+                                      IsChecked="{Binding UnbindDisableCompress}"
+                                      IsEnabled="{Binding UnbindDisableCompressEnabled}"
+                                      ToolTip.Tip="{x:Static loc:GuiLocalizationString.option_disable_compress_hint}"/>
                         </StackPanel>
                     </Expander>
 
@@ -55,7 +58,10 @@
                                                Increment="0.1" FormatString="F2" Width="200" HorizontalAlignment="Left"/>
                             </StackPanel>
                             <CheckBox Content="{x:Static loc:GuiLocalizationString.option_classic_mode}" IsChecked="{Binding LayerMergeClassicMode}"/>
-                            <CheckBox Content="{x:Static loc:GuiLocalizationString.option_disable_compress}" IsChecked="{Binding LayerMergeDisableCompress}"/>
+                            <CheckBox Content="{x:Static loc:GuiLocalizationString.option_disable_compress}"
+                                      IsChecked="{Binding LayerMergeDisableCompress}"
+                                      IsEnabled="{Binding LayerMergeDisableCompressEnabled}"
+                                      ToolTip.Tip="{x:Static loc:GuiLocalizationString.option_disable_compress_hint}"/>
                         </StackPanel>
                     </Expander>
 

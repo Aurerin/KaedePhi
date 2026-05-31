@@ -113,8 +113,10 @@
 
                         <!-- Disable compress -->
                         <CheckBox IsVisible="{Binding ShowDisableCompress}"
+                                  IsEnabled="{Binding DisableCompressEnabled}"
                                   Content="{x:Static loc:GuiLocalizationString.option_disable_compress}"
-                                  IsChecked="{Binding DisableCompress}"/>
+                                  IsChecked="{Binding DisableCompress}"
+                                  ToolTip.Tip="{x:Static loc:GuiLocalizationString.option_disable_compress_hint}"/>
 
                         <!-- Render options -->
                         <StackPanel IsVisible="{Binding ShowRenderOptions}" Spacing="8">

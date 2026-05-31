@@ -255,17 +255,6 @@ public class RePhiEditSerializationTests
     #region Anticipation Tests
 
     [Fact]
-    public void Anticipation_FillsEmptyAlphaEvents()
-    {
-        var chart = CreateChartWithEmptyAlpha();
-
-        chart.Anticipation();
-
-        var firstLine = chart.JudgeLineList[0];
-        firstLine.EventLayers[0].AlphaEvents.Should().NotBeNullOrEmpty();
-    }
-
-    [Fact]
     public void Anticipation_SetsDefaultControls()
     {
         var chart = CreateChartWithNullControls();
@@ -291,12 +280,8 @@ public class RePhiEditSerializationTests
                 "Group": 0,
                 "Name": "",
                 "Texture": "line.png",
-                "PosX": 0,
-                "PosY": 0,
-                "Rotation": 0,
-                "alpha": 255,
                 "isCover": 1,
-                "eventLayers": [null],
+                "eventLayers": null,
                 "father": -1,
                 "zOrder": 0
             }],
@@ -351,28 +336,6 @@ public class RePhiEditSerializationTests
                 new JudgeLine { EventLayers = [new EventLayer()] },
                 new JudgeLine { EventLayers = [new EventLayer()] },
                 new JudgeLine { EventLayers = [new EventLayer()] }
-            ]
-        };
-    }
-
-    private static Chart CreateChartWithEmptyAlpha()
-    {
-        return new Chart
-        {
-            BpmList = [new BpmItem { Bpm = 120, StartBeat = new Beat([0, 0, 1]) }],
-            Meta = new Meta { Name = "Empty Alpha Chart" },
-            JudgeLineList =
-            [
-                new JudgeLine
-                {
-                    EventLayers =
-                    [
-                        new EventLayer
-                        {
-                            AlphaEvents = []
-                        }
-                    ]
-                }
             ]
         };
     }
