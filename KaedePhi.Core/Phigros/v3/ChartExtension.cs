@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
 using Newtonsoft.Json;
 

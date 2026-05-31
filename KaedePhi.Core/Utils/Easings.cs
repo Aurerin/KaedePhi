@@ -9,43 +9,6 @@ namespace KaedePhi.Core.Utils
 
         private const double FloatTolerance = 1e-7;
 
-        /// <summary>
-        /// 根据缓动编号获取对应的缓动函数（共享映射表）。
-        /// </summary>
-        public static EasingFunction GetFunction(int easingType) => easingType switch
-        {
-            1 => Linear,
-            2 => EaseOutSine,
-            3 => EaseInSine,
-            4 => EaseOutQuad,
-            5 => EaseInQuad,
-            6 => EaseInOutSine,
-            7 => EaseInOutQuad,
-            8 => EaseOutCubic,
-            9 => EaseInCubic,
-            10 => EaseOutQuart,
-            11 => EaseInQuart,
-            12 => EaseInOutCubic,
-            13 => EaseInOutQuart,
-            14 => EaseOutQuint,
-            15 => EaseInQuint,
-            16 => EaseOutExpo,
-            17 => EaseInExpo,
-            18 => EaseOutCirc,
-            19 => EaseInCirc,
-            20 => EaseOutBack,
-            21 => EaseInBack,
-            22 => EaseInOutCirc,
-            23 => EaseInOutBack,
-            24 => EaseOutElastic,
-            25 => EaseInElastic,
-            26 => EaseOutBounce,
-            27 => EaseInBounce,
-            28 => EaseInOutBounce,
-            29 => EaseInOutElastic,
-            _ => Linear
-        };
-
         // Linear
         public static double Linear(double t) => t;
 
@@ -132,20 +95,20 @@ namespace KaedePhi.Core.Utils
         // Back
         public static double EaseInBack(double t)
         {
-            const double s = 1.70158f;
+            const double s = 1.70158d;
             return t * t * ((s + 1) * t - s);
         }
 
         public static double EaseOutBack(double t)
         {
-            const double s = 1.70158f;
+            const double s = 1.70158d;
             t--;
             return t * t * ((s + 1) * t + s) + 1;
         }
 
         public static double EaseInOutBack(double t)
         {
-            const double s = 1.70158f * 1.525f;
+            const double s = 1.70158d * 1.525f;
             t *= 2;
             if (t < 1)
                 return 0.5f * (t * t * ((s + 1) * t - s));

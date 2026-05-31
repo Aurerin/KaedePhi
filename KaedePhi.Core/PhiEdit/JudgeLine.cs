@@ -106,7 +106,7 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="beat">目标拍点。</param>
         /// <param name="previousFrame">最近的前置帧。</param>
         /// <returns>事件插值的起始 (X, Y) 坐标。</returns>
-        private (float, float) ResolveMoveEventStartValue(float beat, MoveFrame previousFrame)
+        private (float, float) ResolveMoveEventStartValue(float beat, MoveFrame? previousFrame)
         {
             var previousEvent = FindPreviousMoveEvent(beat);
             if (IsEventCloserThanFrame(previousEvent, previousFrame))
@@ -124,7 +124,7 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="previousEvent">最近结束的历史事件。</param>
         /// <param name="previousFrame">最近的前置帧。</param>
         /// <returns>若应优先使用历史事件值则为 true，否则为 false。</returns>
-        private static bool IsEventCloserThanFrame(MoveEvent previousEvent, MoveFrame previousFrame)
+        private static bool IsEventCloserThanFrame(MoveEvent? previousEvent, MoveFrame? previousFrame)
         {
             return previousEvent != null && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat);
         }

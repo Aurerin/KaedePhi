@@ -12,7 +12,7 @@ namespace KaedePhi.Core.PhiChain.v6
         public int To { get; set; }
 
         [JsonProperty("kind")]
-        public NoteKind Kind { get; set; } = NoteKind.Drag;
+        public NoteType NoteType { get; set; } = NoteType.Drag;
 
         [JsonProperty("hold_beat", NullValueHandling = NullValueHandling.Ignore)]
         public Beat? HoldBeat { get; set; }
@@ -32,7 +32,7 @@ namespace KaedePhi.Core.PhiChain.v6
             {
                 From = From,
                 To = To,
-                Kind = Kind,
+                NoteType = NoteType,
                 HoldBeat = HoldBeat != null ? new Beat((int[])HoldBeat) : null,
                 Density = Density,
                 Curve = Curve?.Clone()

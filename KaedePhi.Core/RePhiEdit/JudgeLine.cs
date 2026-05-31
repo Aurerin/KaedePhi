@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
@@ -11,48 +10,52 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 判定线名称
         /// </summary>
-        [JsonProperty("Name")] public string Name { get; set; }= "KaedePhi_RePhiEditJudgeLine";
+        [JsonProperty("Name")]
+        public string Name { get; set; } = "KaedePhi_RePhiEditJudgeLine";
 
         /// <summary>
         /// 判定线纹理相对路径，默认值为line.png
         /// </summary>
-        [JsonProperty("Texture")] public string Texture { get; set; }= "line.png"; // 判定线纹理路径
+        [JsonProperty("Texture")]
+        public string Texture { get; set; } = "line.png"; // 判定线纹理路径
 
         /// <summary>
         /// 判定线纹理锚点(0~1之间)，默认值为中心点(0.5, 0.5)
         /// </summary>
-        [JsonProperty("anchor")] public float[] Anchor { get; set; }= { 0.5f, 0.5f }; // 判定线纹理锚点
+        [JsonProperty("anchor")]
+        public float[] Anchor { get; set; } = { 0.5f, 0.5f }; // 判定线纹理锚点
 
         /// <summary>
         /// 判定线事件层列表
         /// </summary>
         [JsonProperty("eventLayers", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<EventLayer> EventLayers { get; set; }= new(); // 事件层
+        public List<EventLayer> EventLayers { get; set; } = new(); // 事件层
 
         /// <summary>
         /// 父级判定线索引，-1表示无父级
         /// </summary>
-        [JsonProperty("father")] public int Father { get; set; }= -1; // 父级
+        [JsonProperty("father")]
+        public int Father { get; set; } = -1; // 父级
 
         /// <summary>
         /// 是否遮罩越过判定线的音符（已被打击的除外）
         /// </summary>
-        [JsonProperty("isCover")] [JsonConverter(typeof(BoolConverter))]
-        public bool IsCover { get; set; }= true; // 是否遮罩
+        [JsonProperty("isCover")]
+        [JsonConverter(typeof(BoolConverter))]
+        public bool IsCover { get; set; } = true; // 是否遮罩
 
         /// <summary>
         /// 判定线音符列表
         /// </summary>
         [JsonProperty("notes", DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore)]
-        public List<Note> Notes
+        public List<Note>? Notes
         {
             get => _notes;
             set => _notes = value ?? new List<Note>();
         } // note列表
 
-        private List<Note> _notes = new();
-
+        private List<Note>? _notes = new();
 
         /// <summary>
         /// Note总数量(包含 FakeNote，不包含Hold)。
@@ -65,7 +68,7 @@ namespace KaedePhi.Core.RePhiEdit
             get
             {
                 // Note总数量(包含 FakeNote，不包含任何形式的Hold)
-                return Notes.Count(note => note.Type != NoteType.Hold);
+                return Notes?.Count(note => note.Type != NoteType.Hold) ?? 0;
             }
         }
 
@@ -74,39 +77,44 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         [JsonProperty("extended", DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore)]
-        public ExtendLayer Extended { get; set; }= new();
+        public ExtendLayer Extended { get; set; } = new();
 
         /// <summary>
         /// 判定线的Z轴顺序
         /// </summary>
-        [JsonProperty("zOrder")] public int ZOrder{ get; set; } // Z轴顺序
+        [JsonProperty("zOrder")]
+        public int ZOrder { get; set; } // Z轴顺序
 
         /// <summary>
         /// 判定线是否绑定UI
         /// </summary>
         [JsonProperty("attachUI", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(AttachUiConverter))]
-        public AttachUi? AttachUi{ get; set; } // 绑定UI名，当不绑定时为null
+        public AttachUi? AttachUi { get; set; } // 绑定UI名，当不绑定时为null
 
         /// <summary>
         /// 判定线纹理是否为GIF
         /// </summary>
-        [JsonProperty("isGif")] public bool IsGif{ get; set; } // 纹理是否为GIF
+        [JsonProperty("isGif")]
+        public bool IsGif { get; set; } // 纹理是否为GIF
 
         /// <summary>
         /// 所属组
         /// </summary>
-        [JsonProperty("Group")] public int Group{ get; set; } // 绑定组
+        [JsonProperty("Group")]
+        public int Group { get; set; } // 绑定组
 
         /// <summary>
-        /// 当前判定线相对于当前BPM的因子。判定线BPM = 谱面BPM / BpmFactor
+        /// 当前判定线相对于当前BPM的因子。判定线BPM = 当前BPM / BpmFactor
         /// </summary>
-        [JsonProperty("bpmfactor")] public float BpmFactor { get; set; }= 1.0f; // BPM因子
+        [JsonProperty("bpmfactor")]
+        public float BpmFactor { get; set; } = 1.0f; // BPM因子
 
         /// <summary>
         /// 是否跟随父线旋转
         /// </summary>
-        [JsonProperty("rotateWithFather")] public bool RotateWithFather{ get; set; } // 是否随父级旋转
+        [JsonProperty("rotateWithFather")]
+        public bool RotateWithFather { get; set; } // 是否随父级旋转
 
         /// <summary>
         /// Position（X） Control 控制点列表
