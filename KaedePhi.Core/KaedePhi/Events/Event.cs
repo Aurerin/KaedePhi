@@ -66,17 +66,15 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// <summary>
         /// 当此事件为文字事件时，此值为字体文件相对路径，默认cmdysj.ttf
         /// </summary>
-#nullable enable
         public string? Font { get; set; }
-#nullable disable
         
         /// <summary>
         /// 保留字段
         /// </summary>
         public float FloorPosition { get; set; }
+        
         /// <summary>
         /// 获取某个拍在这个事件中的值（返回double，避免装箱和类型检查）
-        /// 专为EventFit等需要频繁调用的场景优化
         /// </summary>
         public double GetValueAtBeatAsDouble(Beat beat)
         {
@@ -98,11 +96,11 @@ namespace KaedePhi.Core.KaedePhi.Events
         public double GetStartValueAsDouble()
         {
             if (typeof(T) == typeof(double))
-                return (double)(object)StartValue;
+                return (double)((object)StartValue ?? 0);
             if (typeof(T) == typeof(float))
-                return (float)(object)StartValue;
+                return (float)((object)StartValue ?? 0);
             if (typeof(T) == typeof(int))
-                return (int)(object)StartValue;
+                return (int)((object)StartValue ?? 0);
             return Convert.ToDouble(StartValue);
         }
 
@@ -113,11 +111,11 @@ namespace KaedePhi.Core.KaedePhi.Events
         public double GetEndValueAsDouble()
         {
             if (typeof(T) == typeof(double))
-                return (double)(object)EndValue;
+                return (double)((object)EndValue ?? 0);
             if (typeof(T) == typeof(float))
-                return (float)(object)EndValue;
+                return (float)((object)EndValue ?? 0);
             if (typeof(T) == typeof(int))
-                return (int)(object)EndValue;
+                return (int)((object)EndValue ?? 0);
             return Convert.ToDouble(EndValue);
         }
 

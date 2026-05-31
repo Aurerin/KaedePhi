@@ -220,7 +220,7 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     }
 
     private static KpcEvents.Event<TPayload>? GetActiveEventAtBeat(List<KpcEvents.Event<TPayload>> events, Beat beat)
-        => events.Where(e => e.StartBeat <= beat && e.EndBeat >= beat).MaxBy(e => e.StartBeat);
+        => events.LastOrDefault(e => e.StartBeat <= beat && e.EndBeat >= beat);
 
     private static TPayload? GetPreviousEndValue(List<KpcEvents.Event<TPayload>> events, Beat beat)
     {
