@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using KaedePhi.Core.Common;
 
 namespace KaedePhi.Core.KaedePhi.Events
@@ -19,46 +20,54 @@ namespace KaedePhi.Core.KaedePhi.Events
         public List<Event<float>>? SpeedEvents { get; set; } // 速度事件
 
         /// <summary>
-        /// 获取某个拍时，指定事件层级指定事件列表的数值
+        /// 获取某个拍时，指定事件层级指定事件列表的数值。
+        /// <para>
+        /// 重叠规则（后来者至上）：<br/>
+        /// • 部分重叠 —— 后事件 B 从其 StartBeat 起截断前事件 A；<br/>
+        /// • 完全包含 —— A 播放至 B.StartBeat 后切换到 B，B 结束后 A 剩余部分完全忽略；<br/>
+        /// • 同起始拍 —— index 靠后者生效，靠前者被忽略。
+        /// </para>
         /// </summary>
-        /// <param name="events">事件数组</param>
+        /// <param name="events">已按 StartBeat 升序排列的事件列表</param>
         /// <param name="beat">指定拍</param>
         /// <returns>在指定拍时，指定事件列表的数值</returns>
         public static T GetValueAtBeat<T>(List<Event<T>> events, Beat beat)
         {
-            Event<T>? selectedEvent = null;
-
+            // 主导事件：StartBeat <= beat 中 index 最大者
+            // 向后遍历并持续覆盖 dominant，使最晚起始（最大 index）的事件胜出
+            // 同 StartBeat 时，靠后者（index 更大）覆盖靠前者（满足同起始拍 index 至上规则）
+            Event<T>? dominant = null;
             foreach (var e in events)
             {
-                // 事件按开始拍排序时，后到(开始拍更晚)的重叠事件应覆盖先到事件
-                if (beat >= e.StartBeat && beat <= e.EndBeat)
-                    selectedEvent = e;
-                // 如果当前拍小于事件的开始拍，说明后续事件都不符合条件，跳出循环
                 if (beat < e.StartBeat)
                     break;
+                dominant = e;
             }
 
-            if (selectedEvent is not null)
-                return selectedEvent.GetValueAtBeat(beat);
+            if (dominant is null)
+                return default;
 
-            var previousEvent = events.FindLast(e => beat > e.EndBeat);
-            return previousEvent is not null ? previousEvent.EndValue : default;
+            // 主导事件仍活跃 → 插值
+            if (beat <= dominant.EndBeat)
+                return dominant.GetValueAtBeat(beat);
+
+            // 主导事件已结束 → 保持其终值，不降级为更早的事件
+            // （规则 2：B 结束后 A 的剩余部分完全忽略）
+            return dominant.EndValue;
         }
 
         /// <summary>
-        /// 按事件的开始时间排序所有事件
+        /// 按事件的开始时间稳定排序所有事件。
+        /// 使用稳定排序（LINQ OrderBy）以保证同 StartBeat 的事件保持原始 index 顺序，
+        /// 从而确保 GetValueAtBeat 中 index 靠后者能正确胜出。
         /// </summary>
         public void Sort()
         {
-            var eventLists = new List<List<Event<double>>>
-            {
-                MoveXEvents, MoveYEvents, RotateEvents
-            };
-            var alphaEventList = AlphaEvents;
-            var speedEventList = SpeedEvents;
-            eventLists.ForEach(events => { events?.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat)); });
-            alphaEventList?.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
-            speedEventList?.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
+            MoveXEvents = MoveXEvents?.OrderBy(e => e.StartBeat).ToList();
+            MoveYEvents = MoveYEvents?.OrderBy(e => e.StartBeat).ToList();
+            RotateEvents = RotateEvents?.OrderBy(e => e.StartBeat).ToList();
+            AlphaEvents = AlphaEvents?.OrderBy(e => e.StartBeat).ToList();
+            SpeedEvents = SpeedEvents?.OrderBy(e => e.StartBeat).ToList();
         }
 
         /// <summary>

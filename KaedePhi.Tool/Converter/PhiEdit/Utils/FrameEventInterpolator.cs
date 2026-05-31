@@ -80,7 +80,7 @@ public class FrameEventInterpolator
             var activeEvent = FindActiveMoveEvent(orderedEvents, sampleBeat);
             if (activeEvent != null)
             {
-                var eventStartSource = ResolveMoveEventStartValue(activeEvent, orderedFrames, orderedEventsByEnd);
+                var eventStartSource = ResolveMoveEventStartValue(activeEvent, orderedFrames, orderedEvents, orderedEventsByEnd);
                 result.Add(new KpcEvents.Event<double>
                 {
                     StartBeat = new Beat(startBeat),
@@ -139,7 +139,7 @@ public class FrameEventInterpolator
             var activeEvent = FindActiveScalarEvent(orderedEvents, sampleBeat);
             if (activeEvent != null)
             {
-                var eventStartSource = ResolveScalarEventStartValue(activeEvent, orderedFrames, orderedEventsByEnd);
+                var eventStartSource = ResolveScalarEventStartValue(activeEvent, orderedFrames, orderedEvents, orderedEventsByEnd);
                 result.Add(new KpcEvents.Event<T>
                 {
                     StartBeat = new Beat(startBeat),
@@ -326,22 +326,86 @@ public class FrameEventInterpolator
     private static (float X, float Y) ResolveMoveEventStartValue(
         Pe.MoveEvent ev,
         List<Pe.MoveFrame> frames,
-        List<Pe.MoveEvent> events)
+        List<Pe.MoveEvent> orderedEvents,
+        List<Pe.MoveEvent> eventsByEnd)
     {
+        // 优先：ev.StartBeat 处有精确帧
         var frameAtStart = FindMoveFrameAtBeat(frames, ev.StartBeat);
         if (frameAtStart != null)
             return (frameAtStart.XValue, frameAtStart.YValue);
 
-        return ResolveMoveValueAfterBoundary(frames, events, ev.StartBeat);
+        // 查找前驱主导事件：orderedEvents 中位于 ev 之前（index 更小）且
+        // StartBeat <= ev.StartBeat 的最后一个事件
+        var evIndex = orderedEvents.IndexOf(ev);
+        Pe.MoveEvent? precedingDominant = null;
+        for (var i = evIndex - 1; i >= 0; i--)
+        {
+            if (orderedEvents[i].StartBeat <= ev.StartBeat + BeatComparisonEpsilon)
+            {
+                precedingDominant = orderedEvents[i];
+                break;
+            }
+        }
+
+        if (precedingDominant != null)
+        {
+            if (precedingDominant.EndBeat >= ev.StartBeat - BeatComparisonEpsilon)
+            {
+                // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
+                var innerStartSource = ResolveMoveEventStartValue(precedingDominant, frames, orderedEvents, eventsByEnd);
+                return (
+                    InterpolateMoveValue(precedingDominant, ev.StartBeat, innerStartSource, v => v.X),
+                    InterpolateMoveValue(precedingDominant, ev.StartBeat, innerStartSource, v => v.Y)
+                );
+            }
+
+            // 前驱事件已结束，直接使用其终值
+            return (precedingDominant.EndXValue, precedingDominant.EndYValue);
+        }
+
+        // 无前驱事件，降级到帧/默认
+        return ResolveMoveValueAfterBoundary(frames, eventsByEnd, ev.StartBeat);
     }
 
-    private static float ResolveScalarEventStartValue(Pe.Event ev, List<Pe.Frame> frames, List<Pe.Event> events)
+    private static float ResolveScalarEventStartValue(
+        Pe.Event ev,
+        List<Pe.Frame> frames,
+        List<Pe.Event> orderedEvents,
+        List<Pe.Event> eventsByEnd)
     {
+        // 优先：ev.StartBeat 处有精确帧
         var frameAtStart = FindScalarFrameAtBeat(frames, ev.StartBeat);
         if (frameAtStart != null)
             return frameAtStart.Value;
 
-        return ResolveScalarValueAfterBoundary(frames, events, ev.StartBeat);
+        // 查找前驱主导事件：orderedEvents 中位于 ev 之前（index 更小）且
+        // StartBeat <= ev.StartBeat 的最后一个事件
+        var evIndex = orderedEvents.IndexOf(ev);
+        Pe.Event? precedingDominant = null;
+        for (var i = evIndex - 1; i >= 0; i--)
+        {
+            if (orderedEvents[i].StartBeat <= ev.StartBeat + (float)BeatComparisonEpsilon)
+            {
+                precedingDominant = orderedEvents[i];
+                break;
+            }
+        }
+
+        if (precedingDominant != null)
+        {
+            if (precedingDominant.EndBeat >= ev.StartBeat - (float)BeatComparisonEpsilon)
+            {
+                // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
+                var innerStart = ResolveScalarEventStartValue(precedingDominant, frames, orderedEvents, eventsByEnd);
+                return InterpolateScalarValue(precedingDominant, ev.StartBeat, innerStart);
+            }
+
+            // 前驱事件已结束，直接使用其终值
+            return precedingDominant.EndValue;
+        }
+
+        // 无前驱事件，降级到帧/默认
+        return ResolveScalarValueAfterBoundary(frames, eventsByEnd, ev.StartBeat);
     }
 
     private static bool IsMoveEventStartBeat(List<Pe.MoveEvent> events, double beat)
