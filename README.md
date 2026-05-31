@@ -2,7 +2,7 @@
 即使身处无人角落，我仍要继续向前，直到我无法前进。
 
 ## 前言
-NuanR_Star Ciallo Team（以下简称“我们”）KaedePhi（以下简称“本软件”）其源码遵循[GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)开源协议发布，
+NuanR_Star Ciallo Team（以下简称“我们”）KaedePhi（以下简称“本软件”）其源码遵循[GNU LESSER GENERAL PUBLIC LICENSE 3.0](https://www.gnu.org/licenses/lgpl-3.0.html)开源协议发布，
 作为一个刚刚起步的项目，我们不建议您将本软件代码fork进行自行二次开发，我们非常希望可以保持社区的集中性，不分化社区资源，
 使使用者无需在众多分叉中寻找最合适的版本，或是担心某个分叉不再维护而导致的后续问题，
 我们非常希望您向本软件的主分支提交pull request来参与开发，或是加入我们的聊天群来进行讨论，或是通过邮件来联系我们，来参与到本软件的开发中来，

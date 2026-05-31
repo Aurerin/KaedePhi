@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using KaedePhi.Core.Common;
@@ -73,16 +74,20 @@ namespace KaedePhi.Core.RePhiEdit.Events
 #nullable enable
         public string? Font { get; set; }
 #nullable disable
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static TTo Cast<TFrom, TTo>(TFrom value) => Unsafe.As<TFrom, TTo>(ref value);
+
         /// <summary>
         /// 获取StartValue的float表示，避免Convert.ToSingle的装箱开销
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float GetStartValueAsSingle()
         {
-            if (typeof(T) == typeof(float)) return (float)(object)StartValue;
-            if (typeof(T) == typeof(double)) return (float)(double)(object)StartValue;
-            if (typeof(T) == typeof(int)) return (int)(object)StartValue;
-            if (typeof(T) == typeof(byte)) return (byte)(object)StartValue;
+            if (typeof(T) == typeof(float)) return Cast<T, float>(StartValue);
+            if (typeof(T) == typeof(double)) return (float)Cast<T, double>(StartValue);
+            if (typeof(T) == typeof(int)) return Cast<T, int>(StartValue);
+            if (typeof(T) == typeof(byte)) return Cast<T, byte>(StartValue);
             return Convert.ToSingle(StartValue);
         }
 
@@ -92,10 +97,10 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float GetEndValueAsSingle()
         {
-            if (typeof(T) == typeof(float)) return (float)(object)EndValue;
-            if (typeof(T) == typeof(double)) return (float)(double)(object)EndValue;
-            if (typeof(T) == typeof(int)) return (int)(object)EndValue;
-            if (typeof(T) == typeof(byte)) return (byte)(object)EndValue;
+            if (typeof(T) == typeof(float)) return Cast<T, float>(EndValue);
+            if (typeof(T) == typeof(double)) return (float)Cast<T, double>(EndValue);
+            if (typeof(T) == typeof(int)) return Cast<T, int>(EndValue);
+            if (typeof(T) == typeof(byte)) return Cast<T, byte>(EndValue);
             return Convert.ToSingle(EndValue);
         }
 
@@ -105,9 +110,9 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetStartValueAsDouble()
         {
-            if (typeof(T) == typeof(double)) return (double)(object)StartValue;
-            if (typeof(T) == typeof(float)) return (float)(object)StartValue;
-            if (typeof(T) == typeof(int)) return (int)(object)StartValue;
+            if (typeof(T) == typeof(double)) return Cast<T, double>(StartValue);
+            if (typeof(T) == typeof(float)) return Cast<T, float>(StartValue);
+            if (typeof(T) == typeof(int)) return Cast<T, int>(StartValue);
             return Convert.ToDouble(StartValue);
         }
 
@@ -117,9 +122,9 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetEndValueAsDouble()
         {
-            if (typeof(T) == typeof(double)) return (double)(object)EndValue;
-            if (typeof(T) == typeof(float)) return (float)(object)EndValue;
-            if (typeof(T) == typeof(int)) return (int)(object)EndValue;
+            if (typeof(T) == typeof(double)) return Cast<T, double>(EndValue);
+            if (typeof(T) == typeof(float)) return Cast<T, float>(EndValue);
+            if (typeof(T) == typeof(int)) return Cast<T, int>(EndValue);
             return Convert.ToDouble(EndValue);
         }
 
@@ -129,10 +134,10 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetStartValueAsInt32()
         {
-            if (typeof(T) == typeof(int)) return (int)(object)StartValue;
-            if (typeof(T) == typeof(float)) return (int)(float)(object)StartValue;
-            if (typeof(T) == typeof(double)) return (int)(double)(object)StartValue;
-            if (typeof(T) == typeof(byte)) return (byte)(object)StartValue;
+            if (typeof(T) == typeof(int)) return Cast<T, int>(StartValue);
+            if (typeof(T) == typeof(float)) return (int)Cast<T, float>(StartValue);
+            if (typeof(T) == typeof(double)) return (int)Cast<T, double>(StartValue);
+            if (typeof(T) == typeof(byte)) return Cast<T, byte>(StartValue);
             return Convert.ToInt32(StartValue);
         }
 
@@ -142,10 +147,10 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetEndValueAsInt32()
         {
-            if (typeof(T) == typeof(int)) return (int)(object)EndValue;
-            if (typeof(T) == typeof(float)) return (int)(float)(object)EndValue;
-            if (typeof(T) == typeof(double)) return (int)(double)(object)EndValue;
-            if (typeof(T) == typeof(byte)) return (byte)(object)EndValue;
+            if (typeof(T) == typeof(int)) return Cast<T, int>(EndValue);
+            if (typeof(T) == typeof(float)) return (int)Cast<T, float>(EndValue);
+            if (typeof(T) == typeof(double)) return (int)Cast<T, double>(EndValue);
+            if (typeof(T) == typeof(byte)) return Cast<T, byte>(EndValue);
             return Convert.ToInt32(EndValue);
         }
 
@@ -171,11 +176,11 @@ namespace KaedePhi.Core.RePhiEdit.Events
         private T InterpolateBezier(float t)
         {
             if (typeof(T) == typeof(float))
-                return (T)(object)Bezier.Do(BezierPoints, t, GetStartValueAsSingle(), GetEndValueAsSingle());
+                return Cast<float, T>(Bezier.Do(BezierPoints, t, GetStartValueAsSingle(), GetEndValueAsSingle()));
             if (typeof(T) == typeof(double))
-                return (T)(object)Bezier.Do(BezierPoints, t, GetStartValueAsDouble(), GetEndValueAsDouble());
+                return Cast<double, T>(Bezier.Do(BezierPoints, t, GetStartValueAsDouble(), GetEndValueAsDouble()));
             if (typeof(T) == typeof(int))
-                return (T)(object)Bezier.Do(BezierPoints, t, GetStartValueAsInt32(), GetEndValueAsInt32());
+                return Cast<int, T>(Bezier.Do(BezierPoints, t, GetStartValueAsInt32(), GetEndValueAsInt32()));
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: true);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -190,11 +195,11 @@ namespace KaedePhi.Core.RePhiEdit.Events
         private T InterpolateEasing(float t)
         {
             if (typeof(T) == typeof(float))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
+                return Cast<float, T>(Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t));
             if (typeof(T) == typeof(double))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t);
+                return Cast<double, T>(Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t));
             if (typeof(T) == typeof(int))
-                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
+                return Cast<int, T>(Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t));
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -224,7 +229,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
                 result[i] = useBezier
                     ? Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i])
                     : Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
-            return (T)(object)result;
+            return Cast<byte[], T>(result);
         }
 
         /// <summary>
@@ -233,7 +238,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// </summary>
         private static TValue DeepClone<TValue>(TValue value)
         {
-            if (Equals(value, default(TValue)))
+            if (value is null)
                 return default;
 
             var type = typeof(TValue);
@@ -250,8 +255,8 @@ namespace KaedePhi.Core.RePhiEdit.Events
             // byte[]：需要深拷贝
             if (type == typeof(byte[]))
             {
-                var arr = (byte[])(object)value;
-                return (TValue)(object)arr.ToArray();
+                var arr = Cast<TValue, byte[]>(value);
+                return Cast<byte[], TValue>(arr.ToArray());
             }
 
             // 不应到达此处，但提供兜底
@@ -289,11 +294,11 @@ namespace KaedePhi.Core.RePhiEdit.Events
             else if (typeof(T) == typeof(byte[]))
             {
                 // byte[]需要深拷贝
-                clone.StartValue = !Equals(StartValue, default(T))
-                    ? (T)(object)((byte[])(object)StartValue).ToArray()
+                clone.StartValue = StartValue is not null
+                    ? Cast<byte[], T>(Cast<T, byte[]>(StartValue).ToArray())
                     : default;
-                clone.EndValue = !Equals(EndValue, default(T))
-                    ? (T)(object)((byte[])(object)EndValue).ToArray()
+                clone.EndValue = EndValue is not null
+                    ? Cast<byte[], T>(Cast<T, byte[]>(EndValue).ToArray())
                     : default;
             }
             else
