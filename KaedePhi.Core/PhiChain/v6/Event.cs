@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 namespace KaedePhi.Core.PhiChain.v6
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LineEventKind
+    public enum LineEventType
     {
         [EnumMember(Value = "x")]
         X,
@@ -25,7 +25,7 @@ namespace KaedePhi.Core.PhiChain.v6
         Speed
     }
 
-    public enum LineEventValueKind
+    public enum LineEventValueType
     {
         Transition,
         Constant
@@ -35,7 +35,7 @@ namespace KaedePhi.Core.PhiChain.v6
     public sealed class LineEventValue
     {
         [JsonIgnore]
-        public LineEventValueKind Kind { get; set; } = LineEventValueKind.Constant;
+        public LineEventValueType Type { get; set; } = LineEventValueType.Constant;
 
         [JsonIgnore]
         public float Start { get; set; }
@@ -49,11 +49,11 @@ namespace KaedePhi.Core.PhiChain.v6
         [JsonIgnore]
         public float Value { get; set; }
 
-        public static LineEventValue Transition(float start, float end, Easing easing)
+        public static LineEventValue Transition(float start, float end, Easing? easing)
         {
             return new LineEventValue
             {
-                Kind = LineEventValueKind.Transition,
+                Type = LineEventValueType.Transition,
                 Start = start,
                 End = end,
                 Easing = easing ?? Easing.Linear
@@ -64,7 +64,7 @@ namespace KaedePhi.Core.PhiChain.v6
         {
             return new LineEventValue
             {
-                Kind = LineEventValueKind.Constant,
+                Type = LineEventValueType.Constant,
                 Value = value
             };
         }
@@ -76,7 +76,7 @@ namespace KaedePhi.Core.PhiChain.v6
         {
             return new LineEventValue
             {
-                Kind = Kind,
+                Type = Type,
                 Start = Start,
                 End = End,
                 Easing = Easing?.Clone(),
@@ -88,7 +88,7 @@ namespace KaedePhi.Core.PhiChain.v6
     public sealed class LineEvent
     {
         [JsonProperty("kind")]
-        public LineEventKind Kind { get; set; }
+        public LineEventType Type { get; set; }
 
         [JsonProperty("start_beat")]
         public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 });
@@ -106,7 +106,7 @@ namespace KaedePhi.Core.PhiChain.v6
         {
             return new LineEvent
             {
-                Kind = Kind,
+                Type = Type,
                 StartBeat = new Beat((int[])StartBeat),
                 EndBeat = new Beat((int[])EndBeat),
                 Value = Value?.Clone()

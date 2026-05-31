@@ -11,14 +11,14 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         {
             var obj = new JObject
             {
-                ["kind"] = ToKindString(value.Kind),
+                ["kind"] = ToKindString(value.Type),
                 ["above"] = value.Above,
                 ["beat"] = JToken.FromObject(value.Beat, serializer),
                 ["x"] = value.X,
                 ["speed"] = value.Speed
             };
 
-            if (value.Kind == NoteKind.Hold)
+            if (value.Type == NoteType.Hold)
             {
                 obj["hold_beat"] = JToken.FromObject(value.HoldBeat, serializer);
             }
@@ -26,19 +26,19 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             obj.WriteTo(writer);
         }
 
-        public override Note ReadJson(JsonReader reader, Type objectType, Note existingValue, bool hasExistingValue,
+        public override Note ReadJson(JsonReader reader, Type objectType, Note? existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
             var obj = JObject.Load(reader);
             var note = existingValue ?? new Note();
 
-            note.Kind = ParseKind(obj.Value<string>("kind"));
+            note.Type = ParseKind(obj.Value<string>("kind"));
             note.Above = obj.Value<bool?>("above") ?? false;
             note.Beat = obj["beat"]?.ToObject<Beat>(serializer) ?? new Beat(new[] { 0, 0, 1 });
             note.X = obj.Value<float?>("x") ?? 0f;
             note.Speed = obj.Value<float?>("speed") ?? 1f;
 
-            if (note.Kind == NoteKind.Hold)
+            if (note.Type == NoteType.Hold)
             {
                 note.HoldBeat = obj["hold_beat"]?.ToObject<Beat>(serializer) ?? new Beat(new[] { 0, 0, 1 });
             }
@@ -50,38 +50,33 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             return note;
         }
 
-        private static string ToKindString(NoteKind kind)
+        private static string ToKindString(NoteType type)
         {
-            switch (kind)
+            switch (type)
             {
-                case NoteKind.Tap:
+                case NoteType.Tap:
                     return "tap";
-                case NoteKind.Drag:
+                case NoteType.Drag:
                     return "drag";
-                case NoteKind.Hold:
+                case NoteType.Hold:
                     return "hold";
-                case NoteKind.Flick:
+                case NoteType.Flick:
                     return "flick";
                 default:
-                    throw new JsonSerializationException("Unknown note kind.");
+                    throw new JsonSerializationException("Unknown note type.");
             }
         }
 
-        private static NoteKind ParseKind(string kind)
+        private static NoteType ParseKind(string kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case "tap":
-                    return NoteKind.Tap;
-                case "drag":
-                    return NoteKind.Drag;
-                case "hold":
-                    return NoteKind.Hold;
-                case "flick":
-                    return NoteKind.Flick;
-                default:
-                    throw new JsonSerializationException("Unsupported note kind: " + kind);
-            }
+                "tap" => NoteType.Tap,
+                "drag" => NoteType.Drag,
+                "hold" => NoteType.Hold,
+                "flick" => NoteType.Flick,
+                _ => throw new JsonSerializationException("Unsupported note type: " + kind)
+            };
         }
     }
 }

@@ -10,10 +10,10 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         {
             var obj = new JObject
             {
-                ["type"] = value.Kind == LineEventValueKind.Constant ? "constant" : "transition"
+                ["kind"] = value.Type == LineEventValueType.Constant ? "constant" : "transition"
             };
 
-            if (value.Kind == LineEventValueKind.Constant)
+            if (value.Type == LineEventValueType.Constant)
             {
                 obj["value"] = value.Value;
             }
@@ -31,7 +31,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             bool hasExistingValue, JsonSerializer serializer)
         {
             var obj = JObject.Load(reader);
-            var type = obj.Value<string>("type");
+            var type = obj.Value<string>("kind");
 
             if (type == "constant")
             {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.PhiChain.v6
@@ -35,70 +34,6 @@ namespace KaedePhi.Core.PhiChain.v6
                 Offset = Offset,
                 BpmList = BpmList.Clone(),
                 Lines = Lines.Select(l => l.Clone()).ToList()
-            };
-        }
-    }
-
-    public sealed class SerializedLine
-    {
-        // Rust uses serde(flatten) for line; v6 currently only contains name.
-        [JsonProperty("name")] public string Name { get; set; } = "Unnamed Line";
-
-        [JsonIgnore]
-        public Line Line
-        {
-            get => new() { Name = Name };
-            set => Name = value?.Name ?? "Unnamed Line";
-        }
-
-        [JsonProperty("notes")] public List<Note> Notes { get; set; } = new();
-
-        [JsonProperty("events")] public List<LineEvent> Events { get; set; } = DefaultEvents();
-
-        [JsonProperty("children")] public List<SerializedLine> Children { get; set; } = new();
-
-        [JsonProperty("curve_note_tracks")] public List<CurveNoteTrack> CurveNoteTracks { get; set; } = new();
-
-        public static SerializedLine CreateDefault()
-        {
-            return new SerializedLine();
-        }
-
-        /// <summary>
-        /// 深克隆当前 SerializedLine 对象
-        /// </summary>
-        public SerializedLine Clone()
-        {
-            return new SerializedLine
-            {
-                Name = Name,
-                Notes = Notes.Select(n => n.Clone()).ToList(),
-                Events = Events.Select(e => e.Clone()).ToList(),
-                Children = Children.Select(c => c.Clone()).ToList(),
-                CurveNoteTracks = CurveNoteTracks.Select(t => t.Clone()).ToList()
-            };
-        }
-
-        private static List<LineEvent> DefaultEvents()
-        {
-            return new List<LineEvent>
-            {
-                NewConstEvent(LineEventKind.X, 0f),
-                NewConstEvent(LineEventKind.Y, 0f),
-                NewConstEvent(LineEventKind.Rotation, 0f),
-                NewConstEvent(LineEventKind.Opacity, 0f),
-                NewConstEvent(LineEventKind.Speed, 10f)
-            };
-        }
-
-        private static LineEvent NewConstEvent(LineEventKind kind, float value)
-        {
-            return new LineEvent
-            {
-                Kind = kind,
-                Value = LineEventValue.Constant(value),
-                StartBeat = new Beat(new[] { 0, 0, 1 }),
-                EndBeat = new Beat(new[] { 1, 0, 1 })
             };
         }
     }

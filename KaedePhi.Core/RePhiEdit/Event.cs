@@ -190,11 +190,11 @@ namespace KaedePhi.Core.RePhiEdit
         private T InterpolateEasing(float t)
         {
             if (typeof(T) == typeof(float))
-                return (T)(object)Easing.Do(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(), GetEndValueAsSingle(), t);
             if (typeof(T) == typeof(double))
-                return (T)(object)Easing.Do(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t);
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(), GetEndValueAsDouble(), t);
             if (typeof(T) == typeof(int))
-                return (T)(object)Easing.Do(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
+                return (T)(object)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(), GetEndValueAsInt32(), t);
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -223,7 +223,7 @@ namespace KaedePhi.Core.RePhiEdit
             for (var i = 0; i < startBytes.Length; i++)
                 result[i] = useBezier
                     ? Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i])
-                    : Easing.Do(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
+                    : Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
             return (T)(object)result;
         }
 

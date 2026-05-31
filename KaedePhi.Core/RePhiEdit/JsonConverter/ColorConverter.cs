@@ -17,7 +17,7 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
             writer.WriteEndArray();
         }
 
-        public override byte[] ReadJson(JsonReader reader, Type objectType, byte[] existingValue,
+        public override byte[] ReadJson(JsonReader reader, Type objectType, byte[]? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer)
         {

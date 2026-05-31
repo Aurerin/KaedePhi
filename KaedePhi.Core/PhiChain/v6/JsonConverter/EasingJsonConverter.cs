@@ -10,21 +10,21 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         {
             var obj = new JObject
             {
-                ["type"] = ToTypeString(value.Kind)
+                ["kind"] = ToTypeString(value.EasingType)
             };
 
-            if (value.Kind == EasingKind.Custom)
+            if (value.EasingType == EasingKind.Custom)
             {
                 obj["x1"] = value.X1;
                 obj["y1"] = value.Y1;
                 obj["x2"] = value.X2;
                 obj["y2"] = value.Y2;
             }
-            else if (value.Kind == EasingKind.Steps)
+            else if (value.EasingType == EasingKind.Steps)
             {
                 obj["count"] = value.Count;
             }
-            else if (value.Kind == EasingKind.Elastic)
+            else if (value.EasingType == EasingKind.Elastic)
             {
                 obj["omega"] = value.Omega;
             }
@@ -32,25 +32,25 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             obj.WriteTo(writer);
         }
 
-        public override Easing ReadJson(JsonReader reader, Type objectType, Easing existingValue, bool hasExistingValue,
+        public override Easing ReadJson(JsonReader reader, Type objectType, Easing? existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
             var obj = JObject.Load(reader);
             var easing = existingValue ?? new Easing();
-            easing.Kind = ParseType(obj.Value<string>("type"));
+            easing.EasingType = ParseType(obj.Value<string>("kind"));
 
-            if (easing.Kind == EasingKind.Custom)
+            if (easing.EasingType == EasingKind.Custom)
             {
                 easing.X1 = obj.Value<float?>("x1") ?? 0f;
                 easing.Y1 = obj.Value<float?>("y1") ?? 0f;
                 easing.X2 = obj.Value<float?>("x2") ?? 0f;
                 easing.Y2 = obj.Value<float?>("y2") ?? 0f;
             }
-            else if (easing.Kind == EasingKind.Steps)
+            else if (easing.EasingType == EasingKind.Steps)
             {
                 easing.Count = obj.Value<int?>("count") ?? 0;
             }
-            else if (easing.Kind == EasingKind.Elastic)
+            else if (easing.EasingType == EasingKind.Elastic)
             {
                 easing.Omega = obj.Value<float?>("omega") ?? 0f;
             }
@@ -97,7 +97,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
                 case EasingKind.Steps: return "steps";
                 case EasingKind.Elastic: return "elastic";
                 default:
-                    throw new JsonSerializationException("Unknown easing kind.");
+                    throw new JsonSerializationException("Unknown easing type.");
             }
         }
 

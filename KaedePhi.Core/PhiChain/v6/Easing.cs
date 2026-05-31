@@ -44,9 +44,9 @@ namespace KaedePhi.Core.PhiChain.v6
     [JsonConverter(typeof(EasingJsonConverter))]
     public sealed class Easing
     {
-        public static Easing Linear => new() { Kind = EasingKind.Linear };
+        public static Easing Linear => new() { EasingType = EasingKind.Linear };
 
-        [JsonIgnore] public EasingKind Kind { get; set; } = EasingKind.Linear;
+        [JsonIgnore] public EasingKind EasingType { get; set; } = EasingKind.Linear;
 
         [JsonIgnore] public float X1 { get; set; }
 
@@ -67,7 +67,7 @@ namespace KaedePhi.Core.PhiChain.v6
         {
             return new Easing
             {
-                Kind = Kind,
+                EasingType = EasingType,
                 X1 = X1,
                 Y1 = Y1,
                 X2 = X2,

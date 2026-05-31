@@ -23,26 +23,9 @@ namespace KaedePhi.Core.RePhiEdit
                 // 如果这个判定线层级上有null层级，移除它们
                 judgeLine.EventLayers.RemoveAll(layer => layer is null);
                 // 对所有判定线的所有事件层级执行Anticipation()方法
-                for (var index = 0; index < judgeLine.EventLayers.Count; index++)
+                foreach (var eventLayer in judgeLine.EventLayers)
                 {
-                    var eventLayer = judgeLine.EventLayers[index];
                     eventLayer.Anticipation();
-                    // 若事件层级0上Alpha事件类别完全为空，则创建一个垫底事件
-                    if (index == 0 && judgeLine.EventLayers.Count == 1 &&
-                        (eventLayer.AlphaEvents is null || eventLayer.AlphaEvents.Count == 0))
-                    {
-                        eventLayer.AlphaEvents = new List<Event<int>>
-                        {
-                            new()
-                            {
-                                StartBeat = new Beat(0),
-                                EndBeat = new Beat(1),
-                                StartValue = 0,
-                                EndValue = 0
-                            }
-                        };
-                    }
-
                     eventLayer.Sort();
                 }
 
@@ -59,10 +42,14 @@ namespace KaedePhi.Core.RePhiEdit
                     judgeLine.SkewControls = SkewControl.Default;
                 if (ControlsIsNullOrEmpty(judgeLine.YControls.Cast<ControlBase>().ToList()))
                     judgeLine.YControls = YControl.Default;
+                
+                // 如果判定线没有任何音符，则将音符列表设置为null
+                if (judgeLine.Notes?.Count == 0)
+                    judgeLine.Notes = null;
             }
         }
 
-        private static bool ControlsIsNullOrEmpty(List<ControlBase> controls)
+        private static bool ControlsIsNullOrEmpty(List<ControlBase>? controls)
         {
             return controls is null || controls.Count == 0;
         }

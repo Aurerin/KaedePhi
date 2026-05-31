@@ -18,8 +18,8 @@ namespace KaedePhi.Core.Utils
 
             var type = typeof(T);
             if (type != typeof(float) && type != typeof(double)
-                && type != typeof(int) && type != typeof(byte))
-                throw new NotSupportedException("T must be float, double, int, or byte");
+                                      && type != typeof(int) && type != typeof(byte))
+                throw new NotSupportedException("T必须是float、double、int或byte");
 
             float x1 = points[0], y1 = points[1];
             float x2 = points[2], y2 = points[3];
@@ -27,40 +27,49 @@ namespace KaedePhi.Core.Utils
             // t → 映射到参数区间
             var mappedT = left + t * (right - left);
 
-            // 边界快速返回
-            if (mappedT <= 0f) return startValue;
-            if (mappedT >= 1f) return endValue;
+            switch (mappedT)
+            {
+                // 边界快速返回
+                case <= 0f:
+                    return startValue;
+                case >= 1f:
+                    return endValue;
+            }
 
             // 从 x(u) = mappedT 反解参数 u
             var u = SolveU(x1, x2, mappedT);
 
-            // ★ 核心修正：不 Clamp，保留过冲/欠冲
+            // 保留过冲
             var easing = SampleCurveY(u, y1, y2);
 
             if (type == typeof(float))
             {
                 var s = (float)(object)startValue;
                 var e = (float)(object)endValue;
-                return (T)(object)(float)(s + easing * (e - s));
+                return (T)(object)(s + easing * (e - s));
             }
+
             if (type == typeof(double))
             {
                 var s = (double)(object)startValue;
                 var e = (double)(object)endValue;
                 return (T)(object)(s + easing * (e - s));
             }
+
             if (type == typeof(int))
             {
                 var s = (int)(object)startValue;
                 var e = (int)(object)endValue;
                 return (T)(object)(int)(s + easing * (e - s));
             }
+
             if (type == typeof(byte))
             {
                 var s = (byte)(object)startValue;
                 var e = (byte)(object)endValue;
                 return (T)(object)(byte)(s + easing * (e - s));
             }
+
             throw new NotSupportedException("T must be float, double, int, or byte");
         }
 
@@ -94,6 +103,7 @@ namespace KaedePhi.Core.Utils
 
                 u -= err / deriv;
             }
+
             return false;
         }
 
@@ -103,7 +113,7 @@ namespace KaedePhi.Core.Utils
         private static (float uLo, float uHi) FindBracket(float x1, float x2, float targetX)
         {
             const int subdivisions = 32;
-            var step = 1f / subdivisions;
+            const float step = 1f / subdivisions;
             float uLo = 0f, uHi = 1f;
             var prevX = 0f;
 
@@ -139,7 +149,7 @@ namespace KaedePhi.Core.Utils
                 if (MathF.Abs(err) < 1e-7f) break;
 
                 if (err < 0f) uLo = u;
-                else          uHi = u;
+                else uHi = u;
             }
 
             return Math.Clamp((uLo + uHi) * 0.5f, 0f, 1f);
@@ -149,27 +159,27 @@ namespace KaedePhi.Core.Utils
         private static float SampleCurveX(float u, float x1, float x2)
         {
             var omu = 1f - u;
-            return 3f * omu * omu * u   * x1
-                 + 3f * omu * u   * u   * x2
-                 + u   * u   * u;
+            return 3f * omu * omu * u * x1
+                   + 3f * omu * u * u * x2
+                   + u * u * u;
         }
 
         // y(u) = 3(1−u)²u·y1 + 3(1−u)u²·y2 + u³
         private static float SampleCurveY(float u, float y1, float y2)
         {
             var omu = 1f - u;
-            return 3f * omu * omu * u   * y1
-                 + 3f * omu * u   * u   * y2
-                 + u   * u   * u;
+            return 3f * omu * omu * u * y1
+                   + 3f * omu * u * u * y2
+                   + u * u * u;
         }
 
         // x'(u) = 3(1−u)²·x1 + 6(1−u)u·(x2−x1) + 3u²·(1−x2)
         private static float SampleCurveXDerivative(float u, float x1, float x2)
         {
             var omu = 1f - u;
-            return 3f * omu * omu           * x1
-                 + 6f * omu * u             * (x2 - x1)
-                 + 3f * u   * u             * (1f - x2);
+            return 3f * omu * omu * x1
+                   + 6f * omu * u * (x2 - x1)
+                   + 3f * u * u * (1f - x2);
         }
 
         #endregion
