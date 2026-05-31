@@ -151,22 +151,19 @@ namespace KaedePhi.Core.Utils
         {
             const double n1 = 7.5625f;
             const double d1 = 2.75f;
-            if (t < 1 / d1)
-                return n1 * t * t;
-            else if (t < 2 / d1)
+            switch (t)
             {
-                t -= 1.5f / d1;
-                return n1 * t * t + 0.75f;
-            }
-            else if (t < 2.5 / d1)
-            {
-                t -= 2.25f / d1;
-                return n1 * t * t + 0.9375f;
-            }
-            else
-            {
-                t -= 2.625f / d1;
-                return n1 * t * t + 0.984375f;
+                case < 1 / d1:
+                    return n1 * t * t;
+                case < 2 / d1:
+                    t -= 1.5f / d1;
+                    return n1 * t * t + 0.75f;
+                case < 2.5 / d1:
+                    t -= 2.25f / d1;
+                    return n1 * t * t + 0.9375f;
+                default:
+                    t -= 2.625f / d1;
+                    return n1 * t * t + 0.984375f;
             }
         }
 

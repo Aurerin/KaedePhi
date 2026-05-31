@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
 
@@ -12,49 +13,67 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [JsonProperty("colorEvents", NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore)]
         [JsonConverter(typeof(ColorEventsConverter))]
-        public List<Event<byte[]>> ColorEvents { get; set; }
+        public List<Event<byte[]>>? ColorEvents { get; set; }
 
         /// <summary>
         /// 判定线纹理宽度缩放事件列表
         /// </summary>
         [JsonProperty("scaleXEvents", NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> ScaleXEvents { get; set; }
+        public List<Event<float>>? ScaleXEvents { get; set; }
 
         /// <summary>
         /// 判定线纹理高度缩放事件列表
         /// </summary>
         [JsonProperty("scaleYEvents", NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> ScaleYEvents { get; set; }
+        public List<Event<float>>? ScaleYEvents { get; set; }
 
         /// <summary>
         /// 判定线文字纹理事件列表
         /// </summary>
         [JsonProperty("textEvents", NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<string>> TextEvents { get; set; }
+        public List<Event<string>>? TextEvents { get; set; }
 
         /// <summary>
         /// 画笔事件列表，值为画笔大小
         /// </summary>
         [JsonProperty("paintEvents", NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> PaintEvents { get; set; }
+        public List<Event<float>>? PaintEvents { get; set; }
 
         /// <summary>
         /// 判定线动图播放进度事件列表，值为动图帧进度（0~1之间）
         /// </summary>
         [JsonProperty("gifEvents", NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<Event<float>> GifEvents { get; set; }
+        public List<Event<float>>? GifEvents { get; set; }
 
         /// <summary>
         /// 判定线倾斜事件列表，值为Z轴倾斜角度，顺时针为正
         /// </summary>
         [JsonProperty("inclineEvents", NullValueHandling = NullValueHandling.Ignore)]
-        public List<Event<float>> InclineEvents { get; set; }
+        public List<Event<float>>? InclineEvents { get; set; }
 
+        /// <summary>
+        /// 按事件的开始时间稳定排序所有事件。
+        /// </summary>
+        public void Sort()
+        {
+            ColorEvents = ColorEvents?.OrderBy(e => e.StartBeat).ToList();
+            ScaleXEvents = ScaleXEvents?.OrderBy(e => e.StartBeat).ToList();
+            ScaleYEvents = ScaleYEvents?.OrderBy(e => e.StartBeat).ToList();
+            TextEvents = TextEvents?.OrderBy(e => e.StartBeat).ToList();
+            PaintEvents = PaintEvents?.OrderBy(e => e.StartBeat).ToList();
+            GifEvents = GifEvents?.OrderBy(e => e.StartBeat).ToList();
+            InclineEvents = InclineEvents?.OrderBy(e => e.StartBeat).ToList();
+        }
+        
+        
+        /// <summary>
+        /// 深克隆当前 ExtendLayer 对象
+        /// </summary>
         public ExtendLayer Clone()
         {
             // 深拷贝，包括Event列表
