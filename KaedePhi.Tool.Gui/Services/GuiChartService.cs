@@ -71,7 +71,7 @@ public sealed class GuiChartService
         var detectedType = ChartGetType.GetType(text);
         _log.Information(log_step_detected, detectedType);
 
-        _log.Information(log_step_converting);
+        
         // 在后台线程执行耗时的格式转换
         var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType), ct);
 
@@ -79,7 +79,6 @@ public sealed class GuiChartService
         SourceFormat = detectedType;
         SourceFilePath = filePath;
 
-        _log.Information(log_step_saved);
         return (kpcChart, detectedType);
     }
 
@@ -108,6 +107,7 @@ public sealed class GuiChartService
 
     private Chart ConvertToKpc(string text, ChartType sourceType)
     {
+        _log.Information(log_step_converting);
         switch (sourceType)
         {
             case ChartType.RePhiEdit:

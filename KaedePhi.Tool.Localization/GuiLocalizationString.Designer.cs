@@ -366,6 +366,15 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 导出失败.
+        /// </summary>
+        public static string export_error_title {
+            get {
+                return ResourceManager.GetString("export_error_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 格式化输出（缩进）.
         /// </summary>
         public static string export_indented_output {
@@ -389,6 +398,15 @@ namespace KaedePhi.Tool.Localization {
         public static string export_stream_writing {
             get {
                 return ResourceManager.GetString("export_stream_writing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 导出成功.
+        /// </summary>
+        public static string export_success_title {
+            get {
+                return ResourceManager.GetString("export_success_title", resourceCulture);
             }
         }
         
@@ -501,11 +519,29 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 正在加载谱面....
+        /// </summary>
+        public static string import_loading {
+            get {
+                return ResourceManager.GetString("import_loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 流式加载.
         /// </summary>
         public static string import_stream_loading {
             get {
                 return ResourceManager.GetString("import_stream_loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 加载失败.
+        /// </summary>
+        public static string load_error_title {
+            get {
+                return ResourceManager.GetString("load_error_title", resourceCulture);
             }
         }
         
@@ -641,15 +677,6 @@ namespace KaedePhi.Tool.Localization {
         public static string log_step_loading {
             get {
                 return ResourceManager.GetString("log_step_loading", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 已保存至工作区。.
-        /// </summary>
-        public static string log_step_saved {
-            get {
-                return ResourceManager.GetString("log_step_saved", resourceCulture);
             }
         }
         
@@ -1122,6 +1149,15 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 工具运行失败.
+        /// </summary>
+        public static string tool_error_title {
+            get {
+                return ResourceManager.GetString("tool_error_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 将线性事件拟合为缓动曲线.
         /// </summary>
         public static string tool_fit_desc {
@@ -1194,6 +1230,15 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 工具运行成功.
+        /// </summary>
+        public static string tool_success_title {
+            get {
+                return ResourceManager.GetString("tool_success_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 将子判定线从父线坐标系解绑为绝对坐标.
         /// </summary>
         public static string tool_unbind_desc {
@@ -1208,60 +1253,6 @@ namespace KaedePhi.Tool.Localization {
         public static string tool_unbind_name {
             get {
                 return ResourceManager.GetString("tool_unbind_name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 正在加载谱面....
-        /// </summary>
-        public static string import_loading {
-            get {
-                return ResourceManager.GetString("import_loading", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 工具运行成功.
-        /// </summary>
-        public static string tool_success_title {
-            get {
-                return ResourceManager.GetString("tool_success_title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 工具运行失败.
-        /// </summary>
-        public static string tool_error_title {
-            get {
-                return ResourceManager.GetString("tool_error_title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 导出成功.
-        /// </summary>
-        public static string export_success_title {
-            get {
-                return ResourceManager.GetString("export_success_title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 导出失败.
-        /// </summary>
-        public static string export_error_title {
-            get {
-                return ResourceManager.GetString("export_error_title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 加载失败.
-        /// </summary>
-        public static string load_error_title {
-            get {
-                return ResourceManager.GetString("load_error_title", resourceCulture);
             }
         }
     }
