@@ -18,7 +18,7 @@ namespace KaedePhi.Core.PhiEdit
         public float GetValueAtBeat(float beat, float startValue)
         {
             //获得这个拍在这个事件的时间轴上的位置
-            float t = (beat - StartBeat) / (EndBeat - StartBeat);
+            var t = (beat - StartBeat) / (EndBeat - StartBeat);
             return EasingType.Interpolate(startValue, EndValue, t);
         }
 
@@ -34,7 +34,7 @@ namespace KaedePhi.Core.PhiEdit
         /// </summary>
         /// <param name="judgeLineIndex">判定线索引</param>
         /// <param name="head">格式头</param>
-        /// <returns>PhiEditor Chart格式字符串</returns>
+        /// <returns>PhiEditer Chart格式字符串</returns>
         public string ToString(int judgeLineIndex, string head)
         {
             if (head is "cm" or "cp")
