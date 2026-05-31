@@ -5,8 +5,19 @@ public static class EasingConverter
     /// <summary>
     /// KPC 缓动在 PE 中无对应项时抛出，用于触发切段拟合。
     /// </summary>
-    public sealed class EasingNotSupportedException(int nrcEasing)
-        : Exception($"KPC easing {nrcEasing} is unsupported in pe and requires linear slicing");
+    /// <param name="nrcEasing">KPC 缓动编号；贝塞尔事件传 -1。</param>
+    /// <param name="isBezier">是否为贝塞尔事件（贝塞尔曲线无法映射为单一缓动类型）。</param>
+    public sealed class EasingNotSupportedException(int nrcEasing, bool isBezier = false)
+        : Exception(isBezier
+            ? "Bezier easing cannot be mapped to a single PE easing type and requires linear slicing"
+            : $"KPC easing {nrcEasing} is unsupported in PE and requires linear slicing")
+    {
+        /// <summary>触发异常的 KPC 缓动编号（贝塞尔事件为 -1）。</summary>
+        public int NrcEasing { get; } = nrcEasing;
+
+        /// <summary>是否因贝塞尔事件触发。</summary>
+        public bool IsBezier { get; } = isBezier;
+    }
 
     public static int MapToKpc(int pe) => pe switch
     {
@@ -59,5 +70,5 @@ public static class EasingConverter
 
     public static Kpc.Easing ConvertEasing(Pe.Easing src) => new(MapToKpc((int)src));
     public static Pe.Easing ConvertEasing(Kpc.Easing src, bool isBezier = false)
-        => isBezier ? throw new EasingNotSupportedException(-1) : new Pe.Easing(MapToPe((int)src));
+        => isBezier ? new Pe.Easing(1) : new Pe.Easing(MapToPe((int)src));
 }
