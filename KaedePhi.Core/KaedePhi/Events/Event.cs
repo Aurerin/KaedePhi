@@ -52,12 +52,12 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// 模拟器保留字段
         /// </summary>
         public float StartTime { get; set; }
-        
+
         /// <summary>
         /// 事件结束拍
         /// </summary>
         public Beat EndBeat { get; set; } = new(new[] { 1, 0, 1 });
-        
+
         /// <summary>
         /// 模拟器保留字段
         /// </summary>
@@ -67,12 +67,12 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// 当此事件为文字事件时，此值为字体文件相对路径，默认cmdysj.ttf
         /// </summary>
         public string? Font { get; set; }
-        
+
         /// <summary>
         /// 保留字段
         /// </summary>
         public float FloorPosition { get; set; }
-        
+
         /// <summary>
         /// 获取某个拍在这个事件中的值（返回double，避免装箱和类型检查）
         /// </summary>
@@ -126,13 +126,13 @@ namespace KaedePhi.Core.KaedePhi.Events
         public float GetStartValueAsSingle()
         {
             if (typeof(T) == typeof(float))
-                return (float)(object)StartValue;
+                return (float)((object)StartValue ?? 0);
             if (typeof(T) == typeof(double))
-                return (float)(double)(object)StartValue;
+                return (float)(double)((object)StartValue ?? 0);
             if (typeof(T) == typeof(int))
-                return (int)(object)StartValue;
+                return (int)((object)StartValue ?? 0);
             if (typeof(T) == typeof(byte))
-                return (byte)(object)StartValue;
+                return (byte)((object)StartValue ?? 0);
             return Convert.ToSingle(StartValue);
         }
 
@@ -143,13 +143,13 @@ namespace KaedePhi.Core.KaedePhi.Events
         public float GetEndValueAsSingle()
         {
             if (typeof(T) == typeof(float))
-                return (float)(object)EndValue;
+                return (float)((object)EndValue ?? 0);
             if (typeof(T) == typeof(double))
-                return (float)(double)(object)EndValue;
+                return (float)(double)((object)EndValue ?? 0);
             if (typeof(T) == typeof(int))
-                return (int)(object)EndValue;
+                return (int)((object)EndValue ?? 0);
             if (typeof(T) == typeof(byte))
-                return (byte)(object)EndValue;
+                return (byte)((object)EndValue ?? 0);
             return Convert.ToSingle(EndValue);
         }
 
@@ -160,13 +160,13 @@ namespace KaedePhi.Core.KaedePhi.Events
         public int GetStartValueAsInt32()
         {
             if (typeof(T) == typeof(int))
-                return (int)(object)StartValue;
+                return (int)((object)StartValue ?? 0);
             if (typeof(T) == typeof(float))
-                return (int)(float)(object)StartValue;
+                return (int)(float)((object)StartValue ?? 0);
             if (typeof(T) == typeof(double))
-                return (int)(double)(object)StartValue;
+                return (int)(double)((object)StartValue ?? 0);
             if (typeof(T) == typeof(byte))
-                return (byte)(object)StartValue;
+                return (byte)((object)StartValue ?? 0);
             return Convert.ToInt32(StartValue);
         }
 
@@ -177,13 +177,13 @@ namespace KaedePhi.Core.KaedePhi.Events
         public int GetEndValueAsInt32()
         {
             if (typeof(T) == typeof(int))
-                return (int)(object)EndValue;
+                return (int)((object)EndValue ?? 0);
             if (typeof(T) == typeof(float))
-                return (int)(float)(object)EndValue;
+                return (int)(float)((object)EndValue ?? 0);
             if (typeof(T) == typeof(double))
-                return (int)(double)(object)EndValue;
+                return (int)(double)((object)EndValue ?? 0);
             if (typeof(T) == typeof(byte))
-                return (byte)(object)EndValue;
+                return (byte)((object)EndValue ?? 0);
             return Convert.ToInt32(EndValue);
         }
 
@@ -295,7 +295,7 @@ namespace KaedePhi.Core.KaedePhi.Events
             if (type == typeof(byte[]))
             {
                 var arr = (byte[])(object)value;
-                return (TValue)(object)arr.ToArray();
+                return (TValue)(object)arr?.ToArray();
             }
 
             // 不应到达此处，但提供兜底
@@ -314,12 +314,10 @@ namespace KaedePhi.Core.KaedePhi.Events
             };
 
             // BezierPoints: 直接Array.Copy，避免LINQ的ToArray()分配
-            if (BezierPoints != null)
-            {
-                var bp = new float[BezierPoints.Length];
-                Array.Copy(BezierPoints, bp, BezierPoints.Length);
-                clone.BezierPoints = bp;
-            }
+            var bp = new float[BezierPoints.Length];
+            Array.Copy(BezierPoints, bp, BezierPoints.Length);
+            clone.BezierPoints = bp;
+
 
             // 针对已知T类型优化：int/float/double/byte直接赋值，byte[]/string特殊处理
             if (typeof(T) == typeof(int) || typeof(T) == typeof(float) ||
@@ -334,10 +332,10 @@ namespace KaedePhi.Core.KaedePhi.Events
             {
                 // byte[]需要深拷贝
                 clone.StartValue = !Equals(StartValue, default(T))
-                    ? (T)(object)((byte[])(object)StartValue).ToArray()
+                    ? (T)(object)((byte[])(object)StartValue ?? Array.Empty<byte>()).ToArray()
                     : default;
                 clone.EndValue = !Equals(EndValue, default(T))
-                    ? (T)(object)((byte[])(object)EndValue).ToArray()
+                    ? (T)(object)((byte[])(object)EndValue ?? Array.Empty<byte>()).ToArray()
                     : default;
             }
             else

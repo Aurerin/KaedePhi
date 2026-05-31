@@ -5,7 +5,7 @@ namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 public static class Easing
 {
     public static Rpe.Easing ConvertEasing(Kpc.Easing src, bool isBezier)
-        => isBezier ? throw new EasingConverter.EasingNotSupportedException(-1): new Rpe.Easing(MapToPe((int)src));
+        => isBezier ? new Rpe.Easing(1) : new Rpe.Easing(MapToPe((int)src));
     public static Kpc.Easing ConvertEasing(Rpe.Easing src) => new(MapToKpc((int)src));
     public static Rpe.Easing ConvertEasing(Kpc.Easing src) => new(MapToPe((int)src));
     

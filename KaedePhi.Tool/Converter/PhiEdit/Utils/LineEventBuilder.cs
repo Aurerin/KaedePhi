@@ -462,7 +462,7 @@ public class LineEventBuilder
         try
         {
             if (src.IsBezier)
-                throw new EasingConverter.EasingNotSupportedException(-1);
+                throw new EasingConverter.EasingNotSupportedException(-1, isBezier: true);
             _ = EasingConverter.ConvertEasing(src.Easing);
             return [src];
         }
