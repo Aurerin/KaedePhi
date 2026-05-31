@@ -1,0 +1,25 @@
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+
+namespace KaedePhi.Core.RePhiEdit.Controls
+{
+    public class SizeControl : ControlBase
+    {
+        [JsonProperty("size")] public float Size { get; set; } = 1.0f;
+
+        private static readonly List<SizeControl> DefaultInstance = new()
+        {
+            new() { Easing = new Easing(1), Size = 1.0f, X = 0.0f },
+            new() { Easing = new Easing(1), Size = 1.0f, X = 9999999.0f }
+        };
+
+        [JsonIgnore]
+        public static List<SizeControl> Default
+            => DefaultInstance.ConvertAll(input => input.Clone() as SizeControl);
+
+        public override ControlBase Clone()
+        {
+            return new SizeControl { Easing = new Easing(Easing), X = X, Size = Size };
+        }
+    }
+}

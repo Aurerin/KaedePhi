@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Event.KaedePhi;
-using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
+using EventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 using JudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 
 namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
@@ -104,7 +104,7 @@ public static class FatherUnbindHelpers
     /// <summary>
     /// 传入语义：取 beat 时刻正在生效的事件插值（用于段起点）。O(log n) 二分查找。
     /// </summary>
-    public static double GetValIn(List<Kpc.Event<double>> events, Beat beat)
+    public static double GetValIn(List<KpcEvents.Event<double>> events, Beat beat)
     {
         if (events.Count == 0) return 0f;
         int lo = 0, hi = events.Count - 1, idx = -1;
@@ -127,7 +127,7 @@ public static class FatherUnbindHelpers
     /// <summary>
     /// 传出语义：取 beat 时刻即将结束的事件插值（用于段终点）。O(log n) 二分查找。
     /// </summary>
-    public static double GetValOut(List<Kpc.Event<double>> events, Beat beat)
+    public static double GetValOut(List<KpcEvents.Event<double>> events, Beat beat)
     {
         if (events.Count == 0) return 0f;
         int lo = 0, hi = events.Count - 1, idx = -1;
@@ -150,12 +150,12 @@ public static class FatherUnbindHelpers
     /// <summary>
     /// 按层顺序将某一类型的事件列表串行叠加合并。
     /// </summary>
-    public static List<Kpc.Event<double>> MergeLayerChannel(
+    public static List<KpcEvents.Event<double>> MergeLayerChannel(
         List<EventLayer> layers,
-        Func<EventLayer, List<Kpc.Event<double>>?> selector,
-        Func<List<Kpc.Event<double>>, List<Kpc.Event<double>>, List<Kpc.Event<double>>> merge)
+        Func<EventLayer, List<KpcEvents.Event<double>>?> selector,
+        Func<List<KpcEvents.Event<double>>, List<KpcEvents.Event<double>>, List<KpcEvents.Event<double>>> merge)
     {
-        var result = new List<Kpc.Event<double>>();
+        var result = new List<KpcEvents.Event<double>>();
         return layers.Select(selector)
             .Where(ch => ch is { Count: > 0 })
             .Select(ch => ch)
@@ -231,7 +231,7 @@ public static class FatherUnbindHelpers
     }
 
     /// <summary>获取事件列表的拍范围（最小 StartBeat，最大 EndBeat）。列表为空时返回 (0, 0)。</summary>
-    public static (Beat Min, Beat Max) GetEventRange(List<Kpc.Event<double>> events)
+    public static (Beat Min, Beat Max) GetEventRange(List<KpcEvents.Event<double>> events)
         => events.Count == 0
             ? (new Beat(0), new Beat(0))
             : (events.Min(e => e.StartBeat), events.Max(e => e.EndBeat));
@@ -242,10 +242,10 @@ public static class FatherUnbindHelpers
     /// </summary>
     public static void WriteResultToLine(
         JudgeLine line,
-        List<Kpc.Event<double>> newXEvents,
-        List<Kpc.Event<double>> newYEvents,
-        List<Kpc.Event<double>> fatherRotateEvents,
-        Func<List<Kpc.Event<double>>, List<Kpc.Event<double>>, List<Kpc.Event<double>>> merge)
+        List<KpcEvents.Event<double>> newXEvents,
+        List<KpcEvents.Event<double>> newYEvents,
+        List<KpcEvents.Event<double>> fatherRotateEvents,
+        Func<List<KpcEvents.Event<double>>, List<KpcEvents.Event<double>>, List<KpcEvents.Event<double>>> merge)
     {
         for (var i = 1; i < line.EventLayers.Count; i++)
         {
@@ -275,11 +275,11 @@ public static class FatherUnbindHelpers
     /// 使用 readonly record struct 保证值语义，可安全在多线程闭包中捕获。
     /// </summary>
     public readonly record struct EventChannels(
-        List<Kpc.Event<double>> Fx,
-        List<Kpc.Event<double>> Fy,
-        List<Kpc.Event<double>> Fr,
-        List<Kpc.Event<double>> Tx,
-        List<Kpc.Event<double>> Ty);
+        List<KpcEvents.Event<double>> Fx,
+        List<KpcEvents.Event<double>> Fy,
+        List<KpcEvents.Event<double>> Fr,
+        List<KpcEvents.Event<double>> Tx,
+        List<KpcEvents.Event<double>> Ty);
 
     /// <summary>
     /// 合并父子线五个通道事件，统一 EventChannels 拼装顺序。
@@ -287,7 +287,7 @@ public static class FatherUnbindHelpers
     public static EventChannels MergeChannels(
         List<EventLayer> targetLayers,
         List<EventLayer> fatherLayers,
-        Func<List<Kpc.Event<double>>, List<Kpc.Event<double>>, List<Kpc.Event<double>>> merge)
+        Func<List<KpcEvents.Event<double>>, List<KpcEvents.Event<double>>, List<KpcEvents.Event<double>>> merge)
         => new(
             Fx: MergeLayerChannel(fatherLayers, l => l.MoveXEvents, merge),
             Fy: MergeLayerChannel(fatherLayers, l => l.MoveYEvents, merge),
@@ -312,11 +312,11 @@ public static class FatherUnbindHelpers
     /// <summary>
     /// 并行等间隔采样：对 <paramref name="beats"/> 中每一段计算绝对坐标，返回按顺序排列的 X/Y 事件列表。
     /// </summary>
-    public static (List<Kpc.Event<double>> x, List<Kpc.Event<double>> y) EqualSpacingSampling(
+    public static (List<KpcEvents.Event<double>> x, List<KpcEvents.Event<double>> y) EqualSpacingSampling(
         List<Beat> beats, Beat max, Beat step, EventChannels ch)
     {
-        var xBag = new ConcurrentBag<(int i, Kpc.Event<double> evt)>();
-        var yBag = new ConcurrentBag<(int i, Kpc.Event<double> evt)>();
+        var xBag = new ConcurrentBag<(int i, KpcEvents.Event<double> evt)>();
+        var yBag = new ConcurrentBag<(int i, KpcEvents.Event<double> evt)>();
 
         Parallel.For(0, beats.Count, i =>
         {
@@ -335,7 +335,7 @@ public static class FatherUnbindHelpers
     /// 计算单个采样段 [<paramref name="beat"/>, <paramref name="next"/>] 的 X/Y 绝对坐标事件。
     /// 段起点取 GetValIn（正在生效的插值），段终点取 GetValOut（即将结束的插值）。
     /// </summary>
-    public static (Kpc.Event<double> x, Kpc.Event<double> y) ComputeBeatSegment(
+    public static (KpcEvents.Event<double> x, KpcEvents.Event<double> y) ComputeBeatSegment(
         Beat beat, Beat next, EventChannels ch)
     {
         var (startAbsX, startAbsY) = GetLinePos(
@@ -346,8 +346,8 @@ public static class FatherUnbindHelpers
             GetValOut(ch.Tx, next), GetValOut(ch.Ty, next));
 
         return (
-            new Kpc.Event<double> { StartBeat = beat, EndBeat = next, StartValue = startAbsX, EndValue = endAbsX },
-            new Kpc.Event<double> { StartBeat = beat, EndBeat = next, StartValue = startAbsY, EndValue = endAbsY }
+            new KpcEvents.Event<double> { StartBeat = beat, EndBeat = next, StartValue = startAbsX, EndValue = endAbsX },
+            new KpcEvents.Event<double> { StartBeat = beat, EndBeat = next, StartValue = startAbsY, EndValue = endAbsY }
         );
     }
 
@@ -405,12 +405,12 @@ public static class FatherUnbindHelpers
     /// 并行自适应采样：对 <paramref name="keyBeats"/> 中的每个区间调用
     /// <see cref="AdaptiveSampleInterval"/>，汇总后返回 X/Y 事件列表。
     /// </summary>
-    public static (List<Kpc.Event<double>> x, List<Kpc.Event<double>> y) RunAdaptiveSampling(
+    public static (List<KpcEvents.Event<double>> x, List<KpcEvents.Event<double>> y) RunAdaptiveSampling(
         List<Beat> keyBeats, Beat step, double tolerance, EventChannels ch)
     {
         var segmentCount = keyBeats.Count - 1;
-        var segmentsX = new List<Kpc.Event<double>>[segmentCount];
-        var segmentsY = new List<Kpc.Event<double>>[segmentCount];
+        var segmentsX = new List<KpcEvents.Event<double>>[segmentCount];
+        var segmentsY = new List<KpcEvents.Event<double>>[segmentCount];
         for (var i = 0; i < segmentCount; i++)
         {
             segmentsX[i] = [];
@@ -435,8 +435,8 @@ public static class FatherUnbindHelpers
             segmentsY[ki].AddRange(sy);
         });
 
-        var resX = new List<Kpc.Event<double>>();
-        var resY = new List<Kpc.Event<double>>();
+        var resX = new List<KpcEvents.Event<double>>();
+        var resY = new List<KpcEvents.Event<double>>();
         foreach (var seg in segmentsX) resX.AddRange(seg);
         foreach (var seg in segmentsY) resY.AddRange(seg);
         return (resX, resY);
@@ -446,13 +446,13 @@ public static class FatherUnbindHelpers
     /// 对单个区间 [<paramref name="iStart"/>, <paramref name="iEnd"/>] 进行自适应分段采样：
     /// 以 <paramref name="step"/> 推进，当相邻采样点误差超出容差时插入切割点，否则延续当前段。
     /// </summary>
-    private static (List<Kpc.Event<double>> x, List<Kpc.Event<double>> y) AdaptiveSampleInterval(
+    private static (List<KpcEvents.Event<double>> x, List<KpcEvents.Event<double>> y) AdaptiveSampleInterval(
         Beat iStart, Beat iEnd, Beat step, double tolerance,
         Func<Beat, (double X, double Y)> absPosIn,
         Func<Beat, (double X, double Y)> absPosOut)
     {
-        var localX = new List<Kpc.Event<double>>();
-        var localY = new List<Kpc.Event<double>>();
+        var localX = new List<KpcEvents.Event<double>>();
+        var localY = new List<KpcEvents.Event<double>>();
 
         var end = absPosOut(iEnd);
         var segStart = iStart;
@@ -466,9 +466,9 @@ public static class FatherUnbindHelpers
 
             if (isLast || NeedsAdaptiveCut(seg, nextPos, end, segStart, iEnd, next, tolerance))
             {
-                localX.Add(new Kpc.Event<double>
+                localX.Add(new KpcEvents.Event<double>
                     { StartBeat = segStart, EndBeat = next, StartValue = seg.X, EndValue = nextPos.X });
-                localY.Add(new Kpc.Event<double>
+                localY.Add(new KpcEvents.Event<double>
                     { StartBeat = segStart, EndBeat = next, StartValue = seg.Y, EndValue = nextPos.Y });
                 segStart = next;
                 seg = nextPos;

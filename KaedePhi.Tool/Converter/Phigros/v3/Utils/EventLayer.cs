@@ -4,9 +4,9 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
 public static class EventLayer
 {
-    public static Kpc.EventLayer ConvertEventLayer(PhigrosJudgeLine src, double horizonBeat)
+    public static KpcEvents.EventLayer ConvertEventLayer(PhigrosJudgeLine src, double horizonBeat)
     {
-        var result = new Kpc.EventLayer();
+        var result = new KpcEvents.EventLayer();
         var eventListCompress = new Tool.Event.KaedePhi.EventCompressor<double>(); 
 
         var moveX = Event.ConvertMoveAxisEvents(

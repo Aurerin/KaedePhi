@@ -2,33 +2,33 @@
 
 public static class Control
 {
-    public static Kpc.XControl ConvertXControl(Rpe.XControl src) =>
+    public static KpcControls.XControl ConvertXControl(RpeControls.XControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Pos = src.Pos };
 
-    public static Rpe.XControl ConvertXControl(Kpc.XControl src) =>
+    public static RpeControls.XControl ConvertXControl(KpcControls.XControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Pos = src.Pos };
 
-    public static Kpc.AlphaControl ConvertAlphaControl(Rpe.AlphaControl src) =>
+    public static KpcControls.AlphaControl ConvertAlphaControl(RpeControls.AlphaControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Alpha = src.Alpha };
 
-    public static Rpe.AlphaControl ConvertAlphaControl(Kpc.AlphaControl src) =>
+    public static RpeControls.AlphaControl ConvertAlphaControl(KpcControls.AlphaControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Alpha = src.Alpha };
 
-    public static Kpc.SizeControl ConvertSizeControl(Rpe.SizeControl src) =>
+    public static KpcControls.SizeControl ConvertSizeControl(RpeControls.SizeControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Size = src.Size };
 
-    public static Rpe.SizeControl ConvertSizeControl(Kpc.SizeControl src) =>
+    public static RpeControls.SizeControl ConvertSizeControl(KpcControls.SizeControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Size = src.Size };
 
-    public static Kpc.SkewControl ConvertSkewControl(Rpe.SkewControl src) =>
+    public static KpcControls.SkewControl ConvertSkewControl(RpeControls.SkewControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Skew = src.Skew };
 
-    public static Rpe.SkewControl ConvertSkewControl(Kpc.SkewControl src) =>
+    public static RpeControls.SkewControl ConvertSkewControl(KpcControls.SkewControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Skew = src.Skew };
 
-    public static Kpc.YControl ConvertYControl(Rpe.YControl src) =>
+    public static KpcControls.YControl ConvertYControl(RpeControls.YControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Y = src.Y };
 
-    public static Rpe.YControl ConvertYControl(Kpc.YControl src) =>
+    public static RpeControls.YControl ConvertYControl(KpcControls.YControl src) =>
         new() { Easing = Easing.ConvertEasing(src.Easing), X = src.X, Y = src.Y };
 }

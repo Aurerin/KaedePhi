@@ -1,12 +1,12 @@
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using global::KaedePhi.Tool.JudgeLines.KaedePhi;
-using AlphaControl = KaedePhi.Core.KaedePhi.AlphaControl;
-using ExtendLayer = KaedePhi.Core.KaedePhi.ExtendLayer;
+using AlphaControl = KaedePhi.Core.KaedePhi.Controls.AlphaControl;
+using ExtendLayer = KaedePhi.Core.KaedePhi.Events.ExtendLayer;
 using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
-using SizeControl = KaedePhi.Core.KaedePhi.SizeControl;
-using SkewControl = KaedePhi.Core.KaedePhi.SkewControl;
-using XControl = KaedePhi.Core.KaedePhi.XControl;
-using YControl = KaedePhi.Core.KaedePhi.YControl;
+using SizeControl = KaedePhi.Core.KaedePhi.Controls.SizeControl;
+using SkewControl = KaedePhi.Core.KaedePhi.Controls.SkewControl;
+using XControl = KaedePhi.Core.KaedePhi.Controls.XControl;
+using YControl = KaedePhi.Core.KaedePhi.Controls.YControl;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 

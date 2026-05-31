@@ -2,6 +2,7 @@
 using KaedePhi.Core.Common;
 using KaedePhi.Core.KaedePhi;
 using KaedePhi.Core.Utils;
+using KpcEvents = KaedePhi.Core.KaedePhi.Events;
 
 namespace KaedePhi.Tests.KaedePhi;
 
@@ -12,7 +13,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_AtStart_ReturnsStartValue()
     {
-        var evt = new Event<double>
+        var evt = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 1, 0, 1 }),
@@ -29,7 +30,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_AtEnd_ReturnsEndValue()
     {
-        var evt = new Event<double>
+        var evt = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 1, 0, 1 }),
@@ -46,7 +47,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_AtMiddle_ReturnsInterpolatedValue()
     {
-        var evt = new Event<double>
+        var evt = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 2, 0, 1 }),
@@ -63,7 +64,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_BeforeStart_ReturnsStartValue()
     {
-        var evt = new Event<double>
+        var evt = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 1, 0, 1 }),
             EndBeat = new Beat(new[] { 2, 0, 1 }),
@@ -80,7 +81,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_AfterEnd_ReturnsEndValue()
     {
-        var evt = new Event<double>
+        var evt = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 1, 0, 1 }),
@@ -100,7 +101,7 @@ public class EventTests
     [InlineData(100.0, 100.0)]
     public void GetValueAtBeat_WithFloat_AtStart_ReturnsStartValue(float startVal, float expected)
     {
-        var evt = new Event<float>
+        var evt = new KpcEvents.Event<float>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 1, 0, 1 }),
@@ -118,7 +119,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_WithInt_AtMiddle_ReturnsInterpolatedValue()
     {
-        var evt = new Event<int>
+        var evt = new KpcEvents.Event<int>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 2, 0, 1 }),
@@ -140,7 +141,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeatAsDouble_AtMiddle_ReturnsInterpolatedValue()
     {
-        var evt = new Event<float>
+        var evt = new KpcEvents.Event<float>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 2, 0, 1 }),
@@ -158,7 +159,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsDouble_WithDouble_ReturnsDirectly()
     {
-        var evt = new Event<double> { StartValue = 42.5 };
+        var evt = new KpcEvents.Event<double> { StartValue = 42.5 };
 
         evt.GetStartValueAsDouble().Should().Be(42.5);
     }
@@ -166,7 +167,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsDouble_WithFloat_ConvertsCorrectly()
     {
-        var evt = new Event<float> { StartValue = 42.5f };
+        var evt = new KpcEvents.Event<float> { StartValue = 42.5f };
 
         evt.GetStartValueAsDouble().Should().BeApproximately(42.5, 1e-6);
     }
@@ -174,7 +175,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsDouble_WithInt_ConvertsCorrectly()
     {
-        var evt = new Event<int> { StartValue = 42 };
+        var evt = new KpcEvents.Event<int> { StartValue = 42 };
 
         evt.GetStartValueAsDouble().Should().Be(42.0);
     }
@@ -182,7 +183,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsSingle_WithFloat_ReturnsDirectly()
     {
-        var evt = new Event<float> { StartValue = 42.5f };
+        var evt = new KpcEvents.Event<float> { StartValue = 42.5f };
 
         evt.GetStartValueAsSingle().Should().Be(42.5f);
     }
@@ -190,7 +191,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsSingle_WithDouble_ConvertsCorrectly()
     {
-        var evt = new Event<double> { StartValue = 42.5 };
+        var evt = new KpcEvents.Event<double> { StartValue = 42.5 };
 
         evt.GetStartValueAsSingle().Should().Be(42.5f);
     }
@@ -198,7 +199,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsInt32_WithInt_ReturnsDirectly()
     {
-        var evt = new Event<int> { StartValue = 42 };
+        var evt = new KpcEvents.Event<int> { StartValue = 42 };
 
         evt.GetStartValueAsInt32().Should().Be(42);
     }
@@ -206,7 +207,7 @@ public class EventTests
     [Fact]
     public void GetStartValueAsInt32_WithDouble_TruncatesCorrectly()
     {
-        var evt = new Event<double> { StartValue = 42.7 };
+        var evt = new KpcEvents.Event<double> { StartValue = 42.7 };
 
         evt.GetStartValueAsInt32().Should().Be(42);
     }
@@ -218,7 +219,7 @@ public class EventTests
     [Fact]
     public void Clone_WithDouble_CreatesIndependentCopy()
     {
-        var original = new Event<double>
+        var original = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 1, 0, 1 }),
@@ -245,7 +246,7 @@ public class EventTests
     [Fact]
     public void Clone_WithFloat_CreatesIndependentCopy()
     {
-        var original = new Event<float>
+        var original = new KpcEvents.Event<float>
         {
             StartValue = 1.0f,
             EndValue = 2.0f,
@@ -265,7 +266,7 @@ public class EventTests
     [Fact]
     public void Clone_WithInt_CreatesIndependentCopy()
     {
-        var original = new Event<int>
+        var original = new KpcEvents.Event<int>
         {
             StartValue = 10,
             EndValue = 20,
@@ -285,7 +286,7 @@ public class EventTests
     [Fact]
     public void Clone_WithByteArray_CreatesDeepCopy()
     {
-        var original = new Event<byte[]>
+        var original = new KpcEvents.Event<byte[]>
         {
             StartValue = new byte[] { 1, 2, 3 },
             EndValue = new byte[] { 4, 5, 6 },
@@ -306,7 +307,7 @@ public class EventTests
     [Fact]
     public void Clone_WithBezierPoints_CopiesArray()
     {
-        var original = new Event<double>
+        var original = new KpcEvents.Event<double>
         {
             IsBezier = true,
             BezierPoints = new float[] { 0.1f, 0.2f, 0.3f, 0.4f },
@@ -328,7 +329,7 @@ public class EventTests
     [Fact]
     public void Clone_CopiesBeatCorrectly()
     {
-        var original = new Event<double>
+        var original = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 1, 1, 2 }),
             EndBeat = new Beat(new[] { 3, 1, 4 }),
@@ -353,7 +354,7 @@ public class EventTests
     [Fact]
     public void GetValueAtBeat_WithEasingLeft_ClampsCorrectly()
     {
-        var evt = new Event<double>
+        var evt = new KpcEvents.Event<double>
         {
             StartBeat = new Beat(new[] { 0, 0, 1 }),
             EndBeat = new Beat(new[] { 2, 0, 1 }),
@@ -380,7 +381,7 @@ public class EventTests
     [Fact]
     public void NewEvent_HasDefaultValues()
     {
-        var evt = new Event<double>();
+        var evt = new KpcEvents.Event<double>();
 
         evt.IsBezier.Should().BeFalse();
         evt.EasingLeft.Should().Be(0.0f);
@@ -392,7 +393,7 @@ public class EventTests
     [Fact]
     public void NewEvent_HasDefaultBeats()
     {
-        var evt = new Event<double>();
+        var evt = new KpcEvents.Event<double>();
 
         ((double)evt.StartBeat).Should().Be(0.0);
         ((double)evt.EndBeat).Should().Be(1.0);

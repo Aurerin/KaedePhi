@@ -32,16 +32,16 @@ namespace KaedePhi.Core.RePhiEdit
                 judgeLine.Extended.Anticipation();
 
                 // 如果判定线上有任何类型的Control组为空或null，则设定一个默认值
-                if (ControlsIsNullOrEmpty(judgeLine.AlphaControls.Cast<ControlBase>().ToList()))
-                    judgeLine.AlphaControls = AlphaControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.PositionControls.Cast<ControlBase>().ToList()))
-                    judgeLine.PositionControls = XControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.SizeControls.Cast<ControlBase>().ToList()))
-                    judgeLine.SizeControls = SizeControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.SkewControls.Cast<ControlBase>().ToList()))
-                    judgeLine.SkewControls = SkewControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.YControls.Cast<ControlBase>().ToList()))
-                    judgeLine.YControls = YControl.Default;
+                if (ControlsIsNullOrEmpty(judgeLine.AlphaControls.Cast<Controls.ControlBase>().ToList()))
+                    judgeLine.AlphaControls = Controls.AlphaControl.Default;
+                if (ControlsIsNullOrEmpty(judgeLine.PositionControls.Cast<Controls.ControlBase>().ToList()))
+                    judgeLine.PositionControls = Controls.XControl.Default;
+                if (ControlsIsNullOrEmpty(judgeLine.SizeControls.Cast<Controls.ControlBase>().ToList()))
+                    judgeLine.SizeControls = Controls.SizeControl.Default;
+                if (ControlsIsNullOrEmpty(judgeLine.SkewControls.Cast<Controls.ControlBase>().ToList()))
+                    judgeLine.SkewControls = Controls.SkewControl.Default;
+                if (ControlsIsNullOrEmpty(judgeLine.YControls.Cast<Controls.ControlBase>().ToList()))
+                    judgeLine.YControls = Controls.YControl.Default;
                 
                 // 如果判定线没有任何音符，则将音符列表设置为null
                 if (judgeLine.Notes?.Count == 0)
@@ -49,7 +49,7 @@ namespace KaedePhi.Core.RePhiEdit
             }
         }
 
-        private static bool ControlsIsNullOrEmpty(List<ControlBase>? controls)
+        private static bool ControlsIsNullOrEmpty(List<Controls.ControlBase>? controls)
         {
             return controls is null || controls.Count == 0;
         }

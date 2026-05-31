@@ -2,7 +2,7 @@
 using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
-namespace KaedePhi.Core.RePhiEdit
+namespace KaedePhi.Core.RePhiEdit.Events
 {
     public class EventLayer
     {

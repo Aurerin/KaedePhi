@@ -98,7 +98,7 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
             progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
-            List<Kpc.Event<double>> Merge(List<Kpc.Event<double>> a, List<Kpc.Event<double>> b)
+            List<KpcEvents.Event<double>> Merge(List<KpcEvents.Event<double>> a, List<KpcEvents.Event<double>> b)
                 => _merger.EventListMerge(a, b, precision);
         }
         catch (Exception ex)

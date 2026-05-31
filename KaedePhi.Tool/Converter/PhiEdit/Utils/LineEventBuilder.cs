@@ -1,9 +1,9 @@
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using global::KaedePhi.Tool.Layer.KaedePhi;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using KpcEasing = KaedePhi.Core.KaedePhi.Easing;
-using KpcEventLayer = KaedePhi.Core.KaedePhi.EventLayer;
+using KpcEventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
@@ -76,7 +76,7 @@ public class LineEventBuilder
     /// <summary>
     /// 转换 Alpha 事件：PE 的 cf 不支持缓动，需先按单事件切段并压缩，再写入线性事件。
     /// </summary>
-    public void ConvertAlphaEvents(Pe.JudgeLine target, List<Kpc.Event<int>>? sourceEvents)
+    public void ConvertAlphaEvents(Pe.JudgeLine target, List<KpcEvents.Event<int>>? sourceEvents)
     {
         if (sourceEvents == null || sourceEvents.Count == 0) return;
 
@@ -130,7 +130,7 @@ public class LineEventBuilder
     /// <summary>
     /// 转换 Speed 事件：PE 无速度事件，仅导出帧。
     /// </summary>
-    public void ConvertSpeedFrames(Pe.JudgeLine target, List<Kpc.Event<float>>? sourceEvents)
+    public void ConvertSpeedFrames(Pe.JudgeLine target, List<KpcEvents.Event<float>>? sourceEvents)
     {
         if (sourceEvents == null || sourceEvents.Count == 0) return;
 
@@ -188,7 +188,7 @@ public class LineEventBuilder
     public void ConvertScalarEvents(
         List<Pe.Frame> targetFrames,
         List<Pe.Event>? targetEvents,
-        List<Kpc.Event<double>>? sourceEvents,
+        List<KpcEvents.Event<double>>? sourceEvents,
         Func<float, float> valueTransform,
         string channelName)
     {
@@ -199,8 +199,8 @@ public class LineEventBuilder
 
     private void ProcessMoveInterval(
         Pe.JudgeLine target,
-        List<Kpc.Event<double>> xEvents,
-        List<Kpc.Event<double>> yEvents,
+        List<KpcEvents.Event<double>> xEvents,
+        List<KpcEvents.Event<double>> yEvents,
         float start, float end,
         ref double lastX, ref double lastY)
     {
@@ -234,7 +234,7 @@ public class LineEventBuilder
     private void EmitAlignedMoveSegment(
         Pe.JudgeLine target,
         float start, float end,
-        Kpc.Event<double>? activeX, Kpc.Event<double>? activeY,
+        KpcEvents.Event<double>? activeX, KpcEvents.Event<double>? activeY,
         ref double lastX, ref double lastY)
     {
         // 对于精确覆盖当前区间的事件，直接取 StartValue/EndValue；
@@ -291,7 +291,7 @@ public class LineEventBuilder
     }
 
     private void WarnMoveSegmentMisalignment(
-        Kpc.Event<double>? activeX, Kpc.Event<double>? activeY,
+        KpcEvents.Event<double>? activeX, KpcEvents.Event<double>? activeY,
         bool xAligned, bool yAligned,
         float start, float end)
     {
@@ -319,15 +319,15 @@ public class LineEventBuilder
         }
     }
 
-    private static bool IsExactlyCovering(Kpc.Event<double>? ev, float start, float end)
+    private static bool IsExactlyCovering(KpcEvents.Event<double>? ev, float start, float end)
         => ev != null
            && Math.Abs((double)ev.StartBeat - start) <= FloatEpsilon
            && Math.Abs((double)ev.EndBeat - end) <= FloatEpsilon;
 
     private void EmitCutMoveSegments(
         Pe.JudgeLine target,
-        List<Kpc.Event<double>> xEvents,
-        List<Kpc.Event<double>> yEvents,
+        List<KpcEvents.Event<double>> xEvents,
+        List<KpcEvents.Event<double>> yEvents,
         float start, float end,
         ref double lastX, ref double lastY)
     {
@@ -387,7 +387,7 @@ public class LineEventBuilder
     private void ConvertScalarEventsInternal<T>(
         List<Pe.Frame> targetFrames,
         List<Pe.Event>? targetEvents,
-        List<Kpc.Event<T>>? sourceEvents,
+        List<KpcEvents.Event<T>>? sourceEvents,
         Func<float, float> valueTransform,
         string channelName)
     {
@@ -444,11 +444,11 @@ public class LineEventBuilder
         }
     }
 
-    private List<Kpc.Event<double>> ExpandEventsForUnsupportedEasing(
-        List<Kpc.Event<double>> source,
+    private List<KpcEvents.Event<double>> ExpandEventsForUnsupportedEasing(
+        List<KpcEvents.Event<double>> source,
         string channel)
     {
-        var expanded = new List<Kpc.Event<double>>();
+        var expanded = new List<KpcEvents.Event<double>>();
         foreach (var ev in source.OrderBy(e => (double)e.StartBeat))
         {
             expanded.AddRange(ExpandUnsupportedEasing(ev, $"{channel}@{(double)ev.StartBeat:F3}"));
@@ -457,7 +457,7 @@ public class LineEventBuilder
         return expanded;
     }
 
-    private List<Kpc.Event<T>> ExpandUnsupportedEasing<T>(Kpc.Event<T> src, string context)
+    private List<KpcEvents.Event<T>> ExpandUnsupportedEasing<T>(KpcEvents.Event<T> src, string context)
     {
         try
         {
@@ -491,7 +491,7 @@ public class LineEventBuilder
 
     #region Common Helpers
 
-    private static List<float> CollectBoundaries(params List<Kpc.Event<double>>[] eventLists)
+    private static List<float> CollectBoundaries(params List<KpcEvents.Event<double>>[] eventLists)
     {
         var boundaries = new SortedSet<float>();
         foreach (var list in eventLists)
@@ -506,7 +506,7 @@ public class LineEventBuilder
         return boundaries.ToList();
     }
 
-    private static Kpc.Event<double>? FindActiveEvent(List<Kpc.Event<double>> events, Beat beat)
+    private static KpcEvents.Event<double>? FindActiveEvent(List<KpcEvents.Event<double>> events, Beat beat)
     {
         var beatValue = (double)beat;
         // 二分查找：找到最后一个 StartBeat <= beatValue + FloatEpsilon 的事件
@@ -559,7 +559,7 @@ public class LineEventBuilder
            || (layer.AlphaEvents?.Count ?? 0) > 0
            || (layer.SpeedEvents?.Count ?? 0) > 0;
 
-    private void WarnIfEventPayloadUnsupported<T>(IEnumerable<Kpc.Event<T>> events, string channel)
+    private void WarnIfEventPayloadUnsupported<T>(IEnumerable<KpcEvents.Event<T>> events, string channel)
     {
         foreach (var e in events)
         {

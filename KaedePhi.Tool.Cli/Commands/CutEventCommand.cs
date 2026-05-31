@@ -2,7 +2,7 @@
 using KaedePhi.Tool.Cli.Settings;
 using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Layer.KaedePhi;
-using EventLayer = KaedePhi.Core.KaedePhi.EventLayer;
+using EventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 
 namespace KaedePhi.Tool.Cli.Commands;
 

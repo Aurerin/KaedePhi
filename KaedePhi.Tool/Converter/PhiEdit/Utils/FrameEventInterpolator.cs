@@ -1,4 +1,4 @@
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KpcEasing = KaedePhi.Core.KaedePhi.Easing;
 
@@ -43,7 +43,7 @@ public class FrameEventInterpolator
     /// <summary>
     /// 构建 Move 轴（X 或 Y）事件列表。
     /// </summary>
-    public List<Kpc.Event<double>>? BuildMoveAxisEvents(
+    public List<KpcEvents.Event<double>>? BuildMoveAxisEvents(
         List<Pe.MoveFrame>? frames,
         List<Pe.MoveEvent>? events,
         double horizonBeat,
@@ -61,7 +61,7 @@ public class FrameEventInterpolator
 
         if (boundaries.Count < 2) return null;
 
-        var result = new List<Kpc.Event<double>>(boundaries.Count - 1);
+        var result = new List<KpcEvents.Event<double>>(boundaries.Count - 1);
         for (var i = 0; i < boundaries.Count - 1; i++)
         {
             var startBeat = boundaries[i];
@@ -81,7 +81,7 @@ public class FrameEventInterpolator
             if (activeEvent != null)
             {
                 var eventStartSource = ResolveMoveEventStartValue(activeEvent, orderedFrames, orderedEventsByEnd);
-                result.Add(new Kpc.Event<double>
+                result.Add(new KpcEvents.Event<double>
                 {
                     StartBeat = new Beat(startBeat),
                     EndBeat = new Beat(endBeat),
@@ -104,7 +104,7 @@ public class FrameEventInterpolator
     /// <summary>
     /// 构建标量通道（旋转、透明度、速度）事件列表。
     /// </summary>
-    public List<Kpc.Event<T>>? BuildScalarEvents<T>(
+    public List<KpcEvents.Event<T>>? BuildScalarEvents<T>(
         List<Pe.Frame>? frames,
         List<Pe.Event>? events,
         double horizonBeat,
@@ -121,7 +121,7 @@ public class FrameEventInterpolator
 
         if (boundaries.Count < 2) return null;
 
-        var result = new List<Kpc.Event<T>>(boundaries.Count - 1);
+        var result = new List<KpcEvents.Event<T>>(boundaries.Count - 1);
         for (var i = 0; i < boundaries.Count - 1; i++)
         {
             var startBeat = boundaries[i];
@@ -140,7 +140,7 @@ public class FrameEventInterpolator
             if (activeEvent != null)
             {
                 var eventStartSource = ResolveScalarEventStartValue(activeEvent, orderedFrames, orderedEventsByEnd);
-                result.Add(new Kpc.Event<T>
+                result.Add(new KpcEvents.Event<T>
                 {
                     StartBeat = new Beat(startBeat),
                     EndBeat = new Beat(endBeat),
@@ -236,7 +236,7 @@ public class FrameEventInterpolator
         return (float)((beat - eventStartBeat) / duration);
     }
 
-    private static Kpc.Event<T> CreateConstantEvent<T>(double startBeat, double endBeat, T value) => new()
+    private static KpcEvents.Event<T> CreateConstantEvent<T>(double startBeat, double endBeat, T value) => new()
     {
         StartBeat = new Beat(startBeat),
         EndBeat = new Beat(endBeat),
