@@ -20,7 +20,7 @@ public class RenderConfig
     /// <summary>每拍格线细分数（1=只绘节拍线，4=绘四分音符线，默认 2）</summary>
     public int BeatSubdivisions { get; set; } = 2;
 
-    // ---- 新增渲染参数 ----
+    #region 新增渲染参数
 
     /// <summary>采样范围填充比例（用于自动计算值域范围的上下边距，默认 0.10）</summary>
     public double RangePaddingRatio { get; set; } = 0.10;
@@ -36,5 +36,7 @@ public class RenderConfig
 
     /// <summary>最小值域半宽比例（相对于中心值的比例，默认 0.15）</summary>
     public double MinValueRangeHalfRatio { get; set; } = 0.15;
+
+    #endregion
 }
 

@@ -29,11 +29,11 @@ namespace KaedePhi.Core.RePhiEdit.Events
         public List<Event<float>>? RotateEvents { get; set; } // 旋转事件
 
         /// <summary>
-        /// 透明度事件列表
+        /// 不透明度事件列表
         /// </summary>
         [JsonProperty("alphaEvents", DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore)]
-        public List<Event<int>>? AlphaEvents { get; set; } // 透明度事件
+        public List<Event<int>>? AlphaEvents { get; set; } // 不透明度事件
 
         /// <summary>
         /// 速度事件列表

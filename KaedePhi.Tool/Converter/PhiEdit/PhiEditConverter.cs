@@ -5,13 +5,17 @@ using Meta = KaedePhi.Core.KaedePhi.Meta;
 namespace KaedePhi.Tool.Converter.PhiEdit;
 
 /// <summary>
-/// PhiEdit Converter.
-/// ToKpc: TInOptions = PhiEditToKpcConvertOptions.
-/// FromKpc: TOutOptions = KpcToPhiEditConvertOptions.
+/// PhiEdit 格式转换器。
 /// </summary>
 public class PhiEditConverter : LoggableBase,
     IChartConverter<Pe.Chart, PhiEditToKpcConvertOptions, KpcToPhiEditConvertOptions>
 {
+    /// <summary>
+    /// 将 PhiEdit 格式转换为 KPC 内部格式。
+    /// </summary>
+    /// <param name="source">PhiEdit 谱面</param>
+    /// <param name="option">输入转换选项</param>
+    /// <returns>KPC 谱面</returns>
     public Kpc.Chart ToKpc(Pe.Chart source, PhiEditToKpcConvertOptions option)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -25,6 +29,12 @@ public class PhiEditConverter : LoggableBase,
         };
     }
 
+    /// <summary>
+    /// 将 KPC 内部格式转换为 PhiEdit 格式。
+    /// </summary>
+    /// <param name="input">KPC 谱面</param>
+    /// <param name="options">输出转换选项</param>
+    /// <returns>PhiEdit 谱面</returns>
     public Pe.Chart FromKpc(Kpc.Chart input, KpcToPhiEditConvertOptions options)
     {
         ArgumentNullException.ThrowIfNull(input);

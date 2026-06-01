@@ -135,7 +135,7 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         }
     } = string.Empty;
 
-    // ---- PE 转换选项 ----
+    #region PE 转换选项
 
     public double PeSpeedConversionRatio
     {
@@ -217,7 +217,9 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         }
     } = 0.1d;
 
-    // ---- PhigrosV3 转换选项 ----
+    #endregion
+
+    #region PhigrosV3 转换选项
 
     public float PhigrosDefaultBpm
     {
@@ -279,7 +281,9 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         }
     } = 64d;
 
-    // ---- 通用选项 ----
+    #endregion
+
+    #region 通用选项
 
     public double UnbindPrecision
     {
@@ -410,6 +414,8 @@ public sealed class ExportViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     } = 4.0d;
+
+    #endregion
 
     public event Action? RequestExport;
     public event Action? RequestReturnToImport;

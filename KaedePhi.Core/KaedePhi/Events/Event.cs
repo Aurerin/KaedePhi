@@ -77,8 +77,10 @@ namespace KaedePhi.Core.KaedePhi.Events
         public float FloorPosition { get; set; }
 
         /// <summary>
-        /// 获取某个拍在这个事件中的值（返回double，避免装箱和类型检查）
+        /// 获取指定拍在此事件中的插值（返回 double）。
         /// </summary>
+        /// <param name="beat">指定拍</param>
+        /// <returns>插值结果</returns>
         public double GetValueAtBeatAsDouble(Beat beat)
         {
             var t = (beat - StartBeat) / (EndBeat - StartBeat);
@@ -93,8 +95,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取StartValue的double表示，避免Convert.ToDouble的装箱开销
+        /// 获取 StartValue 的 double 表示。
         /// </summary>
+        /// <returns>double 类型的起始值</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetStartValueAsDouble()
         {
@@ -108,8 +111,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取EndValue的double表示，避免Convert.ToDouble的装箱开销
+        /// 获取 EndValue 的 double 表示。
         /// </summary>
+        /// <returns>double 类型的结束值</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetEndValueAsDouble()
         {
@@ -123,8 +127,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取StartValue的float表示，避免Convert.ToSingle的装箱开销
+        /// 获取 StartValue 的 float 表示。
         /// </summary>
+        /// <returns>float 类型的起始值</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float GetStartValueAsSingle()
         {
@@ -140,8 +145,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取EndValue的float表示，避免Convert.ToSingle的装箱开销
+        /// 获取 EndValue 的 float 表示。
         /// </summary>
+        /// <returns>float 类型的结束值</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float GetEndValueAsSingle()
         {
@@ -157,8 +163,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取StartValue的int表示，避免Convert.ToInt32的装箱开销
+        /// 获取 StartValue 的 int 表示。
         /// </summary>
+        /// <returns>int 类型的起始值</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetStartValueAsInt32()
         {
@@ -174,8 +181,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取EndValue的int表示，避免Convert.ToInt32的装箱开销
+        /// 获取 EndValue 的 int 表示。
         /// </summary>
+        /// <returns>int 类型的结束值</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetEndValueAsInt32()
         {
@@ -308,6 +316,10 @@ namespace KaedePhi.Core.KaedePhi.Events
             return value;
         }
 
+        /// <summary>
+        /// 深拷贝事件。
+        /// </summary>
+        /// <returns>事件副本</returns>
         public Event<T> Clone()
         {
             var clone = new Event<T>

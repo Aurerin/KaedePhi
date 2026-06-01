@@ -2,8 +2,14 @@
 
 namespace KaedePhi.Core.KaedePhi.Controls
 {
+    /// <summary>
+    /// Y 轴位置控制点。
+    /// </summary>
     public class YControl : ControlBase
     {
+        /// <summary>
+        /// Y 轴位置值。
+        /// </summary>
         public float Y { get; set; } = 1.0f;
 
         private static readonly List<YControl> DefaultInstance = new()
@@ -12,9 +18,16 @@ namespace KaedePhi.Core.KaedePhi.Controls
             new YControl { Easing = new Easing(1), Y = 1.0f, X = 9999999.0f }
         };
 
+        /// <summary>
+        /// 获取默认控制点列表。
+        /// </summary>
         public static List<YControl> Default
             => DefaultInstance.ConvertAll(input => input.Clone() as YControl);
 
+        /// <summary>
+        /// 深拷贝控制点。
+        /// </summary>
+        /// <returns>控制点副本</returns>
         public override ControlBase Clone()
         {
             return new YControl { Easing = new Easing(Easing), X = X, Y = Y };

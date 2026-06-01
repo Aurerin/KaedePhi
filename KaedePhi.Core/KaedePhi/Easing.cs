@@ -1,7 +1,14 @@
 ﻿namespace KaedePhi.Core.KaedePhi
 {
+    /// <summary>
+    /// 缓动类型封装。
+    /// </summary>
     public class Easing
     {
+        /// <summary>
+        /// 创建指定编号的缓动类型。
+        /// </summary>
+        /// <param name="easingNumber">缓动编号</param>
         public Easing(int easingNumber)
         {
             _easingNumber = easingNumber;
@@ -51,9 +58,15 @@
             return (byte)(start + (end - start) * easedTime);
         }
 
-        // 以int访问时，返回缓动编号
+        /// <summary>
+        /// 隐式转换为 int，返回缓动编号。
+        /// </summary>
         public static implicit operator int(Easing easing) => easing._easingNumber;
 
+        /// <summary>
+        /// 返回缓动函数名称。
+        /// </summary>
+        /// <returns>缓动函数名称</returns>
         public override string ToString()
         {
             // 返回缓动函数名称

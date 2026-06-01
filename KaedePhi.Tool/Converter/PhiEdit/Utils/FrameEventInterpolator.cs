@@ -102,7 +102,7 @@ public class FrameEventInterpolator
     }
 
     /// <summary>
-    /// 构建标量通道（旋转、透明度、速度）事件列表。
+    /// 构建标量通道（旋转、不透明度、速度）事件列表。
     /// </summary>
     public List<KpcEvents.Event<T>>? BuildScalarEvents<T>(
         List<Pe.Frame>? frames,

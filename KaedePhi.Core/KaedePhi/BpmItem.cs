@@ -4,9 +4,15 @@ using KaedePhi.Core.Common;
 
 namespace KaedePhi.Core.KaedePhi
 {
+    /// <summary>
+    /// BPM 节点，定义某一拍点的 BPM 值。
+    /// </summary>
     public class BpmItem
     {
         private float _bpm = 120f;
+        /// <summary>
+        /// BPM 值，必须大于 0。
+        /// </summary>
         public float Bpm
         {
             get => _bpm;
@@ -19,9 +25,16 @@ namespace KaedePhi.Core.KaedePhi
                 _bpm = value;
             }
         }
+        /// <summary>
+        /// BPM 生效的起始拍。
+        /// </summary>
         [PublicAPI]
         public Beat StartBeat { get; set; }= new(new[] { 0, 0, 1 });
 
+        /// <summary>
+        /// 深拷贝 BPM 节点。
+        /// </summary>
+        /// <returns>BPM 节点副本</returns>
         public BpmItem Clone()
         {
             return new BpmItem()

@@ -3,15 +3,27 @@
 namespace KaedePhi.Tool.Converter.KaedePhi;
 
 /// <summary>
-/// 无实际用途，防止Converter路径中传入的本来就是kpc，所以需要传入一个多此一举的转换器
+/// KPC 格式直通转换器（输入已是 KPC 格式时使用）。
 /// </summary>
 public class KaedePhiConverter : LoggableBase, IChartConverter<Kpc.Chart,Unit?,Unit?>
 {
+    /// <summary>
+    /// 直接返回输入的 KPC 谱面。
+    /// </summary>
+    /// <param name="input">KPC 谱面</param>
+    /// <param name="options">未使用</param>
+    /// <returns>原样返回</returns>
     public Kpc.Chart ToKpc(Kpc.Chart input, Unit? options)
     {
         return input;
     }
 
+    /// <summary>
+    /// 直接返回输入的 KPC 谱面。
+    /// </summary>
+    /// <param name="input">KPC 谱面</param>
+    /// <param name="options">未使用</param>
+    /// <returns>原样返回</returns>
     public Kpc.Chart FromKpc(Kpc.Chart input, Unit? options)
     {
         return input;

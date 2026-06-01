@@ -204,7 +204,7 @@ public class EventKpcToPhigrosV3
 
     #endregion
 
-    #region 透明度事件
+    #region 不透明度事件
 
     private void ConvertAlphaEvents(Core.Phigros.v3.JudgeLine target, List<KpcEvents.Event<int>>? sourceEvents)
     {

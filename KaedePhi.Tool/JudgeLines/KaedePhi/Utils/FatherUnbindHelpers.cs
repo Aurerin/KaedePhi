@@ -52,13 +52,16 @@ public static class FatherUnbindHelpers
             fatherLineX, fatherLineY, angleDegrees, lineX, lineY, CurrentRenderProfile);
 
     /// <summary>
-    /// Kpc 虽然以归一化坐标存储，但几何误差必须在当前渲染坐标系评估，
-    /// 否则 X/Y 轴缩放不一致会导致切段阈值偏斜。
-    /// <para>
-    /// 采用逐轴独立误差检测：分别计算屏幕空间 X/Y 轴误差，各轴以自身位移尺度归一化，
-    /// 任一轴超过容差即触发切割。避免欧几里得距离将细小轴偏差淹没在主运动轴中。
-    /// </para>
+    /// 判断线段是否需要进一步切割以满足精度要求。
     /// </summary>
+    /// <param name="segmentStart">线段起点坐标</param>
+    /// <param name="next">下一个采样点坐标</param>
+    /// <param name="intervalEnd">区间终点坐标</param>
+    /// <param name="segmentStartBeat">线段起始拍</param>
+    /// <param name="intervalEndBeat">区间结束拍</param>
+    /// <param name="nextBeat">下一采样点拍</param>
+    /// <param name="tolerance">容差百分比</param>
+    /// <returns>需要切割则返回 true</returns>
     public static bool NeedsAdaptiveCut(
         (double X, double Y) segmentStart,
         (double X, double Y) next,
@@ -102,8 +105,11 @@ public static class FatherUnbindHelpers
     }
 
     /// <summary>
-    /// 传入语义：取 beat 时刻正在生效的事件插值（用于段起点）。O(log n) 二分查找。
+    /// 获取指定拍点上正在生效的事件插值（用于段起点）。
     /// </summary>
+    /// <param name="events">事件列表</param>
+    /// <param name="beat">目标拍点</param>
+    /// <returns>插值结果</returns>
     public static double GetValIn(List<KpcEvents.Event<double>> events, Beat beat)
     {
         if (events.Count == 0) return 0f;
@@ -125,8 +131,11 @@ public static class FatherUnbindHelpers
     }
 
     /// <summary>
-    /// 传出语义：取 beat 时刻即将结束的事件插值（用于段终点）。O(log n) 二分查找。
+    /// 获取指定拍点上即将结束的事件插值（用于段终点）。
     /// </summary>
+    /// <param name="events">事件列表</param>
+    /// <param name="beat">目标拍点</param>
+    /// <returns>插值结果</returns>
     public static double GetValOut(List<KpcEvents.Event<double>> events, Beat beat)
     {
         if (events.Count == 0) return 0f;

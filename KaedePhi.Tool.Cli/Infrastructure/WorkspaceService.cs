@@ -14,8 +14,15 @@ public sealed class WorkspaceService
         Directory.CreateDirectory(_rootDir);
     }
 
+    /// <summary>
+    /// 工作区根目录路径。
+    /// </summary>
     public string Root => _rootDir;
 
+    /// <summary>
+    /// 列出所有工作区 ID。
+    /// </summary>
+    /// <returns>工作区 ID 列表</returns>
     public IEnumerable<string> List() =>
         Directory.EnumerateDirectories(_rootDir).Select(d => Path.GetFileName(d));
 
@@ -55,6 +62,11 @@ public sealed class WorkspaceService
         await src.CopyToAsync(dst);
     }
 
+    /// <summary>
+    /// 检查工作区是否存在。
+    /// </summary>
+    /// <param name="id">工作区 ID</param>
+    /// <returns>存在则返回 true</returns>
     public bool Exists(string id) => Directory.Exists(ValidateAndResolveId(id));
 
     /// <summary>
@@ -82,6 +94,10 @@ public sealed class WorkspaceService
         await src.CopyToAsync(dst);
     }
 
+    /// <summary>
+    /// 清空指定工作区或所有工作区。
+    /// </summary>
+    /// <param name="id">工作区 ID，为 null 时清空所有</param>
     public void Clear(string? id = null)
     {
         if (string.IsNullOrWhiteSpace(id))
