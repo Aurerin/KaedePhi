@@ -1,3 +1,4 @@
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using global::KaedePhi.Tool.JudgeLines.KaedePhi;
 using AlphaControl = KaedePhi.Core.KaedePhi.Controls.AlphaControl;
@@ -72,7 +73,7 @@ public class JudgeLineKpcToPe
     /// </summary>
     private void WarnIfUnsupportedJudgeLineFields(KpcJudgeLine src)
     {
-        var textureRemoveHint  = _options.LineFilter.RemoveTextureLine  ? "，判定线将被自动移除。" : "。";
+        var textureRemoveHint = _options.LineFilter.RemoveTextureLine ? "，判定线将被自动移除。" : "。";
         var attachUiRemoveHint = _options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "。";
 
         if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
@@ -102,111 +103,31 @@ public class JudgeLineKpcToPe
     {
         if (HasNonDefaultExtendLayer(src.Extended))
             Warn("PE 不支持 JudgeLine.Extended（包含非默认数据）");
-        if (!IsDefaultXControls(src.PositionControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.PositionControls))
             Warn("PE 不支持 JudgeLine.PositionControls（包含非默认数据）");
-        if (!IsDefaultAlphaControls(src.AlphaControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.AlphaControls))
             Warn("PE 不支持 JudgeLine.AlphaControls（包含非默认数据）");
-        if (!IsDefaultSizeControls(src.SizeControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.SizeControls))
             Warn("PE 不支持 JudgeLine.SizeControls（包含非默认数据）");
-        if (!IsDefaultSkewControls(src.SkewControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.SkewControls))
             Warn("PE 不支持 JudgeLine.SkewControls（包含非默认数据）");
-        if (!IsDefaultYControls(src.YControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.YControls))
             Warn("PE 不支持 JudgeLine.YControls（包含非默认数据）");
     }
 
     private static bool HasNonDefaultExtendLayer(ExtendLayer? layer)
         => layer != null
-           && ((layer.ColorEvents?.Count ?? 0) > 0
-               || (layer.ScaleXEvents?.Count ?? 0) > 0
-               || (layer.ScaleYEvents?.Count ?? 0) > 0
-               || (layer.TextEvents?.Count ?? 0) > 0
-               || (layer.PaintEvents?.Count ?? 0) > 0
-               || (layer.GifEvents?.Count ?? 0) > 0);
+           && (layer.ColorEvents.Count > 0
+               || layer.ScaleXEvents.Count > 0
+               || layer.ScaleYEvents.Count > 0
+               || layer.TextEvents.Count > 0
+               || layer.PaintEvents.Count > 0
+               || layer.GifEvents.Count > 0);
 
     private static bool IsDefaultAnchor(float[]? anchor)
         => anchor is { Length: 2 }
            && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
            && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
-
-    private static bool IsDefaultXControls(List<XControl>? controls)
-    {
-        var def = XControl.Default;
-        if (controls == null || controls.Count != def.Count) return false;
-        for (var i = 0; i < def.Count; i++)
-        {
-            var d = def[i];
-            var c = controls[i];
-            if ((int)d.Easing != (int)c.Easing) return false;
-            if (Math.Abs(d.X - c.X) > FloatEpsilon) return false;
-            if (Math.Abs(d.Pos - c.Pos) > FloatEpsilon) return false;
-        }
-
-        return true;
-    }
-
-    private static bool IsDefaultAlphaControls(List<AlphaControl>? controls)
-    {
-        var def = AlphaControl.Default;
-        if (controls == null || controls.Count != def.Count) return false;
-        for (var i = 0; i < def.Count; i++)
-        {
-            var d = def[i];
-            var c = controls[i];
-            if ((int)d.Easing != (int)c.Easing) return false;
-            if (Math.Abs(d.X - c.X) > FloatEpsilon) return false;
-            if (Math.Abs(d.Alpha - c.Alpha) > FloatEpsilon) return false;
-        }
-
-        return true;
-    }
-
-    private static bool IsDefaultSizeControls(List<SizeControl>? controls)
-    {
-        var def = SizeControl.Default;
-        if (controls == null || controls.Count != def.Count) return false;
-        for (var i = 0; i < def.Count; i++)
-        {
-            var d = def[i];
-            var c = controls[i];
-            if ((int)d.Easing != (int)c.Easing) return false;
-            if (Math.Abs(d.X - c.X) > FloatEpsilon) return false;
-            if (Math.Abs(d.Size - c.Size) > FloatEpsilon) return false;
-        }
-
-        return true;
-    }
-
-    private static bool IsDefaultSkewControls(List<SkewControl>? controls)
-    {
-        var def = SkewControl.Default;
-        if (controls == null || controls.Count != def.Count) return false;
-        for (var i = 0; i < def.Count; i++)
-        {
-            var d = def[i];
-            var c = controls[i];
-            if ((int)d.Easing != (int)c.Easing) return false;
-            if (Math.Abs(d.X - c.X) > FloatEpsilon) return false;
-            if (Math.Abs(d.Skew - c.Skew) > FloatEpsilon) return false;
-        }
-
-        return true;
-    }
-
-    private static bool IsDefaultYControls(List<YControl>? controls)
-    {
-        var def = YControl.Default;
-        if (controls == null || controls.Count != def.Count) return false;
-        for (var i = 0; i < def.Count; i++)
-        {
-            var d = def[i];
-            var c = controls[i];
-            if ((int)d.Easing != (int)c.Easing) return false;
-            if (Math.Abs(d.X - c.X) > FloatEpsilon) return false;
-            if (Math.Abs(d.Y - c.Y) > FloatEpsilon) return false;
-        }
-
-        return true;
-    }
 
 
     private void Warn(string message) => _warnLogger?.Invoke(message);

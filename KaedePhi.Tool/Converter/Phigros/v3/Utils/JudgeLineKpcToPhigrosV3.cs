@@ -527,15 +527,15 @@ public class JudgeLineKpcToPhigrosV3
     {
         if (HasNonDefaultExtendLayer(src.Extended))
             Warn("PhigrosV3 不支持 JudgeLine.Extended（包含非默认数据）");
-        if (!IsDefaultControls(src.PositionControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.PositionControls))
             Warn("PhigrosV3 不支持 JudgeLine.PositionControls（包含非默认数据）");
-        if (!IsDefaultControls(src.AlphaControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.AlphaControls))
             Warn("PhigrosV3 不支持 JudgeLine.AlphaControls（包含非默认数据）");
-        if (!IsDefaultControls(src.SizeControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.SizeControls))
             Warn("PhigrosV3 不支持 JudgeLine.SizeControls（包含非默认数据）");
-        if (!IsDefaultControls(src.SkewControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.SkewControls))
             Warn("PhigrosV3 不支持 JudgeLine.SkewControls（包含非默认数据）");
-        if (!IsDefaultControls(src.YControls))
+        if (!ControlDefaultChecker.IsDefaultControls(src.YControls))
             Warn("PhigrosV3 不支持 JudgeLine.YControls（包含非默认数据）");
     }
 
@@ -553,11 +553,7 @@ public class JudgeLineKpcToPhigrosV3
            && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
            && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
 
-    private static bool IsDefaultControls<T>(List<T>? controls) where T : class
-    {
-        if (controls == null) return true;
-        return controls.Count == 0;
-    }
+
 
     private void Warn(string message) => _warnLogger?.Invoke($"[ToPhigrosV3] {message}");
 }
