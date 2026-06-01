@@ -1,14 +1,12 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
-using KaedePhi.Tool.Event.KaedePhi;
 using global::KaedePhi.Tool.JudgeLines.KaedePhi;
 using KpcEventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;
 using PhigrosEvent = KaedePhi.Core.Phigros.v3.Event;
 using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
-using PhigrosSpeedEvent = KaedePhi.Core.Phigros.v3.SpeedEvent;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 

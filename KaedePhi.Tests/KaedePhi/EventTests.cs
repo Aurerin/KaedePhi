@@ -1,7 +1,5 @@
-﻿using FluentAssertions;
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Core.KaedePhi;
-using KaedePhi.Core.Utils;
 using KpcEvents = KaedePhi.Core.KaedePhi.Events;
 
 namespace KaedePhi.Tests.KaedePhi;

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Tests.Serialization;

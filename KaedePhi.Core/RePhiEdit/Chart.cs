@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.RePhiEdit
