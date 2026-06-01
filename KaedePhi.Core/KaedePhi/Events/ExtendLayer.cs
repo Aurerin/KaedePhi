@@ -60,27 +60,5 @@ namespace KaedePhi.Core.KaedePhi.Events
                 clone.InclineEvents = InclineEvents.ConvertAll(e => e.Clone());
             return clone;
         }
-
-        /// <summary>
-        /// 强行预期化，将空列表设置为null，保证Json序列化时不包含空列表
-        /// </summary>
-        public void Anticipation()
-        {
-            if (ColorEvents is { Count: 0 })
-                ColorEvents = null;
-            if (ScaleXEvents is { Count: 0 })
-                ScaleXEvents = null;
-            if (ScaleYEvents is { Count: 0 })
-                ScaleYEvents = null;
-            if (TextEvents is { Count: 0 })
-                TextEvents = null;
-            if (PaintEvents is { Count: 0 })
-                PaintEvents = null;
-            if (GifEvents is { Count: 0 })
-                GifEvents = null;
-            // KaedePhi内部格式不会完全遵守RePhiEdit行为
-            if (InclineEvents is { Count: 0 })
-                InclineEvents = null;
-        }
     }
 }
