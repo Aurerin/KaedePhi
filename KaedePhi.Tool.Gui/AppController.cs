@@ -6,7 +6,6 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
-using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
 using KaedePhi.Tool.Gui.Views;

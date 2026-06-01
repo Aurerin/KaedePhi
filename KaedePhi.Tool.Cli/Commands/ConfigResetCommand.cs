@@ -1,6 +1,5 @@
 ﻿using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Model;
-using Spectre.Console.Cli;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
