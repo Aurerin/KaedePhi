@@ -572,7 +572,7 @@ public class LineEventBuilder
         }
     }
 
-    private void Warn(string message) => _warnLogger?.Invoke($"[ToPe] {message}");
+    private void Warn(string message) => _warnLogger?.Invoke(message);
 
     #endregion
 }

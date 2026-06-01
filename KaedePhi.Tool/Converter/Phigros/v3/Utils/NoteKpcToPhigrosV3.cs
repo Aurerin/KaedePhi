@@ -115,7 +115,7 @@ public static class NoteKpcToPhigrosV3
         if (Math.Abs(src.WidthRatio - 1f) > FloatEpsilon)
             Warn($"PhigrosV3 不支持 Note.WidthRatio（值={src.WidthRatio}）");
         return;
-        void Warn(string message) => warnLogger?.Invoke($"[ToPhigrosV3] {message}");
+        void Warn(string message) => warnLogger?.Invoke(message);
     }
 
     private static bool IsDefaultTint(byte[]? tint) => tint is [255, 255, 255];

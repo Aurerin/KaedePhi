@@ -342,7 +342,7 @@ public class EventKpcToPhigrosV3
            || (layer.AlphaEvents?.Count ?? 0) > 0
            || (layer.SpeedEvents?.Count ?? 0) > 0;
 
-    private void Warn(string message) => _warnLogger?.Invoke($"[ToPhigrosV3] {message}");
+    private void Warn(string message) => _warnLogger?.Invoke(message);
 
     #endregion
 }

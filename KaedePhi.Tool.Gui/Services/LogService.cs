@@ -53,7 +53,7 @@ public sealed class LogService : IDisposable
             .MinimumLevel.Debug()
             .WriteTo.File(
                 CurrentLogFile,
-                outputTemplate: "[{Level:u5} {Timestamp:HH:mm:ss}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
+                outputTemplate: "[{Level:u4} {Timestamp:HH:mm:ss}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
                 flushToDiskInterval: TimeSpan.FromSeconds(1))
             .CreateLogger();
 
