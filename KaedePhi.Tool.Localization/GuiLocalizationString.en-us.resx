@@ -361,6 +361,15 @@
   <data name="convert_default_bpm" xml:space="preserve">
     <value>Default BPM</value>
   </data>
+  <data name="convert_filter_fake_notes" xml:space="preserve">
+    <value>Filter Fake Notes (remove IsFake notes)</value>
+  </data>
+  <data name="convert_negative_alpha_elevation" xml:space="preserve">
+    <value>Elevate judge line off-screen during negative alpha</value>
+  </data>
+  <data name="convert_negative_alpha_step" xml:space="preserve">
+    <value>Negative Alpha Elevation Step (KPC Y)</value>
+  </data>
   <data name="convert_common_options" xml:space="preserve">
     <value>Common Options</value>
   </data>

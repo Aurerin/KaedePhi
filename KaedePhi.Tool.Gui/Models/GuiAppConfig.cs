@@ -68,6 +68,9 @@ public sealed class ConvertDefaultsConfig
     public double PhigrosAlphaCutPrecision { get; set; } = 64d;
     public double PhigrosAlphaCutTolerance { get; set; } = 0.1d;
     public double PhigrosSpeedCutPrecision { get; set; } = 64d;
+    public bool PhigrosFilterFakeNotes { get; set; }
+    public bool PhigrosNegativeAlphaElevation { get; set; }
+    public double PhigrosNegativeAlphaStep { get; set; } = 4.0d;
 
     // 通用选项
     public double UnbindPrecision { get; set; } = 64d;

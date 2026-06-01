@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
@@ -293,7 +294,10 @@ internal sealed class AppController
                         outputPath = outputPath + expectedExt;
 
                     // 直接从内存中的 KPC 图表导出，无需重新加载
-                    await _chart.ExportChartAsync(targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, CancellationToken.None);
+                    var phigrosOptions = targetFormat == ChartType.PhigrosV3
+                        ? BuildPhigrosOptions(_exportVm)
+                        : null;
+                    await _chart.ExportChartAsync(targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, phigrosOptions, CancellationToken.None);
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
                     _log.Information(log_export_done);
@@ -316,5 +320,21 @@ internal sealed class AppController
         {
             _exportVm.IsExporting = false;
         }
+    }
+
+    private static KpcToPhigrosV3ConvertOptions BuildPhigrosOptions(ExportViewModel vm)
+    {
+        return new KpcToPhigrosV3ConvertOptions
+        {
+            NoteFilter = new KpcToPhigrosV3ConvertOptions.NoteFilterOptions
+            {
+                FilterFakeNotes = vm.FilterFakeNotes
+            },
+            NegativeAlpha = new KpcToPhigrosV3ConvertOptions.NegativeAlphaOptions
+            {
+                Enabled = vm.NegativeAlphaElevation,
+                ElevationStep = vm.NegativeAlphaStep
+            }
+        };
     }
 }

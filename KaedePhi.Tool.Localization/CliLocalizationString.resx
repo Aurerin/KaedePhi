@@ -240,6 +240,16 @@
         <value>未找到工作区 '{0}'。</value>
         <comment>{0} = 工作区名</comment>
     </data>
+    <!-- ── convert option descriptions ─────────────────────────────────────── -->
+    <data name="convert_opt_filter_fake_notes" xml:space="preserve">
+        <value>过滤假音符（直接删除 IsFake=true 的音符）</value>
+    </data>
+    <data name="convert_opt_negative_alpha_elevation" xml:space="preserve">
+        <value>启用负透明度段判定线抬高至屏幕外</value>
+    </data>
+    <data name="convert_opt_negative_alpha_step" xml:space="preserve">
+        <value>负透明度段每次抬高的 KPC Y 偏移量（默认：4.0）</value>
+    </data>
     <!-- ── misc ──────────────────────────────────────────────────────────────── -->
     <data name="project_link" xml:space="preserve">
         <value>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</value>

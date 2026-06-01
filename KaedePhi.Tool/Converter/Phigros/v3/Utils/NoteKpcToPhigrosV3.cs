@@ -14,7 +14,8 @@ public static class NoteKpcToPhigrosV3
     private const double SpeedValueRatio = 4.5d;
 
     public static (List<PhigrosNote> above, List<PhigrosNote> below) ConvertNotes(
-        List<KpcNote>? notes, List<KpcSpeedEvent>? speedEvents, Action<string>? warnLogger)
+        List<KpcNote>? notes, List<KpcSpeedEvent>? speedEvents, Action<string>? warnLogger,
+        bool filterFakeNotes = false)
     {
         if (notes is not { Count: > 0 }) return ([], []);
 
@@ -23,6 +24,8 @@ public static class NoteKpcToPhigrosV3
 
         foreach (var note in notes)
         {
+            if (filterFakeNotes && note.IsFake) continue;
+
             var converted = ConvertNote(note, speedEvents, warnLogger);
             if (note.Above)
                 above.Add(converted);

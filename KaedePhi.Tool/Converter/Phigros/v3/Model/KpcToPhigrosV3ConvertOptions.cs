@@ -1,4 +1,6 @@
-﻿namespace KaedePhi.Tool.Converter.Phigros.v3.Model;
+﻿using KaedePhi.Tool.Common;
+
+namespace KaedePhi.Tool.Converter.Phigros.v3.Model;
 
 public class KpcToPhigrosV3ConvertOptions
 {
@@ -40,6 +42,16 @@ public class KpcToPhigrosV3ConvertOptions
     /// 判定线过滤相关配置
     /// </summary>
     public LineFilterOptions LineFilter { get; set; } = new();
+
+    /// <summary>
+    /// 音符过滤相关配置
+    /// </summary>
+    public NoteFilterOptions NoteFilter { get; set; } = new();
+
+    /// <summary>
+    /// 负透明度段判定线抬高相关配置
+    /// </summary>
+    public NegativeAlphaOptions NegativeAlpha { get; set; } = new();
 
     public class CuttingOptions
     {
@@ -191,5 +203,35 @@ public class KpcToPhigrosV3ConvertOptions
         /// 是否移除带有自定义材质的判定线
         /// </summary>
         public bool RemoveTextureLine { get; set; }
+    }
+
+    public class NoteFilterOptions
+    {
+        /// <summary>
+        /// 是否过滤假音符。为 true 时直接删除 IsFake=true 的音符，为 false 时视为真音符保留。
+        /// </summary>
+        public bool FilterFakeNotes { get; set; }
+    }
+
+    public class NegativeAlphaOptions
+    {
+        public const double DefaultElevationStep = 4.0;
+
+        /// <summary>
+        /// 是否启用负透明度段判定线抬高。
+        /// 当判定线透明度为负值时，将判定线抬高至屏幕外。
+        /// </summary>
+        public bool Enabled { get; set; }
+
+        /// <summary>
+        /// 每次抬高的 KPC 坐标系 Y 偏移量（默认 4.0，约等于两个屏幕高度）。
+        /// </summary>
+        public double ElevationStep { get; set; } = DefaultElevationStep;
+
+        /// <summary>
+        /// 抬高操作使用的渲染坐标系配置。
+        /// 默认使用标准 675×450 编辑器坐标。
+        /// </summary>
+        public CoordinateProfile RenderProfile { get; set; } = CoordinateProfile.DefaultRenderProfile;
     }
 }
