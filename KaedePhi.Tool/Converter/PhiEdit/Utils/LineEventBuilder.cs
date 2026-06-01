@@ -80,7 +80,7 @@ public class LineEventBuilder
     {
         if (sourceEvents == null || sourceEvents.Count == 0) return;
 
-        WarnIfEventPayloadUnsupported(sourceEvents, "透明度");
+        WarnIfEventPayloadUnsupported(sourceEvents, "不透明度");
 
         var ordered = sourceEvents
             .OrderBy(e => (double)e.StartBeat)

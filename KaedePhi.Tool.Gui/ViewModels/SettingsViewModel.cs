@@ -20,7 +20,8 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
 
     public int MaxLogFiles { get; set; } = 5;
 
-    // ---- Unbind ----
+    #region Unbind
+
     public double UnbindPrecision { get; set; } = 64;
     public double UnbindTolerance { get; set; } = 0.1;
 
@@ -49,7 +50,10 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     /// <summary>仅在经典模式启用时允许修改"禁用压缩"默认值。</summary>
     public bool UnbindDisableCompressEnabled => UnbindClassicMode;
 
-    // ---- LayerMerge ----
+    #endregion
+
+    #region LayerMerge
+
     public double LayerMergePrecision { get; set; } = 64;
     public double LayerMergeTolerance { get; set; } = 0.1;
 
@@ -78,15 +82,24 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     /// <summary>仅在经典模式启用时允许修改"禁用压缩"默认值。</summary>
     public bool LayerMergeDisableCompressEnabled => LayerMergeClassicMode;
 
-    // ---- Cut ----
+    #endregion
+
+    #region Cut
+
     public double CutPrecision { get; set; } = 64;
     public double CutTolerance { get; set; } = 0.1;
     public bool CutDisableCompress { get; set; }
 
-    // ---- Fit ----
+    #endregion
+
+    #region Fit
+
     public double FitTolerance { get; set; } = 0.1;
 
-    // ---- Render ----
+    #endregion
+
+    #region Render
+
     public int RenderPixelsPerBeat { get; set; } = 100;
     public int RenderChannelWidth { get; set; } = 150;
     public int RenderSamplesPerEvent { get; set; } = 64;
@@ -97,7 +110,10 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     public double RenderMinValueRangeHalf { get; set; } = 0.1;
     public double RenderMinValueRangeHalfRatio { get; set; } = 0.15;
 
-    // ---- Convert (PE) ----
+    #endregion
+
+    #region Convert (PE)
+
     public double ConvertPeSpeedConversionRatio { get; set; } = 14d / 9d;
     public double ConvertPeTrailingBeatPadding { get; set; } = 1d / 64d;
     public double ConvertPeUnsupportedEasingPrecision { get; set; } = 64d;
@@ -107,7 +123,10 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     public double ConvertPeSpeedCutPrecision { get; set; } = 64d;
     public double ConvertPeSpeedCutTolerance { get; set; } = 0.1d;
 
-    // ---- Convert (PhigrosV3) ----
+    #endregion
+
+    #region Convert (PhigrosV3)
+
     public float ConvertPhigrosDefaultBpm { get; set; } = 120f;
     public double ConvertPhigrosEasingPrecision { get; set; } = 64d;
     public double ConvertPhigrosMisalignedXyEventPrecision { get; set; } = 64d;
@@ -115,13 +134,18 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     public double ConvertPhigrosAlphaCutTolerance { get; set; } = 0.1d;
     public double ConvertPhigrosSpeedCutPrecision { get; set; } = 64d;
 
-    // ---- Convert (Common) ----
+    #endregion
+
+    #region Convert (Common)
+
     public double ConvertUnbindPrecision { get; set; } = 64d;
     public double ConvertUnbindTolerance { get; set; } = 0.1d;
     public bool ConvertUnbindClassicMode { get; set; }
     public double ConvertMultiLayerMergePrecision { get; set; } = 64d;
     public double ConvertMultiLayerMergeTolerance { get; set; } = 0.1d;
     public bool ConvertMultiLayerMergeClassicMode { get; set; }
+
+    #endregion
 
     public string StatusText
     {

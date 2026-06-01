@@ -100,10 +100,10 @@ public class JudgeLineKpcToPhigrosV3
         return firstLayer.SpeedEvents.OrderBy(e => (double)e.StartBeat).ToList();
     }
 
-    #region 负透明度段判定线抬高
+    #region 负不透明度段判定线抬高
 
     /// <summary>
-    /// 对判定线中透明度为负值的时间段，将判定线 Y 坐标抬高至屏幕外。
+    /// 对判定线中不透明度为负值的时间段，将判定线 Y 坐标抬高至屏幕外。
     /// 若判定线有旋转角度，则进行类父线解绑操作，保证抬高方向为屏幕上方（而非直接对 Y 轴做加法）。
     /// </summary>
     private void ApplyNegativeAlphaElevation(KpcJudgeLine line)
@@ -121,7 +121,7 @@ public class JudgeLineKpcToPhigrosV3
         var renderProfile = _options.NegativeAlpha.RenderProfile;
         var fillLength = new Beat(1d / _options.MultiLayerMerge.Precision);
 
-        Warn($"判定线存在 {negativeSegments.Count} 个负透明度段，将抬高判定线至屏幕外（角度={angle:F1}°, ΔKPC_Y={elevationKpcY:F4}）");
+        Warn($"判定线存在 {negativeSegments.Count} 个负不透明度段，将抬高判定线至屏幕外（角度={angle:F1}°, ΔKPC_Y={elevationKpcY:F4}）");
 
         foreach (var (segStart, segEnd) in negativeSegments)
         {
@@ -145,7 +145,7 @@ public class JudgeLineKpcToPhigrosV3
     }
 
     /// <summary>
-    /// 收集所有透明度为负值的精确时间段。
+    /// 收集所有不透明度为负值的精确时间段。
     /// 遵循事件列表的空隙保持规则：若负 Alpha 事件结束后无后续事件将其回正，
     /// 空隙中 Alpha 仍保持负值，直到遇到回正事件或谱面结束。
     /// 跨零点事件会在零点处拆分，仅返回负值区间。

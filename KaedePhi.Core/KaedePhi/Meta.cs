@@ -45,6 +45,10 @@
         /// </summary>
         public string Song { get; set; } = "0.wav"; // 音乐
 
+        /// <summary>
+        /// 浅拷贝元数据。
+        /// </summary>
+        /// <returns>元数据副本</returns>
         public Meta Clone()
         {
             // 这个没必要自己实现，直接MemberwiseClone就行

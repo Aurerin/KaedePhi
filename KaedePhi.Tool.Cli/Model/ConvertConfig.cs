@@ -27,7 +27,7 @@ public class ConvertConfig
     /// </summary>
     public bool DryRun { get; set; } = false;
 
-    // ---- PhiEdit 转换选项 ----
+    #region PhiEdit 转换选项
 
     /// <summary>
     /// PE 速度帧值到 KPC 速度事件值的转换比率
@@ -39,7 +39,9 @@ public class ConvertConfig
     /// </summary>
     public double PeTrailingBeatPadding { get; set; } = 1d / 64d;
 
-    // ---- KPC -> PhiEdit 转换选项 ----
+    #endregion
+
+    #region KPC -> PhiEdit 转换选项
 
     /// <summary>
     /// 非支持缓动切割精度
@@ -81,7 +83,9 @@ public class ConvertConfig
     /// </summary>
     public double PeSpeedCutTolerance { get; set; } = 0.1d;
 
-    // ---- KPC -> PhigrosV3 转换选项 ----
+    #endregion
+
+    #region KPC -> PhigrosV3 转换选项
 
     /// <summary>
     /// PhigrosV3 默认 BPM（当谱面 BPM 列表为空时使用）
@@ -124,16 +128,18 @@ public class ConvertConfig
     public bool PhigrosFilterFakeNotes { get; set; } = false;
 
     /// <summary>
-    /// 是否启用负透明度段判定线抬高
+    /// 是否启用负不透明度段判定线抬高
     /// </summary>
     public bool PhigrosNegativeAlphaElevation { get; set; } = false;
 
     /// <summary>
-    /// 负透明度段每次抬高的 KPC 坐标系 Y 偏移量
+    /// 负不透明度段每次抬高的 KPC 坐标系 Y 偏移量
     /// </summary>
     public double PhigrosNegativeAlphaStep { get; set; } = 4.0;
 
-    // ---- 通用父子线解绑选项 ----
+    #endregion
+
+    #region 通用父子线解绑选项
 
     /// <summary>
     /// 父子线解绑精度
@@ -150,7 +156,9 @@ public class ConvertConfig
     /// </summary>
     public bool UnbindClassicMode { get; set; } = false;
 
-    // ---- 通用多层级合并选项 ----
+    #endregion
+
+    #region 通用多层级合并选项
 
     /// <summary>
     /// 多层级合并精度
@@ -166,4 +174,6 @@ public class ConvertConfig
     /// 多层级合并是否使用经典模式
     /// </summary>
     public bool MultiLayerMergeClassicMode { get; set; } = false;
+
+    #endregion
 }

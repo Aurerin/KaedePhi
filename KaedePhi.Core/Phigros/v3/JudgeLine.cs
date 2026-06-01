@@ -42,7 +42,7 @@ namespace KaedePhi.Core.Phigros.v3
         public List<Event> JudgeLineRotateEvents { get; set; } = new();
 
         /// <summary>
-        /// 判定线透明度事件，数值范围为0~1，数值越大透明度越高
+        /// 判定线不透明度事件，数值范围为0~1，数值越大越不透明
         /// </summary>
         [JsonProperty("judgeLineDisappearEvents")]
         public List<Event> JudgeLineDisappearEvents { get; set; } = new();

@@ -464,8 +464,8 @@ namespace KaedePhi.Core.PhiEdit
         /// <summary>
         /// 以惰性迭代方式枚举单条判定线 <paramref name="judgeLine"/> 的所有 PhiEditChart 导出行。
         /// <para>
-        /// 输出顺序为：移动关键帧 → 速度关键帧 → 旋转关键帧 → 透明度关键帧 →
-        /// 移动事件 → 旋转事件 → 透明度事件 → 音符。
+        /// 输出顺序为：移动关键帧 → 速度关键帧 → 旋转关键帧 → 不透明度关键帧 →
+        /// 移动事件 → 旋转事件 → 不透明度事件 → 音符。
         /// </para>
         /// </summary>
         /// <param name="judgeLine">待导出的判定线。</param>

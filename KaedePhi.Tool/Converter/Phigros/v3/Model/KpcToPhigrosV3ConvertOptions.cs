@@ -49,7 +49,7 @@ public class KpcToPhigrosV3ConvertOptions
     public NoteFilterOptions NoteFilter { get; set; } = new();
 
     /// <summary>
-    /// 负透明度段判定线抬高相关配置
+    /// 负不透明度段判定线抬高相关配置
     /// </summary>
     public NegativeAlphaOptions NegativeAlpha { get; set; } = new();
 
@@ -218,8 +218,8 @@ public class KpcToPhigrosV3ConvertOptions
         public const double DefaultElevationStep = 4.0;
 
         /// <summary>
-        /// 是否启用负透明度段判定线抬高。
-        /// 当判定线透明度为负值时，将判定线抬高至屏幕外。
+        /// 是否启用负不透明度段判定线抬高。
+        /// 当判定线不透明度为负值时，将判定线抬高至屏幕外。
         /// </summary>
         public bool Enabled { get; set; }
 

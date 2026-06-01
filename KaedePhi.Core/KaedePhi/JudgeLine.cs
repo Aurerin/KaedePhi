@@ -149,6 +149,10 @@ namespace KaedePhi.Core.KaedePhi
 
         private List<Controls.YControl> _yControls;
 
+        /// <summary>
+        /// 深拷贝判定线。
+        /// </summary>
+        /// <returns>判定线副本</returns>
         public JudgeLine Clone()
         {
             var clone = new JudgeLine

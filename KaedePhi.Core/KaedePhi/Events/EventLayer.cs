@@ -4,20 +4,35 @@ using KaedePhi.Core.Common;
 
 namespace KaedePhi.Core.KaedePhi.Events
 {
+    /// <summary>
+    /// 事件层，包含判定线的所有事件通道。
+    /// </summary>
     public class EventLayer
     {
         /// <summary>
-        /// X移动事件
+        /// X 轴移动事件列表。
         /// </summary>
-        public List<Event<double>>? MoveXEvents { get; set; } // 移动事件
+        public List<Event<double>>? MoveXEvents { get; set; }
 
-        public List<Event<double>>? MoveYEvents { get; set; } // 移动事件
+        /// <summary>
+        /// Y 轴移动事件列表。
+        /// </summary>
+        public List<Event<double>>? MoveYEvents { get; set; }
 
-        public List<Event<double>>? RotateEvents { get; set; } // 旋转事件
+        /// <summary>
+        /// 旋转事件列表。
+        /// </summary>
+        public List<Event<double>>? RotateEvents { get; set; }
 
-        public List<Event<int>>? AlphaEvents { get; set; } // 透明度事件
+        /// <summary>
+        /// 不透明度事件列表。
+        /// </summary>
+        public List<Event<int>>? AlphaEvents { get; set; }
 
-        public List<Event<float>>? SpeedEvents { get; set; } // 速度事件
+        /// <summary>
+        /// 速度事件列表。
+        /// </summary>
+        public List<Event<float>>? SpeedEvents { get; set; }
 
         /// <summary>
         /// 获取某个拍时，指定事件层级指定事件列表的数值。

@@ -2,6 +2,9 @@
 
 namespace KaedePhi.Core.KaedePhi.Events
 {
+    /// <summary>
+    /// 扩展事件层（故事板），包含判定线的视觉效果事件。
+    /// </summary>
     public class ExtendLayer
     {
         /// <summary>
@@ -39,6 +42,10 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// </summary>
         public List<Event<float>> InclineEvents { get; set; }
 
+        /// <summary>
+        /// 深拷贝扩展事件层。
+        /// </summary>
+        /// <returns>扩展事件层副本</returns>
         public ExtendLayer Clone()
         {
             // 深拷贝，包括Event列表

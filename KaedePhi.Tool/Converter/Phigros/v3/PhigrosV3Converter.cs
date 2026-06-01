@@ -6,6 +6,9 @@ using PhigrosChart = KaedePhi.Core.Phigros.v3.Chart;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3;
 
+/// <summary>
+/// Phigros V3 格式转换器。
+/// </summary>
 public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Unit?, KpcToPhigrosV3ConvertOptions>
 {
     /// <summary>
@@ -13,6 +16,12 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
     /// </summary>
     private const float DefaultPhigrosBpm = 120f;
 
+    /// <summary>
+    /// 将 Phigros V3 格式转换为 KPC 内部格式。
+    /// </summary>
+    /// <param name="input">Phigros V3 谱面</param>
+    /// <param name="options">输入转换选项（未使用）</param>
+    /// <returns>KPC 谱面</returns>
     public Kpc.Chart ToKpc(PhigrosChart input, Unit? options)
     {
         ArgumentNullException.ThrowIfNull(input);
@@ -29,6 +38,12 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
         };
     }
 
+    /// <summary>
+    /// 将 KPC 内部格式转换为 Phigros V3 格式。
+    /// </summary>
+    /// <param name="input">KPC 谱面</param>
+    /// <param name="options">输出转换选项</param>
+    /// <returns>Phigros V3 谱面</returns>
     public PhigrosChart FromKpc(Kpc.Chart input, KpcToPhigrosV3ConvertOptions options)
     {
         ArgumentNullException.ThrowIfNull(input);

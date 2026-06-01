@@ -14,7 +14,7 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_command_opt_target")]
         public ChartType? TargetType { get; set; }
 
-        // ---- PhiEdit 转换选项 ----
+        #region PhiEdit 转换选项
 
         [CommandOption("--pe-speed-ratio <N>")]
         [LocalizedDescription("convert_opt_pe_speed_ratio")]
@@ -48,7 +48,9 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_opt_pe_speed_tolerance")]
         public double? PeSpeedCutTolerance { get; set; }
 
-        // ---- PhigrosV3 转换选项 ----
+        #endregion
+
+        #region PhigrosV3 转换选项
 
         [CommandOption("--phigros-bpm <N>")]
         [LocalizedDescription("convert_opt_phigros_bpm")]
@@ -74,7 +76,9 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_opt_phigros_speed_precision")]
         public double? PhigrosSpeedCutPrecision { get; set; }
 
-        // ---- 解绑选项 ----
+        #endregion
+
+        #region 解绑选项
 
         [CommandOption("--unbind-precision <N>")]
         [LocalizedDescription("convert_opt_unbind_precision")]
@@ -88,7 +92,9 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_opt_unbind_classic")]
         public bool? UnbindClassicMode { get; set; }
 
-        // ---- 多层级合并选项 ----
+        #endregion
+
+        #region 多层级合并选项
 
         [CommandOption("--merge-precision <N>")]
         [LocalizedDescription("convert_opt_merge_precision")]
@@ -102,7 +108,9 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_opt_merge_classic")]
         public bool? MultiLayerMergeClassicMode { get; set; }
 
-        // ---- 压缩控制选项 ----
+        #endregion
+
+        #region 压缩控制选项
 
         [CommandOption("--no-unbind-compress")]
         [LocalizedDescription("convert_opt_no_unbind_compress")]
@@ -112,7 +120,9 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_opt_no_merge_compress")]
         public bool? DisableMergeCompress { get; set; }
 
-        // ---- 判定线过滤选项 ----
+        #endregion
+
+        #region 判定线过滤选项
 
         [CommandOption("--remove-attach-ui")]
         [LocalizedDescription("convert_opt_remove_attach_ui")]
@@ -122,13 +132,17 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [LocalizedDescription("convert_opt_remove_texture")]
         public bool? RemoveTextureLine { get; set; }
 
-        // ---- 音符过滤选项 ----
+        #endregion
+
+        #region 音符过滤选项
 
         [CommandOption("--filter-fake-notes")]
         [LocalizedDescription("convert_opt_filter_fake_notes")]
         public bool? FilterFakeNotes { get; set; }
 
-        // ---- 负透明度抬高选项 ----
+        #endregion
+
+        #region 负不透明度抬高选项
 
         [CommandOption("--negative-alpha-elevation")]
         [LocalizedDescription("convert_opt_negative_alpha_elevation")]
@@ -137,6 +151,8 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [CommandOption("--negative-alpha-step <N>")]
         [LocalizedDescription("convert_opt_negative_alpha_step")]
         public double? NegativeAlphaStep { get; set; }
+
+        #endregion
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)

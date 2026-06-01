@@ -14,6 +14,12 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <summary>
     /// 根据父线位置与旋转角度，计算子线在绝对坐标系中的位置。
     /// </summary>
+    /// <param name="fatherLineX">父线 X 坐标</param>
+    /// <param name="fatherLineY">父线 Y 坐标</param>
+    /// <param name="angleDegrees">旋转角度（度）</param>
+    /// <param name="lineX">子线 X 坐标</param>
+    /// <param name="lineY">子线 Y 坐标</param>
+    /// <returns>绝对坐标系中的位置</returns>
     (double X, double Y) GetLinePos(
         double fatherLineX, double fatherLineY, double angleDegrees,
         double lineX, double lineY);
@@ -21,6 +27,13 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <summary>
     /// 根据父线位置与旋转角度，计算子线在指定渲染坐标系中的位置。
     /// </summary>
+    /// <param name="fatherLineX">父线 X 坐标</param>
+    /// <param name="fatherLineY">父线 Y 坐标</param>
+    /// <param name="angleDegrees">旋转角度（度）</param>
+    /// <param name="lineX">子线 X 坐标</param>
+    /// <param name="lineY">子线 Y 坐标</param>
+    /// <param name="renderProfile">渲染坐标系配置</param>
+    /// <returns>渲染坐标系中的位置</returns>
     (double X, double Y) GetLinePos(
         double fatherLineX, double fatherLineY, double angleDegrees,
         double lineX, double lineY, CoordinateProfile renderProfile);
