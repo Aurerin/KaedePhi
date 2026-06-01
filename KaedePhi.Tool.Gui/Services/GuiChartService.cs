@@ -85,13 +85,14 @@ public sealed class GuiChartService
     /// <summary>
     /// 将当前 KPC 图表导出到指定格式和路径
     /// </summary>
-    public async Task ExportChartAsync(ChartType targetType, string outputPath, bool stream, bool indented, CancellationToken ct)
+    public async Task ExportChartAsync(ChartType targetType, string outputPath, bool stream, bool indented,
+        KpcToPhigrosV3ConvertOptions? phigrosOptions = null, CancellationToken ct = default)
     {
         if (CurrentChart == null)
             throw new InvalidOperationException("No chart loaded");
 
         _log.Information(log_exporting_to, outputPath, targetType);
-        await ConvertFromKpcAndSaveAsync(CurrentChart, targetType, outputPath, stream, indented, ct);
+        await ConvertFromKpcAndSaveAsync(CurrentChart, targetType, outputPath, stream, indented, phigrosOptions, ct);
         _log.Information(log_export_done);
     }
 
@@ -173,7 +174,8 @@ public sealed class GuiChartService
     }
 
     private async Task ConvertFromKpcAndSaveAsync(
-        Chart chart, ChartType targetType, string outputPath, bool stream, bool indented, CancellationToken ct)
+        Chart chart, ChartType targetType, string outputPath, bool stream, bool indented,
+        KpcToPhigrosV3ConvertOptions? phigrosOptions, CancellationToken ct)
     {
         _log.Information(log_exporting_to, outputPath, targetType);
         switch (targetType)
@@ -226,7 +228,7 @@ public sealed class GuiChartService
                     warning: msg => _log.Warning(msg),
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg));
-                var phigrosChart = v3Converter.FromKpc(chart, new KpcToPhigrosV3ConvertOptions());
+                var phigrosChart = v3Converter.FromKpc(chart, phigrosOptions ?? new KpcToPhigrosV3ConvertOptions());
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);

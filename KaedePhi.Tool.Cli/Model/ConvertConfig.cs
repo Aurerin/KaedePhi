@@ -118,6 +118,21 @@ public class ConvertConfig
     /// </summary>
     public double PhigrosSpeedCutPrecision { get; set; } = 64d;
 
+    /// <summary>
+    /// 是否过滤假音符（直接删除 IsFake=true 的音符）
+    /// </summary>
+    public bool PhigrosFilterFakeNotes { get; set; } = false;
+
+    /// <summary>
+    /// 是否启用负透明度段判定线抬高
+    /// </summary>
+    public bool PhigrosNegativeAlphaElevation { get; set; } = false;
+
+    /// <summary>
+    /// 负透明度段每次抬高的 KPC 坐标系 Y 偏移量
+    /// </summary>
+    public double PhigrosNegativeAlphaStep { get; set; } = 4.0;
+
     // ---- 通用父子线解绑选项 ----
 
     /// <summary>

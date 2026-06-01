@@ -195,6 +195,33 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 过滤假音符（删除 IsFake 音符）.
+        /// </summary>
+        public static string convert_filter_fake_notes {
+            get {
+                return ResourceManager.GetString("convert_filter_fake_notes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 负透明度段判定线抬高至屏幕外.
+        /// </summary>
+        public static string convert_negative_alpha_elevation {
+            get {
+                return ResourceManager.GetString("convert_negative_alpha_elevation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 负透明度抬高步长（KPC Y）.
+        /// </summary>
+        public static string convert_negative_alpha_step {
+            get {
+                return ResourceManager.GetString("convert_negative_alpha_step", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 缓动切割精度.
         /// </summary>
         public static string convert_easing_precision {

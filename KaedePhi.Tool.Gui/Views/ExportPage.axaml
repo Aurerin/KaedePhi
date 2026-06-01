@@ -79,6 +79,12 @@
                                         <TextBlock Text="{x:Static loc:GuiLocalizationString.convert_alpha_precision}" FontSize="12" Opacity="0.7"/>
                                         <NumericUpDown Value="{Binding PhigrosAlphaCutPrecision}" Increment="1" FormatString="F0" Width="200" HorizontalAlignment="Left"/>
                                     </StackPanel>
+                                    <CheckBox Content="{x:Static loc:GuiLocalizationString.convert_filter_fake_notes}" IsChecked="{Binding FilterFakeNotes}"/>
+                                    <CheckBox Content="{x:Static loc:GuiLocalizationString.convert_negative_alpha_elevation}" IsChecked="{Binding NegativeAlphaElevation}"/>
+                                    <StackPanel Spacing="4" IsVisible="{Binding NegativeAlphaElevation}">
+                                        <TextBlock Text="{x:Static loc:GuiLocalizationString.convert_negative_alpha_step}" FontSize="12" Opacity="0.7"/>
+                                        <NumericUpDown Value="{Binding NegativeAlphaStep}" Increment="0.5" FormatString="F1" Minimum="0.1" Width="200" HorizontalAlignment="Left"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
 

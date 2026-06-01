@@ -121,6 +121,22 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         [CommandOption("--remove-texture")]
         [LocalizedDescription("convert_opt_remove_texture")]
         public bool? RemoveTextureLine { get; set; }
+
+        // ---- 音符过滤选项 ----
+
+        [CommandOption("--filter-fake-notes")]
+        [LocalizedDescription("convert_opt_filter_fake_notes")]
+        public bool? FilterFakeNotes { get; set; }
+
+        // ---- 负透明度抬高选项 ----
+
+        [CommandOption("--negative-alpha-elevation")]
+        [LocalizedDescription("convert_opt_negative_alpha_elevation")]
+        public bool? NegativeAlphaElevation { get; set; }
+
+        [CommandOption("--negative-alpha-step <N>")]
+        [LocalizedDescription("convert_opt_negative_alpha_step")]
+        public double? NegativeAlphaStep { get; set; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
@@ -219,6 +235,15 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
             {
                 RemoveAttachUiLine = s.RemoveAttachUiLine ?? false,
                 RemoveTextureLine = s.RemoveTextureLine ?? false
+            },
+            NoteFilter = new KpcToPhigrosV3ConvertOptions.NoteFilterOptions
+            {
+                FilterFakeNotes = s.FilterFakeNotes ?? c.PhigrosFilterFakeNotes
+            },
+            NegativeAlpha = new KpcToPhigrosV3ConvertOptions.NegativeAlphaOptions
+            {
+                Enabled = s.NegativeAlphaElevation ?? c.PhigrosNegativeAlphaElevation,
+                ElevationStep = s.NegativeAlphaStep ?? c.PhigrosNegativeAlphaStep
             }
         };
 

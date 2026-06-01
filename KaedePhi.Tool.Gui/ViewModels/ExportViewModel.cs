@@ -381,6 +381,36 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool FilterFakeNotes
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool NegativeAlphaElevation
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public double NegativeAlphaStep
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 4.0d;
+
     public event Action? RequestExport;
     public event Action? RequestReturnToImport;
 
@@ -412,6 +442,9 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         MultiLayerMergePrecision = config.MultiLayerMergePrecision;
         MultiLayerMergeTolerance = config.MultiLayerMergeTolerance;
         MultiLayerMergeClassicMode = config.MultiLayerMergeClassicMode;
+        FilterFakeNotes = config.PhigrosFilterFakeNotes;
+        NegativeAlphaElevation = config.PhigrosNegativeAlphaElevation;
+        NegativeAlphaStep = config.PhigrosNegativeAlphaStep;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
