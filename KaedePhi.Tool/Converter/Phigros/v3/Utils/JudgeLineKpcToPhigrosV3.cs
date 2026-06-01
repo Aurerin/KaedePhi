@@ -553,5 +553,5 @@ public class JudgeLineKpcToPhigrosV3
 
 
 
-    private void Warn(string message) => _warnLogger?.Invoke($"[ToPhigrosV3] {message}");
+    private void Warn(string message) => _warnLogger?.Invoke(message);
 }

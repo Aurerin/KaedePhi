@@ -100,5 +100,5 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
             Warn($"PhigrosV3 不支持 Meta.Song（值='{src.Song}'）");
     }
 
-    private void Warn(string message) => LogWarning($"[ToPhigrosV3] {message}");
+    private void Warn(string message) => LogWarning(message);
 }

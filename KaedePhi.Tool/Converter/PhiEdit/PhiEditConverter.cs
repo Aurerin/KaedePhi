@@ -56,5 +56,5 @@ public class PhiEditConverter : LoggableBase,
     }
 
 
-    private void Warn(string message) => LogWarning($"[ToPe] {message}");
+    private void Warn(string message) => LogWarning(message);
 }
