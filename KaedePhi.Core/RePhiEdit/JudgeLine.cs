@@ -47,8 +47,11 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 判定线音符列表
         /// </summary>
-        [JsonProperty("notes", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "notes",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public List<Note>? Notes
         {
             get => _notes;
@@ -75,8 +78,11 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 特殊事件层（故事板）
         /// </summary>
-        [JsonProperty("extended", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "extended",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public Events.ExtendLayer Extended { get; set; } = new Events.ExtendLayer();
 
         /// <summary>
@@ -131,7 +137,8 @@ namespace KaedePhi.Core.RePhiEdit
             set => _positionControls = value;
         }
 
-        [JsonIgnore] private List<Controls.XControl> _positionControls;
+        [JsonIgnore]
+        private List<Controls.XControl> _positionControls;
 
         /// <summary>
         /// Alpha Control 控制点列表
@@ -148,7 +155,8 @@ namespace KaedePhi.Core.RePhiEdit
             set => _alphaControls = value;
         }
 
-        [JsonIgnore] private List<Controls.AlphaControl> _alphaControls;
+        [JsonIgnore]
+        private List<Controls.AlphaControl> _alphaControls;
 
         /// <summary>
         /// Size Control 控制点列表
@@ -165,7 +173,8 @@ namespace KaedePhi.Core.RePhiEdit
             set => _sizeControls = value;
         }
 
-        [JsonIgnore] private List<Controls.SizeControl> _sizeControls;
+        [JsonIgnore]
+        private List<Controls.SizeControl> _sizeControls;
 
         /// <summary>
         /// Skew Control 控制点列表
@@ -182,7 +191,8 @@ namespace KaedePhi.Core.RePhiEdit
             set => _skewControls = value;
         }
 
-        [JsonIgnore] private List<Controls.SkewControl> _skewControls;
+        [JsonIgnore]
+        private List<Controls.SkewControl> _skewControls;
 
         /// <summary>
         /// Y Control 控制点列表
@@ -199,7 +209,8 @@ namespace KaedePhi.Core.RePhiEdit
             set => _yControls = value;
         }
 
-        [JsonIgnore] private List<Controls.YControl> _yControls;
+        [JsonIgnore]
+        private List<Controls.YControl> _yControls;
 
         public JudgeLine Clone()
         {
@@ -223,7 +234,7 @@ namespace KaedePhi.Core.RePhiEdit
                 AlphaControls = new List<Controls.AlphaControl>(),
                 SizeControls = new List<Controls.SizeControl>(),
                 SkewControls = new List<Controls.SkewControl>(),
-                YControls = new List<Controls.YControl>()
+                YControls = new List<Controls.YControl>(),
             };
 
             // 深拷贝列表

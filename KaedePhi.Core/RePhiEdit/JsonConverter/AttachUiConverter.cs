@@ -5,7 +5,11 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
 {
     public class AttachUiConverter : JsonConverter<AttachUi?>
     {
-        public override void WriteJson(JsonWriter writer, AttachUi? value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            AttachUi? value,
+            JsonSerializer serializer
+        )
         {
             if (value == null)
             {
@@ -15,32 +19,25 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
 
             switch (value)
             {
-                case AttachUi.Bar
-                    :
+                case AttachUi.Bar:
                     writer.WriteValue("bar");
                     break;
-                case AttachUi.Combo
-                    :
+                case AttachUi.Combo:
                     writer.WriteValue("combo");
                     break;
-                case AttachUi.ComboNumber
-                    : // ReSharper disable once StringLiteralTypo
+                case AttachUi.ComboNumber: // ReSharper disable once StringLiteralTypo
                     writer.WriteValue("combonumber");
                     break;
-                case AttachUi.Level
-                    :
+                case AttachUi.Level:
                     writer.WriteValue("level");
                     break;
-                case AttachUi.Name
-                    :
+                case AttachUi.Name:
                     writer.WriteValue("name");
                     break;
-                case AttachUi.Pause
-                    :
+                case AttachUi.Pause:
                     writer.WriteValue("pause");
                     break;
-                case AttachUi.Score
-                    :
+                case AttachUi.Score:
                     writer.WriteValue("score");
                     break;
                 default:
@@ -49,9 +46,13 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
             }
         }
 
-        public override AttachUi? ReadJson(JsonReader reader, Type objectType, AttachUi? existingValue,
+        public override AttachUi? ReadJson(
+            JsonReader reader,
+            Type objectType,
+            AttachUi? existingValue,
             bool hasExistingValue,
-            JsonSerializer serializer)
+            JsonSerializer serializer
+        )
         {
             if (reader.TokenType == JsonToken.Null)
                 return null;
@@ -69,7 +70,7 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
                     "name" => AttachUi.Name,
                     "pause" => AttachUi.Pause,
                     "score" => AttachUi.Score,
-                    _ => existingValue
+                    _ => existingValue,
                 };
             }
 

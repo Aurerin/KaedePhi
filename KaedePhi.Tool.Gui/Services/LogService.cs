@@ -36,8 +36,7 @@ public sealed class LogService : IDisposable
     /// 若在会话启动前调用，返回 <see cref="Serilog.Core.Logger.None"/>（静默丢弃所有日志）。
     /// </para>
     /// </summary>
-    public ILogger ForContext<T>()
-        => _rootLogger?.ForContext<T>() ?? Serilog.Core.Logger.None;
+    public ILogger ForContext<T>() => _rootLogger?.ForContext<T>() ?? Serilog.Core.Logger.None;
 
     /// <summary>
     /// 启动一个新的日志会话：创建带时间戳的日志文件，配置全局 <see cref="Log.Logger"/>。
@@ -54,7 +53,8 @@ public sealed class LogService : IDisposable
             .WriteTo.File(
                 CurrentLogFile,
                 outputTemplate: "[{Level:u4} {Timestamp:HH:mm:ss}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
-                flushToDiskInterval: TimeSpan.FromSeconds(1))
+                flushToDiskInterval: TimeSpan.FromSeconds(1)
+            )
             .CreateLogger();
 
         // 将全局静态 Logger 指向同一实例，供 ForContext<T>() 使用

@@ -68,21 +68,20 @@ namespace KaedePhi.Core.RePhiEdit
         [JsonProperty("id")]
         public string Id { get; set; } = "0";
 
-        public override string ToString()
-            => ToString(Id + ".json");
+        public override string ToString() => ToString(Id + ".json");
 
         [PublicAPI]
         public string ToString(string fileName)
         {
-            return "#\n" +
-                   $"Name: {Name}\n" +
-                   $"Path: {Id}\n" +
-                   $"Song: {Song}\n" +
-                   $"Picture: {Background}\n" +
-                   $"Chart: {fileName}\n" +
-                   $"Level: {Level}\n" +
-                   $"Composer: {Composer}\n" +
-                   $"Charter: {Charter}\n";
+            return "#\n"
+                + $"Name: {Name}\n"
+                + $"Path: {Id}\n"
+                + $"Song: {Song}\n"
+                + $"Picture: {Background}\n"
+                + $"Chart: {fileName}\n"
+                + $"Level: {Level}\n"
+                + $"Composer: {Composer}\n"
+                + $"Charter: {Charter}\n";
         }
 
         public Meta Clone()

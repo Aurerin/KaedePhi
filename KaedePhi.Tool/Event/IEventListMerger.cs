@@ -26,8 +26,5 @@ public interface IEventListMerger<TEvent> : ILoggable
     /// <param name="fromEvents">来源轨道事件列表；为 <see langword="null"/> 或空时直接返回 <paramref name="toEvents"/> 的克隆。</param>
     /// <param name="precision">重叠区段的切片精度（每拍切片数）；值越大精度越高，事件数量也越多。</param>
     /// <returns>叠加后的新事件列表，已按起始拍升序排序。</returns>
-    List<TEvent> EventListMerge(
-        List<TEvent>? toEvents,
-        List<TEvent>? fromEvents,
-        double precision);
+    List<TEvent> EventListMerge(List<TEvent>? toEvents, List<TEvent>? fromEvents, double precision);
 }

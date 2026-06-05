@@ -7,8 +7,9 @@ namespace KaedePhi.Tool.Converter.PhiEdit;
 /// <summary>
 /// PhiEdit 格式转换器。
 /// </summary>
-public class PhiEditConverter : LoggableBase,
-    IChartConverter<Pe.Chart, PhiEditToKpcConvertOptions, KpcToPhiEditConvertOptions>
+public class PhiEditConverter
+    : LoggableBase,
+        IChartConverter<Pe.Chart, PhiEditToKpcConvertOptions, KpcToPhiEditConvertOptions>
 {
     /// <summary>
     /// 将 PhiEdit 格式转换为 KPC 内部格式。
@@ -25,7 +26,9 @@ public class PhiEditConverter : LoggableBase,
         {
             BpmList = source.BpmList?.ConvertAll(Utils.BpmItem.ConvertBpmItem) ?? [],
             Meta = Utils.Meta.ConvertMeta(source),
-            JudgeLineList = new Utils.JudgeLineConverter(option).ConvertJudgeLines(source.JudgeLineList)
+            JudgeLineList = new Utils.JudgeLineConverter(option).ConvertJudgeLines(
+                source.JudgeLineList
+            ),
         };
     }
 
@@ -48,7 +51,10 @@ public class PhiEditConverter : LoggableBase,
             Offset = Utils.Meta.GetPeOffset(input.Meta),
             BpmList = input.BpmList?.ConvertAll(Utils.BpmItem.ConvertBpmItem) ?? [],
             JudgeLineList =
-                input.JudgeLineList?.ConvertAll(j => judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)) ?? []
+                input.JudgeLineList?.ConvertAll(j =>
+                    judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)
+                )
+                ?? [],
         };
     }
 
@@ -57,14 +63,19 @@ public class PhiEditConverter : LoggableBase,
         var defaults = new Meta();
         if (src.Background != defaults.Background)
             Warn($"PE 不支持 Meta.Background（值='{src.Background}'）");
-        if (src.Author != defaults.Author) Warn($"PE 不支持 Meta.Author（值='{src.Author}'）");
-        if (src.Composer != defaults.Composer) Warn($"PE 不支持 Meta.Composer（值='{src.Composer}'）");
-        if (src.Artist != defaults.Artist) Warn($"PE 不支持 Meta.Artist（值='{src.Artist}'）");
-        if (src.Level != defaults.Level) Warn($"PE 不支持 Meta.Level（值='{src.Level}'）");
-        if (src.Name != defaults.Name) Warn($"PE 不支持 Meta.Name（值='{src.Name}'）");
-        if (src.Song != defaults.Song) Warn($"PE 不支持 Meta.Song（值='{src.Song}'）");
+        if (src.Author != defaults.Author)
+            Warn($"PE 不支持 Meta.Author（值='{src.Author}'）");
+        if (src.Composer != defaults.Composer)
+            Warn($"PE 不支持 Meta.Composer（值='{src.Composer}'）");
+        if (src.Artist != defaults.Artist)
+            Warn($"PE 不支持 Meta.Artist（值='{src.Artist}'）");
+        if (src.Level != defaults.Level)
+            Warn($"PE 不支持 Meta.Level（值='{src.Level}'）");
+        if (src.Name != defaults.Name)
+            Warn($"PE 不支持 Meta.Name（值='{src.Name}'）");
+        if (src.Song != defaults.Song)
+            Warn($"PE 不支持 Meta.Song（值='{src.Song}'）");
     }
-
 
     private void Warn(string message) => LogWarning(message);
 }

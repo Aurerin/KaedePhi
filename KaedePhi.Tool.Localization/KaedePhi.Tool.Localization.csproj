@@ -1,47 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;PreRelease</Configurations>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <Configurations>Debug;Release;PreRelease</Configurations>
-        <Platforms>x64</Platforms>
-    </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="CliLocalizationString.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>CliLocalizationString.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="CliLocalizationString.en-us.resx">
+      <DependentUpon>CliLocalizationString.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="CliLocalizationString.zh-hant.resx">
+      <DependentUpon>CliLocalizationString.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="GuiLocalizationString.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>GuiLocalizationString.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="GuiLocalizationString.en-us.resx">
+      <DependentUpon>GuiLocalizationString.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="GuiLocalizationString.zh-hant.resx">
+      <DependentUpon>GuiLocalizationString.resx</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Update="CliLocalizationString.resx">
-          <Generator>PublicResXFileCodeGenerator</Generator>
-          <LastGenOutput>CliLocalizationString.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="CliLocalizationString.en-us.resx">
-          <DependentUpon>CliLocalizationString.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="CliLocalizationString.zh-hant.resx">
-          <DependentUpon>CliLocalizationString.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="GuiLocalizationString.resx">
-          <Generator>PublicResXFileCodeGenerator</Generator>
-          <LastGenOutput>GuiLocalizationString.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="GuiLocalizationString.en-us.resx">
-          <DependentUpon>GuiLocalizationString.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="GuiLocalizationString.zh-hant.resx">
-          <DependentUpon>GuiLocalizationString.resx</DependentUpon>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="CliLocalizationString.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>CliLocalizationString.resx</DependentUpon>
-        </Compile>
-        <Compile Update="GuiLocalizationString.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>GuiLocalizationString.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
+  <ItemGroup>
+    <Compile Update="CliLocalizationString.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CliLocalizationString.resx</DependentUpon>
+    </Compile>
+    <Compile Update="GuiLocalizationString.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GuiLocalizationString.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

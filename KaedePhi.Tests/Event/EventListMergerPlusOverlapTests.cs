@@ -24,14 +24,8 @@ public class EventListMergerPlusOverlapTests
         // - toEvents has A active (0→100 over [0,10])
         // - fromEvents has B active (0→200 over [0,5])
         // With the fix, GetActiveEventAtBeat correctly picks the last event with the same StartBeat.
-        var toEvents = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(0, 10, 0, 100)
-        };
-        var fromEvents = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(0, 5, 0, 200)
-        };
+        var toEvents = new List<KpcEvents.Event<double>> { CreateEvent(0, 10, 0, 100) };
+        var fromEvents = new List<KpcEvents.Event<double>> { CreateEvent(0, 5, 0, 200) };
 
         var result = _merger.EventListMerge(toEvents, fromEvents, 4, 1.0);
 
@@ -53,14 +47,8 @@ public class EventListMergerPlusOverlapTests
     [Fact]
     public void Merge_NoOverlap_SimpleAddition()
     {
-        var toEvents = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(0, 5, 0, 100)
-        };
-        var fromEvents = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(5, 10, 50, 150)
-        };
+        var toEvents = new List<KpcEvents.Event<double>> { CreateEvent(0, 5, 0, 100) };
+        var fromEvents = new List<KpcEvents.Event<double>> { CreateEvent(5, 10, 50, 150) };
 
         var result = _merger.EventListMerge(toEvents, fromEvents, 4, 1.0);
 
@@ -81,14 +69,8 @@ public class EventListMergerPlusOverlapTests
         // toEvents: [A: 0-5, 0→100]
         // fromEvents: [B: 3-8, 0→200]
         // Overlap: [3, 5]
-        var toEvents = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(0, 5, 0, 100)
-        };
-        var fromEvents = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(3, 8, 0, 200)
-        };
+        var toEvents = new List<KpcEvents.Event<double>> { CreateEvent(0, 5, 0, 100) };
+        var fromEvents = new List<KpcEvents.Event<double>> { CreateEvent(3, 8, 0, 200) };
 
         var result = _merger.EventListMerge(toEvents, fromEvents, 4, 1.0);
 
@@ -110,8 +92,11 @@ public class EventListMergerPlusOverlapTests
     #region Helper Methods
 
     private static KpcEvents.Event<double> CreateEvent(
-        double startBeat, double endBeat,
-        double startValue, double endValue)
+        double startBeat,
+        double endBeat,
+        double startValue,
+        double endValue
+    )
     {
         return new KpcEvents.Event<double>
         {
@@ -119,7 +104,7 @@ public class EventListMergerPlusOverlapTests
             EndBeat = new Beat(endBeat),
             StartValue = startValue,
             EndValue = endValue,
-            Easing = new Easing(1)
+            Easing = new Easing(1),
         };
     }
 

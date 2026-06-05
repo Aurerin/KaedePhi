@@ -37,5 +37,6 @@ public interface ILoggable
         Action<string>? info = null,
         Action<string>? warning = null,
         Action<string>? error = null,
-        Action<string>? debug = null);
+        Action<string>? debug = null
+    );
 }

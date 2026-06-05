@@ -14,15 +14,25 @@ namespace KaedePhi.Core.KaedePhi.Controls
 
         private static readonly List<SizeControl> DefaultInstance = new()
         {
-            new SizeControl { Easing = new Easing(1), Size = 1.0f, X = 0.0f },
-            new SizeControl { Easing = new Easing(1), Size = 1.0f, X = 9999999.0f }
+            new SizeControl
+            {
+                Easing = new Easing(1),
+                Size = 1.0f,
+                X = 0.0f,
+            },
+            new SizeControl
+            {
+                Easing = new Easing(1),
+                Size = 1.0f,
+                X = 9999999.0f,
+            },
         };
 
         /// <summary>
         /// 获取默认控制点列表。
         /// </summary>
-        public static List<SizeControl> Default
-            => DefaultInstance.ConvertAll(input => input.Clone() as SizeControl);
+        public static List<SizeControl> Default =>
+            DefaultInstance.ConvertAll(input => input.Clone() as SizeControl);
 
         /// <summary>
         /// 深拷贝控制点。
@@ -30,7 +40,12 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// <returns>控制点副本</returns>
         public override ControlBase Clone()
         {
-            return new SizeControl { Easing = new Easing(Easing), X = X, Size = Size };
+            return new SizeControl
+            {
+                Easing = new Easing(Easing),
+                X = X,
+                Size = Size,
+            };
         }
     }
 }

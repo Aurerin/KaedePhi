@@ -15,7 +15,8 @@ public sealed class LogSubscription : IDisposable
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _unsubscribe();
         _disposed = true;
     }

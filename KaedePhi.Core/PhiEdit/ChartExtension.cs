@@ -29,7 +29,9 @@ namespace KaedePhi.Core.PhiEdit
             var lines = pec.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             if (!int.TryParse(lines[0], out var offset))
-                throw new FormatException("Malformed chart file: first line is not a valid integer offset.");
+                throw new FormatException(
+                    "Malformed chart file: first line is not a valid integer offset."
+                );
             chart.Offset = offset;
 
             var i = 1;
@@ -54,10 +56,16 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="judgeDict">判定线暂存字典，键为判定线索引，值为对应 <see cref="JudgeLine"/>。</param>
         /// <returns>下一次应处理的行索引。</returns>
         /// <exception cref="FormatException">指令字段数不足或格式不合法。</exception>
-        private static int ProcessLine(string[] lines, int i, Chart chart, Dictionary<int, JudgeLine> judgeDict)
+        private static int ProcessLine(
+            string[] lines,
+            int i,
+            Chart chart,
+            Dictionary<int, JudgeLine> judgeDict
+        )
         {
             var line = lines[i];
-            if (string.IsNullOrWhiteSpace(line)) return i + 1;
+            if (string.IsNullOrWhiteSpace(line))
+                return i + 1;
 
             var part = line.Split(' ');
             var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
@@ -65,7 +73,9 @@ namespace KaedePhi.Core.PhiEdit
             if (part[0] == "bp")
             {
                 EnsureMinParts(part, 3, "bp");
-                chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
+                chart.BpmList.Add(
+                    new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) }
+                );
             }
             else if (line.StartsWith('n'))
                 i = ParseNote(lines, i, part, judgeLineIndex, judgeDict);
@@ -89,15 +99,22 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static Chart LoadStream(Stream stream)
         {
-            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
-                1024, leaveOpen: true);
+            using var reader = new StreamReader(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                detectEncodingFromByteOrderMarks: true,
+                1024,
+                leaveOpen: true
+            );
 
             var chart = new Chart();
             var judgeDict = new Dictionary<int, JudgeLine>();
 
             var firstLine = reader.ReadLine();
             if (!int.TryParse(firstLine, out var offset))
-                throw new FormatException("Malformed chart file: first line is not a valid integer offset.");
+                throw new FormatException(
+                    "Malformed chart file: first line is not a valid integer offset."
+                );
             chart.Offset = offset;
 
             string? line;
@@ -125,15 +142,22 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static async Task<Chart> LoadStreamAsync(Stream stream)
         {
-            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
-                1024, leaveOpen: true);
+            using var reader = new StreamReader(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                detectEncodingFromByteOrderMarks: true,
+                1024,
+                leaveOpen: true
+            );
 
             var chart = new Chart();
             var judgeDict = new Dictionary<int, JudgeLine>();
 
             var firstLine = await reader.ReadLineAsync();
             if (!int.TryParse(firstLine, out var offset))
-                throw new FormatException("Malformed chart file: first line is not a valid integer offset.");
+                throw new FormatException(
+                    "Malformed chart file: first line is not a valid integer offset."
+                );
             chart.Offset = offset;
 
             string line;
@@ -158,8 +182,12 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="chart">正在构建的谱面对象。</param>
         /// <param name="judgeDict">判定线暂存字典。</param>
         /// <exception cref="FormatException">指令字段数不足，或 Note 缺失速度/宽度行。</exception>
-        private static void ParseChartLine(string line, StreamReader reader, Chart chart,
-            Dictionary<int, JudgeLine> judgeDict)
+        private static void ParseChartLine(
+            string line,
+            StreamReader reader,
+            Chart chart,
+            Dictionary<int, JudgeLine> judgeDict
+        )
         {
             var part = line.Split(' ');
             var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
@@ -167,7 +195,9 @@ namespace KaedePhi.Core.PhiEdit
             if (part[0] == "bp")
             {
                 EnsureMinParts(part, 3, "bp");
-                chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
+                chart.BpmList.Add(
+                    new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) }
+                );
             }
             else if (line.StartsWith('n'))
             {
@@ -198,8 +228,12 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="chart">正在构建的谱面对象。</param>
         /// <param name="judgeDict">判定线暂存字典。</param>
         /// <exception cref="FormatException">指令字段数不足，或 Note 缺失速度/宽度行。</exception>
-        private static async Task ParseChartLineAsync(string line, StreamReader reader, Chart chart,
-            Dictionary<int, JudgeLine> judgeDict)
+        private static async Task ParseChartLineAsync(
+            string line,
+            StreamReader reader,
+            Chart chart,
+            Dictionary<int, JudgeLine> judgeDict
+        )
         {
             var part = line.Split(' ');
             var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
@@ -207,7 +241,9 @@ namespace KaedePhi.Core.PhiEdit
             if (part[0] == "bp")
             {
                 EnsureMinParts(part, 3, "bp");
-                chart.BpmList.Add(new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) });
+                chart.BpmList.Add(
+                    new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) }
+                );
             }
             else if (line.StartsWith('n'))
             {
@@ -238,7 +274,8 @@ namespace KaedePhi.Core.PhiEdit
         {
             if (part.Length < min)
                 throw new FormatException(
-                    $"Malformed '{cmd}' command: expected at least {min} parts, got {part.Length}.");
+                    $"Malformed '{cmd}' command: expected at least {min} parts, got {part.Length}."
+                );
         }
 
         /// <summary>
@@ -252,67 +289,93 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="judgeLineIndex">当前指令作用的判定线索引。</param>
         /// <param name="judgeDict">判定线暂存字典，解析结果将就地写入。</param>
         /// <exception cref="FormatException">指令字段数不足。</exception>
-        private static void ParseLineCommand(string[] part, int judgeLineIndex, Dictionary<int, JudgeLine> judgeDict)
+        private static void ParseLineCommand(
+            string[] part,
+            int judgeLineIndex,
+            Dictionary<int, JudgeLine> judgeDict
+        )
         {
             switch (part[0])
             {
                 case "cv":
                     EnsureMinParts(part, 4, "cv");
                     Ensure();
-                    judgeDict[judgeLineIndex].SpeedFrames.Add(new Frame
-                    { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
+                    judgeDict[judgeLineIndex]
+                        .SpeedFrames.Add(
+                            new Frame { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) }
+                        );
                     break;
                 case "cp":
                     EnsureMinParts(part, 5, "cp");
                     Ensure();
-                    judgeDict[judgeLineIndex].MoveFrames.Add(new MoveFrame
-                    { Beat = float.Parse(part[2]), XValue = float.Parse(part[3]), YValue = float.Parse(part[4]) });
+                    judgeDict[judgeLineIndex]
+                        .MoveFrames.Add(
+                            new MoveFrame
+                            {
+                                Beat = float.Parse(part[2]),
+                                XValue = float.Parse(part[3]),
+                                YValue = float.Parse(part[4]),
+                            }
+                        );
                     break;
                 case "cd":
                     EnsureMinParts(part, 4, "cd");
                     Ensure();
-                    judgeDict[judgeLineIndex].RotateFrames.Add(new Frame
-                    { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
+                    judgeDict[judgeLineIndex]
+                        .RotateFrames.Add(
+                            new Frame { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) }
+                        );
                     break;
                 case "ca":
                     EnsureMinParts(part, 4, "ca");
                     Ensure();
-                    judgeDict[judgeLineIndex].AlphaFrames.Add(new Frame
-                    { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
+                    judgeDict[judgeLineIndex]
+                        .AlphaFrames.Add(
+                            new Frame { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) }
+                        );
                     break;
                 case "cm":
                     EnsureMinParts(part, 7, "cm");
                     Ensure();
-                    judgeDict[judgeLineIndex].MoveEvents.Add(new MoveEvent
-                    {
-                        StartBeat = float.Parse(part[2]),
-                        EndBeat = float.Parse(part[3]),
-                        EndXValue = float.Parse(part[4]),
-                        EndYValue = float.Parse(part[5]),
-                        EasingType = new Easing(int.Parse(part[6]))
-                    });
+                    judgeDict[judgeLineIndex]
+                        .MoveEvents.Add(
+                            new MoveEvent
+                            {
+                                StartBeat = float.Parse(part[2]),
+                                EndBeat = float.Parse(part[3]),
+                                EndXValue = float.Parse(part[4]),
+                                EndYValue = float.Parse(part[5]),
+                                EasingType = new Easing(int.Parse(part[6])),
+                            }
+                        );
                     break;
                 case "cr":
                     EnsureMinParts(part, 6, "cr");
                     Ensure();
-                    judgeDict[judgeLineIndex].RotateEvents.Add(new Event
-                    {
-                        StartBeat = float.Parse(part[2]),
-                        EndBeat = float.Parse(part[3]),
-                        EndValue = float.Parse(part[4]),
-                        EasingType = new Easing(int.Parse(part[5]))
-                    });
+                    judgeDict[judgeLineIndex]
+                        .RotateEvents.Add(
+                            new Event
+                            {
+                                StartBeat = float.Parse(part[2]),
+                                EndBeat = float.Parse(part[3]),
+                                EndValue = float.Parse(part[4]),
+                                EasingType = new Easing(int.Parse(part[5])),
+                            }
+                        );
                     break;
                 case "cf":
                     EnsureMinParts(part, 5, "cf");
                     Ensure();
-                    judgeDict[judgeLineIndex].AlphaEvents.Add(new Event
-                    {
-                        StartBeat = float.Parse(part[2]),
-                        EndBeat = float.Parse(part[3]),
-                        EndValue = float.Parse(part[4]),
-                        EasingType = new Easing(1)
-                    });
+                    judgeDict[judgeLineIndex]
+                        .AlphaEvents.Add(
+                            new Event
+                            {
+                                StartBeat = float.Parse(part[2]),
+                                EndBeat = float.Parse(part[3]),
+                                EndValue = float.Parse(part[4]),
+                                EasingType = new Easing(1),
+                            }
+                        );
                     break;
             }
 
@@ -320,7 +383,8 @@ namespace KaedePhi.Core.PhiEdit
 
             void Ensure()
             {
-                if (!judgeDict.ContainsKey(judgeLineIndex)) judgeDict[judgeLineIndex] = new JudgeLine();
+                if (!judgeDict.ContainsKey(judgeLineIndex))
+                    judgeDict[judgeLineIndex] = new JudgeLine();
             }
         }
 
@@ -337,14 +401,24 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="noteWidthRatioPart">宽度行字段数组，格式为 <c>["&amp;", value]</c>（至少 2 个元素）。</param>
         /// <returns>完整填充的 <see cref="Note"/> 实例。</returns>
         /// <exception cref="FormatException">任意字段数组元素数量不足。</exception>
-        private static Note BuildNote(string[] part, string[] noteSpeedMultiplierPart, string[] noteWidthRatioPart)
+        private static Note BuildNote(
+            string[] part,
+            string[] noteSpeedMultiplierPart,
+            string[] noteWidthRatioPart
+        )
         {
             if (part.Length < 4)
-                throw new FormatException($"Malformed note command: expected at least 4 parts, got {part.Length}.");
+                throw new FormatException(
+                    $"Malformed note command: expected at least 4 parts, got {part.Length}."
+                );
             if (noteSpeedMultiplierPart.Length < 2)
-                throw new FormatException("Malformed note speed multiplier part: expected at least 2 elements.");
+                throw new FormatException(
+                    "Malformed note speed multiplier part: expected at least 2 elements."
+                );
             if (noteWidthRatioPart.Length < 2)
-                throw new FormatException("Malformed note width ratio part: expected at least 2 elements.");
+                throw new FormatException(
+                    "Malformed note width ratio part: expected at least 2 elements."
+                );
 
             var noteType = (NoteType)int.Parse(part[0].Substring(1, 1));
             var isHold = noteType == NoteType.Hold;
@@ -357,7 +431,7 @@ namespace KaedePhi.Core.PhiEdit
                 IsFake = part[isHold ? 6 : 5] == "1",
                 SpeedMultiplier = float.Parse(noteSpeedMultiplierPart[1]),
                 WidthRatio = float.Parse(noteWidthRatioPart[1]),
-                Type = noteType
+                Type = noteType,
             };
         }
 
@@ -377,7 +451,12 @@ namespace KaedePhi.Core.PhiEdit
         {
             var hashIndex = Array.IndexOf(part, "#");
             var ampIndex = Array.IndexOf(part, "&");
-            if (hashIndex != -1 && ampIndex != -1 && hashIndex + 1 < part.Length && ampIndex + 1 < part.Length)
+            if (
+                hashIndex != -1
+                && ampIndex != -1
+                && hashIndex + 1 < part.Length
+                && ampIndex + 1 < part.Length
+            )
                 return (new[] { "#", part[hashIndex + 1] }, new[] { "&", part[ampIndex + 1] });
             return (null, null);
         }
@@ -389,9 +468,14 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="note">待追加的音符。</param>
         /// <param name="judgeLineIndex">音符所属判定线的索引。</param>
         /// <param name="judgeDict">判定线暂存字典。</param>
-        private static void AddNoteToDict(Note note, int judgeLineIndex, Dictionary<int, JudgeLine> judgeDict)
+        private static void AddNoteToDict(
+            Note note,
+            int judgeLineIndex,
+            Dictionary<int, JudgeLine> judgeDict
+        )
         {
-            if (!judgeDict.ContainsKey(judgeLineIndex)) judgeDict[judgeLineIndex] = new JudgeLine();
+            if (!judgeDict.ContainsKey(judgeLineIndex))
+                judgeDict[judgeLineIndex] = new JudgeLine();
             judgeDict[judgeLineIndex].NoteList.Add(note);
         }
 
@@ -409,14 +493,21 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="judgeDict">判定线暂存字典。</param>
         /// <returns>消耗完本 Note 所有行后的行索引（调用方应在此基础上再 +1 以推进到下一条指令）。</returns>
         /// <exception cref="FormatException">多行 Note 缺失速度或宽度行。</exception>
-        private static int ParseNote(string[] lines, int i, string[] part, int judgeLineIndex,
-            Dictionary<int, JudgeLine> judgeDict)
+        private static int ParseNote(
+            string[] lines,
+            int i,
+            string[] part,
+            int judgeLineIndex,
+            Dictionary<int, JudgeLine> judgeDict
+        )
         {
             var (speedPart, widthPart) = GetInlineNoteParts(part);
             if (speedPart == null)
             {
                 if (i + 2 >= lines.Length)
-                    throw new FormatException($"Malformed note at line {i + 1}: missing speed or width lines.");
+                    throw new FormatException(
+                        $"Malformed note at line {i + 1}: missing speed or width lines."
+                    );
                 speedPart = lines[i + 1].Split(' ');
                 widthPart = lines[i + 2].Split(' ');
                 i += 2;
@@ -464,8 +555,7 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="pec">符合 PhiEditChart 规范的文本字符串。</param>
         /// <returns>已完整反序列化并排序的 <see cref="Chart"/> 实例。</returns>
         /// <exception cref="FormatException">首行不是合法整数偏移量，或任意指令字段数不足。</exception>
-        public static async Task<Chart> LoadAsync(string pec)
-            => await Task.Run(() => Load(pec));
+        public static async Task<Chart> LoadAsync(string pec) => await Task.Run(() => Load(pec));
 
         /// <summary>
         /// 以惰性迭代方式枚举单条判定线 <paramref name="judgeLine"/> 的所有 PhiEditChart 导出行。
@@ -480,16 +570,24 @@ namespace KaedePhi.Core.PhiEdit
         private static IEnumerable<string> GetJudgeLineLines(JudgeLine judgeLine, int index)
         {
             // Frame
-            foreach (var frame in judgeLine.MoveFrames) yield return frame.ToString(index);
-            foreach (var frame in judgeLine.SpeedFrames) yield return frame.ToString(index, "cv");
-            foreach (var frame in judgeLine.RotateFrames) yield return frame.ToString(index, "cd");
-            foreach (var frame in judgeLine.AlphaFrames) yield return frame.ToString(index, "ca");
+            foreach (var frame in judgeLine.MoveFrames)
+                yield return frame.ToString(index);
+            foreach (var frame in judgeLine.SpeedFrames)
+                yield return frame.ToString(index, "cv");
+            foreach (var frame in judgeLine.RotateFrames)
+                yield return frame.ToString(index, "cd");
+            foreach (var frame in judgeLine.AlphaFrames)
+                yield return frame.ToString(index, "ca");
             // Event
-            foreach (var ev in judgeLine.MoveEvents) yield return ev.ToString(index);
-            foreach (var ev in judgeLine.RotateEvents) yield return ev.ToString(index, "cr");
-            foreach (var ev in judgeLine.AlphaEvents) yield return ev.ToString(index, "cf");
+            foreach (var ev in judgeLine.MoveEvents)
+                yield return ev.ToString(index);
+            foreach (var ev in judgeLine.RotateEvents)
+                yield return ev.ToString(index, "cr");
+            foreach (var ev in judgeLine.AlphaEvents)
+                yield return ev.ToString(index, "cf");
             // Note
-            foreach (var note in judgeLine.NoteList) yield return note.ToString(index);
+            foreach (var note in judgeLine.NoteList)
+                yield return note.ToString(index);
         }
 
         /// <summary>
@@ -519,8 +617,7 @@ namespace KaedePhi.Core.PhiEdit
         /// <para>内部在线程池上调用同步的 <see cref="Export"/>，适合在 UI 线程等不宜阻塞的上下文中使用。</para>
         /// </summary>
         /// <returns>完整的 PhiEditChart 文本。</returns>
-        public async Task<string> ExportAsync()
-            => await Task.Run(Export);
+        public async Task<string> ExportAsync() => await Task.Run(Export);
 
         /// <summary>
         /// 将谱面以 PhiEditChart 格式流式写入 <paramref name="stream"/>，每行结尾使用系统换行符。
@@ -529,8 +626,12 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="stream">可写的目标流。</param>
         public void ExportToStream(Stream stream)
         {
-            using var writer =
-                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+            using var writer = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
             foreach (var line in GetExportLines())
                 writer.WriteLine(line);
         }
@@ -542,8 +643,12 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="stream">可写的目标流。</param>
         public async Task ExportToStreamAsync(Stream stream)
         {
-            await using var writer =
-                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+            await using var writer = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
             foreach (var line in GetExportLines())
                 await writer.WriteLineAsync(line);
         }

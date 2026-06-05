@@ -26,17 +26,40 @@ public class FrameEventInterpolator
     {
         var maxBeat = 0d;
         maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NoteList?.Select(note => (double)note.EndBeat)));
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NoteList?.Select(note => (double)note.StartBeat)));
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.SpeedFrames?.Select(frame => (double)frame.Beat)));
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.MoveFrames?.Select(frame => (double)frame.Beat)));
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.RotateFrames?.Select(frame => (double)frame.Beat)));
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.AlphaFrames?.Select(frame => (double)frame.Beat)));
-        maxBeat = Math.Max(maxBeat,
-            GetMaxBeat(src.MoveEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })));
-        maxBeat = Math.Max(maxBeat,
-            GetMaxBeat(src.RotateEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })));
-        maxBeat = Math.Max(maxBeat,
-            GetMaxBeat(src.AlphaEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })));
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.NoteList?.Select(note => (double)note.StartBeat))
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.SpeedFrames?.Select(frame => (double)frame.Beat))
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.MoveFrames?.Select(frame => (double)frame.Beat))
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.RotateFrames?.Select(frame => (double)frame.Beat))
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.AlphaFrames?.Select(frame => (double)frame.Beat))
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.MoveEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(
+                src.RotateEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })
+            )
+        );
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.AlphaEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
+        );
         return maxBeat + _trailingBeatPadding;
     }
 
@@ -48,7 +71,8 @@ public class FrameEventInterpolator
         List<Pe.MoveEvent>? events,
         double horizonBeat,
         Func<(float X, float Y), float> selector,
-        Func<float, double> valueTransformer)
+        Func<float, double> valueTransformer
+    )
     {
         var orderedFrames = frames?.OrderBy(frame => frame.Beat).ToList() ?? [];
         var orderedEvents = events?.OrderBy(ev => ev.StartBeat).ToList() ?? [];
@@ -57,21 +81,26 @@ public class FrameEventInterpolator
             orderedFrames.Select(frame => (double)frame.Beat),
             orderedEvents.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }),
             orderedEvents.Select(ev => (double)ev.StartBeat),
-            horizonBeat);
+            horizonBeat
+        );
 
-        if (boundaries.Count < 2) return null;
+        if (boundaries.Count < 2)
+            return null;
 
         var result = new List<KpcEvents.Event<double>>(boundaries.Count - 1);
         for (var i = 0; i < boundaries.Count - 1; i++)
         {
             var startBeat = boundaries[i];
             var endBeat = boundaries[i + 1];
-            if (endBeat <= startBeat) continue;
+            if (endBeat <= startBeat)
+                continue;
 
             var frameAtBoundary = FindMoveFrameAtBeat(orderedFrames, startBeat);
             if (frameAtBoundary != null && !IsMoveEventStartBeat(orderedEvents, startBeat))
             {
-                var convertedValue = valueTransformer(selector((frameAtBoundary.XValue, frameAtBoundary.YValue)));
+                var convertedValue = valueTransformer(
+                    selector((frameAtBoundary.XValue, frameAtBoundary.YValue))
+                );
                 result.Add(CreateConstantEvent(startBeat, endBeat, convertedValue));
                 continue;
             }
@@ -80,25 +109,40 @@ public class FrameEventInterpolator
             var activeEvent = FindActiveMoveEvent(orderedEvents, sampleBeat);
             if (activeEvent != null)
             {
-                var eventStartSource = ResolveMoveEventStartValue(activeEvent, orderedFrames, orderedEvents, orderedEventsByEnd);
-                result.Add(new KpcEvents.Event<double>
-                {
-                    StartBeat = new Beat(startBeat),
-                    EndBeat = new Beat(endBeat),
-                    Easing = EasingConverter.ConvertEasing(activeEvent.EasingType),
-                    EasingLeft = GetEventBoundary(activeEvent.StartBeat, activeEvent.EndBeat, startBeat),
-                    EasingRight = GetEventBoundary(activeEvent.StartBeat, activeEvent.EndBeat, endBeat),
-                    StartValue =
-                        valueTransformer(InterpolateMoveValue(activeEvent, startBeat, eventStartSource, selector)),
-                    EndValue = valueTransformer(InterpolateMoveValue(activeEvent, endBeat, eventStartSource,
-                        selector))
-                });
+                var eventStartSource = ResolveMoveEventStartValue(
+                    activeEvent,
+                    orderedFrames,
+                    orderedEvents,
+                    orderedEventsByEnd
+                );
+                result.Add(
+                    new KpcEvents.Event<double>
+                    {
+                        StartBeat = new Beat(startBeat),
+                        EndBeat = new Beat(endBeat),
+                        Easing = EasingConverter.ConvertEasing(activeEvent.EasingType),
+                        EasingLeft = GetEventBoundary(
+                            activeEvent.StartBeat,
+                            activeEvent.EndBeat,
+                            startBeat
+                        ),
+                        EasingRight = GetEventBoundary(
+                            activeEvent.StartBeat,
+                            activeEvent.EndBeat,
+                            endBeat
+                        ),
+                        StartValue = valueTransformer(
+                            InterpolateMoveValue(activeEvent, startBeat, eventStartSource, selector)
+                        ),
+                        EndValue = valueTransformer(
+                            InterpolateMoveValue(activeEvent, endBeat, eventStartSource, selector)
+                        ),
+                    }
+                );
             }
         }
 
-        return result.Count == 0
-            ? null
-            : result;
+        return result.Count == 0 ? null : result;
     }
 
     /// <summary>
@@ -108,7 +152,8 @@ public class FrameEventInterpolator
         List<Pe.Frame>? frames,
         List<Pe.Event>? events,
         double horizonBeat,
-        Func<float, T> valueTransformer)
+        Func<float, T> valueTransformer
+    )
     {
         var orderedFrames = frames?.OrderBy(frame => frame.Beat).ToList() ?? [];
         var orderedEvents = events?.OrderBy(ev => ev.StartBeat).ToList() ?? [];
@@ -117,21 +162,26 @@ public class FrameEventInterpolator
             orderedFrames.Select(frame => (double)frame.Beat),
             orderedEvents.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }),
             orderedEvents.Select(ev => (double)ev.StartBeat),
-            horizonBeat);
+            horizonBeat
+        );
 
-        if (boundaries.Count < 2) return null;
+        if (boundaries.Count < 2)
+            return null;
 
         var result = new List<KpcEvents.Event<T>>(boundaries.Count - 1);
         for (var i = 0; i < boundaries.Count - 1; i++)
         {
             var startBeat = boundaries[i];
             var endBeat = boundaries[i + 1];
-            if (endBeat <= startBeat) continue;
+            if (endBeat <= startBeat)
+                continue;
 
             var frameAtBoundary = FindScalarFrameAtBeat(orderedFrames, startBeat);
             if (frameAtBoundary != null && !IsScalarEventStartBeat(orderedEvents, startBeat))
             {
-                result.Add(CreateConstantEvent(startBeat, endBeat, valueTransformer(frameAtBoundary.Value)));
+                result.Add(
+                    CreateConstantEvent(startBeat, endBeat, valueTransformer(frameAtBoundary.Value))
+                );
                 continue;
             }
 
@@ -139,17 +189,36 @@ public class FrameEventInterpolator
             var activeEvent = FindActiveScalarEvent(orderedEvents, sampleBeat);
             if (activeEvent != null)
             {
-                var eventStartSource = ResolveScalarEventStartValue(activeEvent, orderedFrames, orderedEvents, orderedEventsByEnd);
-                result.Add(new KpcEvents.Event<T>
-                {
-                    StartBeat = new Beat(startBeat),
-                    EndBeat = new Beat(endBeat),
-                    Easing = EasingConverter.ConvertEasing(activeEvent.EasingType),
-                    EasingLeft = GetEventBoundary(activeEvent.StartBeat, activeEvent.EndBeat, startBeat),
-                    EasingRight = GetEventBoundary(activeEvent.StartBeat, activeEvent.EndBeat, endBeat),
-                    StartValue = valueTransformer(InterpolateScalarValue(activeEvent, startBeat, eventStartSource)),
-                    EndValue = valueTransformer(InterpolateScalarValue(activeEvent, endBeat, eventStartSource))
-                });
+                var eventStartSource = ResolveScalarEventStartValue(
+                    activeEvent,
+                    orderedFrames,
+                    orderedEvents,
+                    orderedEventsByEnd
+                );
+                result.Add(
+                    new KpcEvents.Event<T>
+                    {
+                        StartBeat = new Beat(startBeat),
+                        EndBeat = new Beat(endBeat),
+                        Easing = EasingConverter.ConvertEasing(activeEvent.EasingType),
+                        EasingLeft = GetEventBoundary(
+                            activeEvent.StartBeat,
+                            activeEvent.EndBeat,
+                            startBeat
+                        ),
+                        EasingRight = GetEventBoundary(
+                            activeEvent.StartBeat,
+                            activeEvent.EndBeat,
+                            endBeat
+                        ),
+                        StartValue = valueTransformer(
+                            InterpolateScalarValue(activeEvent, startBeat, eventStartSource)
+                        ),
+                        EndValue = valueTransformer(
+                            InterpolateScalarValue(activeEvent, endBeat, eventStartSource)
+                        ),
+                    }
+                );
             }
         }
 
@@ -158,22 +227,28 @@ public class FrameEventInterpolator
 
     #region Helpers
 
-    private static double GetMaxBeat(IEnumerable<double>? beats) => beats?.DefaultIfEmpty(0d).Max() ?? 0d;
+    private static double GetMaxBeat(IEnumerable<double>? beats) =>
+        beats?.DefaultIfEmpty(0d).Max() ?? 0d;
 
-    private static double GetMidBeat(double startBeat, double endBeat) => startBeat + (endBeat - startBeat) / 2d;
+    private static double GetMidBeat(double startBeat, double endBeat) =>
+        startBeat + (endBeat - startBeat) / 2d;
 
-    private static bool IsSameBeat(double leftBeat, double rightBeat)
-        => Math.Abs(leftBeat - rightBeat) <= BeatComparisonEpsilon;
+    private static bool IsSameBeat(double leftBeat, double rightBeat) =>
+        Math.Abs(leftBeat - rightBeat) <= BeatComparisonEpsilon;
 
     private List<double> BuildBoundaries(
         IEnumerable<double> frameBoundaries,
         IEnumerable<double> eventBoundaries,
-        double horizonBeat)
+        double horizonBeat
+    )
     {
         var boundaries = new SortedSet<double>();
-        foreach (var beat in frameBoundaries) boundaries.Add(beat);
-        foreach (var beat in eventBoundaries) boundaries.Add(beat);
-        if (boundaries.Count == 0) return [];
+        foreach (var beat in frameBoundaries)
+            boundaries.Add(beat);
+        foreach (var beat in eventBoundaries)
+            boundaries.Add(beat);
+        if (boundaries.Count == 0)
+            return [];
 
         boundaries.Add(Math.Max(horizonBeat, boundaries.Max + _trailingBeatPadding));
         return boundaries.ToList();
@@ -183,24 +258,31 @@ public class FrameEventInterpolator
         IEnumerable<double> frameBoundaries,
         IEnumerable<double> eventBoundaries,
         IEnumerable<double> eventStartBoundaries,
-        double horizonBeat)
+        double horizonBeat
+    )
     {
         var frameList = frameBoundaries.ToList();
         var eventStartList = eventStartBoundaries.OrderBy(beat => beat).ToList();
         var boundaries = BuildBoundaries(frameList, eventBoundaries, horizonBeat);
-        if (boundaries.Count == 0) return boundaries;
+        if (boundaries.Count == 0)
+            return boundaries;
 
         var expandedBoundaries = new SortedSet<double>(boundaries);
         foreach (var frameBeat in frameList)
         {
-            if (ContainsBeat(eventStartList, frameBeat)) continue;
+            if (ContainsBeat(eventStartList, frameBeat))
+                continue;
             expandedBoundaries.Add(frameBeat + _frameDurationBeat);
         }
 
         return expandedBoundaries.ToList();
     }
 
-    private static int FindLastIndexAtOrBeforeBeat<T>(List<T> items, double beat, Func<T, double> beatSelector)
+    private static int FindLastIndexAtOrBeforeBeat<T>(
+        List<T> items,
+        double beat,
+        Func<T, double> beatSelector
+    )
     {
         var lo = 0;
         var hi = items.Count - 1;
@@ -232,20 +314,26 @@ public class FrameEventInterpolator
     private static float GetEventBoundary(float eventStartBeat, float eventEndBeat, double beat)
     {
         var duration = eventEndBeat - eventStartBeat;
-        if (Math.Abs(duration) < 1e-6f) return 1f;
+        if (Math.Abs(duration) < 1e-6f)
+            return 1f;
         return (float)((beat - eventStartBeat) / duration);
     }
 
-    private static KpcEvents.Event<T> CreateConstantEvent<T>(double startBeat, double endBeat, T value) => new()
-    {
-        StartBeat = new Beat(startBeat),
-        EndBeat = new Beat(endBeat),
-        Easing = new KpcEasing(1),
-        EasingLeft = 0f,
-        EasingRight = 1f,
-        StartValue = value,
-        EndValue = value
-    };
+    private static KpcEvents.Event<T> CreateConstantEvent<T>(
+        double startBeat,
+        double endBeat,
+        T value
+    ) =>
+        new()
+        {
+            StartBeat = new Beat(startBeat),
+            EndBeat = new Beat(endBeat),
+            Easing = new KpcEasing(1),
+            EasingLeft = 0f,
+            EasingRight = 1f,
+            StartValue = value,
+            EndValue = value,
+        };
 
     private static Pe.MoveEvent? FindActiveMoveEvent(List<Pe.MoveEvent> events, double beat)
     {
@@ -286,15 +374,27 @@ public class FrameEventInterpolator
     private static (float X, float Y) ResolveMoveValueAfterBoundary(
         List<Pe.MoveFrame> frames,
         List<Pe.MoveEvent> events,
-        double boundaryBeat)
+        double boundaryBeat
+    )
     {
-        var previousFrameIndex = FindLastIndexAtOrBeforeBeat(frames, boundaryBeat, frame => frame.Beat);
-        var previousEventIndex = FindLastIndexAtOrBeforeBeat(events, boundaryBeat, ev => ev.EndBeat);
+        var previousFrameIndex = FindLastIndexAtOrBeforeBeat(
+            frames,
+            boundaryBeat,
+            frame => frame.Beat
+        );
+        var previousEventIndex = FindLastIndexAtOrBeforeBeat(
+            events,
+            boundaryBeat,
+            ev => ev.EndBeat
+        );
 
         var previousFrame = previousFrameIndex >= 0 ? frames[previousFrameIndex] : null;
         var previousEvent = previousEventIndex >= 0 ? events[previousEventIndex] : null;
 
-        if (previousEvent != null && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat))
+        if (
+            previousEvent != null
+            && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat)
+        )
             return (previousEvent.EndXValue, previousEvent.EndYValue);
 
         if (previousFrame != null)
@@ -306,15 +406,27 @@ public class FrameEventInterpolator
     private static float ResolveScalarValueAfterBoundary(
         List<Pe.Frame> frames,
         List<Pe.Event> events,
-        double boundaryBeat)
+        double boundaryBeat
+    )
     {
-        var previousFrameIndex = FindLastIndexAtOrBeforeBeat(frames, boundaryBeat, frame => frame.Beat);
-        var previousEventIndex = FindLastIndexAtOrBeforeBeat(events, boundaryBeat, ev => ev.EndBeat);
+        var previousFrameIndex = FindLastIndexAtOrBeforeBeat(
+            frames,
+            boundaryBeat,
+            frame => frame.Beat
+        );
+        var previousEventIndex = FindLastIndexAtOrBeforeBeat(
+            events,
+            boundaryBeat,
+            ev => ev.EndBeat
+        );
 
         var previousFrame = previousFrameIndex >= 0 ? frames[previousFrameIndex] : null;
         var previousEvent = previousEventIndex >= 0 ? events[previousEventIndex] : null;
 
-        if (previousEvent != null && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat))
+        if (
+            previousEvent != null
+            && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat)
+        )
             return previousEvent.EndValue;
 
         if (previousFrame != null)
@@ -327,7 +439,8 @@ public class FrameEventInterpolator
         Pe.MoveEvent ev,
         List<Pe.MoveFrame> frames,
         List<Pe.MoveEvent> orderedEvents,
-        List<Pe.MoveEvent> eventsByEnd)
+        List<Pe.MoveEvent> eventsByEnd
+    )
     {
         // 优先：ev.StartBeat 处有精确帧
         var frameAtStart = FindMoveFrameAtBeat(frames, ev.StartBeat);
@@ -352,10 +465,25 @@ public class FrameEventInterpolator
             if (precedingDominant.EndBeat >= ev.StartBeat - BeatComparisonEpsilon)
             {
                 // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
-                var innerStartSource = ResolveMoveEventStartValue(precedingDominant, frames, orderedEvents, eventsByEnd);
+                var innerStartSource = ResolveMoveEventStartValue(
+                    precedingDominant,
+                    frames,
+                    orderedEvents,
+                    eventsByEnd
+                );
                 return (
-                    InterpolateMoveValue(precedingDominant, ev.StartBeat, innerStartSource, v => v.X),
-                    InterpolateMoveValue(precedingDominant, ev.StartBeat, innerStartSource, v => v.Y)
+                    InterpolateMoveValue(
+                        precedingDominant,
+                        ev.StartBeat,
+                        innerStartSource,
+                        v => v.X
+                    ),
+                    InterpolateMoveValue(
+                        precedingDominant,
+                        ev.StartBeat,
+                        innerStartSource,
+                        v => v.Y
+                    )
                 );
             }
 
@@ -371,7 +499,8 @@ public class FrameEventInterpolator
         Pe.Event ev,
         List<Pe.Frame> frames,
         List<Pe.Event> orderedEvents,
-        List<Pe.Event> eventsByEnd)
+        List<Pe.Event> eventsByEnd
+    )
     {
         // 优先：ev.StartBeat 处有精确帧
         var frameAtStart = FindScalarFrameAtBeat(frames, ev.StartBeat);
@@ -396,7 +525,12 @@ public class FrameEventInterpolator
             if (precedingDominant.EndBeat >= ev.StartBeat - (float)BeatComparisonEpsilon)
             {
                 // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
-                var innerStart = ResolveScalarEventStartValue(precedingDominant, frames, orderedEvents, eventsByEnd);
+                var innerStart = ResolveScalarEventStartValue(
+                    precedingDominant,
+                    frames,
+                    orderedEvents,
+                    eventsByEnd
+                );
                 return InterpolateScalarValue(precedingDominant, ev.StartBeat, innerStart);
             }
 
@@ -436,12 +570,15 @@ public class FrameEventInterpolator
         Pe.MoveEvent ev,
         double beat,
         (float X, float Y) intervalStartSource,
-        Func<(float X, float Y), float> selector)
+        Func<(float X, float Y), float> selector
+    )
     {
         if (Math.Abs(ev.EndBeat - ev.StartBeat) < 1e-6f)
             return selector((ev.EndXValue, ev.EndYValue));
 
-        return selector(ev.GetValueAtBeat((float)beat, intervalStartSource.X, intervalStartSource.Y));
+        return selector(
+            ev.GetValueAtBeat((float)beat, intervalStartSource.X, intervalStartSource.Y)
+        );
     }
 
     private static float InterpolateScalarValue(Pe.Event ev, double beat, float intervalStartSource)

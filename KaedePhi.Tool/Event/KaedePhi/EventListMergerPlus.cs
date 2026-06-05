@@ -29,10 +29,13 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         List<KpcEvents.Event<TPayload>>? toEvents,
         List<KpcEvents.Event<TPayload>>? fromEvents,
         double precision,
-        double tolerance)
+        double tolerance
+    )
     {
-        if (TryGetMergeEarlyReturn(toEvents, fromEvents, out var earlyReturn)) return earlyReturn;
-        if (toEvents == null || fromEvents == null) return [];
+        if (TryGetMergeEarlyReturn(toEvents, fromEvents, out var earlyReturn))
+            return earlyReturn;
+        if (toEvents == null || fromEvents == null)
+            return [];
 
         EnsureSupportedNumericType();
 
@@ -45,7 +48,12 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
             return MergeWithoutOverlap(toEventsCopy, fromEventsCopy);
 
         return MergeWithOverlapAdaptiveSampling(
-            toEvents, toEventsCopy, fromEventsCopy, precision, tolerance);
+            toEvents,
+            toEventsCopy,
+            fromEventsCopy,
+            precision,
+            tolerance
+        );
     }
 
     #endregion
@@ -60,14 +68,26 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         List<KpcEvents.Event<TPayload>> toEventsCopy,
         List<KpcEvents.Event<TPayload>> fromEventsCopy,
         double precision,
-        double tolerance)
+        double tolerance
+    )
     {
         var overlapIntervals = BuildOverlapIntervals(toEventsCopy, fromEventsCopy);
         var newEvents = BuildBaseEventsOutsideOverlap(
-            toEventsCopy, fromEventsCopy, toEventsForOffsetLookup, overlapIntervals);
+            toEventsCopy,
+            fromEventsCopy,
+            toEventsForOffsetLookup,
+            overlapIntervals
+        );
 
         newEvents.AddRange(
-            MergeAdaptiveIntervals(toEventsCopy, fromEventsCopy, overlapIntervals, precision, tolerance));
+            MergeAdaptiveIntervals(
+                toEventsCopy,
+                fromEventsCopy,
+                overlapIntervals,
+                precision,
+                tolerance
+            )
+        );
 
         SortByStartBeat(newEvents);
         return newEvents;
@@ -81,14 +101,23 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         List<KpcEvents.Event<TPayload>> fromEventsCopy,
         List<(Beat Start, Beat End)> overlapIntervals,
         double precision,
-        double tolerance)
+        double tolerance
+    )
     {
         var cutLength = new Beat(1d / precision);
         var result = new List<KpcEvents.Event<TPayload>>();
         foreach (var (start, end) in overlapIntervals)
         {
             result.AddRange(
-                MergeAdaptiveSingleInterval(toEventsCopy, fromEventsCopy, start, end, cutLength, tolerance));
+                MergeAdaptiveSingleInterval(
+                    toEventsCopy,
+                    fromEventsCopy,
+                    start,
+                    end,
+                    cutLength,
+                    tolerance
+                )
+            );
         }
 
         return result;
@@ -108,7 +137,11 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     private List<KpcEvents.Event<TPayload>> MergeAdaptiveSingleInterval(
         List<KpcEvents.Event<TPayload>> toEventsCopy,
         List<KpcEvents.Event<TPayload>> fromEventsCopy,
-        Beat start, Beat end, Beat cutLength, double tolerance)
+        Beat start,
+        Beat end,
+        Beat cutLength,
+        double tolerance
+    )
     {
         var result = new List<KpcEvents.Event<TPayload>>();
 
@@ -118,10 +151,19 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         {
             var subStart = keyBeats[ki];
             var subEnd = keyBeats[ki + 1];
-            if (subStart >= subEnd) continue;
+            if (subStart >= subEnd)
+                continue;
 
             result.AddRange(
-                AdaptiveSampleSubInterval(toEventsCopy, fromEventsCopy, subStart, subEnd, cutLength, tolerance));
+                AdaptiveSampleSubInterval(
+                    toEventsCopy,
+                    fromEventsCopy,
+                    subStart,
+                    subEnd,
+                    cutLength,
+                    tolerance
+                )
+            );
         }
 
         return result;
@@ -135,7 +177,11 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     private List<KpcEvents.Event<TPayload>> AdaptiveSampleSubInterval(
         List<KpcEvents.Event<TPayload>> toEventsCopy,
         List<KpcEvents.Event<TPayload>> fromEventsCopy,
-        Beat subStart, Beat subEnd, Beat cutLength, double tolerance)
+        Beat subStart,
+        Beat subEnd,
+        Beat cutLength,
+        double tolerance
+    )
     {
         var result = new List<KpcEvents.Event<TPayload>>();
 
@@ -144,8 +190,12 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
 
         var toEventAtCurrent = GetActiveEventAtBeat(toEventsCopy, subStart);
         var formEventAtCurrent = GetActiveEventAtBeat(fromEventsCopy, subStart);
-        var toValAtCurrent = toEventAtCurrent != null ? toEventAtCurrent.GetValueAtBeat(subStart) : lastToValue;
-        var formValAtCurrent = formEventAtCurrent != null ? formEventAtCurrent.GetValueAtBeat(subStart) : lastFormValue;
+        var toValAtCurrent =
+            toEventAtCurrent != null ? toEventAtCurrent.GetValueAtBeat(subStart) : lastToValue;
+        var formValAtCurrent =
+            formEventAtCurrent != null
+                ? formEventAtCurrent.GetValueAtBeat(subStart)
+                : lastFormValue;
 
         var segmentStart = subStart;
         var segmentStartToValue = toValAtCurrent;
@@ -154,29 +204,56 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
 
         var subEndSum = AddValues(
             GetValueAtBeatOrPreviousEnd(toEventsCopy, subEnd),
-            GetValueAtBeatOrPreviousEnd(fromEventsCopy, subEnd));
+            GetValueAtBeatOrPreviousEnd(fromEventsCopy, subEnd)
+        );
 
         for (var cur = subStart; cur < subEnd;)
         {
             var nextBeat = cur + cutLength;
-            if (nextBeat > subEnd) nextBeat = subEnd;
+            if (nextBeat > subEnd)
+                nextBeat = subEnd;
             var isLast = nextBeat >= subEnd;
 
             var toEventAtNext = GetActiveEventAtBeat(toEventsCopy, nextBeat);
             var formEventAtNext = GetActiveEventAtBeat(fromEventsCopy, nextBeat);
 
-            var (toValueAtNext, toValUpdate) =
-                GetNextBeatValues(toEventsCopy, toEventAtCurrent, toEventAtNext, nextBeat);
-            var (formValueAtNext, formValUpdate) =
-                GetNextBeatValues(fromEventsCopy, formEventAtCurrent, formEventAtNext, nextBeat);
+            var (toValueAtNext, toValUpdate) = GetNextBeatValues(
+                toEventsCopy,
+                toEventAtCurrent,
+                toEventAtNext,
+                nextBeat
+            );
+            var (formValueAtNext, formValUpdate) = GetNextBeatValues(
+                fromEventsCopy,
+                formEventAtCurrent,
+                formEventAtNext,
+                nextBeat
+            );
 
             var sumAtNext = AddValues(toValueAtNext, formValueAtNext);
 
-            if (isLast || ShouldSplitAdaptiveSegment(
-                    segmentStart, nextBeat, subEnd, segmentStartSum, sumAtNext, subEndSum, tolerance))
+            if (
+                isLast
+                || ShouldSplitAdaptiveSegment(
+                    segmentStart,
+                    nextBeat,
+                    subEnd,
+                    segmentStartSum,
+                    sumAtNext,
+                    subEndSum,
+                    tolerance
+                )
+            )
             {
-                AddSegmentEvent(result, segmentStart, nextBeat,
-                    segmentStartToValue, segmentStartFormValue, toValueAtNext, formValueAtNext);
+                AddSegmentEvent(
+                    result,
+                    segmentStart,
+                    nextBeat,
+                    segmentStartToValue,
+                    segmentStartFormValue,
+                    toValueAtNext,
+                    formValueAtNext
+                );
                 segmentStart = nextBeat;
                 segmentStartToValue = toValUpdate;
                 segmentStartFormValue = formValUpdate;
@@ -201,26 +278,34 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     private static List<Beat> CollectMergeKeyBeats(
         List<KpcEvents.Event<TPayload>> toEvents,
         List<KpcEvents.Event<TPayload>> fromEvents,
-        Beat start, Beat end)
+        Beat start,
+        Beat end
+    )
     {
         var beats = new List<Beat> { start, end };
         foreach (var e in toEvents)
         {
-            if (e.StartBeat > start && e.StartBeat < end) beats.Add(e.StartBeat);
-            if (e.EndBeat > start && e.EndBeat < end) beats.Add(e.EndBeat);
+            if (e.StartBeat > start && e.StartBeat < end)
+                beats.Add(e.StartBeat);
+            if (e.EndBeat > start && e.EndBeat < end)
+                beats.Add(e.EndBeat);
         }
 
         foreach (var e in fromEvents)
         {
-            if (e.StartBeat > start && e.StartBeat < end) beats.Add(e.StartBeat);
-            if (e.EndBeat > start && e.EndBeat < end) beats.Add(e.EndBeat);
+            if (e.StartBeat > start && e.StartBeat < end)
+                beats.Add(e.StartBeat);
+            if (e.EndBeat > start && e.EndBeat < end)
+                beats.Add(e.EndBeat);
         }
 
         return beats.Distinct().OrderBy(b => b).ToList();
     }
 
-    private static KpcEvents.Event<TPayload>? GetActiveEventAtBeat(List<KpcEvents.Event<TPayload>> events, Beat beat)
-        => events.LastOrDefault(e => e.StartBeat <= beat && e.EndBeat >= beat);
+    private static KpcEvents.Event<TPayload>? GetActiveEventAtBeat(
+        List<KpcEvents.Event<TPayload>> events,
+        Beat beat
+    ) => events.LastOrDefault(e => e.StartBeat <= beat && e.EndBeat >= beat);
 
     private static TPayload? GetPreviousEndValue(List<KpcEvents.Event<TPayload>> events, Beat beat)
     {
@@ -228,24 +313,28 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         return prev != null ? prev.EndValue : default;
     }
 
-    private static TPayload? GetValueAtBeatOrPreviousEnd(List<KpcEvents.Event<TPayload>> events, Beat beat)
+    private static TPayload? GetValueAtBeatOrPreviousEnd(
+        List<KpcEvents.Event<TPayload>> events,
+        Beat beat
+    )
     {
         var active = GetActiveEventAtBeat(events, beat);
         return active != null ? active.GetValueAtBeat(beat) : GetPreviousEndValue(events, beat);
     }
 
     private static (TPayload? Outgoing, TPayload? Incoming) GetNextBeatValues(
-        List<KpcEvents.Event<TPayload>> events, KpcEvents.Event<TPayload>? eventAtCurrent,
+        List<KpcEvents.Event<TPayload>> events,
+        KpcEvents.Event<TPayload>? eventAtCurrent,
         KpcEvents.Event<TPayload>? eventAtNext,
-        Beat nextBeat)
+        Beat nextBeat
+    )
     {
         var prevEnd = GetPreviousEndValue(events, nextBeat);
-        var outgoing = (eventAtCurrent is not null && eventAtCurrent.EndBeat >= nextBeat)
-            ? eventAtCurrent.GetValueAtBeat(nextBeat)
-            : prevEnd;
-        var incoming = eventAtNext is not null
-            ? eventAtNext.GetValueAtBeat(nextBeat)
-            : prevEnd;
+        var outgoing =
+            (eventAtCurrent is not null && eventAtCurrent.EndBeat >= nextBeat)
+                ? eventAtCurrent.GetValueAtBeat(nextBeat)
+                : prevEnd;
+        var incoming = eventAtNext is not null ? eventAtNext.GetValueAtBeat(nextBeat) : prevEnd;
         return (outgoing, incoming);
     }
 
@@ -257,15 +346,24 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     /// </para>
     /// </summary>
     protected virtual bool ShouldSplitAdaptiveSegment(
-        Beat segmentStart, Beat nextBeat, Beat intervalEnd,
-        TPayload? segmentStartSum, TPayload? sumAtNext, TPayload? sumAtEnd, double tolerance)
+        Beat segmentStart,
+        Beat nextBeat,
+        Beat intervalEnd,
+        TPayload? segmentStartSum,
+        TPayload? sumAtNext,
+        TPayload? sumAtEnd,
+        double tolerance
+    )
     {
-        if (nextBeat >= intervalEnd) return true;
-        if (nextBeat <= segmentStart) return false;
+        if (nextBeat >= intervalEnd)
+            return true;
+        if (nextBeat <= segmentStart)
+            return false;
 
         var dtTotal = (double)(intervalEnd - segmentStart);
         var dtLocal = (double)(nextBeat - segmentStart);
-        if (dtTotal <= 1e-12 || dtLocal <= 1e-12) return false;
+        if (dtTotal <= 1e-12 || dtLocal <= 1e-12)
+            return false;
 
         var p = Math.Clamp(dtLocal / dtTotal, 0.0, 1.0);
 
@@ -291,20 +389,28 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
             : NumericHelper.ToDouble(value);
     }
 
-    private static TPayload AddValues(TPayload? left, TPayload? right)
-        => NumericHelper.Add(left, right);
+    private static TPayload AddValues(TPayload? left, TPayload? right) =>
+        NumericHelper.Add(left, right);
 
     private static void AddSegmentEvent(
-        List<KpcEvents.Event<TPayload>> target, Beat startBeat, Beat endBeat,
-        TPayload? startToValue, TPayload? startFormValue, TPayload? endToValue, TPayload? endFormValue)
+        List<KpcEvents.Event<TPayload>> target,
+        Beat startBeat,
+        Beat endBeat,
+        TPayload? startToValue,
+        TPayload? startFormValue,
+        TPayload? endToValue,
+        TPayload? endFormValue
+    )
     {
-        target.Add(new KpcEvents.Event<TPayload>
-        {
-            StartBeat = startBeat,
-            EndBeat = endBeat,
-            StartValue = AddValues(startToValue, startFormValue),
-            EndValue = AddValues(endToValue, endFormValue),
-        });
+        target.Add(
+            new KpcEvents.Event<TPayload>
+            {
+                StartBeat = startBeat,
+                EndBeat = endBeat,
+                StartValue = AddValues(startToValue, startFormValue),
+                EndValue = AddValues(endToValue, endFormValue),
+            }
+        );
     }
 
     #endregion

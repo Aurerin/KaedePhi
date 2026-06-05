@@ -8,7 +8,8 @@ internal static class AppPaths
 {
     private static readonly string AppDataRoot = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "KaedePhi");
+        "KaedePhi"
+    );
 
     public static string GetDirectory(params string[] segments)
     {

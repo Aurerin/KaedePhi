@@ -21,9 +21,15 @@ namespace KaedePhi.Core.Common
         public Beat(int[] beatArray)
         {
             if (beatArray == null || beatArray.Length != 3)
-                throw new ArgumentException("Beat array must have exactly 3 elements.", nameof(beatArray));
+                throw new ArgumentException(
+                    "Beat array must have exactly 3 elements.",
+                    nameof(beatArray)
+                );
             if (beatArray[2] == 0)
-                throw new ArgumentException("Beat denominator (beat[2]) cannot be zero.", nameof(beatArray));
+                throw new ArgumentException(
+                    "Beat denominator (beat[2]) cannot be zero.",
+                    nameof(beatArray)
+                );
 
             _whole = beatArray[0];
             _numerator = beatArray[1];
@@ -48,8 +54,10 @@ namespace KaedePhi.Core.Common
                 return;
             }
 
-            int numerator = 1, denominator = 0;
-            int prevNumerator = 0, prevDenominator = 1;
+            int numerator = 1,
+                denominator = 0;
+            int prevNumerator = 0,
+                prevDenominator = 1;
             var remaining = fractionalPart;
             const int maxDenominator = 1000;
 
@@ -60,7 +68,8 @@ namespace KaedePhi.Core.Common
                 var tempNum = digit * numerator + prevNumerator;
                 var tempDen = digit * denominator + prevDenominator;
 
-                if (tempDen > maxDenominator) break;
+                if (tempDen > maxDenominator)
+                    break;
 
                 prevNumerator = numerator;
                 prevDenominator = denominator;
@@ -68,7 +77,10 @@ namespace KaedePhi.Core.Common
                 denominator = tempDen;
 
                 remaining = remaining - digit;
-                if (Math.Abs(remaining) < 1e-9 || Math.Abs((double)numerator / denominator - fractionalPart) < 1e-9)
+                if (
+                    Math.Abs(remaining) < 1e-9
+                    || Math.Abs((double)numerator / denominator - fractionalPart) < 1e-9
+                )
                     break;
 
                 remaining = 1.0 / remaining;
@@ -121,14 +133,18 @@ namespace KaedePhi.Core.Common
             return a;
         }
 
-        public int this[int index] => index switch
-        {
-            0 => _whole,
-            1 => _numerator,
-            2 => _denominator,
-            _ => throw new ArgumentOutOfRangeException(nameof(index), index,
-                "Beat index must be between 0 and 2.")
-        };
+        public int this[int index] =>
+            index switch
+            {
+                0 => _whole,
+                1 => _numerator,
+                2 => _denominator,
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(index),
+                    index,
+                    "Beat index must be between 0 and 2."
+                ),
+            };
 
         // 隐式转换为 float
         public static implicit operator float(Beat beat) => beat._curBeatFloat;
@@ -137,13 +153,15 @@ namespace KaedePhi.Core.Common
         public static implicit operator double(Beat beat) => beat._curBeatDouble;
 
         // 隐式转换为 int[]，返回新数组
-        public static implicit operator int[](Beat beat) => new[] { beat._whole, beat._numerator, beat._denominator };
+        public static implicit operator int[](Beat beat) =>
+            new[] { beat._whole, beat._numerator, beat._denominator };
 
         public static Beat operator +(Beat a, Beat b)
         {
             var wholePart = a._whole + b._whole;
 
-            var numerator = (long)a._numerator * b._denominator + (long)b._numerator * a._denominator;
+            var numerator =
+                (long)a._numerator * b._denominator + (long)b._numerator * a._denominator;
             var denominator = (long)a._denominator * b._denominator;
 
             if (numerator >= denominator)
@@ -168,7 +186,9 @@ namespace KaedePhi.Core.Common
             denominator /= gcd;
 
             if (numerator > int.MaxValue || denominator > int.MaxValue)
-                throw new OverflowException("Beat calculation resulted in values too large for int representation.");
+                throw new OverflowException(
+                    "Beat calculation resulted in values too large for int representation."
+                );
 
             return new Beat(wholePart, (int)numerator, (int)denominator);
         }
@@ -177,7 +197,8 @@ namespace KaedePhi.Core.Common
         {
             var wholePart = a._whole - b._whole;
 
-            var numerator = (long)a._numerator * b._denominator - (long)b._numerator * a._denominator;
+            var numerator =
+                (long)a._numerator * b._denominator - (long)b._numerator * a._denominator;
             var denominator = (long)a._denominator * b._denominator;
 
             if (numerator < 0)
@@ -195,7 +216,9 @@ namespace KaedePhi.Core.Common
             denominator /= gcd;
 
             if (numerator > int.MaxValue || denominator > int.MaxValue)
-                throw new OverflowException("Beat calculation resulted in values too large for int representation.");
+                throw new OverflowException(
+                    "Beat calculation resulted in values too large for int representation."
+                );
 
             return new Beat(wholePart, (int)numerator, (int)denominator);
         }
@@ -210,7 +233,8 @@ namespace KaedePhi.Core.Common
 
         public static bool operator ==(Beat a, Beat b) => a._curBeatDouble.Equals(b._curBeatDouble);
 
-        public static bool operator !=(Beat a, Beat b) => !a._curBeatDouble.Equals(b._curBeatDouble);
+        public static bool operator !=(Beat a, Beat b) =>
+            !a._curBeatDouble.Equals(b._curBeatDouble);
 
         public override string ToString() => $"{_whole}:{_numerator}/{_denominator}";
 

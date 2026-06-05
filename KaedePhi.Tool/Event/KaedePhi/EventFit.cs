@@ -12,16 +12,16 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
 
     /// <inheritdoc/>
     public List<KpcEvents.Event<TPayload>> FitEvents(
-        List<KpcEvents.Event<TPayload>>? events, double tolerance)
+        List<KpcEvents.Event<TPayload>>? events,
+        double tolerance
+    )
     {
         EnsureSupportedNumericType();
 
         if (events == null || events.Count == 0)
             return [];
 
-        var sortedEvents = events
-            .OrderBy(e => e.StartBeat)
-            .ToList();
+        var sortedEvents = events.OrderBy(e => e.StartBeat).ToList();
 
         return FitEventsCore(sortedEvents, tolerance);
     }
@@ -31,7 +31,9 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 常量事件和非线性事件直接原样写入输出。
     /// </summary>
     private static List<KpcEvents.Event<TPayload>> FitEventsCore(
-        List<KpcEvents.Event<TPayload>> sortedEvents, double tolerance)
+        List<KpcEvents.Event<TPayload>> sortedEvents,
+        double tolerance
+    )
     {
         var result = new List<KpcEvents.Event<TPayload>>();
         var i = 0;
@@ -60,21 +62,29 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 从指定位置起收集一段时间连续、数值连续、方向一致的线性事件序列（run）。
     /// </summary>
     private static List<KpcEvents.Event<TPayload>> CollectRun(
-        List<KpcEvents.Event<TPayload>> events, int start, out int nextIndex)
+        List<KpcEvents.Event<TPayload>> events,
+        int start,
+        out int nextIndex
+    )
     {
         var run = new List<KpcEvents.Event<TPayload>> { events[start] };
         var firstDir = GetDirection(
             events[start].GetStartValueAsDouble(),
-            events[start].GetEndValueAsDouble());
+            events[start].GetEndValueAsDouble()
+        );
 
         nextIndex = start + 1;
         while (nextIndex < events.Count)
         {
             var next = events[nextIndex];
-            if (IsNumericConstant(next)) break;
-            if (!IsLinear(next)) break;
-            if (!IsContiguous(run[^1], next)) break;
-            if (GetDirection(next.GetStartValueAsDouble(), next.GetEndValueAsDouble()) != firstDir) break;
+            if (IsNumericConstant(next))
+                break;
+            if (!IsLinear(next))
+                break;
+            if (!IsContiguous(run[^1], next))
+                break;
+            if (GetDirection(next.GetStartValueAsDouble(), next.GetEndValueAsDouble()) != firstDir)
+                break;
 
             run.Add(next);
             nextIndex++;
@@ -91,7 +101,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     private static void FitRunInto(
         List<KpcEvents.Event<TPayload>> run,
         List<KpcEvents.Event<TPayload>> target,
-        double tolerance)
+        double tolerance
+    )
     {
         var remaining = run;
 
@@ -139,7 +150,9 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 无法拟合时返回 null。
     /// </summary>
     private static KpcEvents.Event<TPayload>? TryFitEasing(
-        List<KpcEvents.Event<TPayload>> events, double tolerance)
+        List<KpcEvents.Event<TPayload>> events,
+        double tolerance
+    )
     {
         if (events.Count <= 1)
             return null;
@@ -153,9 +166,26 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
 
         foreach (var easingId in AllEasingIds)
         {
-            var candidate = CreateMergedEvent(first, startBeat, startValue, endBeat, endValue, easingId);
+            var candidate = CreateMergedEvent(
+                first,
+                startBeat,
+                startValue,
+                endBeat,
+                endValue,
+                easingId
+            );
 
-            if (FitsWithinTolerance(candidate, events, tolerance, startBeat, endBeat, startValue, endValue))
+            if (
+                FitsWithinTolerance(
+                    candidate,
+                    events,
+                    tolerance,
+                    startBeat,
+                    endBeat,
+                    startValue,
+                    endValue
+                )
+            )
                 return candidate;
         }
 
@@ -166,11 +196,15 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 在所有原始事件的起止边界处采样候选缓动，验证每处的相对误差百分比均不超过容差。
     /// 相对误差（%）= 绝对偏差 / 整段值域跨度 × 100。
     /// </summary>
-    private static bool FitsWithinTolerance(KpcEvents.Event<TPayload> candidate,
+    private static bool FitsWithinTolerance(
+        KpcEvents.Event<TPayload> candidate,
         List<KpcEvents.Event<TPayload>> events,
         double tolerance,
-        Beat segStartBeat, Beat segEndBeat,
-        double segStartValue, double segEndValue)
+        Beat segStartBeat,
+        Beat segEndBeat,
+        double segStartValue,
+        double segEndValue
+    )
     {
         var segSpan = segEndBeat - (double)segStartBeat;
         if (segSpan <= 1e-9)
@@ -191,15 +225,18 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             var normStart = (evtStart - segStartBeat) / segSpan;
             var normEnd = (evtEnd - segStartBeat) / segSpan;
 
-            var easedStart = segStartValue + valueDelta * GetEasingValue(candidate.Easing, normStart);
+            var easedStart =
+                segStartValue + valueDelta * GetEasingValue(candidate.Easing, normStart);
             var easedEnd = segStartValue + valueDelta * GetEasingValue(candidate.Easing, normEnd);
 
             var srcStartVal = evt.GetStartValueAsDouble();
             var srcEndVal = evt.GetEndValueAsDouble();
 
             // 相对误差（%）：绝对偏差 / 值域 × 100 与容差百分比比较
-            if (Math.Abs(easedStart - srcStartVal) / valueRange * 100.0 > tolerance ||
-                Math.Abs(easedEnd - srcEndVal) / valueRange * 100.0 > tolerance)
+            if (
+                Math.Abs(easedStart - srcStartVal) / valueRange * 100.0 > tolerance
+                || Math.Abs(easedEnd - srcEndVal) / valueRange * 100.0 > tolerance
+            )
                 return false;
         }
 
@@ -217,10 +254,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// <summary>
     /// 判断两个事件是否在时间上首尾相接且数值连续。
     /// </summary>
-    private static bool IsContiguous(KpcEvents.Event<TPayload> first, KpcEvents.Event<TPayload> second)
+    private static bool IsContiguous(
+        KpcEvents.Event<TPayload> first,
+        KpcEvents.Event<TPayload> second
+    )
     {
-        return first.EndBeat == second.StartBeat &&
-               Math.Abs(first.GetEndValueAsDouble() - second.GetStartValueAsDouble()) < 1e-9;
+        return first.EndBeat == second.StartBeat
+            && Math.Abs(first.GetEndValueAsDouble() - second.GetStartValueAsDouble()) < 1e-9;
     }
 
     /// <summary>
@@ -236,9 +276,9 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// </summary>
     private static bool IsLinear(KpcEvents.Event<TPayload> evt)
     {
-        return (int)evt.Easing == 1 &&
-               Math.Abs(evt.EasingLeft) < 1e-6f &&
-               Math.Abs(evt.EasingRight - 1f) < 1e-6f;
+        return (int)evt.Easing == 1
+            && Math.Abs(evt.EasingLeft) < 1e-6f
+            && Math.Abs(evt.EasingRight - 1f) < 1e-6f;
     }
 
     /// <summary>
@@ -247,7 +287,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     private static int GetDirection(double start, double end)
     {
         var diff = end - start;
-        if (Math.Abs(diff) < 1e-9) return 0;
+        if (Math.Abs(diff) < 1e-9)
+            return 0;
         return diff > 0 ? 1 : -1;
     }
 
@@ -255,17 +296,21 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 使用指定缓动函数创建覆盖给定时间区间和值域的新事件。
     /// Font 字段从模板事件继承，其余字段均为合并后的值。
     /// </summary>
-    private static KpcEvents.Event<TPayload> CreateMergedEvent(KpcEvents.Event<TPayload> template,
-        Beat startBeat, double startValue,
-        Beat endBeat, double endValue,
-        int easingId)
+    private static KpcEvents.Event<TPayload> CreateMergedEvent(
+        KpcEvents.Event<TPayload> template,
+        Beat startBeat,
+        double startValue,
+        Beat endBeat,
+        double endValue,
+        int easingId
+    )
     {
         var evt = new KpcEvents.Event<TPayload>
         {
             StartBeat = new Beat((int[])startBeat),
             EndBeat = new Beat((int[])endBeat),
             Easing = new Kpc.Easing(easingId),
-            Font = template.Font
+            Font = template.Font,
         };
 
         if (typeof(TPayload) == typeof(double))
@@ -289,7 +334,11 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
 
     private static void EnsureSupportedNumericType()
     {
-        if (typeof(TPayload) != typeof(int) && typeof(TPayload) != typeof(float) && typeof(TPayload) != typeof(double))
+        if (
+            typeof(TPayload) != typeof(int)
+            && typeof(TPayload) != typeof(float)
+            && typeof(TPayload) != typeof(double)
+        )
             throw new NotSupportedException("EventFit only supports int, float, and double types.");
     }
 }

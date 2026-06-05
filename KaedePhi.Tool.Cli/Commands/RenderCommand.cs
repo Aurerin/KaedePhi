@@ -53,7 +53,11 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
         public double? MinValueRangeHalfRatio { get; set; }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings s,
+        CancellationToken cancellationToken
+    )
     {
         var c = s.AppConfig.RenderConfig;
         s.PixelsPerBeat ??= c.PixelsPerBeat;
@@ -63,7 +67,11 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
 
         var svc = new ChartService();
         var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (nrc == null) { ConsoleWriter.Error(CliLocalizationString.render_err_load_failed); return 1; }
+        if (nrc == null)
+        {
+            ConsoleWriter.Error(CliLocalizationString.render_err_load_failed);
+            return 1;
+        }
 
         string? outputDir;
         if (!string.IsNullOrWhiteSpace(s.Output))
@@ -85,21 +93,31 @@ public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
             RangeSamplesPerEvent = s.RangeSamplesPerEvent ?? c.RangeSamplesPerEvent,
             SegmentGroupTolerance = s.SegmentGroupTolerance ?? c.SegmentGroupTolerance,
             MinValueRangeHalf = s.MinValueRangeHalf ?? c.MinValueRangeHalf,
-            MinValueRangeHalfRatio = s.MinValueRangeHalfRatio ?? c.MinValueRangeHalfRatio
+            MinValueRangeHalfRatio = s.MinValueRangeHalfRatio ?? c.MinValueRangeHalfRatio,
         };
 
         var exporter = new KpcChartRenderExporter();
-        exporter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error);
+        exporter.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error
+        );
 
         try
         {
             var files = exporter.ExportChart(nrc, outputDir, opts, s.LineIndex, s.LayerIndex);
-            if (files.Count == 0) ConsoleWriter.Warn(CliLocalizationString.render_warn_nothing);
-            else ConsoleWriter.Info(string.Format(CliLocalizationString.render_msg_done, files.Count, outputDir));
+            if (files.Count == 0)
+                ConsoleWriter.Warn(CliLocalizationString.render_warn_nothing);
+            else
+                ConsoleWriter.Info(
+                    string.Format(CliLocalizationString.render_msg_done, files.Count, outputDir)
+                );
         }
         catch (Exception ex)
         {
-            ConsoleWriter.Error(string.Format(CliLocalizationString.render_err_render_failed, ex.Message));
+            ConsoleWriter.Error(
+                string.Format(CliLocalizationString.render_err_render_failed, ex.Message)
+            );
             return 2;
         }
 

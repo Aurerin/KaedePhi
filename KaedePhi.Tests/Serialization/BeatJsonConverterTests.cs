@@ -68,11 +68,7 @@ public class BeatJsonConverterTests
     [Fact]
     public void Serialize_BeatInObject_WorksCorrectly()
     {
-        var obj = new TestObject
-        {
-            Name = "test",
-            Beat = new Beat([1, 1, 2])
-        };
+        var obj = new TestObject { Name = "test", Beat = new Beat([1, 1, 2]) };
 
         var json = JsonConvert.SerializeObject(obj);
 
@@ -94,11 +90,7 @@ public class BeatJsonConverterTests
     [Fact]
     public void RoundTrip_BeatInObject_PreservesValues()
     {
-        var original = new TestObject
-        {
-            Name = "test",
-            Beat = new Beat([3, 5, 8])
-        };
+        var original = new TestObject { Name = "test", Beat = new Beat([3, 5, 8]) };
 
         var json = JsonConvert.SerializeObject(original);
         var deserialized = JsonConvert.DeserializeObject<TestObject>(json);
@@ -116,7 +108,9 @@ public class BeatJsonConverterTests
         var beat = JsonConvert.DeserializeObject<Beat>(json);
 
         // Converter returns default(Beat) for null JSON
-        ((double)beat).Should().Be(0.0);
+        ((double)beat)
+            .Should()
+            .Be(0.0);
     }
 
     [Fact]

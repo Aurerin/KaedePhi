@@ -24,7 +24,8 @@
 internal static class CoordinateGeometry
 {
     private static readonly CoordinateProfile KpcProfile = CoordinateProfile.KpcProfile;
-    private static readonly CoordinateProfile RenderProfileDefault = CoordinateProfile.DefaultRenderProfile;
+    private static readonly CoordinateProfile RenderProfileDefault =
+        CoordinateProfile.DefaultRenderProfile;
 
     /// <summary>
     /// 计算坐标轴跨度，并校验跨度不为零。
@@ -54,8 +55,14 @@ internal static class CoordinateGeometry
     /// <param name="targetMax">目标区间最大值。</param>
     /// <param name="axisName">轴名称，传递给 <see cref="GetSpan"/> 用于跨度校验错误定位。</param>
     /// <returns>映射后的目标坐标值。</returns>
-    private static double MapValue(double value, double sourceMin, double sourceMax, double targetMin, double targetMax,
-        string axisName)
+    private static double MapValue(
+        double value,
+        double sourceMin,
+        double sourceMax,
+        double targetMin,
+        double targetMax,
+        string axisName
+    )
     {
         var sourceSpan = GetSpan(sourceMin, sourceMax, axisName);
         var targetSpan = GetSpan(targetMin, targetMax, axisName);
@@ -72,8 +79,14 @@ internal static class CoordinateGeometry
     /// <param name="targetMax">目标区间最大值。</param>
     /// <param name="axisName">轴名称，传递给 <see cref="GetSpan"/> 用于跨度校验错误定位。</param>
     /// <returns>映射后的目标坐标增量（<c>delta * targetSpan / sourceSpan</c>）。</returns>
-    private static double MapDelta(double delta, double sourceMin, double sourceMax, double targetMin, double targetMax,
-        string axisName)
+    private static double MapDelta(
+        double delta,
+        double sourceMin,
+        double sourceMax,
+        double targetMin,
+        double targetMax,
+        string axisName
+    )
     {
         var sourceSpan = GetSpan(sourceMin, sourceMax, axisName);
         var targetSpan = GetSpan(targetMin, targetMax, axisName);
@@ -86,8 +99,8 @@ internal static class CoordinateGeometry
     /// <param name="x">Kpc X 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 X 坐标。</returns>
-    private static double ToTargetXCore(double x, CoordinateProfile target)
-        => MapValue(x, KpcProfile.MinX, KpcProfile.MaxX, target.MinX, target.MaxX, "X");
+    private static double ToTargetXCore(double x, CoordinateProfile target) =>
+        MapValue(x, KpcProfile.MinX, KpcProfile.MaxX, target.MinX, target.MaxX, "X");
 
     /// <summary>
     /// 将 Kpc Y 坐标映射到目标坐标系 Y 坐标（内部实现）。
@@ -95,8 +108,8 @@ internal static class CoordinateGeometry
     /// <param name="y">Kpc Y 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 Y 坐标。</returns>
-    private static double ToTargetYCore(double y, CoordinateProfile target)
-        => MapValue(y, KpcProfile.MinY, KpcProfile.MaxY, target.MinY, target.MaxY, "Y");
+    private static double ToTargetYCore(double y, CoordinateProfile target) =>
+        MapValue(y, KpcProfile.MinY, KpcProfile.MaxY, target.MinY, target.MaxY, "Y");
 
     /// <summary>
     /// 将源坐标系 X 坐标映射到 Kpc X 坐标（内部实现）。
@@ -104,8 +117,8 @@ internal static class CoordinateGeometry
     /// <param name="x">源坐标系 X 坐标。</param>
     /// <param name="source">源坐标配置。</param>
     /// <returns>Kpc 坐标系下的 X 坐标。</returns>
-    private static double ToKpcXCore(double x, CoordinateProfile source)
-        => MapValue(x, source.MinX, source.MaxX, KpcProfile.MinX, KpcProfile.MaxX, "X");
+    private static double ToKpcXCore(double x, CoordinateProfile source) =>
+        MapValue(x, source.MinX, source.MaxX, KpcProfile.MinX, KpcProfile.MaxX, "X");
 
     /// <summary>
     /// 将源坐标系 Y 坐标映射到 Kpc Y 坐标（内部实现）。
@@ -113,8 +126,8 @@ internal static class CoordinateGeometry
     /// <param name="y">源坐标系 Y 坐标。</param>
     /// <param name="source">源坐标配置。</param>
     /// <returns>Kpc 坐标系下的 Y 坐标。</returns>
-    private static double ToKpcYCore(double y, CoordinateProfile source)
-        => MapValue(y, source.MinY, source.MaxY, KpcProfile.MinY, KpcProfile.MaxY, "Y");
+    private static double ToKpcYCore(double y, CoordinateProfile source) =>
+        MapValue(y, source.MinY, source.MaxY, KpcProfile.MinY, KpcProfile.MaxY, "Y");
 
     /// <summary>
     /// 将 Kpc X 增量按目标坐标系比例缩放（内部实现），不做原点平移。
@@ -122,8 +135,8 @@ internal static class CoordinateGeometry
     /// <param name="x">Kpc X 增量。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 X 增量。</returns>
-    private static double ToTargetDeltaXCore(double x, CoordinateProfile target)
-        => MapDelta(x, KpcProfile.MinX, KpcProfile.MaxX, target.MinX, target.MaxX, "X");
+    private static double ToTargetDeltaXCore(double x, CoordinateProfile target) =>
+        MapDelta(x, KpcProfile.MinX, KpcProfile.MaxX, target.MinX, target.MaxX, "X");
 
     /// <summary>
     /// 将 Kpc Y 增量按目标坐标系比例缩放（内部实现），不做原点平移。
@@ -131,8 +144,8 @@ internal static class CoordinateGeometry
     /// <param name="y">Kpc Y 增量。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 Y 增量。</returns>
-    private static double ToTargetDeltaYCore(double y, CoordinateProfile target)
-        => MapDelta(y, KpcProfile.MinY, KpcProfile.MaxY, target.MinY, target.MaxY, "Y");
+    private static double ToTargetDeltaYCore(double y, CoordinateProfile target) =>
+        MapDelta(y, KpcProfile.MinY, KpcProfile.MaxY, target.MinY, target.MaxY, "Y");
 
     /// <summary>
     /// 将 Kpc 角度转换到目标坐标系角度（内部实现）。
@@ -142,8 +155,10 @@ internal static class CoordinateGeometry
     /// <returns>
     /// 当目标坐标系旋转方向与 Kpc 一致时返回原值；否则取反，以适配不同旋转正方向约定。
     /// </returns>
-    private static double ToTargetAngleCore(double kpcAngleDegrees, CoordinateProfile target)
-        => target.ClockwiseRotation == KpcProfile.ClockwiseRotation ? kpcAngleDegrees : -kpcAngleDegrees;
+    private static double ToTargetAngleCore(double kpcAngleDegrees, CoordinateProfile target) =>
+        target.ClockwiseRotation == KpcProfile.ClockwiseRotation
+            ? kpcAngleDegrees
+            : -kpcAngleDegrees;
 
     /// <summary>
     /// 将源坐标系角度转换到 Kpc 角度（内部实现）。
@@ -153,8 +168,10 @@ internal static class CoordinateGeometry
     /// <returns>
     /// 当源坐标系旋转方向与 Kpc 一致时返回原值；否则取反，以适配不同旋转正方向约定。
     /// </returns>
-    private static double ToKpcAngleCore(double sourceAngleDegrees, CoordinateProfile source)
-        => source.ClockwiseRotation == KpcProfile.ClockwiseRotation ? sourceAngleDegrees : -sourceAngleDegrees;
+    private static double ToKpcAngleCore(double sourceAngleDegrees, CoordinateProfile source) =>
+        source.ClockwiseRotation == KpcProfile.ClockwiseRotation
+            ? sourceAngleDegrees
+            : -sourceAngleDegrees;
 
     /// <summary>
     /// 将 Kpc X 坐标转换为指定坐标系的 X 坐标。
@@ -162,7 +179,8 @@ internal static class CoordinateGeometry
     /// <param name="x">Kpc X 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 X 坐标。</returns>
-    internal static double ToTargetX(double x, in CoordinateProfile target) => ToTargetXCore(x, target);
+    internal static double ToTargetX(double x, in CoordinateProfile target) =>
+        ToTargetXCore(x, target);
 
     /// <summary>
     /// 将 Kpc Y 坐标转换为指定坐标系的 Y 坐标。
@@ -170,7 +188,8 @@ internal static class CoordinateGeometry
     /// <param name="y">Kpc Y 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 Y 坐标。</returns>
-    internal static double ToTargetY(double y, in CoordinateProfile target) => ToTargetYCore(y, target);
+    internal static double ToTargetY(double y, in CoordinateProfile target) =>
+        ToTargetYCore(y, target);
 
     /// <summary>
     /// 将 Kpc X 坐标转换为指定坐标系的 X 坐标（单精度浮点数）。
@@ -178,7 +197,8 @@ internal static class CoordinateGeometry
     /// <param name="x">Kpc X 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 X 坐标（<see langword="float"/>）。</returns>
-    internal static float ToTargetXf(double x, in CoordinateProfile target) => (float)ToTargetXCore(x, target);
+    internal static float ToTargetXf(double x, in CoordinateProfile target) =>
+        (float)ToTargetXCore(x, target);
 
     /// <summary>
     /// 将 Kpc Y 坐标转换为指定坐标系的 Y 坐标（单精度浮点数）。
@@ -186,7 +206,8 @@ internal static class CoordinateGeometry
     /// <param name="y">Kpc Y 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的 Y 坐标（<see langword="float"/>）。</returns>
-    internal static float ToTargetYf(double y, in CoordinateProfile target) => (float)ToTargetYCore(y, target);
+    internal static float ToTargetYf(double y, in CoordinateProfile target) =>
+        (float)ToTargetYCore(y, target);
 
     /// <summary>
     /// 将指定坐标系的 X 坐标转换为 Kpc X 坐标。
@@ -229,8 +250,8 @@ internal static class CoordinateGeometry
     /// <remarks>
     /// 当目标坐标系与 Kpc 旋转正方向一致时角度值不变；否则取反，以匹配目标坐标系的旋转约定。
     /// </remarks>
-    internal static double ToTargetAngle(double kpcAngleDegrees, in CoordinateProfile target)
-        => ToTargetAngleCore(kpcAngleDegrees, target);
+    internal static double ToTargetAngle(double kpcAngleDegrees, in CoordinateProfile target) =>
+        ToTargetAngleCore(kpcAngleDegrees, target);
 
     /// <summary>
     /// 将指定坐标系的角度转换为 Kpc 角度。
@@ -241,8 +262,8 @@ internal static class CoordinateGeometry
     /// <remarks>
     /// 当源坐标系与 Kpc 旋转正方向一致时角度值不变；否则取反，以匹配 Kpc 的旋转约定。
     /// </remarks>
-    internal static double ToKpcAngle(double sourceAngleDegrees, in CoordinateProfile source)
-        => ToKpcAngleCore(sourceAngleDegrees, source);
+    internal static double ToKpcAngle(double sourceAngleDegrees, in CoordinateProfile source) =>
+        ToKpcAngleCore(sourceAngleDegrees, source);
 
     /// <summary>
     /// 将默认渲染坐标系的角度转换为 Kpc 角度。
@@ -301,8 +322,8 @@ internal static class CoordinateGeometry
     /// <param name="y">Kpc Y 坐标。</param>
     /// <returns>默认渲染坐标系下的点坐标 <c>(X, Y)</c>。</returns>
     /// <seealso cref="CoordinateProfile.DefaultRenderProfile"/>
-    internal static (double X, double Y) ToRenderPoint(double x, double y)
-        => (ToRenderX(x), ToRenderY(y));
+    internal static (double X, double Y) ToRenderPoint(double x, double y) =>
+        (ToRenderX(x), ToRenderY(y));
 
     /// <summary>
     /// 将 Kpc 点坐标转换为指定坐标系的点坐标。
@@ -311,8 +332,11 @@ internal static class CoordinateGeometry
     /// <param name="y">Kpc Y 坐标。</param>
     /// <param name="target">目标坐标配置。</param>
     /// <returns>目标坐标系下的点坐标 <c>(X, Y)</c>。</returns>
-    private static (double X, double Y) ToTargetPoint(double x, double y, in CoordinateProfile target)
-        => (ToTargetXCore(x, target), ToTargetYCore(y, target));
+    private static (double X, double Y) ToTargetPoint(
+        double x,
+        double y,
+        in CoordinateProfile target
+    ) => (ToTargetXCore(x, target), ToTargetYCore(y, target));
 
     /// <summary>
     /// 在物理等比空间中旋转 Kpc 偏移向量，旋转后还原到 Kpc 坐标（指定渲染配置）。
@@ -345,7 +369,11 @@ internal static class CoordinateGeometry
     /// </para>
     /// </remarks>
     private static (double X, double Y) RotateKpcOffset(
-        double x, double y, double angleDegrees, in CoordinateProfile renderProfile)
+        double x,
+        double y,
+        double angleDegrees,
+        in CoordinateProfile renderProfile
+    )
     {
         var spanX = GetSpan(renderProfile.MinX, renderProfile.MaxX, "X");
         var spanY = GetSpan(renderProfile.MinY, renderProfile.MaxY, "Y");
@@ -353,8 +381,7 @@ internal static class CoordinateGeometry
         var rad = angleDegrees * (Math.PI / 180d);
         var cos = Math.Cos(rad);
         var sin = Math.Sin(rad);
-        return (x * cos - y * k * sin,
-                (x * sin + y * k * cos) / k);
+        return (x * cos - y * k * sin, (x * sin + y * k * cos) / k);
     }
 
     /// <summary>
@@ -369,8 +396,8 @@ internal static class CoordinateGeometry
     /// 旋转语义详见
     /// <see cref="RotateKpcOffset(double,double,double,in CoordinateProfile)"/>。
     /// </remarks>
-    internal static (double X, double Y) RotateKpcOffset(double x, double y, double angleDegrees)
-        => RotateKpcOffset(x, y, angleDegrees, RenderProfileDefault);
+    internal static (double X, double Y) RotateKpcOffset(double x, double y, double angleDegrees) =>
+        RotateKpcOffset(x, y, angleDegrees, RenderProfileDefault);
 
     /// <summary>
     /// 根据父线位置与旋转角度，计算子线在 Kpc 坐标系下的绝对位置（使用默认渲染配置）。
@@ -387,8 +414,12 @@ internal static class CoordinateGeometry
     /// 旋转语义详见 <see cref="RotateKpcOffset(double,double,double)"/>。
     /// </remarks>
     internal static (double X, double Y) GetKpcAbsolutePos(
-        double fatherLineX, double fatherLineY, double angleDegrees,
-        double lineX, double lineY)
+        double fatherLineX,
+        double fatherLineY,
+        double angleDegrees,
+        double lineX,
+        double lineY
+    )
     {
         var (rotX, rotY) = RotateKpcOffset(lineX, lineY, angleDegrees);
         return (fatherLineX + rotX, fatherLineY + rotY);
@@ -410,8 +441,13 @@ internal static class CoordinateGeometry
     /// 旋转语义详见 <see cref="RotateKpcOffset(double,double,double,in CoordinateProfile)"/>。
     /// </remarks>
     internal static (double X, double Y) GetKpcAbsolutePos(
-        double fatherLineX, double fatherLineY, double angleDegrees,
-        double lineX, double lineY, in CoordinateProfile renderProfile)
+        double fatherLineX,
+        double fatherLineY,
+        double angleDegrees,
+        double lineX,
+        double lineY,
+        in CoordinateProfile renderProfile
+    )
     {
         var (rotX, rotY) = RotateKpcOffset(lineX, lineY, angleDegrees, renderProfile);
         return (fatherLineX + rotX, fatherLineY + rotY);
@@ -423,8 +459,8 @@ internal static class CoordinateGeometry
     /// <param name="point">Kpc 点坐标 <c>(X, Y)</c>。</param>
     /// <returns>该点映射到默认渲染坐标系后，距渲染原点的欧氏距离。</returns>
     /// <seealso cref="CoordinateProfile.DefaultRenderProfile"/>
-    internal static double GetKpcScreenMagnitude((double X, double Y) point)
-        => GetKpcScreenMagnitude(point, RenderProfileDefault);
+    internal static double GetKpcScreenMagnitude((double X, double Y) point) =>
+        GetKpcScreenMagnitude(point, RenderProfileDefault);
 
     /// <summary>
     /// 计算 Kpc 点在指定渲染坐标系中距原点的欧氏距离（模长）。
@@ -437,7 +473,10 @@ internal static class CoordinateGeometry
     /// 注意：此为点到渲染原点的距离，而非两点间距离；两点间距离请使用
     /// <see cref="GetKpcScreenDistance(System.ValueTuple{double,double},System.ValueTuple{double,double},in CoordinateProfile)"/>。
     /// </remarks>
-    private static double GetKpcScreenMagnitude((double X, double Y) point, in CoordinateProfile renderProfile)
+    private static double GetKpcScreenMagnitude(
+        (double X, double Y) point,
+        in CoordinateProfile renderProfile
+    )
     {
         var (renderX, renderY) = ToTargetPoint(point.X, point.Y, renderProfile);
         return Math.Sqrt(renderX * renderX + renderY * renderY);
@@ -450,8 +489,10 @@ internal static class CoordinateGeometry
     /// <param name="right">第二个 Kpc 点坐标 <c>(X, Y)</c>。</param>
     /// <returns>两点映射到默认渲染坐标系后的欧氏距离。</returns>
     /// <seealso cref="CoordinateProfile.DefaultRenderProfile"/>
-    internal static double GetKpcScreenDistance((double X, double Y) left, (double X, double Y) right)
-        => GetKpcScreenDistance(left, right, RenderProfileDefault);
+    internal static double GetKpcScreenDistance(
+        (double X, double Y) left,
+        (double X, double Y) right
+    ) => GetKpcScreenDistance(left, right, RenderProfileDefault);
 
     /// <summary>
     /// 计算两个 Kpc 点在指定渲染坐标系中的欧氏距离。
@@ -467,7 +508,8 @@ internal static class CoordinateGeometry
     internal static double GetKpcScreenDistance(
         (double X, double Y) left,
         (double X, double Y) right,
-        in CoordinateProfile renderProfile)
+        in CoordinateProfile renderProfile
+    )
     {
         var deltaRenderX = ToTargetDeltaXCore(left.X - right.X, renderProfile);
         var deltaRenderY = ToTargetDeltaYCore(left.Y - right.Y, renderProfile);

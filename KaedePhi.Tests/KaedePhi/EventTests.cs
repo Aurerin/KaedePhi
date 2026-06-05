@@ -17,7 +17,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1) // Linear
+            Easing = new Easing(1), // Linear
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 0, 0, 1 }));
@@ -34,7 +34,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1) // Linear
+            Easing = new Easing(1), // Linear
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 1, 0, 1 }));
@@ -51,7 +51,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0.0,
             EndValue = 100.0,
-            Easing = new Easing(1) // Linear
+            Easing = new Easing(1), // Linear
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 1, 0, 1 }));
@@ -68,7 +68,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1)
+            Easing = new Easing(1),
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 0, 0, 1 }));
@@ -85,7 +85,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1)
+            Easing = new Easing(1),
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 2, 0, 1 }));
@@ -105,7 +105,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = startVal,
             EndValue = 200.0f,
-            Easing = new Easing(1)
+            Easing = new Easing(1),
         };
 
         // At StartBeat (t=0), returns StartValue
@@ -123,7 +123,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0,
             EndValue = 100,
-            Easing = new Easing(1)
+            Easing = new Easing(1),
         };
 
         // At beat 1 (middle of [0,2]), should return 50
@@ -145,7 +145,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0.0f,
             EndValue = 100.0f,
-            Easing = new Easing(1)
+            Easing = new Easing(1),
         };
 
         // At beat 1 (middle of [0,2]), should return 50
@@ -226,7 +226,7 @@ public class EventTests
             Easing = new Easing(1),
             EasingLeft = 0.1f,
             EasingRight = 0.9f,
-            IsBezier = false
+            IsBezier = false,
         };
 
         var clone = original.Clone();
@@ -249,7 +249,7 @@ public class EventTests
             StartValue = 1.0f,
             EndValue = 2.0f,
             StartBeat = new Beat(new[] { 0, 0, 1 }),
-            EndBeat = new Beat(new[] { 1, 0, 1 })
+            EndBeat = new Beat(new[] { 1, 0, 1 }),
         };
 
         var clone = original.Clone();
@@ -269,7 +269,7 @@ public class EventTests
             StartValue = 10,
             EndValue = 20,
             StartBeat = new Beat(new[] { 0, 0, 1 }),
-            EndBeat = new Beat(new[] { 1, 0, 1 })
+            EndBeat = new Beat(new[] { 1, 0, 1 }),
         };
 
         var clone = original.Clone();
@@ -289,7 +289,7 @@ public class EventTests
             StartValue = new byte[] { 1, 2, 3 },
             EndValue = new byte[] { 4, 5, 6 },
             StartBeat = new Beat(new[] { 0, 0, 1 }),
-            EndBeat = new Beat(new[] { 1, 0, 1 })
+            EndBeat = new Beat(new[] { 1, 0, 1 }),
         };
 
         var clone = original.Clone();
@@ -312,7 +312,7 @@ public class EventTests
             StartValue = 0.0,
             EndValue = 1.0,
             StartBeat = new Beat(new[] { 0, 0, 1 }),
-            EndBeat = new Beat(new[] { 1, 0, 1 })
+            EndBeat = new Beat(new[] { 1, 0, 1 }),
         };
 
         var clone = original.Clone();
@@ -332,7 +332,7 @@ public class EventTests
             StartBeat = new Beat(new[] { 1, 1, 2 }),
             EndBeat = new Beat(new[] { 3, 1, 4 }),
             StartValue = 0.0,
-            EndValue = 1.0
+            EndValue = 1.0,
         };
 
         var clone = original.Clone();
@@ -360,7 +360,7 @@ public class EventTests
             EndValue = 100.0,
             Easing = new Easing(1), // Linear
             EasingLeft = 0.2f,
-            EasingRight = 0.8f
+            EasingRight = 0.8f,
         };
 
         // At beat 1 (middle of [0,2])

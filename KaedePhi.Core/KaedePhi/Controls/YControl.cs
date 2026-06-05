@@ -14,15 +14,25 @@ namespace KaedePhi.Core.KaedePhi.Controls
 
         private static readonly List<YControl> DefaultInstance = new()
         {
-            new YControl { Easing = new Easing(1), Y = 1.0f, X = 0.0f },
-            new YControl { Easing = new Easing(1), Y = 1.0f, X = 9999999.0f }
+            new YControl
+            {
+                Easing = new Easing(1),
+                Y = 1.0f,
+                X = 0.0f,
+            },
+            new YControl
+            {
+                Easing = new Easing(1),
+                Y = 1.0f,
+                X = 9999999.0f,
+            },
         };
 
         /// <summary>
         /// 获取默认控制点列表。
         /// </summary>
-        public static List<YControl> Default
-            => DefaultInstance.ConvertAll(input => input.Clone() as YControl);
+        public static List<YControl> Default =>
+            DefaultInstance.ConvertAll(input => input.Clone() as YControl);
 
         /// <summary>
         /// 深拷贝控制点。
@@ -30,7 +40,12 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// <returns>控制点副本</returns>
         public override ControlBase Clone()
         {
-            return new YControl { Easing = new Easing(Easing), X = X, Y = Y };
+            return new YControl
+            {
+                Easing = new Easing(Easing),
+                X = X,
+                Y = Y,
+            };
         }
     }
 }

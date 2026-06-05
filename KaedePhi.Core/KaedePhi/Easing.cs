@@ -40,7 +40,6 @@
             return start + (end - start) * easedTime;
         }
 
-
         /// <inheritdoc cref="Interpolate(float,float,float,float,float)"/>
         public int Interpolate(float minLim, float maxLim, int start, int end, float t)
         {
@@ -48,7 +47,6 @@
             //插值后返回
             return (int)(start + (end - start) * easedTime);
         }
-
 
         /// <inheritdoc cref="Interpolate(float,float,float,float,float)"/>
         public byte Interpolate(float minLim, float maxLim, byte start, byte end, float t)
@@ -114,7 +112,7 @@
                 30 => "EaseOutBounce",
                 31 => "EaseInOutBounce",
                 // Fallback
-                _ => $"Unknown({_easingNumber})"
+                _ => $"Unknown({_easingNumber})",
             };
         }
     }

@@ -16,7 +16,8 @@ public static class ControlDefaultChecker
     /// <typeparam name="T">Control 类型</typeparam>
     /// <param name="controls">要检查的 Control 列表</param>
     /// <returns>如果与默认值一致则返回 true</returns>
-    public static bool IsDefaultControls<T>(List<T>? controls) where T : ControlBase
+    public static bool IsDefaultControls<T>(List<T>? controls)
+        where T : ControlBase
     {
         var defaultControls = GetDefaultControls<T>();
         if (controls == null || controls.Count != defaultControls.Count)
@@ -36,17 +37,25 @@ public static class ControlDefaultChecker
     /// </summary>
     /// <typeparam name="T">Control 类型</typeparam>
     /// <returns>默认值列表</returns>
-    private static List<T> GetDefaultControls<T>() where T : ControlBase
+    private static List<T> GetDefaultControls<T>()
+        where T : ControlBase
     {
-        var defaultProperty = typeof(T).GetProperty("Default", BindingFlags.Public | BindingFlags.Static);
+        var defaultProperty = typeof(T).GetProperty(
+            "Default",
+            BindingFlags.Public | BindingFlags.Static
+        );
         if (defaultProperty == null)
-            throw new InvalidOperationException($"Type {typeof(T).Name} does not have a static Default property.");
+            throw new InvalidOperationException(
+                $"Type {typeof(T).Name} does not have a static Default property."
+            );
 
         var value = defaultProperty.GetValue(null);
         if (value is List<T> defaultList)
             return defaultList;
 
-        throw new InvalidOperationException($"Type {typeof(T).Name}.Default is not of type List<{typeof(T).Name}>.");
+        throw new InvalidOperationException(
+            $"Type {typeof(T).Name}.Default is not of type List<{typeof(T).Name}>."
+        );
     }
 
     /// <summary>
@@ -56,11 +65,14 @@ public static class ControlDefaultChecker
     /// <param name="a">第一个 Control</param>
     /// <param name="b">第二个 Control</param>
     /// <returns>如果相等则返回 true</returns>
-    private static bool AreControlsEqual<T>(T a, T b) where T : ControlBase
+    private static bool AreControlsEqual<T>(T a, T b)
+        where T : ControlBase
     {
         // 比较基类属性
-        if ((int)a.Easing != (int)b.Easing) return false;
-        if (Math.Abs(a.X - b.X) > FloatEpsilon) return false;
+        if ((int)a.Easing != (int)b.Easing)
+            return false;
+        if (Math.Abs(a.X - b.X) > FloatEpsilon)
+            return false;
 
         // 比较派生类特定属性
         return AreDerivedPropertiesEqual(a, b);
@@ -73,7 +85,8 @@ public static class ControlDefaultChecker
     /// <param name="a">第一个 Control</param>
     /// <param name="b">第二个 Control</param>
     /// <returns>如果特定属性相等则返回 true</returns>
-    private static bool AreDerivedPropertiesEqual<T>(T a, T b) where T : ControlBase
+    private static bool AreDerivedPropertiesEqual<T>(T a, T b)
+        where T : ControlBase
     {
         var type = typeof(T);
 
@@ -131,7 +144,8 @@ public static class ControlDefaultChecker
 
         foreach (var prop in properties)
         {
-            if (!prop.CanRead) continue;
+            if (!prop.CanRead)
+                continue;
 
             var valueA = prop.GetValue(a);
             var valueB = prop.GetValue(b);
@@ -140,39 +154,46 @@ public static class ControlDefaultChecker
             {
                 var floatA = (float)(valueA ?? 0f);
                 var floatB = (float)(valueB ?? 0f);
-                if (Math.Abs(floatA - floatB) > FloatEpsilon) return false;
+                if (Math.Abs(floatA - floatB) > FloatEpsilon)
+                    return false;
             }
             else if (prop.PropertyType == typeof(double))
             {
                 var doubleA = (double)(valueA ?? 0d);
                 var doubleB = (double)(valueB ?? 0d);
-                if (Math.Abs(doubleA - doubleB) > FloatEpsilon) return false;
+                if (Math.Abs(doubleA - doubleB) > FloatEpsilon)
+                    return false;
             }
             else if (prop.PropertyType == typeof(int))
             {
                 var intA = (int)(valueA ?? 0);
                 var intB = (int)(valueB ?? 0);
-                if (intA != intB) return false;
+                if (intA != intB)
+                    return false;
             }
             else if (prop.PropertyType == typeof(bool))
             {
                 var boolA = (bool)(valueA ?? false);
                 var boolB = (bool)(valueB ?? false);
-                if (boolA != boolB) return false;
+                if (boolA != boolB)
+                    return false;
             }
             else if (prop.PropertyType == typeof(string))
             {
                 var strA = valueA as string;
                 var strB = valueB as string;
-                if (strA != strB) return false;
+                if (strA != strB)
+                    return false;
             }
             else if (prop.PropertyType.IsEnum)
             {
-                if (!Equals(valueA, valueB)) return false;
+                if (!Equals(valueA, valueB))
+                    return false;
             }
             else if (prop.PropertyType.IsClass)
             {
-                if (!Equals(valueA, valueB)) return false;
+                if (!Equals(valueA, valueB))
+                    return false;
             }
         }
 

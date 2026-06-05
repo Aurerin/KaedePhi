@@ -6,17 +6,20 @@ public class JudgeLineConverter
 {
     private readonly FrameEventInterpolator _frameEventInterpolator;
     private readonly EventLayerConverter _eventLayerConverter;
+
     public JudgeLineConverter(PhiEditToKpcConvertOptions options)
     {
         _eventLayerConverter = new EventLayerConverter(options);
         _frameEventInterpolator = new FrameEventInterpolator(options);
     }
+
     /// <summary>
     /// 转换全部判定线。
     /// </summary>
     public List<Kpc.JudgeLine> ConvertJudgeLines(List<Pe.JudgeLine>? judgeLines)
     {
-        if (judgeLines == null || judgeLines.Count == 0) return [];
+        if (judgeLines == null || judgeLines.Count == 0)
+            return [];
 
         var result = new List<Kpc.JudgeLine>(judgeLines.Count);
         for (var i = 0; i < judgeLines.Count; i++)
@@ -37,7 +40,7 @@ public class JudgeLineConverter
         {
             Name = $"PeJudgeLine_{index}",
             Notes = src.NoteList?.ConvertAll(Note.ConvertNote) ?? [],
-            EventLayers = [eventLayer]
+            EventLayers = [eventLayer],
         };
     }
 }

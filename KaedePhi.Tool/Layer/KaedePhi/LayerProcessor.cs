@@ -26,10 +26,15 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     private readonly EventCompressor<float> _floatCompressor = new();
 
     /// <inheritdoc/>
-    public EventLayer LayerMerge(List<EventLayer> layers, double precision, IProgress<ToolProgress>? progress = null)
+    public EventLayer LayerMerge(
+        List<EventLayer> layers,
+        double precision,
+        IProgress<ToolProgress>? progress = null
+    )
     {
         layers.RemoveAll(layer => (object?)layer is null);
-        if (layers.Count <= 1) return layers.FirstOrDefault() ?? new EventLayer();
+        if (layers.Count <= 1)
+            return layers.FirstOrDefault() ?? new EventLayer();
         layers = RemoveUnlessLayer(layers) ?? layers;
 
         var mergedLayer = new EventLayer();
@@ -38,20 +43,35 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         {
             var layer = layers[li];
             if (layer.AlphaEvents is { Count: > 0 })
-                mergedLayer.AlphaEvents =
-                    _intMerger.EventListMerge(mergedLayer.AlphaEvents, layer.AlphaEvents, precision);
+                mergedLayer.AlphaEvents = _intMerger.EventListMerge(
+                    mergedLayer.AlphaEvents,
+                    layer.AlphaEvents,
+                    precision
+                );
             if (layer.MoveXEvents is { Count: > 0 })
-                mergedLayer.MoveXEvents =
-                    _doubleMergerSqrt.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision);
+                mergedLayer.MoveXEvents = _doubleMergerSqrt.EventListMerge(
+                    mergedLayer.MoveXEvents,
+                    layer.MoveXEvents,
+                    precision
+                );
             if (layer.MoveYEvents is { Count: > 0 })
-                mergedLayer.MoveYEvents =
-                    _doubleMergerSqrt.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision);
+                mergedLayer.MoveYEvents = _doubleMergerSqrt.EventListMerge(
+                    mergedLayer.MoveYEvents,
+                    layer.MoveYEvents,
+                    precision
+                );
             if (layer.RotateEvents is { Count: > 0 })
-                mergedLayer.RotateEvents =
-                    _doubleMerger.EventListMerge(mergedLayer.RotateEvents, layer.RotateEvents, precision);
+                mergedLayer.RotateEvents = _doubleMerger.EventListMerge(
+                    mergedLayer.RotateEvents,
+                    layer.RotateEvents,
+                    precision
+                );
             if (layer.SpeedEvents is { Count: > 0 })
-                mergedLayer.SpeedEvents =
-                    _floatMerger.EventListMerge(mergedLayer.SpeedEvents, layer.SpeedEvents, precision);
+                mergedLayer.SpeedEvents = _floatMerger.EventListMerge(
+                    mergedLayer.SpeedEvents,
+                    layer.SpeedEvents,
+                    precision
+                );
 
             progress?.Report(new ToolProgress((double)(li + 1) / totalLayers));
         }
@@ -61,11 +81,16 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     }
 
     /// <inheritdoc/>
-    public EventLayer LayerMergePlus(List<EventLayer> layers, double precision, double tolerance,
-        IProgress<ToolProgress>? progress = null)
+    public EventLayer LayerMergePlus(
+        List<EventLayer> layers,
+        double precision,
+        double tolerance,
+        IProgress<ToolProgress>? progress = null
+    )
     {
         layers.RemoveAll(layer => (object?)layer is null);
-        if (layers.Count <= 1) return layers.FirstOrDefault() ?? new EventLayer();
+        if (layers.Count <= 1)
+            return layers.FirstOrDefault() ?? new EventLayer();
         layers = RemoveUnlessLayer(layers) ?? layers;
 
         var mergedLayer = new EventLayer();
@@ -74,23 +99,40 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         {
             var layer = layers[li];
             if (layer.AlphaEvents is { Count: > 0 })
-                mergedLayer.AlphaEvents =
-                    _intMergerPlus.EventListMerge(mergedLayer.AlphaEvents, layer.AlphaEvents, precision, tolerance);
+                mergedLayer.AlphaEvents = _intMergerPlus.EventListMerge(
+                    mergedLayer.AlphaEvents,
+                    layer.AlphaEvents,
+                    precision,
+                    tolerance
+                );
             if (layer.MoveXEvents is { Count: > 0 })
-                mergedLayer.MoveXEvents =
-                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveXEvents, layer.MoveXEvents, precision,
-                        tolerance);
+                mergedLayer.MoveXEvents = _doubleMergerSqrtPlus.EventListMerge(
+                    mergedLayer.MoveXEvents,
+                    layer.MoveXEvents,
+                    precision,
+                    tolerance
+                );
             if (layer.MoveYEvents is { Count: > 0 })
-                mergedLayer.MoveYEvents =
-                    _doubleMergerSqrtPlus.EventListMerge(mergedLayer.MoveYEvents, layer.MoveYEvents, precision,
-                        tolerance);
+                mergedLayer.MoveYEvents = _doubleMergerSqrtPlus.EventListMerge(
+                    mergedLayer.MoveYEvents,
+                    layer.MoveYEvents,
+                    precision,
+                    tolerance
+                );
             if (layer.RotateEvents is { Count: > 0 })
-                mergedLayer.RotateEvents =
-                    _doubleMergerPlus.EventListMerge(mergedLayer.RotateEvents, layer.RotateEvents, precision,
-                        tolerance);
+                mergedLayer.RotateEvents = _doubleMergerPlus.EventListMerge(
+                    mergedLayer.RotateEvents,
+                    layer.RotateEvents,
+                    precision,
+                    tolerance
+                );
             if (layer.SpeedEvents is { Count: > 0 })
-                mergedLayer.SpeedEvents =
-                    _floatMergerPlus.EventListMerge(mergedLayer.SpeedEvents, layer.SpeedEvents, precision, tolerance);
+                mergedLayer.SpeedEvents = _floatMergerPlus.EventListMerge(
+                    mergedLayer.SpeedEvents,
+                    layer.SpeedEvents,
+                    precision,
+                    tolerance
+                );
 
             progress?.Report(new ToolProgress((double)(li + 1) / totalLayers));
         }
@@ -100,9 +142,14 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     }
 
     /// <inheritdoc/>
-    public EventLayer CutLayerEvents(EventLayer? layer, double precision, IProgress<ToolProgress>? progress = null)
+    public EventLayer CutLayerEvents(
+        EventLayer? layer,
+        double precision,
+        IProgress<ToolProgress>? progress = null
+    )
     {
-        if (layer == null) return new EventLayer();
+        if (layer == null)
+            return new EventLayer();
 
         var cutLength = new Beat(1d / precision);
         var cutEventLayer = new EventLayer();
@@ -113,43 +160,56 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
             cutEventLayer.AlphaEvents = _intCutter.CutEventsInRange(
                 layer.AlphaEvents,
                 layer.AlphaEvents.Min(e => e.StartBeat),
-                layer.AlphaEvents.Max(e => e.EndBeat), cutLength);
+                layer.AlphaEvents.Max(e => e.EndBeat),
+                cutLength
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveXEvents is { Count: > 0 })
             cutEventLayer.MoveXEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveXEvents,
                 layer.MoveXEvents.Min(e => e.StartBeat),
-                layer.MoveXEvents.Max(e => e.EndBeat), cutLength);
+                layer.MoveXEvents.Max(e => e.EndBeat),
+                cutLength
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveYEvents is { Count: > 0 })
             cutEventLayer.MoveYEvents = _doubleCutter.CutEventsInRange(
                 layer.MoveYEvents,
                 layer.MoveYEvents.Min(e => e.StartBeat),
-                layer.MoveYEvents.Max(e => e.EndBeat), cutLength);
+                layer.MoveYEvents.Max(e => e.EndBeat),
+                cutLength
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.RotateEvents is { Count: > 0 })
             cutEventLayer.RotateEvents = _doubleCutter.CutEventsInRange(
                 layer.RotateEvents,
                 layer.RotateEvents.Min(e => e.StartBeat),
-                layer.RotateEvents.Max(e => e.EndBeat), cutLength);
+                layer.RotateEvents.Max(e => e.EndBeat),
+                cutLength
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.SpeedEvents is { Count: > 0 })
             cutEventLayer.SpeedEvents = _floatCutter.CutEventsInRange(
                 layer.SpeedEvents,
                 layer.SpeedEvents.Min(e => e.StartBeat),
-                layer.SpeedEvents.Max(e => e.EndBeat), cutLength);
+                layer.SpeedEvents.Max(e => e.EndBeat),
+                cutLength
+            );
         progress?.Report(new ToolProgress(1.0));
 
         return cutEventLayer;
     }
 
     /// <inheritdoc/>
-    public List<EventLayer> CutLayerEvents(List<EventLayer> layers, double precision,
-        IProgress<ToolProgress>? progress = null)
+    public List<EventLayer> CutLayerEvents(
+        List<EventLayer> layers,
+        double precision,
+        IProgress<ToolProgress>? progress = null
+    )
     {
         layers.RemoveAll(layer => (object?)layer is null);
         layers = RemoveUnlessLayer(layers) ?? layers;
@@ -165,7 +225,11 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
     }
 
     /// <inheritdoc/>
-    public void LayerEventsCompress(EventLayer layer, double tolerance, IProgress<ToolProgress>? progress = null)
+    public void LayerEventsCompress(
+        EventLayer layer,
+        double tolerance,
+        IProgress<ToolProgress>? progress = null
+    )
     {
         const int totalChannels = 5;
         var completedChannels = 0;
@@ -175,32 +239,53 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveXEvents is { Count: > 0 })
-            layer.MoveXEvents = _doubleCompressor.EventListCompressSqrt(layer.MoveXEvents, tolerance);
+            layer.MoveXEvents = _doubleCompressor.EventListCompressSqrt(
+                layer.MoveXEvents,
+                tolerance
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.MoveYEvents is { Count: > 0 })
-            layer.MoveYEvents = _doubleCompressor.EventListCompressSqrt(layer.MoveYEvents, tolerance);
+            layer.MoveYEvents = _doubleCompressor.EventListCompressSqrt(
+                layer.MoveYEvents,
+                tolerance
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.RotateEvents is { Count: > 0 })
-            layer.RotateEvents = _doubleCompressor.EventListCompressSlope(layer.RotateEvents, tolerance);
+            layer.RotateEvents = _doubleCompressor.EventListCompressSlope(
+                layer.RotateEvents,
+                tolerance
+            );
         progress?.Report(new ToolProgress((double)++completedChannels / totalChannels));
 
         if (layer.SpeedEvents is { Count: > 0 })
-            layer.SpeedEvents = _floatCompressor.EventListCompressSlope(layer.SpeedEvents, tolerance);
+            layer.SpeedEvents = _floatCompressor.EventListCompressSlope(
+                layer.SpeedEvents,
+                tolerance
+            );
         progress?.Report(new ToolProgress(1.0));
     }
 
     private List<EventLayer>? RemoveUnlessLayer(List<EventLayer>? layers)
     {
-        if (layers is not { Count: > 1 }) return layers;
+        if (layers is not { Count: > 1 })
+            return layers;
         var layersCopy = layers.Select(l => l.Clone()).ToList();
         foreach (var layer in layersCopy)
         {
-            layer.AlphaEvents = _intCompressor.RemoveUselessEvent(layer.AlphaEvents) ?? throw new InvalidOperationException();
-            layer.MoveXEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents) ?? throw new InvalidOperationException();
-            layer.MoveYEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents) ?? throw new InvalidOperationException();
-            layer.RotateEvents = _doubleCompressor.RemoveUselessEvent(layer.RotateEvents) ?? throw new InvalidOperationException();
+            layer.AlphaEvents =
+                _intCompressor.RemoveUselessEvent(layer.AlphaEvents)
+                ?? throw new InvalidOperationException();
+            layer.MoveXEvents =
+                _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents)
+                ?? throw new InvalidOperationException();
+            layer.MoveYEvents =
+                _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents)
+                ?? throw new InvalidOperationException();
+            layer.RotateEvents =
+                _doubleCompressor.RemoveUselessEvent(layer.RotateEvents)
+                ?? throw new InvalidOperationException();
         }
 
         return layersCopy;

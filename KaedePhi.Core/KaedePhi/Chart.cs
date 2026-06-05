@@ -11,12 +11,16 @@ namespace KaedePhi.Core.KaedePhi
         {
             /// <summary>X 轴最大值</summary>
             public const float MaxX = 1f;
+
             /// <summary>X 轴最小值</summary>
             public const float MinX = -1f;
+
             /// <summary>Y 轴最大值</summary>
             public const float MaxY = 1f;
+
             /// <summary>Y 轴最小值</summary>
             public const float MinY = -1f;
+
             /// <summary>旋转方向是否为顺时针</summary>
             public const bool ClockwiseRotation = false;
         }

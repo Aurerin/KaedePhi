@@ -50,7 +50,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         {
             // 二分查找：定位 StartBeat <= beat 中 index 最大者（主导事件）
             // 同 StartBeat 时取靠后者（index 更大），满足同起始拍 index 至上规则
-            int lo = 0, hi = events.Count - 1, idx = -1;
+            int lo = 0,
+                hi = events.Count - 1,
+                idx = -1;
             while (lo <= hi)
             {
                 var mid = (lo + hi) >> 1;

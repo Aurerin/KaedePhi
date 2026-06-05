@@ -40,8 +40,7 @@ public class BeatTests
     {
         var act = () => new Beat(new[] { 1, 2 });
 
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("*3 elements*");
+        act.Should().Throw<ArgumentException>().WithMessage("*3 elements*");
     }
 
     [Fact]
@@ -49,8 +48,7 @@ public class BeatTests
     {
         var act = () => new Beat(new[] { 1, 0, 0 });
 
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("*denominator*cannot be zero*");
+        act.Should().Throw<ArgumentException>().WithMessage("*denominator*cannot be zero*");
     }
 
     [Fact]
@@ -87,7 +85,11 @@ public class BeatTests
     [InlineData(0.75, 0, 3, 4)]
     [InlineData(0.125, 0, 1, 8)]
     public void Constructor_WithDouble_FindsBestFractionApproximation(
-        double input, int expectedWhole, int expectedNum, int expectedDen)
+        double input,
+        int expectedWhole,
+        int expectedNum,
+        int expectedDen
+    )
     {
         var beat = new Beat(input);
 
@@ -146,7 +148,10 @@ public class BeatTests
     {
         var beat = new Beat(new[] { 1, 0, 1 });
 
-        var act = () => { var _ = beat[-1]; };
+        var act = () =>
+        {
+            var _ = beat[-1];
+        };
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -456,7 +461,9 @@ public class BeatTests
         }
 
         // Repeated fractional additions accumulate rounding error
-        ((double)beat).Should().BeApproximately(0.1, 0.01);
+        ((double)beat)
+            .Should()
+            .BeApproximately(0.1, 0.01);
     }
 
     #endregion

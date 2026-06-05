@@ -10,9 +10,13 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
             writer.WriteValue((int)value);
         }
 
-        public override Easing ReadJson(JsonReader reader, Type objectType, Easing existingValue,
+        public override Easing ReadJson(
+            JsonReader reader,
+            Type objectType,
+            Easing existingValue,
             bool hasExistingValue,
-            JsonSerializer serializer)
+            JsonSerializer serializer
+        )
         {
             var easingNumber = serializer.Deserialize<int>(reader);
             return new Easing(easingNumber);

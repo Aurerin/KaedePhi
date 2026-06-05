@@ -7,7 +7,11 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
 {
     public class ColorEventsConverter : JsonConverter<List<RePhiEdit.Events.Event<byte[]>>>
     {
-        public override void WriteJson(JsonWriter writer, List<RePhiEdit.Events.Event<byte[]>> value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            List<RePhiEdit.Events.Event<byte[]>> value,
+            JsonSerializer serializer
+        )
         {
             writer.WriteStartArray();
             foreach (var evt in value)
@@ -54,8 +58,13 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
             writer.WriteEndArray();
         }
 
-        public override List<RePhiEdit.Events.Event<byte[]>> ReadJson(JsonReader reader, Type objectType,
-            List<RePhiEdit.Events.Event<byte[]>> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override List<RePhiEdit.Events.Event<byte[]>> ReadJson(
+            JsonReader reader,
+            Type objectType,
+            List<RePhiEdit.Events.Event<byte[]>> existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             var result = new List<RePhiEdit.Events.Event<byte[]>>();
             var token = Newtonsoft.Json.Linq.JToken.Load(reader);
@@ -66,13 +75,19 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
                 {
                     StartBeat = new Beat(item["startTime"]?.ToObject<int[]>()),
                     EndBeat = new Beat(item["endTime"]?.ToObject<int[]>()),
-                    StartValue = Array.ConvertAll(item["start"]?.ToObject<int[]>() ?? Array.Empty<int>(), i => (byte)i),
-                    EndValue = Array.ConvertAll(item["end"]?.ToObject<int[]>() ?? Array.Empty<int>(), i => (byte)i),
+                    StartValue = Array.ConvertAll(
+                        item["start"]?.ToObject<int[]>() ?? Array.Empty<int>(),
+                        i => (byte)i
+                    ),
+                    EndValue = Array.ConvertAll(
+                        item["end"]?.ToObject<int[]>() ?? Array.Empty<int>(),
+                        i => (byte)i
+                    ),
                     Easing = new Easing(item["easingType"]?.ToObject<int>() ?? 1),
                     EasingLeft = item["easingLeft"]?.ToObject<float>() ?? 0.0f,
                     EasingRight = item["easingRight"]?.ToObject<float>() ?? 1.0f,
                     IsBezier = item["bezier"]?.ToObject<int>() == 1,
-                    BezierPoints = item["bezierPoints"]?.ToObject<float[]>() ?? new float[4]
+                    BezierPoints = item["bezierPoints"]?.ToObject<float[]>() ?? new float[4],
                 };
                 result.Add(evt);
             }

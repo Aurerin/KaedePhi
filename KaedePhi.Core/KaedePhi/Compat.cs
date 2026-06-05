@@ -17,9 +17,11 @@ using System;
 namespace KaedePhi.Core.KaedePhi
 {
     /// <inheritdoc cref="Events.Event{T}"/>
-    [Obsolete("Event<T> has been moved to KaedePhi.Core.KaedePhi.Events.Event<T>. " +
-              "WARNING: List<Event<T>> is NOT assignment-compatible with List<Events.Event<T>>; " +
-              "please migrate all collection usages to the new namespace directly.")]
+    [Obsolete(
+        "Event<T> has been moved to KaedePhi.Core.KaedePhi.Events.Event<T>. "
+            + "WARNING: List<Event<T>> is NOT assignment-compatible with List<Events.Event<T>>; "
+            + "please migrate all collection usages to the new namespace directly."
+    )]
     public class Event<T> : Events.Event<T> { }
 
     /// <inheritdoc cref="Events.EventLayer"/>

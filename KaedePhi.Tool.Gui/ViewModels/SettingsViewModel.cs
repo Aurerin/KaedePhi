@@ -33,7 +33,8 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
             field = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(UnbindDisableCompressEnabled));
-            if (!value) UnbindDisableCompress = false;
+            if (!value)
+                UnbindDisableCompress = false;
         }
     }
 
@@ -65,7 +66,8 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
             field = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(LayerMergeDisableCompressEnabled));
-            if (!value) LayerMergeDisableCompress = false;
+            if (!value)
+                LayerMergeDisableCompress = false;
         }
     }
 
@@ -150,7 +152,11 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
     public string StatusText
     {
         get => _statusText;
-        set { _statusText = value; OnPropertyChanged(); }
+        set
+        {
+            _statusText = value;
+            OnPropertyChanged();
+        }
     }
 
     public event Action? RequestReturnToTools;
@@ -278,6 +284,6 @@ public sealed class SettingsViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

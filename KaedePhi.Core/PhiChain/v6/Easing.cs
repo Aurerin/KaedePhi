@@ -38,7 +38,7 @@ namespace KaedePhi.Core.PhiChain.v6
         EaseInOutBounce,
         Custom,
         Steps,
-        Elastic
+        Elastic,
     }
 
     [JsonConverter(typeof(EasingJsonConverter))]
@@ -46,19 +46,26 @@ namespace KaedePhi.Core.PhiChain.v6
     {
         public static Easing Linear => new() { EasingType = EasingKind.Linear };
 
-        [JsonIgnore] public EasingKind EasingType { get; set; } = EasingKind.Linear;
+        [JsonIgnore]
+        public EasingKind EasingType { get; set; } = EasingKind.Linear;
 
-        [JsonIgnore] public float X1 { get; set; }
+        [JsonIgnore]
+        public float X1 { get; set; }
 
-        [JsonIgnore] public float Y1 { get; set; }
+        [JsonIgnore]
+        public float Y1 { get; set; }
 
-        [JsonIgnore] public float X2 { get; set; }
+        [JsonIgnore]
+        public float X2 { get; set; }
 
-        [JsonIgnore] public float Y2 { get; set; }
+        [JsonIgnore]
+        public float Y2 { get; set; }
 
-        [JsonIgnore] public int Count { get; set; }
+        [JsonIgnore]
+        public int Count { get; set; }
 
-        [JsonIgnore] public float Omega { get; set; }
+        [JsonIgnore]
+        public float Omega { get; set; }
 
         /// <summary>
         /// 深克隆当前 Easing 对象
@@ -73,7 +80,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 X2 = X2,
                 Y2 = Y2,
                 Count = Count,
-                Omega = Omega
+                Omega = Omega,
             };
         }
     }

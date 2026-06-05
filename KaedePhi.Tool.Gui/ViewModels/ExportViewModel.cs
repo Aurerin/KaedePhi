@@ -16,28 +16,25 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// 获取谱面格式的级别（数值越大级别越高）
     /// RePhiEdit > PhiChain > PhiEdit > PhiFans > PhigrosV3 > PhigrosV1
     /// </summary>
-    private static int GetFormatLevel(ChartType format) => format switch
-    {
-        ChartType.RePhiEdit => 6,
-        ChartType.PhiChain => 5,
-        ChartType.PhiEdit => 4,
-        ChartType.PhiFans => 3,
-        ChartType.PhigrosV3 => 2,
-        ChartType.PhigrosV1 => 1,
-        _ => 0
-    };
+    private static int GetFormatLevel(ChartType format) =>
+        format switch
+        {
+            ChartType.RePhiEdit => 6,
+            ChartType.PhiChain => 5,
+            ChartType.PhiEdit => 4,
+            ChartType.PhiFans => 3,
+            ChartType.PhigrosV3 => 2,
+            ChartType.PhigrosV1 => 1,
+            _ => 0,
+        };
 
     /// <summary>
     /// 判断是否是降级转换（从高级格式转换到低级格式）
     /// </summary>
     private bool IsDowngrade => GetFormatLevel(_sourceFormat) > GetFormatLevel(_selectedFormat);
 
-    public List<ChartType> AvailableFormats { get; } = new()
-    {
-        ChartType.RePhiEdit,
-        ChartType.PhiEdit,
-        ChartType.PhigrosV3
-    };
+    public List<ChartType> AvailableFormats { get; } =
+        new() { ChartType.RePhiEdit, ChartType.PhiEdit, ChartType.PhigrosV3 };
 
     public ChartType SourceFormat
     {
@@ -71,11 +68,12 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// <summary>
     /// 当前选择的导出格式是否为 JSON 格式（true 时才显示格式化输出选项）
     /// </summary>
-    public bool IsJsonFormat => _selectedFormat switch
-    {
-        ChartType.PhiEdit => false,
-        _ => true
-    };
+    public bool IsJsonFormat =>
+        _selectedFormat switch
+        {
+            ChartType.PhiEdit => false,
+            _ => true,
+        };
 
     /// <summary>
     /// 是否需要显示转换选项（仅在降级转换时显示）
@@ -90,7 +88,8 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// <summary>
     /// 是否显示 PhigrosV3 专属转换选项（降级且目标为 PhigrosV3）
     /// </summary>
-    public bool ShowPhigrosOptions => ShowConversionOptions && _selectedFormat == ChartType.PhigrosV3;
+    public bool ShowPhigrosOptions =>
+        ShowConversionOptions && _selectedFormat == ChartType.PhigrosV3;
 
     public bool UseStream
     {
@@ -421,6 +420,7 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     public event Action? RequestReturnToImport;
 
     public void OnExportClicked() => RequestExport?.Invoke();
+
     public void OnReturnClicked() => RequestReturnToImport?.Invoke();
 
     /// <summary>
@@ -455,6 +455,6 @@ public sealed class ExportViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

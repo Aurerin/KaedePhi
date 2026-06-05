@@ -9,20 +9,32 @@ namespace KaedePhi.Core.Utils
         /// points = [x1, y1, x2, y2]，隐含端点 (0,0) → (1,1)。
         /// 控制点可以是负数或大于1，产生过冲/欠冲效果。
         /// </summary>
-        public static T Do<T>(float[] points, float t, T startValue, T endValue,
-            float left = 0.0f, float right = 1.0f)
+        public static T Do<T>(
+            float[] points,
+            float t,
+            T startValue,
+            T endValue,
+            float left = 0.0f,
+            float right = 1.0f
+        )
             where T : struct, IComparable, IFormattable, IConvertible
         {
             if (points == null || points.Length < 4)
                 throw new ArgumentException("points 需要至少 4 个元素 [x1, y1, x2, y2]");
 
             var type = typeof(T);
-            if (type != typeof(float) && type != typeof(double)
-                                      && type != typeof(int) && type != typeof(byte))
+            if (
+                type != typeof(float)
+                && type != typeof(double)
+                && type != typeof(int)
+                && type != typeof(byte)
+            )
                 throw new NotSupportedException("T必须是float、double、int或byte");
 
-            float x1 = points[0], y1 = points[1];
-            float x2 = points[2], y2 = points[3];
+            float x1 = points[0],
+                y1 = points[1];
+            float x2 = points[2],
+                y2 = points[3];
 
             // t → 映射到参数区间
             var mappedT = left + t * (right - left);
@@ -96,10 +108,12 @@ namespace KaedePhi.Core.Utils
             for (var i = 0; i < 8; i++)
             {
                 var err = SampleCurveX(u, x1, x2) - targetX;
-                if (MathF.Abs(err) < 1e-7f) return true;
+                if (MathF.Abs(err) < 1e-7f)
+                    return true;
 
                 var deriv = SampleCurveXDerivative(u, x1, x2);
-                if (MathF.Abs(deriv) < 1e-7f) return false; // 导数太小 → 切二分
+                if (MathF.Abs(deriv) < 1e-7f)
+                    return false; // 导数太小 → 切二分
 
                 u -= err / deriv;
             }
@@ -114,7 +128,8 @@ namespace KaedePhi.Core.Utils
         {
             const int subdivisions = 32;
             const float step = 1f / subdivisions;
-            float uLo = 0f, uHi = 1f;
+            float uLo = 0f,
+                uHi = 1f;
             var prevX = 0f;
 
             for (var i = 1; i <= subdivisions; i++)
@@ -122,8 +137,8 @@ namespace KaedePhi.Core.Utils
                 var ui = step * i;
                 var xi = SampleCurveX(ui, x1, x2);
 
-                var crosses = (prevX <= targetX && xi >= targetX)
-                              || (prevX >= targetX && xi <= targetX);
+                var crosses =
+                    (prevX <= targetX && xi >= targetX) || (prevX >= targetX && xi <= targetX);
                 if (crosses)
                 {
                     uLo = step * (i - 1);
@@ -139,17 +154,26 @@ namespace KaedePhi.Core.Utils
         /// <summary>
         /// 第二阶段（下）：在已知区间内做精确二分，返回 Clamp 后的结果。
         /// </summary>
-        private static float RefineByBisection(float x1, float x2, float targetX, float uLo, float uHi)
+        private static float RefineByBisection(
+            float x1,
+            float x2,
+            float targetX,
+            float uLo,
+            float uHi
+        )
         {
             for (var i = 0; i < 20; i++)
             {
                 var u = (uLo + uHi) * 0.5f;
                 var err = SampleCurveX(u, x1, x2) - targetX;
 
-                if (MathF.Abs(err) < 1e-7f) break;
+                if (MathF.Abs(err) < 1e-7f)
+                    break;
 
-                if (err < 0f) uLo = u;
-                else uHi = u;
+                if (err < 0f)
+                    uLo = u;
+                else
+                    uHi = u;
             }
 
             return Math.Clamp((uLo + uHi) * 0.5f, 0f, 1f);
@@ -159,27 +183,21 @@ namespace KaedePhi.Core.Utils
         private static float SampleCurveX(float u, float x1, float x2)
         {
             var omu = 1f - u;
-            return 3f * omu * omu * u * x1
-                   + 3f * omu * u * u * x2
-                   + u * u * u;
+            return 3f * omu * omu * u * x1 + 3f * omu * u * u * x2 + u * u * u;
         }
 
         // y(u) = 3(1−u)²u·y1 + 3(1−u)u²·y2 + u³
         private static float SampleCurveY(float u, float y1, float y2)
         {
             var omu = 1f - u;
-            return 3f * omu * omu * u * y1
-                   + 3f * omu * u * u * y2
-                   + u * u * u;
+            return 3f * omu * omu * u * y1 + 3f * omu * u * u * y2 + u * u * u;
         }
 
         // x'(u) = 3(1−u)²·x1 + 6(1−u)u·(x2−x1) + 3u²·(1−x2)
         private static float SampleCurveXDerivative(float u, float x1, float x2)
         {
             var omu = 1f - u;
-            return 3f * omu * omu * x1
-                   + 6f * omu * u * (x2 - x1)
-                   + 3f * u * u * (1f - x2);
+            return 3f * omu * omu * x1 + 6f * omu * u * (x2 - x1) + 3f * u * u * (1f - x2);
         }
 
         #endregion

@@ -14,15 +14,25 @@ namespace KaedePhi.Core.KaedePhi.Controls
 
         private static readonly List<XControl> DefaultInstance = new()
         {
-            new XControl { Easing = new Easing(1), Pos = 1.0f, X = 0.0f },
-            new XControl { Easing = new Easing(1), Pos = 1.0f, X = 9999999.0f }
+            new XControl
+            {
+                Easing = new Easing(1),
+                Pos = 1.0f,
+                X = 0.0f,
+            },
+            new XControl
+            {
+                Easing = new Easing(1),
+                Pos = 1.0f,
+                X = 9999999.0f,
+            },
         };
 
         /// <summary>
         /// 获取默认控制点列表。
         /// </summary>
-        public static List<XControl> Default
-            => DefaultInstance.ConvertAll(input => input.Clone() as XControl);
+        public static List<XControl> Default =>
+            DefaultInstance.ConvertAll(input => input.Clone() as XControl);
 
         /// <summary>
         /// 深拷贝控制点。
@@ -30,7 +40,12 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// <returns>控制点副本</returns>
         public override ControlBase Clone()
         {
-            return new XControl { Easing = new Easing(Easing), X = X, Pos = Pos };
+            return new XControl
+            {
+                Easing = new Easing(Easing),
+                X = X,
+                Pos = Pos,
+            };
         }
     }
 }

@@ -31,15 +31,33 @@ namespace KaedePhi.Core.RePhiEdit
                 judgeLine.Extended.Anticipation();
 
                 // 如果判定线上有任何类型的Control组为空或null，则设定一个默认值
-                if (ControlsIsNullOrEmpty(judgeLine.AlphaControls.Cast<Controls.ControlBase>().ToList()))
+                if (
+                    ControlsIsNullOrEmpty(
+                        judgeLine.AlphaControls.Cast<Controls.ControlBase>().ToList()
+                    )
+                )
                     judgeLine.AlphaControls = Controls.AlphaControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.PositionControls.Cast<Controls.ControlBase>().ToList()))
+                if (
+                    ControlsIsNullOrEmpty(
+                        judgeLine.PositionControls.Cast<Controls.ControlBase>().ToList()
+                    )
+                )
                     judgeLine.PositionControls = Controls.XControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.SizeControls.Cast<Controls.ControlBase>().ToList()))
+                if (
+                    ControlsIsNullOrEmpty(
+                        judgeLine.SizeControls.Cast<Controls.ControlBase>().ToList()
+                    )
+                )
                     judgeLine.SizeControls = Controls.SizeControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.SkewControls.Cast<Controls.ControlBase>().ToList()))
+                if (
+                    ControlsIsNullOrEmpty(
+                        judgeLine.SkewControls.Cast<Controls.ControlBase>().ToList()
+                    )
+                )
                     judgeLine.SkewControls = Controls.SkewControl.Default;
-                if (ControlsIsNullOrEmpty(judgeLine.YControls.Cast<Controls.ControlBase>().ToList()))
+                if (
+                    ControlsIsNullOrEmpty(judgeLine.YControls.Cast<Controls.ControlBase>().ToList())
+                )
                     judgeLine.YControls = Controls.YControl.Default;
 
                 // 如果判定线没有任何音符，则将音符列表设置为null
@@ -62,7 +80,10 @@ namespace KaedePhi.Core.RePhiEdit
         public string ExportToJson(bool format)
         {
             Anticipation();
-            return JsonConvert.SerializeObject(this, format ? Formatting.Indented : Formatting.None);
+            return JsonConvert.SerializeObject(
+                this,
+                format ? Formatting.Indented : Formatting.None
+            );
         }
 
         /// <summary>
@@ -73,8 +94,15 @@ namespace KaedePhi.Core.RePhiEdit
         public void ExportToJsonStream(Stream stream, bool format)
         {
             Anticipation();
-            using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
-            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
+            using var streamWriter = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
+            var serializer = JsonDefaults.CreateSerializer(
+                format ? Formatting.Indented : Formatting.None
+            );
 
             using var jsonWriter = new JsonTextWriter(streamWriter) { CloseOutput = false };
             serializer.Serialize(jsonWriter, this);
@@ -90,9 +118,15 @@ namespace KaedePhi.Core.RePhiEdit
         public async Task ExportToJsonStreamAsync(Stream stream, bool format)
         {
             Anticipation();
-            await using var streamWriter =
-                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
-            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
+            await using var streamWriter = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
+            var serializer = JsonDefaults.CreateSerializer(
+                format ? Formatting.Indented : Formatting.None
+            );
 
             await Task.Run(() =>
             {
@@ -109,9 +143,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         /// <param name="format">是否需要格式化</param>
         /// <returns>json</returns>
-        public Task<string> ExportToJsonAsync(bool format)
-            => Task.Run(() => ExportToJson(format));
-
+        public Task<string> ExportToJsonAsync(bool format) => Task.Run(() => ExportToJson(format));
 
         /// <summary>
         /// 从Json反序列化
@@ -122,14 +154,16 @@ namespace KaedePhi.Core.RePhiEdit
         [PublicAPI]
         public static Chart LoadFromJson(string json)
         {
-            var chart = JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings) ??
-                        throw new InvalidOperationException(
-                            "Failed to deserialize Chart from JSON.");
-            foreach (var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
-                     {
-                         judgeLine.EventLayers.RemoveAll(layer => layer is null);
-                         return judgeLine.EventLayers;
-                     }))
+            var chart =
+                JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings)
+                ?? throw new InvalidOperationException("Failed to deserialize Chart from JSON.");
+            foreach (
+                var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
+                {
+                    judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                    return judgeLine.EventLayers;
+                })
+            )
                 eventLayer.Sort();
 
             return chart;
@@ -140,8 +174,8 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         /// <param name="json">谱面Json数据</param>
         /// <returns>谱面</returns>
-        public static Task<Chart> LoadFromJsonAsync(string json)
-            => Task.Run(() => LoadFromJson(json));
+        public static Task<Chart> LoadFromJsonAsync(string json) =>
+            Task.Run(() => LoadFromJson(json));
 
         /// <summary>
         /// 从流反序列化
@@ -156,18 +190,21 @@ namespace KaedePhi.Core.RePhiEdit
                 JsonDefaults.NoBomUtf8,
                 detectEncodingFromByteOrderMarks: true,
                 bufferSize: 1024,
-                leaveOpen: true);
+                leaveOpen: true
+            );
             using var jsonReader = new JsonTextReader(streamReader);
             var serializer = JsonDefaults.CreateSerializer(Formatting.None);
-            var chart = serializer.Deserialize<Chart>(jsonReader) ??
-                        throw new InvalidOperationException(
-                            "Failed to deserialize Chart from stream.");
+            var chart =
+                serializer.Deserialize<Chart>(jsonReader)
+                ?? throw new InvalidOperationException("Failed to deserialize Chart from stream.");
 
-            foreach (var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
-                     {
-                         judgeLine.EventLayers.RemoveAll(layer => layer is null);
-                         return judgeLine.EventLayers;
-                     }))
+            foreach (
+                var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
+                {
+                    judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                    return judgeLine.EventLayers;
+                })
+            )
                 eventLayer.Sort();
 
             return chart;
@@ -188,18 +225,23 @@ namespace KaedePhi.Core.RePhiEdit
                     JsonDefaults.NoBomUtf8,
                     detectEncodingFromByteOrderMarks: true,
                     bufferSize: 1024,
-                    leaveOpen: true);
+                    leaveOpen: true
+                );
                 using var jsonReader = new JsonTextReader(streamReader);
                 var serializer = JsonDefaults.CreateSerializer(Formatting.None);
-                var chart = serializer.Deserialize<Chart>(jsonReader) ??
-                            throw new InvalidOperationException(
-                                "Failed to deserialize Chart from stream.");
+                var chart =
+                    serializer.Deserialize<Chart>(jsonReader)
+                    ?? throw new InvalidOperationException(
+                        "Failed to deserialize Chart from stream."
+                    );
 
-                foreach (var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
-                         {
-                             judgeLine.EventLayers.RemoveAll(layer => layer is null);
-                             return judgeLine.EventLayers;
-                         }))
+                foreach (
+                    var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
+                    {
+                        judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                        return judgeLine.EventLayers;
+                    })
+                )
                     eventLayer.Sort();
 
                 return Task.FromResult(chart);
@@ -221,7 +263,7 @@ namespace KaedePhi.Core.RePhiEdit
                 JudgeLineGroup = JudgeLineGroup.ToArray(),
                 MultiLineString = MultiLineString,
                 MultiScale = MultiScale,
-                XyBind = XyBind
+                XyBind = XyBind,
             };
         }
     }

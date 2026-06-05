@@ -25,5 +25,6 @@ public interface IChartRenderExporter<in TChart, in TRenderOptions> : ILoggable
         TRenderOptions opts,
         int? lineIndex = null,
         int? layerIndex = null,
-        IProgress<ToolProgress>? progress = null);
+        IProgress<ToolProgress>? progress = null
+    );
 }

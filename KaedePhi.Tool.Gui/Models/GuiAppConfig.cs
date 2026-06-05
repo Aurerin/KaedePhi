@@ -3,26 +3,29 @@ namespace KaedePhi.Tool.Gui.Models;
 public sealed class GuiAppConfig
 {
     public int MaxLogFiles { get; set; } = 5;
-    public ToolDefaultsConfig Unbind { get; set; } = new()
-    {
-        Precision = 64,
-        Tolerance = 5,
-        ClassicMode = false,
-        DisableCompress = false
-    };
-    public ToolDefaultsConfig LayerMerge { get; set; } = new()
-    {
-        Precision = 64,
-        Tolerance = 0.2,
-        ClassicMode = false,
-        DisableCompress = false
-    };
-    public ToolDefaultsConfig Cut { get; set; } = new()
-    {
-        Precision = 64,
-        Tolerance = 0.1,
-        DisableCompress = false
-    };
+    public ToolDefaultsConfig Unbind { get; set; } =
+        new()
+        {
+            Precision = 64,
+            Tolerance = 5,
+            ClassicMode = false,
+            DisableCompress = false,
+        };
+    public ToolDefaultsConfig LayerMerge { get; set; } =
+        new()
+        {
+            Precision = 64,
+            Tolerance = 0.2,
+            ClassicMode = false,
+            DisableCompress = false,
+        };
+    public ToolDefaultsConfig Cut { get; set; } =
+        new()
+        {
+            Precision = 64,
+            Tolerance = 0.1,
+            DisableCompress = false,
+        };
     public FitDefaultsConfig Fit { get; set; } = new();
     public RenderDefaultsConfig Render { get; set; } = new();
     public ConvertDefaultsConfig Convert { get; set; } = new();

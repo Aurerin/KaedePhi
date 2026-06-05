@@ -17,9 +17,8 @@ namespace KaedePhi.Core.PhiEdit
         /// <summary>
         /// 调试用方法，不要调用，请改用<see cref="ToString(int)"/>
         /// </summary>
-        public override string ToString()
-            => $"Note(Type: {Type}, StartBeat: {StartBeat}, EndBeat: {EndBeat}, Above: {Above}, PositionX: {PositionX}, WidthRatio: {WidthRatio}, IsFake: {IsFake}, SpeedMultiplier: {SpeedMultiplier})";
-
+        public override string ToString() =>
+            $"Note(Type: {Type}, StartBeat: {StartBeat}, EndBeat: {EndBeat}, Above: {Above}, PositionX: {PositionX}, WidthRatio: {WidthRatio}, IsFake: {IsFake}, SpeedMultiplier: {SpeedMultiplier})";
 
         /// <summary>
         /// 用于将瞬时事件转换为PhiEditor Chart格式的字符串
@@ -39,18 +38,19 @@ namespace KaedePhi.Core.PhiEdit
                 if (Math.Abs(StartBeat - EndBeat) > 0.0001f) // 两者不相等？这不是Hold吧，throw
                     throw new ArgumentException("非Hold音符的开始拍与结束拍应相等");
 
-
                 var aboveNumber = Above ? aboveNote : belowNote; // 上方为1，下方为2
                 var isFakeNumber = IsFake ? fakeNote : realNote; // 假音符为1，真音符为0
                 stringBuilder.AppendLine(
-                    $"n{(int)Type} {judgeLineIndex} {StartBeat} {PositionX} {aboveNumber} {isFakeNumber}");
+                    $"n{(int)Type} {judgeLineIndex} {StartBeat} {PositionX} {aboveNumber} {isFakeNumber}"
+                );
             }
             else
             {
                 var aboveNumber = Above ? aboveNote : belowNote; // 上方为1，下方为2
                 var isFakeNumber = IsFake ? fakeNote : realNote; // 假音符为1，真音符为0
                 stringBuilder.AppendLine(
-                    $"n{(int)Type} {judgeLineIndex} {StartBeat} {EndBeat} {PositionX} {aboveNumber} {isFakeNumber}");
+                    $"n{(int)Type} {judgeLineIndex} {StartBeat} {EndBeat} {PositionX} {aboveNumber} {isFakeNumber}"
+                );
             }
 
             stringBuilder.AppendLine($"# {SpeedMultiplier}");
@@ -70,7 +70,7 @@ namespace KaedePhi.Core.PhiEdit
                 PositionX = PositionX,
                 WidthRatio = WidthRatio,
                 IsFake = IsFake,
-                SpeedMultiplier = SpeedMultiplier
+                SpeedMultiplier = SpeedMultiplier,
             };
         }
     }
@@ -80,6 +80,6 @@ namespace KaedePhi.Core.PhiEdit
         Tap = 1,
         Hold = 2,
         Flick = 3,
-        Drag = 4
+        Drag = 4,
     }
 }

@@ -13,7 +13,7 @@ public static class JudgeLine
             Name = $"PhigrosLine_{index}",
             Notes = Note.ConvertNotes(src.NotesAbove, src.NotesBelow),
             EventLayers = [EventLayer.ConvertEventLayer(src, horizonBeat)],
-            BpmFactor = defaultBpm / src.Bpm
+            BpmFactor = defaultBpm / src.Bpm,
         };
     }
 }

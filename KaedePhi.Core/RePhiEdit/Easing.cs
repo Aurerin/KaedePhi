@@ -11,7 +11,8 @@ namespace KaedePhi.Core.RePhiEdit
             _easingNumber = easingNumber;
         }
 
-        [JsonIgnore] private readonly int _easingNumber;
+        [JsonIgnore]
+        private readonly int _easingNumber;
 
         public float Interpolate(float minLim, float maxLim, float start, float end, float t)
         {

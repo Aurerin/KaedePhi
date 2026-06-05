@@ -22,13 +22,13 @@ namespace KaedePhi.Core.PhiChain.v6
         Opacity,
 
         [EnumMember(Value = "speed")]
-        Speed
+        Speed,
     }
 
     public enum LineEventValueType
     {
         Transition,
-        Constant
+        Constant,
     }
 
     [JsonConverter(typeof(LineEventValueJsonConverter))]
@@ -56,17 +56,13 @@ namespace KaedePhi.Core.PhiChain.v6
                 Type = LineEventValueType.Transition,
                 Start = start,
                 End = end,
-                Easing = easing ?? Easing.Linear
+                Easing = easing ?? Easing.Linear,
             };
         }
 
         public static LineEventValue Constant(float value)
         {
-            return new LineEventValue
-            {
-                Type = LineEventValueType.Constant,
-                Value = value
-            };
+            return new LineEventValue { Type = LineEventValueType.Constant, Value = value };
         }
 
         /// <summary>
@@ -80,7 +76,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 Start = Start,
                 End = End,
                 Easing = Easing?.Clone(),
-                Value = Value
+                Value = Value,
             };
         }
     }
@@ -109,9 +105,8 @@ namespace KaedePhi.Core.PhiChain.v6
                 Type = Type,
                 StartBeat = new Beat((int[])StartBeat),
                 EndBeat = new Beat((int[])EndBeat),
-                Value = Value?.Clone()
+                Value = Value?.Clone(),
             };
         }
     }
 }
-

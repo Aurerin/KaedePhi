@@ -10,36 +10,51 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// <summary>
         /// X轴移动事件列表
         /// </summary>
-        [JsonProperty("moveXEvents", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "moveXEvents",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public List<Event<float>>? MoveXEvents { get; set; } // 移动事件
 
         /// <summary>
         /// Y轴移动事件列表
         /// </summary>
-        [JsonProperty("moveYEvents", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "moveYEvents",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public List<Event<float>>? MoveYEvents { get; set; } // 移动事件
 
         /// <summary>
         /// 旋转事件列表
         /// </summary>
-        [JsonProperty("rotateEvents", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "rotateEvents",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public List<Event<float>>? RotateEvents { get; set; } // 旋转事件
 
         /// <summary>
         /// 不透明度事件列表
         /// </summary>
-        [JsonProperty("alphaEvents", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "alphaEvents",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public List<Event<int>>? AlphaEvents { get; set; } // 不透明度事件
 
         /// <summary>
         /// 速度事件列表
         /// </summary>
-        [JsonProperty("speedEvents", DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(
+            "speedEvents",
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        )]
         public List<Event<float>>? SpeedEvents { get; set; } // 速度事件
 
         /// <summary>
@@ -58,7 +73,9 @@ namespace KaedePhi.Core.RePhiEdit.Events
         {
             // 二分查找：定位 StartBeat <= beat 中 index 最大者（主导事件）
             // 同 StartBeat 时取靠后者（index 更大），满足同起始拍 index 至上规则
-            int lo = 0, hi = events.Count - 1, idx = -1;
+            int lo = 0,
+                hi = events.Count - 1,
+                idx = -1;
             while (lo <= hi)
             {
                 var mid = (lo + hi) >> 1;

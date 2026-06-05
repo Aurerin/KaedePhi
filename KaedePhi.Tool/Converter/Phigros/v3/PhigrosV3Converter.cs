@@ -9,7 +9,9 @@ namespace KaedePhi.Tool.Converter.Phigros.v3;
 /// <summary>
 /// Phigros V3 格式转换器。
 /// </summary>
-public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Unit?, KpcToPhigrosV3ConvertOptions>
+public class PhigrosV3Converter
+    : LoggableBase,
+        IChartConverter<PhigrosChart, Unit?, KpcToPhigrosV3ConvertOptions>
 {
     /// <summary>
     /// Phigros 格式默认 BPM（当谱面未提供 BPM 时使用）。
@@ -30,11 +32,20 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
         {
             BpmList = BpmItem.ConvertBpmList(input.JudgeLineList),
             Meta = Meta.ConvertMeta(input),
-            JudgeLineList = input.JudgeLineList?
-                .Select((j, i) =>
-                    JudgeLine.ConvertJudgeLine(j, i,
-                        input.JudgeLineList.Count > 0 ? input.JudgeLineList[0].Bpm : DefaultPhigrosBpm))
-                .ToList() ?? []
+            JudgeLineList =
+                input
+                    .JudgeLineList?.Select(
+                        (j, i) =>
+                            JudgeLine.ConvertJudgeLine(
+                                j,
+                                i,
+                                input.JudgeLineList.Count > 0
+                                    ? input.JudgeLineList[0].Bpm
+                                    : DefaultPhigrosBpm
+                            )
+                    )
+                    .ToList()
+                ?? [],
         };
     }
 
@@ -54,13 +65,21 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
         var globalBpm = input.BpmList is { Count: > 0 } ? input.BpmList[0].Bpm : options.DefaultBpm;
         var chartEndBeat = CalculateChartEndBeat(input);
 
-        var judgeLineConverter = new JudgeLineKpcToPhigrosV3(options, globalBpm, chartEndBeat, OnWarning);
+        var judgeLineConverter = new JudgeLineKpcToPhigrosV3(
+            options,
+            globalBpm,
+            chartEndBeat,
+            OnWarning
+        );
 
         return new PhigrosChart
         {
             Offset = GetPhigrosV3Offset(input.Meta),
-            JudgeLineList = input.JudgeLineList?
-                .ConvertAll(j => judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)) ?? []
+            JudgeLineList =
+                input.JudgeLineList?.ConvertAll(j =>
+                    judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)
+                )
+                ?? [],
         };
     }
 
@@ -68,13 +87,15 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
     {
         var maxBeat = 0d;
 
-        if (input.JudgeLineList is not { Count: > 0 }) return (float)(maxBeat * 32) + 1f;
+        if (input.JudgeLineList is not { Count: > 0 })
+            return (float)(maxBeat * 32) + 1f;
         foreach (var line in input.JudgeLineList)
         {
             if (line.Notes is { Count: > 0 })
                 maxBeat = line.Notes.Select(note => (double)note.EndBeat).Prepend(maxBeat).Max();
 
-            if (line.EventLayers is not { Count: > 0 }) continue;
+            if (line.EventLayers is not { Count: > 0 })
+                continue;
             foreach (var layer in line.EventLayers)
             {
                 maxBeat = Math.Max(maxBeat, GetMaxEventEndBeat(layer.MoveXEvents));
@@ -90,7 +111,8 @@ public class PhigrosV3Converter : LoggableBase, IChartConverter<PhigrosChart, Un
 
     private static double GetMaxEventEndBeat<T>(List<KpcEvents.Event<T>>? events)
     {
-        if (events is not { Count: > 0 }) return 0;
+        if (events is not { Count: > 0 })
+            return 0;
         return events.Max(e => (double)e.EndBeat);
     }
 

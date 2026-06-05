@@ -17,24 +17,28 @@ public partial class ImportPage : UserControl
 
     private async void OnImportClick(object? sender, RoutedEventArgs e)
     {
-        if (_isPicking) return;
+        if (_isPicking)
+            return;
         _isPicking = true;
 
         try
         {
             var topLevel = TopLevel.GetTopLevel(this);
-            if (topLevel == null) return;
+            if (topLevel == null)
+                return;
 
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-            {
-                Title = import_file_picker_title,
-                AllowMultiple = false,
-                FileTypeFilter = new[]
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
                 {
-                    new FilePickerFileType(file_type_json) { Patterns = new[] { "*.json" } },
-                    new FilePickerFileType(file_type_all) { Patterns = new[] { "*.*" } }
+                    Title = import_file_picker_title,
+                    AllowMultiple = false,
+                    FileTypeFilter = new[]
+                    {
+                        new FilePickerFileType(file_type_json) { Patterns = new[] { "*.json" } },
+                        new FilePickerFileType(file_type_all) { Patterns = new[] { "*.*" } },
+                    },
                 }
-            });
+            );
 
             if (files.Count > 0 && DataContext is ImportViewModel vm)
             {

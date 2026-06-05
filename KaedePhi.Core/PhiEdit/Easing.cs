@@ -40,6 +40,7 @@ namespace KaedePhi.Core.PhiEdit
         }
 
         public static implicit operator int(Easing easing) => easing._easingNumber;
+
         public static implicit operator Easing(int easingNumber) => Get(easingNumber);
     }
 }

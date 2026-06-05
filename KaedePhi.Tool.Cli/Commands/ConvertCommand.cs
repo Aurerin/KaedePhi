@@ -155,7 +155,11 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         #endregion
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings s,
+        CancellationToken cancellationToken
+    )
     {
         var c = s.AppConfig.ConvertConfig;
         s.TargetType ??= c.TargetType;
@@ -166,7 +170,11 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
         var svc = new ChartService();
 
         var kpc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (kpc == null) { ConsoleWriter.Error(CliLocalizationString.err_unimplemented); return 1; }
+        if (kpc == null)
+        {
+            ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
+            return 1;
+        }
 
         var output = svc.ResolveOutputPath(s.Input, s.Output, s.Workspace);
 
@@ -179,40 +187,42 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
             TrailingBeatPadding = s.PeTrailingBeatPadding ?? c.PeTrailingBeatPadding,
             Cutting = new KpcToPhiEditConvertOptions.CuttingOptions
             {
-                UnsupportedEasingPrecision = s.PeUnsupportedEasingPrecision ?? c.PeUnsupportedEasingPrecision,
-                MisalignedXyEventPrecision = s.PeMisalignedXyEventPrecision ?? c.PeMisalignedXyEventPrecision
+                UnsupportedEasingPrecision =
+                    s.PeUnsupportedEasingPrecision ?? c.PeUnsupportedEasingPrecision,
+                MisalignedXyEventPrecision =
+                    s.PeMisalignedXyEventPrecision ?? c.PeMisalignedXyEventPrecision,
             },
             Alpha = new KpcToPhiEditConvertOptions.AlphaOptions
             {
                 CutPrecision = s.PeAlphaCutPrecision ?? c.PeAlphaCutPrecision,
                 CutCompress = c.PeAlphaCutCompress,
-                CutTolerance = s.PeAlphaCutTolerance ?? c.PeAlphaCutTolerance
+                CutTolerance = s.PeAlphaCutTolerance ?? c.PeAlphaCutTolerance,
             },
             Speed = new KpcToPhiEditConvertOptions.SpeedOptions
             {
                 CutPrecision = s.PeSpeedCutPrecision ?? c.PeSpeedCutPrecision,
                 CutCompress = c.PeSpeedCutCompress,
-                CutTolerance = s.PeSpeedCutTolerance ?? c.PeSpeedCutTolerance
+                CutTolerance = s.PeSpeedCutTolerance ?? c.PeSpeedCutTolerance,
             },
             FatherLineUnbind = new KpcToPhiEditConvertOptions.FatherLineUnbindOptions
             {
                 Precision = s.UnbindPrecision ?? s.Precision ?? c.UnbindPrecision,
                 Tolerance = s.UnbindTolerance ?? s.Tolerance ?? c.UnbindTolerance,
                 ClassicMode = s.UnbindClassicMode ?? s.Classic ?? c.UnbindClassicMode,
-                Compress = !disableUnbindCompress
+                Compress = !disableUnbindCompress,
             },
             MultiLayerMerge = new KpcToPhiEditConvertOptions.MultiLayerMergeOptions
             {
                 Precision = s.MultiLayerMergePrecision ?? c.MultiLayerMergePrecision,
                 Tolerance = s.MultiLayerMergeTolerance ?? c.MultiLayerMergeTolerance,
                 ClassicMode = s.MultiLayerMergeClassicMode ?? c.MultiLayerMergeClassicMode,
-                Compress = !disableMergeCompress
+                Compress = !disableMergeCompress,
             },
             LineFilter = new KpcToPhiEditConvertOptions.LineFilterOptions
             {
                 RemoveAttachUiLine = s.RemoveAttachUiLine ?? false,
-                RemoveTextureLine = s.RemoveTextureLine ?? false
-            }
+                RemoveTextureLine = s.RemoveTextureLine ?? false,
+            },
         };
 
         var phigrosOptions = new KpcToPhigrosV3ConvertOptions
@@ -221,59 +231,69 @@ public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
             Cutting = new KpcToPhigrosV3ConvertOptions.CuttingOptions
             {
                 EasingPrecision = s.PhigrosEasingPrecision ?? c.PhigrosEasingPrecision,
-                MisalignedXyEventPrecision = s.PhigrosMisalignedXyEventPrecision ?? c.PhigrosMisalignedXyEventPrecision
+                MisalignedXyEventPrecision =
+                    s.PhigrosMisalignedXyEventPrecision ?? c.PhigrosMisalignedXyEventPrecision,
             },
             Alpha = new KpcToPhigrosV3ConvertOptions.AlphaOptions
             {
                 CutPrecision = s.PhigrosAlphaCutPrecision ?? c.PhigrosAlphaCutPrecision,
                 CutCompress = c.PhigrosAlphaCutCompress,
-                CutTolerance = s.PhigrosAlphaCutTolerance ?? c.PhigrosAlphaCutTolerance
+                CutTolerance = s.PhigrosAlphaCutTolerance ?? c.PhigrosAlphaCutTolerance,
             },
             Speed = new KpcToPhigrosV3ConvertOptions.SpeedOptions
             {
-                CutPrecision = s.PhigrosSpeedCutPrecision ?? c.PhigrosSpeedCutPrecision
+                CutPrecision = s.PhigrosSpeedCutPrecision ?? c.PhigrosSpeedCutPrecision,
             },
             FatherLineUnbind = new KpcToPhigrosV3ConvertOptions.FatherLineUnbindOptions
             {
                 Precision = s.UnbindPrecision ?? s.Precision ?? c.UnbindPrecision,
                 Tolerance = s.UnbindTolerance ?? s.Tolerance ?? c.UnbindTolerance,
                 ClassicMode = s.UnbindClassicMode ?? s.Classic ?? c.UnbindClassicMode,
-                Compress = !disableUnbindCompress
+                Compress = !disableUnbindCompress,
             },
             MultiLayerMerge = new KpcToPhigrosV3ConvertOptions.MultiLayerMergeOptions
             {
                 Precision = s.MultiLayerMergePrecision ?? c.MultiLayerMergePrecision,
                 Tolerance = s.MultiLayerMergeTolerance ?? c.MultiLayerMergeTolerance,
                 ClassicMode = s.MultiLayerMergeClassicMode ?? c.MultiLayerMergeClassicMode,
-                Compress = !disableMergeCompress
+                Compress = !disableMergeCompress,
             },
             LineFilter = new KpcToPhigrosV3ConvertOptions.LineFilterOptions
             {
                 RemoveAttachUiLine = s.RemoveAttachUiLine ?? false,
-                RemoveTextureLine = s.RemoveTextureLine ?? false
+                RemoveTextureLine = s.RemoveTextureLine ?? false,
             },
             NoteFilter = new KpcToPhigrosV3ConvertOptions.NoteFilterOptions
             {
-                FilterFakeNotes = s.FilterFakeNotes ?? c.PhigrosFilterFakeNotes
+                FilterFakeNotes = s.FilterFakeNotes ?? c.PhigrosFilterFakeNotes,
             },
             NegativeAlpha = new KpcToPhigrosV3ConvertOptions.NegativeAlphaOptions
             {
                 Enabled = s.NegativeAlphaElevation ?? c.PhigrosNegativeAlphaElevation,
-                ElevationStep = s.NegativeAlphaStep ?? c.PhigrosNegativeAlphaStep
-            }
+                ElevationStep = s.NegativeAlphaStep ?? c.PhigrosNegativeAlphaStep,
+            },
         };
 
-        var result = await ChartService.SaveAsAsync(kpc, output, s.TargetType ?? ChartType.RePhiEdit,
+        var result = await ChartService.SaveAsAsync(
+            kpc,
+            output,
+            s.TargetType ?? ChartType.RePhiEdit,
             new SaveAsOptions
             {
                 Stream = s.StreamOutput ?? false,
                 Format = s.FormatOutput ?? false,
                 DryRun = s.DryRun ?? false,
                 PhiEditOptions = peOptions,
-                PhigrosOptions = phigrosOptions
-            }, cancellationToken);
+                PhigrosOptions = phigrosOptions,
+            },
+            cancellationToken
+        );
 
-        if (result == null) { ConsoleWriter.Warn(CliLocalizationString.warn_rpe_convert); return 2; }
+        if (result == null)
+        {
+            ConsoleWriter.Warn(CliLocalizationString.warn_rpe_convert);
+            return 2;
+        }
         ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, result));
         return 0;
     }

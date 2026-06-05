@@ -10,15 +10,19 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 #if !Release
-        var ver = Assembly.GetExecutingAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-            .InformationalVersion ?? "unknown";
+        var ver =
+            Assembly
+                .GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion
+            ?? "unknown";
         VersionLabel.Text = $"v{ver}";
         VersionLabel.Foreground = new SolidColorBrush(Colors.Yellow);
         VersionLabel.Opacity = 0.85;
 #else
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        VersionLabel.Text = version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v?";
+        VersionLabel.Text =
+            version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v?";
 #endif
     }
 }

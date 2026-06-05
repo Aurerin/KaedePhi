@@ -8,7 +8,11 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
 {
     public sealed class Settings : OperationSettings;
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings s,
+        CancellationToken cancellationToken
+    )
     {
         var c = s.AppConfig.UnbindConfig;
         s.Precision ??= c.Precision;
@@ -18,21 +22,41 @@ public sealed class UnbindFatherCommand : AsyncCommand<UnbindFatherCommand.Setti
 
         var svc = new ChartService();
         var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (nrc == null) { ConsoleWriter.Error(CliLocalizationString.err_unimplemented); return 1; }
+        if (nrc == null)
+        {
+            ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
+            return 1;
+        }
 
         var nrcCopy = nrc.Clone();
         var unbinder = new JudgeLineUnbinder();
-        unbinder.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
+        unbinder.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error,
+            debug: ConsoleWriter.Debug
+        );
 
         for (var i = 0; i < nrc.JudgeLineList.Count; i++)
         {
             if (nrc.JudgeLineList[i].Father != -1)
-                nrcCopy.JudgeLineList[i] = s.Classic == true
-                    ? unbinder.FatherUnbind(i, nrc.JudgeLineList, s.Precision ?? 64d)
-                    : unbinder.FatherUnbind(i, nrc.JudgeLineList, s.Precision ?? 64d, s.Tolerance ?? 5d);
+                nrcCopy.JudgeLineList[i] =
+                    s.Classic == true
+                        ? unbinder.FatherUnbind(i, nrc.JudgeLineList, s.Precision ?? 64d)
+                        : unbinder.FatherUnbind(
+                            i,
+                            nrc.JudgeLineList,
+                            s.Precision ?? 64d,
+                            s.Tolerance ?? 5d
+                        );
         }
 
-        var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace), s.DryRun ?? false, cancellationToken);
+        var output = await ChartService.SaveAsRpeAsync(
+            nrcCopy,
+            svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
+            s.DryRun ?? false,
+            cancellationToken
+        );
         ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
         return 0;
     }

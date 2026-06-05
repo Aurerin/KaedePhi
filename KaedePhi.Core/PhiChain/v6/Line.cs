@@ -8,4 +8,3 @@ namespace KaedePhi.Core.PhiChain.v6
         public string Name { get; set; } = "Unnamed Line";
     }
 }
-

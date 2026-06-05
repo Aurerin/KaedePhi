@@ -22,19 +22,28 @@ public abstract class LoggableBase : ILoggable
         Action<string>? info = null,
         Action<string>? warning = null,
         Action<string>? error = null,
-        Action<string>? debug = null)
+        Action<string>? debug = null
+    )
     {
-        if (info != null) OnInfo += info;
-        if (warning != null) OnWarning += warning;
-        if (error != null) OnError += error;
-        if (debug != null) OnDebug += debug;
+        if (info != null)
+            OnInfo += info;
+        if (warning != null)
+            OnWarning += warning;
+        if (error != null)
+            OnError += error;
+        if (debug != null)
+            OnDebug += debug;
 
         return new LogSubscription(() =>
         {
-            if (info != null) OnInfo -= info;
-            if (warning != null) OnWarning -= warning;
-            if (error != null) OnError -= error;
-            if (debug != null) OnDebug -= debug;
+            if (info != null)
+                OnInfo -= info;
+            if (warning != null)
+                OnWarning -= warning;
+            if (error != null)
+                OnError -= error;
+            if (debug != null)
+                OnDebug -= debug;
         });
     }
 

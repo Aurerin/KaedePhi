@@ -1,4 +1,5 @@
 ﻿using Chart = KaedePhi.Core.KaedePhi.Chart;
+
 namespace KaedePhi.Tool.Common;
 
 /// <summary>
@@ -11,7 +12,8 @@ public readonly record struct CoordinateProfile(
     double MaxX,
     double MinY,
     double MaxY,
-    bool ClockwiseRotation)
+    bool ClockwiseRotation
+)
 {
     /// <summary>
     /// KPC 的归一化坐标系配置。
@@ -21,12 +23,17 @@ public readonly record struct CoordinateProfile(
         Chart.CoordinateSystem.MaxX,
         Chart.CoordinateSystem.MinY,
         Chart.CoordinateSystem.MaxY,
-        Chart.CoordinateSystem.ClockwiseRotation);
+        Chart.CoordinateSystem.ClockwiseRotation
+    );
 
     /// <summary>
     /// 默认渲染坐标系配置（当前与常见 675x450 编辑器坐标兼容）。
     /// </summary>
-    public static readonly CoordinateProfile DefaultRenderProfile = new(-675d, 675d, -450d, 450d, true);
+    public static readonly CoordinateProfile DefaultRenderProfile = new(
+        -675d,
+        675d,
+        -450d,
+        450d,
+        true
+    );
 }
-
-

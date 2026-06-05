@@ -12,13 +12,21 @@ public sealed class ImportViewModel : INotifyPropertyChanged
     public bool UseStream
     {
         get => _useStream;
-        set { _useStream = value; OnPropertyChanged(); }
+        set
+        {
+            _useStream = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsLoading
     {
         get => _isLoading;
-        set { _isLoading = value; OnPropertyChanged(); }
+        set
+        {
+            _isLoading = value;
+            OnPropertyChanged();
+        }
     }
 
     public event Action<string, bool>? FileSelected;
@@ -30,6 +38,6 @@ public sealed class ImportViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

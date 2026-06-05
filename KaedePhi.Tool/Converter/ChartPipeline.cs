@@ -11,7 +11,8 @@ public static class ChartPipeline
     public static ChartPipelineSource From<TIn, TInOptions, TOutOptions>(
         TIn input,
         IChartConverter<TIn, TInOptions, TOutOptions> converter,
-        TInOptions inOptions)
+        TInOptions inOptions
+    )
     {
         var kpc = converter.ToKpc(input, inOptions);
         return new ChartPipelineSource(kpc);
@@ -32,6 +33,6 @@ public sealed class ChartPipelineSource
     /// </summary>
     public TOut To<TOut, TInOptions, TOutOptions>(
         IChartConverter<TOut, TInOptions, TOutOptions> toConverter,
-        TOutOptions outOptions)
-        => toConverter.FromKpc(_kpc, outOptions);
+        TOutOptions outOptions
+    ) => toConverter.FromKpc(_kpc, outOptions);
 }

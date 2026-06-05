@@ -1,6 +1,6 @@
+using global::KaedePhi.Tool.JudgeLines.KaedePhi;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
-using global::KaedePhi.Tool.JudgeLines.KaedePhi;
 using ExtendLayer = KaedePhi.Core.KaedePhi.Events.ExtendLayer;
 using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 
@@ -32,12 +32,15 @@ public class JudgeLineKpcToPe
         var trueSrc = src;
         var pe = new Pe.JudgeLine
         {
-            NoteList = trueSrc.Notes?.ConvertAll(n => Note.ConvertNote(n, _warnLogger)) ?? []
+            NoteList = trueSrc.Notes?.ConvertAll(n => Note.ConvertNote(n, _warnLogger)) ?? [],
         };
 
-        if (!string.Equals(trueSrc.Texture, "line.png", StringComparison.Ordinal) ||
-            _options.LineFilter.RemoveTextureLine || trueSrc.AttachUi.HasValue ||
-            _options.LineFilter.RemoveAttachUiLine)
+        if (
+            !string.Equals(trueSrc.Texture, "line.png", StringComparison.Ordinal)
+            || _options.LineFilter.RemoveTextureLine
+            || trueSrc.AttachUi.HasValue
+            || _options.LineFilter.RemoveAttachUiLine
+        )
         {
             return pe;
         }
@@ -47,13 +50,19 @@ public class JudgeLineKpcToPe
             var unbinder = new JudgeLineUnbinder();
             if (_options.FatherLineUnbind.ClassicMode)
             {
-                trueSrc = unbinder.FatherUnbind(allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
-                    allLine, _options.FatherLineUnbind.Precision);
+                trueSrc = unbinder.FatherUnbind(
+                    allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
+                    allLine,
+                    _options.FatherLineUnbind.Precision
+                );
             }
             else
                 trueSrc = unbinder.FatherUnbind(
                     allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
-                    allLine, _options.FatherLineUnbind.Precision, _options.FatherLineUnbind.Tolerance);
+                    allLine,
+                    _options.FatherLineUnbind.Precision,
+                    _options.FatherLineUnbind.Tolerance
+                );
         }
 
         _eventBuilder.ConvertLineEvents(pe, trueSrc.EventLayers ?? []);
@@ -68,8 +77,12 @@ public class JudgeLineKpcToPe
     /// </summary>
     private void WarnIfUnsupportedJudgeLineFields(KpcJudgeLine src)
     {
-        var textureRemoveHint = _options.LineFilter.RemoveTextureLine ? "，判定线将被自动移除。" : "。";
-        var attachUiRemoveHint = _options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "。";
+        var textureRemoveHint = _options.LineFilter.RemoveTextureLine
+            ? "，判定线将被自动移除。"
+            : "。";
+        var attachUiRemoveHint = _options.LineFilter.RemoveAttachUiLine
+            ? "，判定线将被自动移除。"
+            : "。";
 
         if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
             Warn($"PE 不支持 JudgeLine.Texture（值='{src.Texture}'），{textureRemoveHint}");
@@ -82,7 +95,9 @@ public class JudgeLineKpcToPe
         if (src.ZOrder != 0)
             Warn($"PE 不支持 JudgeLine.ZOrder（值={src.ZOrder}）");
         if (src.AttachUi.HasValue)
-            Warn($"PE 不支持 JudgeLine.AttachUi（值={(int)src.AttachUi.Value}）{attachUiRemoveHint}");
+            Warn(
+                $"PE 不支持 JudgeLine.AttachUi（值={(int)src.AttachUi.Value}）{attachUiRemoveHint}"
+            );
         if (src.IsGif)
             Warn($"PE 不支持 JudgeLine.IsGif（值={src.IsGif}）");
         if (Math.Abs(src.BpmFactor - 1f) > FloatEpsilon)
@@ -110,20 +125,21 @@ public class JudgeLineKpcToPe
             Warn("PE 不支持 JudgeLine.YControls（包含非默认数据）");
     }
 
-    private static bool HasNonDefaultExtendLayer(ExtendLayer? layer)
-        => layer != null
-           && (layer.ColorEvents.Count > 0
-               || layer.ScaleXEvents.Count > 0
-               || layer.ScaleYEvents.Count > 0
-               || layer.TextEvents.Count > 0
-               || layer.PaintEvents.Count > 0
-               || layer.GifEvents.Count > 0);
+    private static bool HasNonDefaultExtendLayer(ExtendLayer? layer) =>
+        layer != null
+        && (
+            layer.ColorEvents.Count > 0
+            || layer.ScaleXEvents.Count > 0
+            || layer.ScaleYEvents.Count > 0
+            || layer.TextEvents.Count > 0
+            || layer.PaintEvents.Count > 0
+            || layer.GifEvents.Count > 0
+        );
 
-    private static bool IsDefaultAnchor(float[]? anchor)
-        => anchor is { Length: 2 }
-           && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
-           && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
-
+    private static bool IsDefaultAnchor(float[]? anchor) =>
+        anchor is { Length: 2 }
+        && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
+        && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
 
     private void Warn(string message) => _warnLogger?.Invoke(message);
 }

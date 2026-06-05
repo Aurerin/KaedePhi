@@ -61,7 +61,7 @@ namespace KaedePhi.Core.KaedePhi
                 30 => EaseOutBounce,
                 31 => EaseInOutBounce,
                 // Fallback
-                _ => Linear
+                _ => Linear,
             };
 
             return Evaluate(function, start, end, t);

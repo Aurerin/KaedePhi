@@ -10,22 +10,36 @@ public static class EventLayer
         var eventListCompress = new Tool.Event.KaedePhi.EventCompressor<double>();
 
         var moveX = Event.ConvertMoveAxisEvents(
-            src.JudgeLineMoveEvents, horizonBeat, e => e.Start, e => e.End, Transform.ToKpcX);
+            src.JudgeLineMoveEvents,
+            horizonBeat,
+            e => e.Start,
+            e => e.End,
+            Transform.ToKpcX
+        );
         if (moveX != null)
             result.MoveXEvents = eventListCompress.EventListCompressSqrt(moveX, 0d);
 
         var moveY = Event.ConvertMoveAxisEvents(
-            src.JudgeLineMoveEvents, horizonBeat, e => e.Start2, e => e.End2, Transform.ToKpcY);
+            src.JudgeLineMoveEvents,
+            horizonBeat,
+            e => e.Start2,
+            e => e.End2,
+            Transform.ToKpcY
+        );
         if (moveY != null)
             result.MoveYEvents = eventListCompress.EventListCompressSqrt(moveY, 0d);
 
         result.RotateEvents = Event.ConvertEvents(
-            src.JudgeLineRotateEvents, horizonBeat,
-            Transform.ToKpcAngle);
+            src.JudgeLineRotateEvents,
+            horizonBeat,
+            Transform.ToKpcAngle
+        );
 
         result.AlphaEvents = Event.ConvertEvents(
-            src.JudgeLineDisappearEvents, horizonBeat,
-            v => (int)Math.Clamp(Math.Round(v * 255), 0, 255));
+            src.JudgeLineDisappearEvents,
+            horizonBeat,
+            v => (int)Math.Clamp(Math.Round(v * 255), 0, 255)
+        );
 
         result.SpeedEvents = Event.ConvertSpeedEvents(src.SpeedEvents, horizonBeat);
 

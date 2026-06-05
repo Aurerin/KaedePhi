@@ -10,13 +10,22 @@ public static class Transform
         PhigrosV3.CoordinateSystem.MaxX,
         PhigrosV3.CoordinateSystem.MinY,
         PhigrosV3.CoordinateSystem.MaxY,
-        PhigrosV3.CoordinateSystem.ClockwiseRotation);
+        PhigrosV3.CoordinateSystem.ClockwiseRotation
+    );
 
     public static double ToKpcX(float x) => CoordinateGeometry.ToKpcX(x, PhigrosV3Profile);
-    public static double ToKpcY(float y) => CoordinateGeometry.ToKpcY(y, PhigrosV3Profile);
-    public static double ToKpcAngle(float angle) => CoordinateGeometry.ToKpcAngle(angle, PhigrosV3Profile);
 
-    public static float ToPhigrosV3X(double x) => CoordinateGeometry.ToTargetXf(x, PhigrosV3Profile);
-    public static float ToPhigrosV3Y(double y) => CoordinateGeometry.ToTargetYf(y, PhigrosV3Profile);
-    public static float ToPhigrosV3Angle(double angle) => (float)CoordinateGeometry.ToTargetAngle(angle, PhigrosV3Profile);
+    public static double ToKpcY(float y) => CoordinateGeometry.ToKpcY(y, PhigrosV3Profile);
+
+    public static double ToKpcAngle(float angle) =>
+        CoordinateGeometry.ToKpcAngle(angle, PhigrosV3Profile);
+
+    public static float ToPhigrosV3X(double x) =>
+        CoordinateGeometry.ToTargetXf(x, PhigrosV3Profile);
+
+    public static float ToPhigrosV3Y(double y) =>
+        CoordinateGeometry.ToTargetYf(y, PhigrosV3Profile);
+
+    public static float ToPhigrosV3Angle(double angle) =>
+        (float)CoordinateGeometry.ToTargetAngle(angle, PhigrosV3Profile);
 }

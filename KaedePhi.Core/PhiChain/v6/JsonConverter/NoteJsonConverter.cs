@@ -15,7 +15,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
                 ["above"] = value.Above,
                 ["beat"] = JToken.FromObject(value.Beat, serializer),
                 ["x"] = value.X,
-                ["speed"] = value.Speed
+                ["speed"] = value.Speed,
             };
 
             if (value.Type == NoteType.Hold)
@@ -26,8 +26,13 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             obj.WriteTo(writer);
         }
 
-        public override Note ReadJson(JsonReader reader, Type objectType, Note? existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
+        public override Note ReadJson(
+            JsonReader reader,
+            Type objectType,
+            Note? existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             var obj = JObject.Load(reader);
             var note = existingValue ?? new Note();
@@ -40,7 +45,8 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
 
             if (note.Type == NoteType.Hold)
             {
-                note.HoldBeat = obj["hold_beat"]?.ToObject<Beat>(serializer) ?? new Beat(new[] { 0, 0, 1 });
+                note.HoldBeat =
+                    obj["hold_beat"]?.ToObject<Beat>(serializer) ?? new Beat(new[] { 0, 0, 1 });
             }
             else
             {
@@ -75,7 +81,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
                 "drag" => NoteType.Drag,
                 "hold" => NoteType.Hold,
                 "flick" => NoteType.Flick,
-                _ => throw new JsonSerializationException("Unsupported note type: " + kind)
+                _ => throw new JsonSerializationException("Unsupported note type: " + kind),
             };
         }
     }

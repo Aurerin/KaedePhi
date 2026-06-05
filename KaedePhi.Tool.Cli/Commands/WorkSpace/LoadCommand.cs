@@ -24,8 +24,11 @@ public sealed class LoadCommand : AsyncCommand<LoadCommand.Settings>
         }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings,
-        CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings settings,
+        CancellationToken cancellationToken
+    )
     {
         var ws = new WorkspaceService();
         if (settings.Input is not { } input)

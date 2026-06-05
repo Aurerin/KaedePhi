@@ -38,7 +38,7 @@ namespace KaedePhi.Core.PhiEdit
             {
                 Offset = Offset,
                 BpmList = BpmList.Select(b => b.Clone()).ToList(),
-                JudgeLineList = JudgeLineList.Select(jl => jl.Clone()).ToList()
+                JudgeLineList = JudgeLineList.Select(jl => jl.Clone()).ToList(),
             };
             return clonedChart;
         }

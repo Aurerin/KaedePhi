@@ -21,8 +21,12 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="lineY">子线 Y 坐标</param>
     /// <returns>绝对坐标系中的位置</returns>
     (double X, double Y) GetLinePos(
-        double fatherLineX, double fatherLineY, double angleDegrees,
-        double lineX, double lineY);
+        double fatherLineX,
+        double fatherLineY,
+        double angleDegrees,
+        double lineX,
+        double lineY
+    );
 
     /// <summary>
     /// 根据父线位置与旋转角度，计算子线在指定渲染坐标系中的位置。
@@ -35,8 +39,13 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="renderProfile">渲染坐标系配置</param>
     /// <returns>渲染坐标系中的位置</returns>
     (double X, double Y) GetLinePos(
-        double fatherLineX, double fatherLineY, double angleDegrees,
-        double lineX, double lineY, CoordinateProfile renderProfile);
+        double fatherLineX,
+        double fatherLineY,
+        double angleDegrees,
+        double lineX,
+        double lineY,
+        CoordinateProfile renderProfile
+    );
 
     /// <summary>
     /// 将判定线与父判定线解绑。
@@ -48,15 +57,20 @@ public interface IJudgeLineUnbinder<TJudgeLine> : ILoggable
     /// <param name="progress">进度回调。</param>
     /// <returns>解绑后的判定线（已转换为绝对坐标）。</returns>
     TJudgeLine FatherUnbind(
-        int targetJudgeLineIndex, List<TJudgeLine> allTJudgeLines,
+        int targetJudgeLineIndex,
+        List<TJudgeLine> allTJudgeLines,
         double precision,
-        IProgress<ToolProgress>? progress = null);
+        IProgress<ToolProgress>? progress = null
+    );
 
     /// <summary>
     /// 将判定线与父判定线解绑（指定渲染坐标系）。
     /// </summary>
     TJudgeLine FatherUnbind(
-        int targetJudgeLineIndex, List<TJudgeLine> allTJudgeLines, CoordinateProfile renderProfile,
+        int targetJudgeLineIndex,
+        List<TJudgeLine> allTJudgeLines,
+        CoordinateProfile renderProfile,
         double precision,
-        IProgress<ToolProgress>? progress = null);
+        IProgress<ToolProgress>? progress = null
+    );
 }

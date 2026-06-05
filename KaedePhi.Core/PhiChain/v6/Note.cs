@@ -19,7 +19,7 @@ namespace KaedePhi.Core.PhiChain.v6
         Hold,
 
         [EnumMember(Value = "flick")]
-        Flick
+        Flick,
     }
 
     [JsonConverter(typeof(NoteJsonConverter))]
@@ -55,10 +55,8 @@ namespace KaedePhi.Core.PhiChain.v6
                 Above = Above,
                 Beat = new Beat((int[])Beat),
                 X = X,
-                Speed = Speed
+                Speed = Speed,
             };
         }
     }
 }
-
-

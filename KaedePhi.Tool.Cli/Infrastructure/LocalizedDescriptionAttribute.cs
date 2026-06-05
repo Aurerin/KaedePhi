@@ -15,7 +15,8 @@ public sealed class LocalizedDescriptionAttribute : DescriptionAttribute
     private readonly string _resourceKey;
 
     /// <param name="resourceKey"><see cref="CliLocalizationString"/> (.resx) 中对应的资源键。</param>
-    public LocalizedDescriptionAttribute(string resourceKey) : base(resourceKey)
+    public LocalizedDescriptionAttribute(string resourceKey)
+        : base(resourceKey)
     {
         _resourceKey = resourceKey;
     }

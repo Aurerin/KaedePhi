@@ -13,8 +13,13 @@ namespace KaedePhi.Core.Utils
             serializer.Serialize(writer, beatArray);
         }
 
-        public override Beat ReadJson(JsonReader reader, Type objectType, Beat existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
+        public override Beat ReadJson(
+            JsonReader reader,
+            Type objectType,
+            Beat existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             if (reader.TokenType == JsonToken.Null)
                 return default;

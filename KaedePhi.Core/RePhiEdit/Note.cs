@@ -96,7 +96,8 @@ namespace KaedePhi.Core.RePhiEdit
             get => null; // 序列化时不输出
             set
             {
-                if (value != null) Color = value;
+                if (value != null)
+                    Color = value;
             } // 反序列化时赋值
         }
 
@@ -132,7 +133,7 @@ namespace KaedePhi.Core.RePhiEdit
                 YOffset = YOffset,
                 Color = Color.ToArray(),
                 HitFxColor = HitFxColor?.ToArray(),
-                HitSound = HitSound
+                HitSound = HitSound,
             };
         }
     }
@@ -142,6 +143,6 @@ namespace KaedePhi.Core.RePhiEdit
         Tap = 1,
         Hold = 2,
         Flick = 3,
-        Drag = 4
+        Drag = 4,
     }
 }

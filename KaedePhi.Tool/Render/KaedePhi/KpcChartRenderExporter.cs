@@ -16,7 +16,8 @@ public class KpcChartRenderExporter : LoggableBase, IChartRenderExporter<Chart, 
         KpcRenderOptions opts,
         int? lineIndex = null,
         int? layerIndex = null,
-        IProgress<ToolProgress>? progress = null)
+        IProgress<ToolProgress>? progress = null
+    )
     {
         Directory.CreateDirectory(outputDir);
         var written = new List<string>();
@@ -28,7 +29,8 @@ public class KpcChartRenderExporter : LoggableBase, IChartRenderExporter<Chart, 
 
         for (int li = lineStart; li < lineEnd; li++)
         {
-            if (li >= chart.JudgeLineList.Count) break;
+            if (li >= chart.JudgeLineList.Count)
+                break;
             var line = chart.JudgeLineList[li];
             if (line.EventLayers == null || line.EventLayers.Count == 0)
             {
@@ -45,7 +47,8 @@ public class KpcChartRenderExporter : LoggableBase, IChartRenderExporter<Chart, 
 
             for (int ei = layerStart; ei < layerEnd; ei++)
             {
-                if (ei >= line.EventLayers.Count) break;
+                if (ei >= line.EventLayers.Count)
+                    break;
                 var eventLayer = line.EventLayers[ei];
                 if (eventLayer == null)
                 {
@@ -66,8 +69,9 @@ public class KpcChartRenderExporter : LoggableBase, IChartRenderExporter<Chart, 
                 completedLayers++;
                 var lineProgress = (double)completedLines / totalLines;
                 var layerProgress = (double)completedLayers / totalLayers / totalLines;
-                progress?.Report(new ToolProgress(lineProgress + layerProgress,
-                    $"[{li}]{safeName} layer{ei}"));
+                progress?.Report(
+                    new ToolProgress(lineProgress + layerProgress, $"[{li}]{safeName} layer{ei}")
+                );
             }
 
             completedLines++;

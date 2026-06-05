@@ -11,7 +11,9 @@ public static class NumericHelper
     public static T Add<T>(T? left, T? right)
     {
         if (left is null || right is null)
-            throw new ArgumentNullException($"NumericHelper.Add does not support null values for type {typeof(T)}.");
+            throw new ArgumentNullException(
+                $"NumericHelper.Add does not support null values for type {typeof(T)}."
+            );
         if (typeof(T) == typeof(double))
             return (T)(object)((double)(object)left + (double)(object)right);
         if (typeof(T) == typeof(float))
@@ -25,13 +27,17 @@ public static class NumericHelper
     public static double ToDouble<T>(T? value)
     {
         if (value is null)
-            throw new ArgumentNullException($"NumericHelper.ToDouble does not support null values for type {typeof(T)}.");
+            throw new ArgumentNullException(
+                $"NumericHelper.ToDouble does not support null values for type {typeof(T)}."
+            );
         if (typeof(T) == typeof(double))
             return (double)(object)value;
         if (typeof(T) == typeof(float))
             return (float)(object)value;
         if (typeof(T) == typeof(int))
             return (int)(object)value;
-        throw new NotSupportedException($"NumericHelper.ToDouble does not support type {typeof(T)}.");
+        throw new NotSupportedException(
+            $"NumericHelper.ToDouble does not support type {typeof(T)}."
+        );
     }
 }

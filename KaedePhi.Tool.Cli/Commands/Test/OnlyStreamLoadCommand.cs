@@ -12,8 +12,11 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
         public string? Input { get; set; }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, GetTypeTestCommand.Settings settings,
-    CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        GetTypeTestCommand.Settings settings,
+        CancellationToken cancellationToken
+    )
     {
 #if Debug
         var input = settings.Input;
