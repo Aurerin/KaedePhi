@@ -12,8 +12,13 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             serializer.Serialize(writer, value);
         }
 
-        public override BpmList ReadJson(JsonReader reader, Type objectType, BpmList existingValue,
-            bool hasExistingValue, JsonSerializer serializer)
+        public override BpmList ReadJson(
+            JsonReader reader,
+            Type objectType,
+            BpmList existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             var array = JArray.Load(reader);
             var points = array.ToObject<List<BpmPoint>>(serializer) ?? new List<BpmPoint>();

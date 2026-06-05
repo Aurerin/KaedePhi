@@ -8,17 +8,20 @@ namespace KaedePhi.Core.Phigros.v3
         /// <summary>
         /// 格式版本号
         /// </summary>
-        [JsonProperty("formatVersion")] public uint FormatVersion { get; set; } = 3;
+        [JsonProperty("formatVersion")]
+        public uint FormatVersion { get; set; } = 3;
 
         /// <summary>
         /// 谱面偏移，单位为秒
         /// </summary>
-        [JsonProperty("offset")] public float Offset { get; set; }
+        [JsonProperty("offset")]
+        public float Offset { get; set; }
 
         /// <summary>
         /// 判定线列表
         /// </summary>
-        [JsonProperty("judgeLineList")] public List<JudgeLine> JudgeLineList { get; set; } = new();
+        [JsonProperty("judgeLineList")]
+        public List<JudgeLine> JudgeLineList { get; set; } = new();
 
         /// <summary>
         /// 坐标系边界

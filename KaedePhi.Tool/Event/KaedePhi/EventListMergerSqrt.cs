@@ -20,16 +20,24 @@ public class EventListMergerSqrt<TPayload> : EventListMergerPlus<TPayload>
 {
     /// <inheritdoc/>
     protected override bool ShouldSplitAdaptiveSegment(
-        Beat segmentStart, Beat nextBeat, Beat intervalEnd,
-        TPayload? segmentStartSum, TPayload? sumAtNext, TPayload? sumAtEnd,
-        double tolerance)
+        Beat segmentStart,
+        Beat nextBeat,
+        Beat intervalEnd,
+        TPayload? segmentStartSum,
+        TPayload? sumAtNext,
+        TPayload? sumAtEnd,
+        double tolerance
+    )
     {
-        if (nextBeat >= intervalEnd) return true;
-        if (nextBeat <= segmentStart) return false;
+        if (nextBeat >= intervalEnd)
+            return true;
+        if (nextBeat <= segmentStart)
+            return false;
 
         var dtTotal = (double)(intervalEnd - segmentStart);
         var dtLocal = (double)(nextBeat - segmentStart);
-        if (dtTotal <= 1e-12 || dtLocal <= 1e-12) return false;
+        if (dtTotal <= 1e-12 || dtLocal <= 1e-12)
+            return false;
 
         var p = Math.Clamp(dtLocal / dtTotal, 0.0, 1.0);
 
@@ -55,4 +63,3 @@ public class EventListMergerSqrt<TPayload> : EventListMergerPlus<TPayload>
         return Math.Abs(linearDeviation) / mergedLineLength > Math.Max(0d, tolerance) / 100.0;
     }
 }
-

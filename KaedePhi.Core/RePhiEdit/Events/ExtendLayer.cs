@@ -10,44 +10,62 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// <summary>
         /// 判定线纹理颜色事件列表，颜色格式为RGB字节数组，使用顶点颜色乘法
         /// </summary>
-        [JsonProperty("colorEvents", NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(
+            "colorEvents",
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        )]
         [JsonConverter(typeof(ColorEventsConverter))]
         public List<Event<byte[]>>? ColorEvents { get; set; }
 
         /// <summary>
         /// 判定线纹理宽度缩放事件列表
         /// </summary>
-        [JsonProperty("scaleXEvents", NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(
+            "scaleXEvents",
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        )]
         public List<Event<float>>? ScaleXEvents { get; set; }
 
         /// <summary>
         /// 判定线纹理高度缩放事件列表
         /// </summary>
-        [JsonProperty("scaleYEvents", NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(
+            "scaleYEvents",
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        )]
         public List<Event<float>>? ScaleYEvents { get; set; }
 
         /// <summary>
         /// 判定线文字纹理事件列表
         /// </summary>
-        [JsonProperty("textEvents", NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(
+            "textEvents",
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        )]
         public List<Event<string>>? TextEvents { get; set; }
 
         /// <summary>
         /// 画笔事件列表，值为画笔大小
         /// </summary>
-        [JsonProperty("paintEvents", NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(
+            "paintEvents",
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        )]
         public List<Event<float>>? PaintEvents { get; set; }
 
         /// <summary>
         /// 判定线动图播放进度事件列表，值为动图帧进度（0~1之间）
         /// </summary>
-        [JsonProperty("gifEvents", NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(
+            "gifEvents",
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        )]
         public List<Event<float>>? GifEvents { get; set; }
 
         /// <summary>
@@ -69,7 +87,6 @@ namespace KaedePhi.Core.RePhiEdit.Events
             GifEvents = GifEvents?.OrderBy(e => e.StartBeat).ToList();
             InclineEvents = InclineEvents?.OrderBy(e => e.StartBeat).ToList();
         }
-
 
         /// <summary>
         /// 深克隆当前 ExtendLayer 对象
@@ -117,10 +134,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             // 倾斜事件早废弃了，我写在这里就是单纯的防止某些模拟器抽风
             // 所以，为什么，EasingType可以为0，可以大于30，cmdysj！RePhiEdit！Fxxk！
             if (InclineEvents is null || InclineEvents.Count == 0)
-                InclineEvents = new List<Event<float>>
-                {
-                    new()
-                };
+                InclineEvents = new List<Event<float>> { new() };
         }
     }
 }

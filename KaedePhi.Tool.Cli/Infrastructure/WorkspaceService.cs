@@ -38,11 +38,15 @@ public sealed class WorkspaceService
         if (!id.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-'))
             throw new ArgumentException(
                 CliLocalizationString.err_workspace_id_invalid_chars,
-                nameof(id));
+                nameof(id)
+            );
 
         var dir = Path.GetFullPath(Path.Combine(_rootDir, id));
         if (!dir.StartsWith(Path.GetFullPath(_rootDir), StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException(CliLocalizationString.err_workspace_id_path_traversal, nameof(id));
+            throw new ArgumentException(
+                CliLocalizationString.err_workspace_id_path_traversal,
+                nameof(id)
+            );
 
         return dir;
     }
@@ -55,10 +59,22 @@ public sealed class WorkspaceService
         var dir = ValidateAndResolveId(id);
         Directory.CreateDirectory(dir);
         var dest = Path.Combine(dir, ChartFileName);
-        await using var src = new FileStream(chartPath, FileMode.Open, FileAccess.Read,
-            FileShare.Read, bufferSize: 65536, useAsync: true);
-        await using var dst = new FileStream(dest, FileMode.Create, FileAccess.Write,
-            FileShare.None, bufferSize: 65536, useAsync: true);
+        await using var src = new FileStream(
+            chartPath,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            bufferSize: 65536,
+            useAsync: true
+        );
+        await using var dst = new FileStream(
+            dest,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 65536,
+            useAsync: true
+        );
         await src.CopyToAsync(dst);
     }
 
@@ -84,13 +100,27 @@ public sealed class WorkspaceService
     /// </summary>
     public async Task SaveAsync(string id, string outputPath)
     {
-        var file = GetChartPath(id)
-                   ?? throw new InvalidOperationException(
-                       string.Format(CliLocalizationString.err_workspace_not_found, id));
-        await using var src = new FileStream(file, FileMode.Open, FileAccess.Read,
-            FileShare.Read, bufferSize: 65536, useAsync: true);
-        await using var dst = new FileStream(outputPath, FileMode.Create, FileAccess.Write,
-            FileShare.None, bufferSize: 65536, useAsync: true);
+        var file =
+            GetChartPath(id)
+            ?? throw new InvalidOperationException(
+                string.Format(CliLocalizationString.err_workspace_not_found, id)
+            );
+        await using var src = new FileStream(
+            file,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            bufferSize: 65536,
+            useAsync: true
+        );
+        await using var dst = new FileStream(
+            outputPath,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 65536,
+            useAsync: true
+        );
         await src.CopyToAsync(dst);
     }
 
@@ -109,6 +139,7 @@ public sealed class WorkspaceService
         }
 
         var dir = ValidateAndResolveId(id);
-        if (Directory.Exists(dir)) Directory.Delete(dir, true);
+        if (Directory.Exists(dir))
+            Directory.Delete(dir, true);
     }
 }

@@ -14,17 +14,22 @@ public static class NoteKpcToPhigrosV3
     private const double SpeedValueRatio = 4.5d;
 
     public static (List<PhigrosNote> above, List<PhigrosNote> below) ConvertNotes(
-        List<KpcNote>? notes, List<KpcSpeedEvent>? speedEvents, Action<string>? warnLogger,
-        bool filterFakeNotes = false)
+        List<KpcNote>? notes,
+        List<KpcSpeedEvent>? speedEvents,
+        Action<string>? warnLogger,
+        bool filterFakeNotes = false
+    )
     {
-        if (notes is not { Count: > 0 }) return ([], []);
+        if (notes is not { Count: > 0 })
+            return ([], []);
 
         var above = new List<PhigrosNote>();
         var below = new List<PhigrosNote>();
 
         foreach (var note in notes)
         {
-            if (filterFakeNotes && note.IsFake) continue;
+            if (filterFakeNotes && note.IsFake)
+                continue;
 
             var converted = ConvertNote(note, speedEvents, warnLogger);
             if (note.Above)
@@ -36,7 +41,11 @@ public static class NoteKpcToPhigrosV3
         return (above, below);
     }
 
-    public static PhigrosNote ConvertNote(KpcNote src, List<KpcSpeedEvent>? speedEvents, Action<string>? warnLogger)
+    public static PhigrosNote ConvertNote(
+        KpcNote src,
+        List<KpcSpeedEvent>? speedEvents,
+        Action<string>? warnLogger
+    )
     {
         WarnIfUnsupportedNoteFields(src, warnLogger);
 
@@ -61,7 +70,7 @@ public static class NoteKpcToPhigrosV3
             Time = time,
             PositionX = (float)(src.PositionX / NotePositionXRatio),
             HoldTime = holdTime,
-            Speed = speed
+            Speed = speed,
         };
     }
 
@@ -85,14 +94,15 @@ public static class NoteKpcToPhigrosV3
         return (float)(speedEvents[^1].EndValue / SpeedValueRatio);
     }
 
-    public static PhigrosNoteType ConvertNoteType(KpcNoteType type) => type switch
-    {
-        KpcNoteType.Tap => PhigrosNoteType.Tap,
-        KpcNoteType.Hold => PhigrosNoteType.Hold,
-        KpcNoteType.Flick => PhigrosNoteType.Flick,
-        KpcNoteType.Drag => PhigrosNoteType.Drag,
-        _ => PhigrosNoteType.Tap
-    };
+    public static PhigrosNoteType ConvertNoteType(KpcNoteType type) =>
+        type switch
+        {
+            KpcNoteType.Tap => PhigrosNoteType.Tap,
+            KpcNoteType.Hold => PhigrosNoteType.Hold,
+            KpcNoteType.Flick => PhigrosNoteType.Flick,
+            KpcNoteType.Drag => PhigrosNoteType.Drag,
+            _ => PhigrosNoteType.Tap,
+        };
 
     private static void WarnIfUnsupportedNoteFields(KpcNote src, Action<string>? warnLogger)
     {

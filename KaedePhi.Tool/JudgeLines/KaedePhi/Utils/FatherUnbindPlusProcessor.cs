@@ -22,7 +22,8 @@ public class FatherUnbindPlusProcessor : FatherUnbindProcessorBase
         Action<string>? logInfo = null,
         Action<string>? logWarning = null,
         Action<string>? logError = null,
-        Action<string>? logDebug = null)
+        Action<string>? logDebug = null
+    )
         : base(cache, logInfo, logWarning, logError, logDebug)
     {
         _tolerance = tolerance;
@@ -36,7 +37,8 @@ public class FatherUnbindPlusProcessor : FatherUnbindProcessorBase
         int targetJudgeLineIndex,
         List<JudgeLine> allJudgeLines,
         double precision,
-        IProgress<ToolProgress>? progress = null)
+        IProgress<ToolProgress>? progress = null
+    )
     {
         JudgeLine judgeLineCopy;
         try
@@ -48,7 +50,8 @@ public class FatherUnbindPlusProcessor : FatherUnbindProcessorBase
                 allJudgeLines,
                 logTag: "FatherUnbindPlus",
                 startAction: "开始解绑（自适应采样）",
-                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, progress));
+                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, progress)
+            );
 
             judgeLineCopy = judgeLine;
             if (shouldReturn || fatherLine is null)
@@ -58,7 +61,11 @@ public class FatherUnbindPlusProcessor : FatherUnbindProcessorBase
             }
 
             progress?.Report(new ToolProgress(0.2, "合并通道"));
-            var ch = FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
+            var ch = FatherUnbindHelpers.MergeChannels(
+                judgeLineCopy.EventLayers,
+                fatherLine.EventLayers,
+                Merge
+            );
 
             var rangeResult = FatherUnbindHelpers.TryGetOverallRange(ch);
             if (rangeResult is null)
@@ -77,26 +84,36 @@ public class FatherUnbindPlusProcessor : FatherUnbindProcessorBase
 
             progress?.Report(new ToolProgress(0.6, "自适应采样"));
             LogDebug?.Invoke(
-                $"FatherUnbindPlus[{targetJudgeLineIndex}]: 自适应采样，关键帧数={keyBeats.Count}，最大精度={precision}");
-            var (resultX, resultY) = FatherUnbindHelpers.RunAdaptiveSampling(keyBeats, step, _tolerance, ch);
+                $"FatherUnbindPlus[{targetJudgeLineIndex}]: 自适应采样，关键帧数={keyBeats.Count}，最大精度={precision}"
+            );
+            var (resultX, resultY) = FatherUnbindHelpers.RunAdaptiveSampling(
+                keyBeats,
+                step,
+                _tolerance,
+                ch
+            );
 
             progress?.Report(new ToolProgress(0.9, "写回结果"));
             LogDebug?.Invoke(
-                $"FatherUnbindPlus[{targetJudgeLineIndex}]: 采样完成（生成 {resultX.Count} 段），压缩并写回");
-            FatherUnbindHelpers.WriteResultToLine(
-                judgeLineCopy, resultX, resultY, ch.Fr, Merge);
+                $"FatherUnbindPlus[{targetJudgeLineIndex}]: 采样完成（生成 {resultX.Count} 段），压缩并写回"
+            );
+            FatherUnbindHelpers.WriteResultToLine(judgeLineCopy, resultX, resultY, ch.Fr, Merge);
 
             Cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
             LogInfo?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑完成");
             progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
-            List<KpcEvents.Event<double>> Merge(List<KpcEvents.Event<double>> a, List<KpcEvents.Event<double>> b)
-                => _merger.EventListMerge(a, b, precision, _tolerance);
+            List<KpcEvents.Event<double>> Merge(
+                List<KpcEvents.Event<double>> a,
+                List<KpcEvents.Event<double>> b
+            ) => _merger.EventListMerge(a, b, precision, _tolerance);
         }
         catch (Exception ex)
         {
-            LogError?.Invoke($"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message);
+            LogError?.Invoke(
+                $"FatherUnbindPlus[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message
+            );
             return allJudgeLines[targetJudgeLineIndex].Clone();
         }
     }

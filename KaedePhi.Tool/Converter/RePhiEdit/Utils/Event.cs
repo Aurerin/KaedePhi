@@ -11,8 +11,11 @@ public static class Event
     private static readonly EventCutter<double> DoubleCutter = new();
     private static readonly EventCutter<int> IntCutter = new();
 
-    public static KpcEvents.Event<T> ConvertEvent<T>(RpeEvents.Event<T> src, Func<T, T>? valueCopier = null,
-        Func<T, T>? valueTransformer = null)
+    public static KpcEvents.Event<T> ConvertEvent<T>(
+        RpeEvents.Event<T> src,
+        Func<T, T>? valueCopier = null,
+        Func<T, T>? valueTransformer = null
+    )
     {
         valueCopier ??= v => v;
         valueTransformer ??= v => v;
@@ -27,12 +30,15 @@ public static class Event
             EndValue = valueTransformer(valueCopier(src.EndValue)),
             StartBeat = new Beat((int[])src.StartBeat),
             EndBeat = new Beat((int[])src.EndBeat),
-            Font = src.Font
+            Font = src.Font,
         };
     }
 
-    public static RpeEvents.Event<T> ConvertEvent<T>(KpcEvents.Event<T> src,
-        Func<T, T>? valueCopier = null, Func<T, T>? valueTransformer = null)
+    public static RpeEvents.Event<T> ConvertEvent<T>(
+        KpcEvents.Event<T> src,
+        Func<T, T>? valueCopier = null,
+        Func<T, T>? valueTransformer = null
+    )
     {
         valueCopier ??= v => v;
         valueTransformer ??= v => v;
@@ -47,12 +53,14 @@ public static class Event
             EndValue = valueTransformer(valueCopier(src.EndValue)),
             StartBeat = new Beat((int[])src.StartBeat),
             EndBeat = new Beat((int[])src.EndBeat),
-            Font = src.Font
+            Font = src.Font,
         };
     }
 
-    public static KpcEvents.Event<double> ConvertFloatToDoubleEvent(RpeEvents.Event<float> src,
-        Func<float, double> valueTransformer)
+    public static KpcEvents.Event<double> ConvertFloatToDoubleEvent(
+        RpeEvents.Event<float> src,
+        Func<float, double> valueTransformer
+    )
     {
         return new KpcEvents.Event<double>
         {
@@ -65,7 +73,7 @@ public static class Event
             EndValue = valueTransformer(src.EndValue),
             StartBeat = new Beat((int[])src.StartBeat),
             EndBeat = new Beat((int[])src.EndBeat),
-            Font = src.Font
+            Font = src.Font,
         };
     }
 
@@ -99,8 +107,10 @@ public static class Event
         return ConvertEvent(src, v => v.ToArray());
     }
 
-    public static List<RpeEvents.Event<float>> ConvertFloatEventExpanding(KpcEvents.Event<float> src,
-        ConvertOption.CuttingOptions options)
+    public static List<RpeEvents.Event<float>> ConvertFloatEventExpanding(
+        KpcEvents.Event<float> src,
+        ConvertOption.CuttingOptions options
+    )
     {
         try
         {
@@ -116,13 +126,16 @@ public static class Event
                     EndBeat = new Beat((int[])e.EndBeat),
                     StartValue = e.StartValue,
                     EndValue = e.EndValue,
-                    Easing = new Rpe.Easing(1)
+                    Easing = new Rpe.Easing(1),
                 });
         }
     }
 
-    public static List<RpeEvents.Event<float>> ConvertDoubleEventExpanding(KpcEvents.Event<double> src,
-        ConvertOption.CuttingOptions options, Func<double, double>? valueTransformer = null)
+    public static List<RpeEvents.Event<float>> ConvertDoubleEventExpanding(
+        KpcEvents.Event<double> src,
+        ConvertOption.CuttingOptions options,
+        Func<double, double>? valueTransformer = null
+    )
     {
         valueTransformer ??= v => v;
         try
@@ -140,8 +153,8 @@ public static class Event
                     EndValue = (float)valueTransformer(src.EndValue),
                     StartBeat = new Beat((int[])src.StartBeat),
                     EndBeat = new Beat((int[])src.EndBeat),
-                    Font = src.Font
-                }
+                    Font = src.Font,
+                },
             ];
         }
         catch (EasingConverter.EasingNotSupportedException)
@@ -154,13 +167,15 @@ public static class Event
                     EndBeat = new Beat((int[])e.EndBeat),
                     StartValue = (float)valueTransformer(e.StartValue),
                     EndValue = (float)valueTransformer(e.EndValue),
-                    Easing = new Rpe.Easing(1)
+                    Easing = new Rpe.Easing(1),
                 });
         }
     }
 
-    public static List<RpeEvents.Event<int>> ConvertIntEventExpanding(KpcEvents.Event<int> src,
-        ConvertOption.CuttingOptions options)
+    public static List<RpeEvents.Event<int>> ConvertIntEventExpanding(
+        KpcEvents.Event<int> src,
+        ConvertOption.CuttingOptions options
+    )
     {
         try
         {
@@ -176,7 +191,7 @@ public static class Event
                     EndBeat = new Beat((int[])e.EndBeat),
                     StartValue = e.StartValue,
                     EndValue = e.EndValue,
-                    Easing = new Rpe.Easing(1)
+                    Easing = new Rpe.Easing(1),
                 });
         }
     }

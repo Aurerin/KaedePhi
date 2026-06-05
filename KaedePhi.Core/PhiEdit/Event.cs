@@ -25,9 +25,8 @@ namespace KaedePhi.Core.PhiEdit
         /// <summary>
         /// 调试用方法，不要调用，请改用<see cref="ToString(int, string)"/>
         /// </summary>
-        public override string ToString()
-            => $"Event(StartBeat={StartBeat}, EndBeat={EndBeat}, EasingType={EasingType}, EndValue={EndValue})";
-
+        public override string ToString() =>
+            $"Event(StartBeat={StartBeat}, EndBeat={EndBeat}, EasingType={EasingType}, EndValue={EndValue})";
 
         /// <summary>
         /// 用于将瞬时事件转换为PhiEditor Chart格式的字符串
@@ -38,7 +37,9 @@ namespace KaedePhi.Core.PhiEdit
         public string ToString(int judgeLineIndex, string head)
         {
             if (head is "cm" or "cp")
-                throw new ArgumentException("请使用 MoveEvent 或 MoveFrame 的 ToString 方法，这不是一个 MoveEvent 或 MoveFrame");
+                throw new ArgumentException(
+                    "请使用 MoveEvent 或 MoveFrame 的 ToString 方法，这不是一个 MoveEvent 或 MoveFrame"
+                );
             return head != "cf"
                 ? $"{head} {judgeLineIndex} {StartBeat} {EndBeat} {EndValue} {(int)EasingType}"
                 : $"{head} {judgeLineIndex} {StartBeat} {EndBeat} {EndValue}";
@@ -51,7 +52,7 @@ namespace KaedePhi.Core.PhiEdit
                 StartBeat = StartBeat,
                 EndBeat = EndBeat,
                 EasingType = EasingType,
-                EndValue = EndValue
+                EndValue = EndValue,
             };
         }
     }

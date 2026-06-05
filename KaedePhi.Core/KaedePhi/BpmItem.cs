@@ -10,6 +10,7 @@ namespace KaedePhi.Core.KaedePhi
     public class BpmItem
     {
         private float _bpm = 120f;
+
         /// <summary>
         /// BPM 值，必须大于 0。
         /// </summary>
@@ -20,11 +21,15 @@ namespace KaedePhi.Core.KaedePhi
             {
                 if (value <= 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(Bpm), "BPM must be greater than 0.");
+                    throw new ArgumentOutOfRangeException(
+                        nameof(Bpm),
+                        "BPM must be greater than 0."
+                    );
                 }
                 _bpm = value;
             }
         }
+
         /// <summary>
         /// BPM 生效的起始拍。
         /// </summary>
@@ -37,11 +42,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <returns>BPM 节点副本</returns>
         public BpmItem Clone()
         {
-            return new BpmItem()
-            {
-                Bpm = Bpm,
-                StartBeat = new Beat((int[])StartBeat)
-            };
+            return new BpmItem() { Bpm = Bpm, StartBeat = new Beat((int[])StartBeat) };
         }
     }
 }

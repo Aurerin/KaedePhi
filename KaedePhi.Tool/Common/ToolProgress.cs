@@ -7,9 +7,7 @@ public readonly struct ToolProgress
     public string? Detail { get; }
 
     public ToolProgress(double percentage, string? detail = null)
-        : this(percentage, -1, detail)
-    {
-    }
+        : this(percentage, -1, detail) { }
 
     public ToolProgress(double percentage, double overallPercentage, string? detail = null)
     {

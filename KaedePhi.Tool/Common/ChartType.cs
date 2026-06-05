@@ -7,5 +7,5 @@ public enum ChartType
     PhigrosV1,
     PhigrosV3,
     PhiChain,
-    PhiFans
+    PhiFans,
 }

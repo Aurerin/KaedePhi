@@ -21,7 +21,8 @@ public abstract class FatherUnbindProcessorBase
         Action<string>? logInfo = null,
         Action<string>? logWarning = null,
         Action<string>? logError = null,
-        Action<string>? logDebug = null)
+        Action<string>? logDebug = null
+    )
     {
         Cache = cache;
         LogInfo = logInfo;
@@ -33,16 +34,26 @@ public abstract class FatherUnbindProcessorBase
     protected readonly record struct PrepareResult(
         JudgeLine JudgeLine,
         JudgeLine? FatherLine,
-        bool ShouldReturn);
+        bool ShouldReturn
+    );
 
     protected PrepareResult PrepareUnbindContext(
         int targetJudgeLineIndex,
         List<JudgeLine> allJudgeLines,
         string logTag,
         string startAction,
-        Func<int, List<JudgeLine>, JudgeLine> recursiveUnbind)
+        Func<int, List<JudgeLine>, JudgeLine> recursiveUnbind
+    )
     {
-        if (FatherUnbindHelpers.TryGetCachedClone(targetJudgeLineIndex, Cache, logTag, out var cached, LogDebug))
+        if (
+            FatherUnbindHelpers.TryGetCachedClone(
+                targetJudgeLineIndex,
+                Cache,
+                logTag,
+                out var cached,
+                LogDebug
+            )
+        )
         {
             return new PrepareResult(cached, null, true);
         }
@@ -50,17 +61,29 @@ public abstract class FatherUnbindProcessorBase
         var judgeLineCopy = allJudgeLines[targetJudgeLineIndex].Clone();
         var allJudgeLinesCopy = allJudgeLines.Select(jl => jl.Clone()).ToList();
 
-        if (FatherUnbindHelpers.TryReturnWhenNoFather(targetJudgeLineIndex, judgeLineCopy, Cache, logTag, LogWarning))
+        if (
+            FatherUnbindHelpers.TryReturnWhenNoFather(
+                targetJudgeLineIndex,
+                judgeLineCopy,
+                Cache,
+                logTag,
+                LogWarning
+            )
+        )
         {
             return new PrepareResult(judgeLineCopy, null, true);
         }
 
-        LogInfo?.Invoke($"{logTag}[{targetJudgeLineIndex}]: {startAction}，父线索引={judgeLineCopy.Father}");
+        LogInfo?.Invoke(
+            $"{logTag}[{targetJudgeLineIndex}]: {startAction}，父线索引={judgeLineCopy.Father}"
+        );
 
         var fatherLineCopy = allJudgeLinesCopy[judgeLineCopy.Father].Clone();
         if (fatherLineCopy.Father >= 0)
         {
-            LogDebug?.Invoke($"{logTag}[{targetJudgeLineIndex}]: 父线 {judgeLineCopy.Father} 仍有父线，递归解绑");
+            LogDebug?.Invoke(
+                $"{logTag}[{targetJudgeLineIndex}]: 父线 {judgeLineCopy.Father} 仍有父线，递归解绑"
+            );
             fatherLineCopy = recursiveUnbind(judgeLineCopy.Father, allJudgeLinesCopy);
         }
 

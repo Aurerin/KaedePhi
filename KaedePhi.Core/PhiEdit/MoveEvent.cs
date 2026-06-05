@@ -27,17 +27,16 @@
         /// <summary>
         /// 调试用方法，不要调用，请改用<see cref="ToString(int)"/>
         /// </summary>
-        public override string ToString()
-            => $"MoveEvent(StartBeat={StartBeat}, EndBeat={EndBeat}, EasingType={EasingType}, EndXValue={EndXValue}, EndYValue={EndYValue})";
-
+        public override string ToString() =>
+            $"MoveEvent(StartBeat={StartBeat}, EndBeat={EndBeat}, EasingType={EasingType}, EndXValue={EndXValue}, EndYValue={EndYValue})";
 
         /// <summary>
         /// 用于将瞬时事件转换为PhiEditor Chart格式的字符串
         /// </summary>
         /// <param name="judgeLineIndex">判定线索引</param>
         /// <returns>PhiEditor Chart格式字符串</returns>
-        public string ToString(int judgeLineIndex)
-            => $"cm {judgeLineIndex} {StartBeat} {EndBeat} {EndXValue} {EndYValue} {(int)EasingType}";
+        public string ToString(int judgeLineIndex) =>
+            $"cm {judgeLineIndex} {StartBeat} {EndBeat} {EndXValue} {EndYValue} {(int)EasingType}";
 
         public MoveEvent Clone()
         {
@@ -47,7 +46,7 @@
                 EndBeat = EndBeat,
                 EasingType = EasingType,
                 EndXValue = EndXValue,
-                EndYValue = EndYValue
+                EndYValue = EndYValue,
             };
         }
     }

@@ -14,10 +14,10 @@ namespace KaedePhi.Core.Utils
 
         // Quadratic
         public static double EaseInQuad(double t) => t * t;
+
         public static double EaseOutQuad(double t) => t * (2 - t);
 
-        public static double EaseInOutQuad(double t) =>
-            t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        public static double EaseInOutQuad(double t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
         // Cubic
         public static double EaseInCubic(double t) => t * t * t;
@@ -56,14 +56,11 @@ namespace KaedePhi.Core.Utils
             t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
 
         // Sine
-        public static double EaseInSine(double t) =>
-            1 - Math.Cos(t * Math.PI / 2);
+        public static double EaseInSine(double t) => 1 - Math.Cos(t * Math.PI / 2);
 
-        public static double EaseOutSine(double t) =>
-            Math.Sin(t * Math.PI / 2);
+        public static double EaseOutSine(double t) => Math.Sin(t * Math.PI / 2);
 
-        public static double EaseInOutSine(double t) =>
-            -0.5f * (Math.Cos(Math.PI * t) - 1);
+        public static double EaseInOutSine(double t) => -0.5f * (Math.Cos(Math.PI * t) - 1);
 
         // Exponential
         public static double EaseInExpo(double t) =>
@@ -74,18 +71,17 @@ namespace KaedePhi.Core.Utils
 
         public static double EaseInOutExpo(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon) return t;
+            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+                return t;
             return t < 0.5f
                 ? 0.5f * Math.Pow(2, 20 * t - 10)
                 : 1 - 0.5f * Math.Pow(2, -20 * t + 10);
         }
 
         // Circular
-        public static double EaseInCirc(double t) =>
-            1 - Math.Sqrt(1 - t * t);
+        public static double EaseInCirc(double t) => 1 - Math.Sqrt(1 - t * t);
 
-        public static double EaseOutCirc(double t) =>
-            Math.Sqrt(1 - (--t) * t);
+        public static double EaseOutCirc(double t) => Math.Sqrt(1 - (--t) * t);
 
         public static double EaseInOutCirc(double t) =>
             t < 0.5f
@@ -119,33 +115,31 @@ namespace KaedePhi.Core.Utils
         // Elastic
         public static double EaseInElastic(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon) return t;
-            return -Math.Pow(2, 10 * (t - 1)) *
-                   Math.Sin((t - 1.1f) * 5 * Math.PI);
+            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+                return t;
+            return -Math.Pow(2, 10 * (t - 1)) * Math.Sin((t - 1.1f) * 5 * Math.PI);
         }
 
         public static double EaseOutElastic(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon) return t;
-            return Math.Pow(2, -10 * t) *
-                Math.Sin((t - 0.1f) * 5 * Math.PI) + 1;
+            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+                return t;
+            return Math.Pow(2, -10 * t) * Math.Sin((t - 0.1f) * 5 * Math.PI) + 1;
         }
 
         public static double EaseInOutElastic(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon) return t;
+            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+                return t;
             t *= 2;
             if (t < 1)
-                return -0.5f * Math.Pow(2, 10 * (t - 1)) *
-                       Math.Sin((t - 1.1f) * 5 * Math.PI);
+                return -0.5f * Math.Pow(2, 10 * (t - 1)) * Math.Sin((t - 1.1f) * 5 * Math.PI);
             t--;
-            return Math.Pow(2, -10 * t) *
-                Math.Sin((t - 0.1f) * 5 * Math.PI) * 0.5f + 1;
+            return Math.Pow(2, -10 * t) * Math.Sin((t - 0.1f) * 5 * Math.PI) * 0.5f + 1;
         }
 
         // Bounce
-        public static double EaseInBounce(double t) =>
-            1 - EaseOutBounce(1 - t);
+        public static double EaseInBounce(double t) => 1 - EaseOutBounce(1 - t);
 
         public static double EaseOutBounce(double t)
         {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
-using System.Runtime.CompilerServices;
 
 namespace KaedePhi.Core.KaedePhi.Events
 {
@@ -90,8 +90,13 @@ namespace KaedePhi.Core.KaedePhi.Events
                 return GetEndValueAsDouble();
 
             // 直接使用double类型的Interpolate，避免类型检查
-            return Easing.Interpolate(EasingLeft, EasingRight,
-                GetStartValueAsDouble(), GetEndValueAsDouble(), t);
+            return Easing.Interpolate(
+                EasingLeft,
+                EasingRight,
+                GetStartValueAsDouble(),
+                GetEndValueAsDouble(),
+                t
+            );
         }
 
         /// <summary>
@@ -210,7 +215,7 @@ namespace KaedePhi.Core.KaedePhi.Events
             {
                 <= 0 => StartValue,
                 >= 1 => EndValue,
-                _ => IsBezier ? InterpolateBezier(t) : InterpolateEasing(t)
+                _ => IsBezier ? InterpolateBezier(t) : InterpolateEasing(t),
             };
         }
 
@@ -224,11 +229,17 @@ namespace KaedePhi.Core.KaedePhi.Events
         {
             var ft = (float)t;
             if (typeof(T) == typeof(float))
-                return Cast<float, T>(Bezier.Do(BezierPoints, ft, GetStartValueAsSingle(), GetEndValueAsSingle()));
+                return Cast<float, T>(
+                    Bezier.Do(BezierPoints, ft, GetStartValueAsSingle(), GetEndValueAsSingle())
+                );
             if (typeof(T) == typeof(double))
-                return Cast<double, T>(Bezier.Do(BezierPoints, ft, GetStartValueAsDouble(), GetEndValueAsDouble()));
+                return Cast<double, T>(
+                    Bezier.Do(BezierPoints, ft, GetStartValueAsDouble(), GetEndValueAsDouble())
+                );
             if (typeof(T) == typeof(int))
-                return Cast<int, T>(Bezier.Do(BezierPoints, ft, GetStartValueAsInt32(), GetEndValueAsInt32()));
+                return Cast<int, T>(
+                    Bezier.Do(BezierPoints, ft, GetStartValueAsInt32(), GetEndValueAsInt32())
+                );
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: true);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -243,14 +254,37 @@ namespace KaedePhi.Core.KaedePhi.Events
         private T InterpolateEasing(double t)
         {
             if (typeof(T) == typeof(float))
-                return Cast<float, T>((float)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsSingle(),
-                    GetEndValueAsSingle(), t));
+                return Cast<float, T>(
+                    (float)
+                        Easing.Interpolate(
+                            EasingLeft,
+                            EasingRight,
+                            GetStartValueAsSingle(),
+                            GetEndValueAsSingle(),
+                            t
+                        )
+                );
             if (typeof(T) == typeof(double))
-                return Cast<double, T>(Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsDouble(),
-                    GetEndValueAsDouble(), t));
+                return Cast<double, T>(
+                    Easing.Interpolate(
+                        EasingLeft,
+                        EasingRight,
+                        GetStartValueAsDouble(),
+                        GetEndValueAsDouble(),
+                        t
+                    )
+                );
             if (typeof(T) == typeof(int))
-                return Cast<int, T>((int)Easing.Interpolate(EasingLeft, EasingRight, GetStartValueAsInt32(),
-                    GetEndValueAsInt32(), t));
+                return Cast<int, T>(
+                    (int)
+                        Easing.Interpolate(
+                            EasingLeft,
+                            EasingRight,
+                            GetStartValueAsInt32(),
+                            GetEndValueAsInt32(),
+                            t
+                        )
+                );
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
             throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
@@ -269,19 +303,35 @@ namespace KaedePhi.Core.KaedePhi.Events
         private T InterpolateByteArray(double t, bool useBezier)
         {
             var ft = (float)t;
-            var startBytes = StartValue as byte[]
-                             ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
-            var endBytes = EndValue as byte[]
-                           ?? throw new InvalidOperationException("Start or End is not a byte array, or is null.");
+            var startBytes =
+                StartValue as byte[]
+                ?? throw new InvalidOperationException(
+                    "Start or End is not a byte array, or is null."
+                );
+            var endBytes =
+                EndValue as byte[]
+                ?? throw new InvalidOperationException(
+                    "Start or End is not a byte array, or is null."
+                );
             if (startBytes.Length != endBytes.Length)
-                throw new InvalidOperationException("Byte arrays must be of the same length for interpolation.");
+                throw new InvalidOperationException(
+                    "Byte arrays must be of the same length for interpolation."
+                );
 
             var result = new byte[startBytes.Length];
             for (var i = 0; i < startBytes.Length; i++)
                 if (useBezier)
-                    result[i] = Bezier.Do(BezierPoints, ft, startBytes[i], endBytes[i], EasingLeft, EasingRight);
+                    result[i] = Bezier.Do(
+                        BezierPoints,
+                        ft,
+                        startBytes[i],
+                        endBytes[i],
+                        EasingLeft,
+                        EasingRight
+                    );
                 else
-                    result[i] = (byte)Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
+                    result[i] = (byte)
+                        Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
             return Cast<byte[], T>(result);
         }
 
@@ -297,8 +347,12 @@ namespace KaedePhi.Core.KaedePhi.Events
             var type = typeof(TValue);
 
             // 值类型：int, float, double, byte
-            if (type == typeof(int) || type == typeof(float) ||
-                type == typeof(double) || type == typeof(byte))
+            if (
+                type == typeof(int)
+                || type == typeof(float)
+                || type == typeof(double)
+                || type == typeof(byte)
+            )
                 return value;
 
             // 不可变引用类型：string
@@ -328,7 +382,7 @@ namespace KaedePhi.Core.KaedePhi.Events
                 EasingLeft = EasingLeft,
                 EasingRight = EasingRight,
                 Easing = Easing,
-                Font = Font
+                Font = Font,
             };
 
             // BezierPoints: 直接Array.Copy，避免LINQ的ToArray()分配
@@ -336,11 +390,14 @@ namespace KaedePhi.Core.KaedePhi.Events
             Array.Copy(BezierPoints, bp, BezierPoints.Length);
             clone.BezierPoints = bp;
 
-
             // 针对已知T类型优化：int/float/double/byte直接赋值，byte[]/string特殊处理
-            if (typeof(T) == typeof(int) || typeof(T) == typeof(float) ||
-                typeof(T) == typeof(double) || typeof(T) == typeof(byte) ||
-                typeof(T) == typeof(string))
+            if (
+                typeof(T) == typeof(int)
+                || typeof(T) == typeof(float)
+                || typeof(T) == typeof(double)
+                || typeof(T) == typeof(byte)
+                || typeof(T) == typeof(string)
+            )
             {
                 // 值类型直接赋值，无开销
                 clone.StartValue = StartValue;

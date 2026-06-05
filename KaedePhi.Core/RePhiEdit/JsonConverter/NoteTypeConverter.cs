@@ -13,9 +13,13 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
             writer.WriteValue((int)value);
         }
 
-        public override NoteType ReadJson(JsonReader reader, Type objectType, NoteType existingValue,
+        public override NoteType ReadJson(
+            JsonReader reader,
+            Type objectType,
+            NoteType existingValue,
             bool hasExistingValue,
-            JsonSerializer serializer)
+            JsonSerializer serializer
+        )
         {
             if (reader.Value is long longValue)
                 return (NoteType)longValue;

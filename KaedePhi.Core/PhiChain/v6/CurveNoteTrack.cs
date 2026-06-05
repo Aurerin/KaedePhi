@@ -35,9 +35,8 @@ namespace KaedePhi.Core.PhiChain.v6
                 NoteType = NoteType,
                 HoldBeat = HoldBeat != null ? new Beat((int[])HoldBeat) : null,
                 Density = Density,
-                Curve = Curve?.Clone()
+                Curve = Curve?.Clone(),
             };
         }
     }
 }
-

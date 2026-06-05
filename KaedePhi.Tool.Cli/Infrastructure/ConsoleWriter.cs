@@ -20,7 +20,8 @@ public static class ConsoleWriter
     /// </summary>
     public static void Debug(string message)
     {
-        if (!ShouldLog(1)) return;
+        if (!ShouldLog(1))
+            return;
         AnsiConsole.MarkupLine($"[grey]{Escape(message)}[/]");
     }
 
@@ -29,7 +30,8 @@ public static class ConsoleWriter
     /// </summary>
     public static void Info(string message)
     {
-        if (!ShouldLog(2)) return;
+        if (!ShouldLog(2))
+            return;
         AnsiConsole.MarkupLine($"[green]{Escape(message)}[/]");
     }
 
@@ -38,7 +40,8 @@ public static class ConsoleWriter
     /// </summary>
     public static void Warn(string message)
     {
-        if (!ShouldLog(3)) return;
+        if (!ShouldLog(3))
+            return;
         AnsiConsole.MarkupLine($"[yellow]{Escape(message)}[/]");
     }
 
@@ -47,7 +50,8 @@ public static class ConsoleWriter
     /// </summary>
     public static void Error(string message)
     {
-        if (!ShouldLog(4)) return;
+        if (!ShouldLog(4))
+            return;
         AnsiConsole.MarkupLine($"[red]{Escape(message)}[/]");
     }
 

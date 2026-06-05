@@ -32,7 +32,13 @@ internal sealed class AppController
     private CancellationTokenSource? _cts;
     private bool _isFileProcessing;
 
-    public AppController(MainViewModel main, GuiChartService chart, LogService logService, ConfigService config, Window window)
+    public AppController(
+        MainViewModel main,
+        GuiChartService chart,
+        LogService logService,
+        ConfigService config,
+        Window window
+    )
     {
         _main = main;
         _chart = chart;
@@ -135,13 +141,18 @@ internal sealed class AppController
 
     private async void OnFileSelected(string filePath, bool useStream)
     {
-        if (_isFileProcessing) return;
+        if (_isFileProcessing)
+            return;
         _isFileProcessing = true;
         _importVm.IsLoading = true;
 
         try
         {
-            var (_, detectedType) = await _chart.LoadChartAsync(filePath, useStream, CancellationToken.None);
+            var (_, detectedType) = await _chart.LoadChartAsync(
+                filePath,
+                useStream,
+                CancellationToken.None
+            );
 
             _toolVm.CurrentFileName = System.IO.Path.GetFileName(filePath);
             _toolVm.DetectedFormat = detectedType.ToString();
@@ -165,8 +176,10 @@ internal sealed class AppController
 
     private async void OnToolRun()
     {
-        if (_toolVm.SelectedTool == null || _toolVm.IsProcessing) return;
-        if (_chart.CurrentChart == null) return;
+        if (_toolVm.SelectedTool == null || _toolVm.IsProcessing)
+            return;
+        if (_chart.CurrentChart == null)
+            return;
 
         _toolVm.IsProcessing = true;
         _toolVm.StatusText = status_processing;
@@ -187,37 +200,67 @@ internal sealed class AppController
                 var overall = p.OverallPercentage >= 0 ? p.OverallPercentage : p.Percentage;
                 _processingVm.SetToolProgress(p.Percentage, overall, p.Detail);
             });
-            await Task.Run(() =>
-            {
-                switch (toolId)
+            await Task.Run(
+                () =>
                 {
-                    case "unbind":
-                        _chart.RunFatherUnbind(kpcChart, _toolVm.Precision, _toolVm.Tolerance,
-                            _toolVm.ClassicMode, _toolVm.DisableCompress, toolProgress);
-                        break;
-                    case "layermerge":
-                        _chart.RunLayerMerge(kpcChart, _toolVm.Precision, _toolVm.Tolerance,
-                            _toolVm.ClassicMode, _toolVm.DisableCompress, toolProgress);
-                        break;
-                    case "cut":
-                        _chart.RunCutEvent(kpcChart, _toolVm.Precision, _toolVm.Tolerance,
-                            _toolVm.DisableCompress, toolProgress);
-                        break;
-                    case "fit":
-                        _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, toolProgress);
-                        break;
-                    case "render":
-                        _chart.RunRender(kpcChart, _toolVm.PixelsPerBeat,
-                            _toolVm.ChannelWidth, _toolVm.SamplesPerEvent, _toolVm.BeatSubdivisions, toolProgress);
-                        break;
-                }
-            }, _cts.Token);
+                    switch (toolId)
+                    {
+                        case "unbind":
+                            _chart.RunFatherUnbind(
+                                kpcChart,
+                                _toolVm.Precision,
+                                _toolVm.Tolerance,
+                                _toolVm.ClassicMode,
+                                _toolVm.DisableCompress,
+                                toolProgress
+                            );
+                            break;
+                        case "layermerge":
+                            _chart.RunLayerMerge(
+                                kpcChart,
+                                _toolVm.Precision,
+                                _toolVm.Tolerance,
+                                _toolVm.ClassicMode,
+                                _toolVm.DisableCompress,
+                                toolProgress
+                            );
+                            break;
+                        case "cut":
+                            _chart.RunCutEvent(
+                                kpcChart,
+                                _toolVm.Precision,
+                                _toolVm.Tolerance,
+                                _toolVm.DisableCompress,
+                                toolProgress
+                            );
+                            break;
+                        case "fit":
+                            _chart.RunFitEvent(kpcChart, _toolVm.Tolerance, toolProgress);
+                            break;
+                        case "render":
+                            _chart.RunRender(
+                                kpcChart,
+                                _toolVm.PixelsPerBeat,
+                                _toolVm.ChannelWidth,
+                                _toolVm.SamplesPerEvent,
+                                _toolVm.BeatSubdivisions,
+                                toolProgress
+                            );
+                            break;
+                    }
+                },
+                _cts.Token
+            );
 
             _log.Information(log_tool_completed, toolId);
 
             // 返回工具页面并显示成功对话框
             NavigateToTool();
-            MessageDialog.ShowSuccess(_window, tool_success_title, string.Format(log_tool_completed, toolId));
+            MessageDialog.ShowSuccess(
+                _window,
+                tool_success_title,
+                string.Format(log_tool_completed, toolId)
+            );
         }
         catch (Exception ex)
         {
@@ -243,15 +286,16 @@ internal sealed class AppController
     /// <summary>
     /// 根据导出格式返回 (扩展名不含点, 文件类型描述) 元组
     /// </summary>
-    private static (string Extension, string TypeLabel) GetFormatFileInfo(ChartType format) => format switch
-    {
-        ChartType.PhiEdit => ("pec", file_type_pe_chart),
-        ChartType.RePhiEdit => ("json", file_type_rpe_json),
-        ChartType.PhigrosV3 => ("json", file_type_phigros_json),
-        ChartType.PhiFans => ("json", file_type_phifans_json),
-        ChartType.PhiChain => ("json", file_type_phichain_json),
-        _ => ("json", file_type_json)
-    };
+    private static (string Extension, string TypeLabel) GetFormatFileInfo(ChartType format) =>
+        format switch
+        {
+            ChartType.PhiEdit => ("pec", file_type_pe_chart),
+            ChartType.RePhiEdit => ("json", file_type_rpe_json),
+            ChartType.PhigrosV3 => ("json", file_type_phigros_json),
+            ChartType.PhiFans => ("json", file_type_phifans_json),
+            ChartType.PhiChain => ("json", file_type_phichain_json),
+            _ => ("json", file_type_json),
+        };
 
     private async void OnExportExecute()
     {
@@ -271,16 +315,18 @@ internal sealed class AppController
             var formatName = targetFormat.ToString();
             var (ext, typeLabel) = GetFormatFileInfo(targetFormat);
 
-            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = export_title,
-                SuggestedFileName = $"export_{formatName}.{ext}",
-                DefaultExtension = ext,
-                FileTypeChoices =
-                [
-                    new FilePickerFileType(typeLabel) { Patterns = [$"*.{ext}"] }
-                ]
-            });
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(
+                new FilePickerSaveOptions
+                {
+                    Title = export_title,
+                    SuggestedFileName = $"export_{formatName}.{ext}",
+                    DefaultExtension = ext,
+                    FileTypeChoices =
+                    [
+                        new FilePickerFileType(typeLabel) { Patterns = [$"*.{ext}"] },
+                    ],
+                }
+            );
 
             if (file != null)
             {
@@ -293,14 +339,24 @@ internal sealed class AppController
                         outputPath = outputPath + expectedExt;
 
                     // 直接从内存中的 KPC 图表导出，无需重新加载
-                    var phigrosOptions = targetFormat == ChartType.PhigrosV3
-                        ? BuildPhigrosOptions(_exportVm)
-                        : null;
-                    await _chart.ExportChartAsync(targetFormat, outputPath, _exportVm.UseStream, _exportVm.IndentedOutput, phigrosOptions, CancellationToken.None);
+                    var phigrosOptions =
+                        targetFormat == ChartType.PhigrosV3 ? BuildPhigrosOptions(_exportVm) : null;
+                    await _chart.ExportChartAsync(
+                        targetFormat,
+                        outputPath,
+                        _exportVm.UseStream,
+                        _exportVm.IndentedOutput,
+                        phigrosOptions,
+                        CancellationToken.None
+                    );
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
                     _log.Information(log_export_done);
-                    MessageDialog.ShowSuccess(_window, export_success_title, string.Format(status_exported_to, outputPath));
+                    MessageDialog.ShowSuccess(
+                        _window,
+                        export_success_title,
+                        string.Format(status_exported_to, outputPath)
+                    );
                 }
             }
             else
@@ -312,7 +368,11 @@ internal sealed class AppController
         catch (Exception ex)
         {
             _log.Error(ex, log_export_failed);
-            _exportVm.StatusText = string.Format(status_error_with_log, ex.Message, _logService.CurrentLogFile);
+            _exportVm.StatusText = string.Format(
+                status_error_with_log,
+                ex.Message,
+                _logService.CurrentLogFile
+            );
             MessageDialog.ShowError(_window, export_error_title, ex.Message);
         }
         finally
@@ -327,13 +387,13 @@ internal sealed class AppController
         {
             NoteFilter = new KpcToPhigrosV3ConvertOptions.NoteFilterOptions
             {
-                FilterFakeNotes = vm.FilterFakeNotes
+                FilterFakeNotes = vm.FilterFakeNotes,
             },
             NegativeAlpha = new KpcToPhigrosV3ConvertOptions.NegativeAlphaOptions
             {
                 Enabled = vm.NegativeAlphaElevation,
-                ElevationStep = vm.NegativeAlphaStep
-            }
+                ElevationStep = vm.NegativeAlphaStep,
+            },
         };
     }
 }

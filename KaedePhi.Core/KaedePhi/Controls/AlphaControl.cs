@@ -14,15 +14,25 @@ namespace KaedePhi.Core.KaedePhi.Controls
 
         private static readonly List<AlphaControl> DefaultInstance = new()
         {
-            new AlphaControl { Easing = new Easing(1), Alpha = 1.0f, X = 0.0f },
-            new AlphaControl { Easing = new Easing(1), Alpha = 1.0f, X = 9999999.0f }
+            new AlphaControl
+            {
+                Easing = new Easing(1),
+                Alpha = 1.0f,
+                X = 0.0f,
+            },
+            new AlphaControl
+            {
+                Easing = new Easing(1),
+                Alpha = 1.0f,
+                X = 9999999.0f,
+            },
         };
 
         /// <summary>
         /// 获取默认控制点列表。
         /// </summary>
-        public static List<AlphaControl> Default
-            => DefaultInstance.ConvertAll(input => input.Clone() as AlphaControl);
+        public static List<AlphaControl> Default =>
+            DefaultInstance.ConvertAll(input => input.Clone() as AlphaControl);
 
         /// <summary>
         /// 深拷贝控制点。
@@ -30,7 +40,12 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// <returns>控制点副本</returns>
         public override ControlBase Clone()
         {
-            return new AlphaControl { Easing = new Easing(Easing), X = X, Alpha = Alpha };
+            return new AlphaControl
+            {
+                Easing = new Easing(Easing),
+                X = X,
+                Alpha = Alpha,
+            };
         }
     }
 }

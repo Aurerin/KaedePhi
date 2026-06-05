@@ -331,8 +331,12 @@ public class EasingsTests
         for (double t = 0.1; t <= 1.0; t += 0.1)
         {
             var current = func(t);
-            current.Should().BeGreaterThanOrEqualTo(previous,
-                because: $"{name} should be monotonically increasing");
+            current
+                .Should()
+                .BeGreaterThanOrEqualTo(
+                    previous,
+                    because: $"{name} should be monotonically increasing"
+                );
             previous = current;
         }
     }
@@ -357,71 +361,79 @@ public class EasingsTests
         var atThreeQuarter = func(0.75);
 
         // For symmetric functions: f(0.25) + f(0.75) should ≈ 1.0
-        (atQuarter + atThreeQuarter).Should().BeApproximately(1.0, 1e-6,
-            because: $"{functionName} should be symmetric around t=0.5");
+        (atQuarter + atThreeQuarter)
+            .Should()
+            .BeApproximately(
+                1.0,
+                1e-6,
+                because: $"{functionName} should be symmetric around t=0.5"
+            );
     }
 
     #endregion
 
     #region Helper Methods and Data
 
-    public static TheoryData<Easings.EasingFunction, string> AllEasingFunctions => new()
-    {
-        { Easings.Linear, nameof(Easings.Linear) },
-        { Easings.EaseInQuad, nameof(Easings.EaseInQuad) },
-        { Easings.EaseOutQuad, nameof(Easings.EaseOutQuad) },
-        { Easings.EaseInOutQuad, nameof(Easings.EaseInOutQuad) },
-        { Easings.EaseInCubic, nameof(Easings.EaseInCubic) },
-        { Easings.EaseOutCubic, nameof(Easings.EaseOutCubic) },
-        { Easings.EaseInOutCubic, nameof(Easings.EaseInOutCubic) },
-        { Easings.EaseInQuart, nameof(Easings.EaseInQuart) },
-        { Easings.EaseOutQuart, nameof(Easings.EaseOutQuart) },
-        { Easings.EaseInOutQuart, nameof(Easings.EaseInOutQuart) },
-        { Easings.EaseInQuint, nameof(Easings.EaseInQuint) },
-        { Easings.EaseOutQuint, nameof(Easings.EaseOutQuint) },
-        { Easings.EaseInOutQuint, nameof(Easings.EaseInOutQuint) },
-        { Easings.EaseInSine, nameof(Easings.EaseInSine) },
-        { Easings.EaseOutSine, nameof(Easings.EaseOutSine) },
-        { Easings.EaseInOutSine, nameof(Easings.EaseInOutSine) },
-        { Easings.EaseInExpo, nameof(Easings.EaseInExpo) },
-        { Easings.EaseOutExpo, nameof(Easings.EaseOutExpo) },
-        { Easings.EaseInOutExpo, nameof(Easings.EaseInOutExpo) },
-        { Easings.EaseInCirc, nameof(Easings.EaseInCirc) },
-        { Easings.EaseOutCirc, nameof(Easings.EaseOutCirc) },
-        { Easings.EaseInOutCirc, nameof(Easings.EaseInOutCirc) },
-        { Easings.EaseInBack, nameof(Easings.EaseInBack) },
-        { Easings.EaseOutBack, nameof(Easings.EaseOutBack) },
-        { Easings.EaseInOutBack, nameof(Easings.EaseInOutBack) },
-        { Easings.EaseInElastic, nameof(Easings.EaseInElastic) },
-        { Easings.EaseOutElastic, nameof(Easings.EaseOutElastic) },
-        { Easings.EaseInOutElastic, nameof(Easings.EaseInOutElastic) },
-        { Easings.EaseInBounce, nameof(Easings.EaseInBounce) },
-        { Easings.EaseOutBounce, nameof(Easings.EaseOutBounce) },
-        { Easings.EaseInOutBounce, nameof(Easings.EaseInOutBounce) },
-    };
+    public static TheoryData<Easings.EasingFunction, string> AllEasingFunctions =>
+        new()
+        {
+            { Easings.Linear, nameof(Easings.Linear) },
+            { Easings.EaseInQuad, nameof(Easings.EaseInQuad) },
+            { Easings.EaseOutQuad, nameof(Easings.EaseOutQuad) },
+            { Easings.EaseInOutQuad, nameof(Easings.EaseInOutQuad) },
+            { Easings.EaseInCubic, nameof(Easings.EaseInCubic) },
+            { Easings.EaseOutCubic, nameof(Easings.EaseOutCubic) },
+            { Easings.EaseInOutCubic, nameof(Easings.EaseInOutCubic) },
+            { Easings.EaseInQuart, nameof(Easings.EaseInQuart) },
+            { Easings.EaseOutQuart, nameof(Easings.EaseOutQuart) },
+            { Easings.EaseInOutQuart, nameof(Easings.EaseInOutQuart) },
+            { Easings.EaseInQuint, nameof(Easings.EaseInQuint) },
+            { Easings.EaseOutQuint, nameof(Easings.EaseOutQuint) },
+            { Easings.EaseInOutQuint, nameof(Easings.EaseInOutQuint) },
+            { Easings.EaseInSine, nameof(Easings.EaseInSine) },
+            { Easings.EaseOutSine, nameof(Easings.EaseOutSine) },
+            { Easings.EaseInOutSine, nameof(Easings.EaseInOutSine) },
+            { Easings.EaseInExpo, nameof(Easings.EaseInExpo) },
+            { Easings.EaseOutExpo, nameof(Easings.EaseOutExpo) },
+            { Easings.EaseInOutExpo, nameof(Easings.EaseInOutExpo) },
+            { Easings.EaseInCirc, nameof(Easings.EaseInCirc) },
+            { Easings.EaseOutCirc, nameof(Easings.EaseOutCirc) },
+            { Easings.EaseInOutCirc, nameof(Easings.EaseInOutCirc) },
+            { Easings.EaseInBack, nameof(Easings.EaseInBack) },
+            { Easings.EaseOutBack, nameof(Easings.EaseOutBack) },
+            { Easings.EaseInOutBack, nameof(Easings.EaseInOutBack) },
+            { Easings.EaseInElastic, nameof(Easings.EaseInElastic) },
+            { Easings.EaseOutElastic, nameof(Easings.EaseOutElastic) },
+            { Easings.EaseInOutElastic, nameof(Easings.EaseInOutElastic) },
+            { Easings.EaseInBounce, nameof(Easings.EaseInBounce) },
+            { Easings.EaseOutBounce, nameof(Easings.EaseOutBounce) },
+            { Easings.EaseInOutBounce, nameof(Easings.EaseInOutBounce) },
+        };
 
-    public static TheoryData<Easings.EasingFunction, string> EaseInFunctions => new()
-    {
-        { Easings.EaseInQuad, nameof(Easings.EaseInQuad) },
-        { Easings.EaseInCubic, nameof(Easings.EaseInCubic) },
-        { Easings.EaseInQuart, nameof(Easings.EaseInQuart) },
-        { Easings.EaseInQuint, nameof(Easings.EaseInQuint) },
-        { Easings.EaseInSine, nameof(Easings.EaseInSine) },
-        { Easings.EaseInExpo, nameof(Easings.EaseInExpo) },
-        { Easings.EaseInCirc, nameof(Easings.EaseInCirc) },
-    };
+    public static TheoryData<Easings.EasingFunction, string> EaseInFunctions =>
+        new()
+        {
+            { Easings.EaseInQuad, nameof(Easings.EaseInQuad) },
+            { Easings.EaseInCubic, nameof(Easings.EaseInCubic) },
+            { Easings.EaseInQuart, nameof(Easings.EaseInQuart) },
+            { Easings.EaseInQuint, nameof(Easings.EaseInQuint) },
+            { Easings.EaseInSine, nameof(Easings.EaseInSine) },
+            { Easings.EaseInExpo, nameof(Easings.EaseInExpo) },
+            { Easings.EaseInCirc, nameof(Easings.EaseInCirc) },
+        };
 
-    private static Easings.EasingFunction GetEasingFunction(string name) => name switch
-    {
-        nameof(Easings.EaseInOutQuad) => Easings.EaseInOutQuad,
-        nameof(Easings.EaseInOutCubic) => Easings.EaseInOutCubic,
-        nameof(Easings.EaseInOutQuart) => Easings.EaseInOutQuart,
-        nameof(Easings.EaseInOutQuint) => Easings.EaseInOutQuint,
-        nameof(Easings.EaseInOutSine) => Easings.EaseInOutSine,
-        nameof(Easings.EaseInOutExpo) => Easings.EaseInOutExpo,
-        nameof(Easings.EaseInOutCirc) => Easings.EaseInOutCirc,
-        _ => throw new ArgumentException($"Unknown easing function: {name}")
-    };
+    private static Easings.EasingFunction GetEasingFunction(string name) =>
+        name switch
+        {
+            nameof(Easings.EaseInOutQuad) => Easings.EaseInOutQuad,
+            nameof(Easings.EaseInOutCubic) => Easings.EaseInOutCubic,
+            nameof(Easings.EaseInOutQuart) => Easings.EaseInOutQuart,
+            nameof(Easings.EaseInOutQuint) => Easings.EaseInOutQuint,
+            nameof(Easings.EaseInOutSine) => Easings.EaseInOutSine,
+            nameof(Easings.EaseInOutExpo) => Easings.EaseInOutExpo,
+            nameof(Easings.EaseInOutCirc) => Easings.EaseInOutCirc,
+            _ => throw new ArgumentException($"Unknown easing function: {name}"),
+        };
 
     #endregion
 }

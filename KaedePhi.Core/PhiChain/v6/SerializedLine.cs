@@ -8,7 +8,8 @@ namespace KaedePhi.Core.PhiChain.v6
     public sealed class SerializedLine
     {
         // Rust uses serde(flatten) for line; v6 currently only contains name.
-        [JsonProperty("name")] public string Name { get; set; } = "PhiChain Line";
+        [JsonProperty("name")]
+        public string Name { get; set; } = "PhiChain Line";
 
         [JsonIgnore]
         public Line Line
@@ -17,13 +18,17 @@ namespace KaedePhi.Core.PhiChain.v6
             set => Name = value?.Name ?? "PhiChain Line";
         }
 
-        [JsonProperty("notes")] public List<Note> Notes { get; set; } = new();
+        [JsonProperty("notes")]
+        public List<Note> Notes { get; set; } = new();
 
-        [JsonProperty("events")] public List<LineEvent> Events { get; set; } = new();
+        [JsonProperty("events")]
+        public List<LineEvent> Events { get; set; } = new();
 
-        [JsonProperty("children")] public List<SerializedLine> Children { get; set; } = new();
+        [JsonProperty("children")]
+        public List<SerializedLine> Children { get; set; } = new();
 
-        [JsonProperty("curve_note_tracks")] public List<CurveNoteTrack> CurveNoteTracks { get; set; } = new();
+        [JsonProperty("curve_note_tracks")]
+        public List<CurveNoteTrack> CurveNoteTracks { get; set; } = new();
 
         public static SerializedLine CreateDefault()
         {
@@ -41,7 +46,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 Notes = Notes.Select(n => n.Clone()).ToList(),
                 Events = Events.Select(e => e.Clone()).ToList(),
                 Children = Children.Select(c => c.Clone()).ToList(),
-                CurveNoteTracks = CurveNoteTracks.Select(t => t.Clone()).ToList()
+                CurveNoteTracks = CurveNoteTracks.Select(t => t.Clone()).ToList(),
             };
         }
 
@@ -52,7 +57,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 Type = type,
                 Value = LineEventValue.Constant(value),
                 StartBeat = new Beat(new[] { 0, 0, 1 }),
-                EndBeat = new Beat(new[] { 1, 0, 1 })
+                EndBeat = new Beat(new[] { 1, 0, 1 }),
             };
         }
     }

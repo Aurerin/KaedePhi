@@ -13,7 +13,8 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<RpeEvents.Event<
         List<RpeEvents.Event<TPayload>> events,
         Beat startBeat,
         Beat endBeat,
-        double cutLength)
+        double cutLength
+    )
     {
         var cutLengthBeat = new Beat(cutLength);
         return CutEventsInRange(events, startBeat, endBeat, cutLengthBeat);
@@ -21,13 +22,15 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<RpeEvents.Event<
 
     /// <inheritdoc/>
     public List<RpeEvents.Event<TPayload>> CutEventToLiner(
-        RpeEvents.Event<TPayload> evt, double cutLength)
-        => CutEventToLiner(evt, new Beat(cutLength));
+        RpeEvents.Event<TPayload> evt,
+        double cutLength
+    ) => CutEventToLiner(evt, new Beat(cutLength));
 
     /// <inheritdoc/>
     public List<RpeEvents.Event<TPayload>> CutEventToLiner(
         RpeEvents.Event<TPayload> evt,
-        Beat cutLength)
+        Beat cutLength
+    )
     {
         var cutEvents = new List<RpeEvents.Event<TPayload>>();
         // 在evt中均匀采样，并返回
@@ -40,13 +43,15 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<RpeEvents.Event<
                 segmentEnd = evt.EndBeat;
             }
 
-            cutEvents.Add(new RpeEvents.Event<TPayload>()
-            {
-                StartBeat = nowBeat,
-                EndBeat = segmentEnd,
-                StartValue = evt.GetValueAtBeat(nowBeat),
-                EndValue = evt.GetValueAtBeat(segmentEnd),
-            });
+            cutEvents.Add(
+                new RpeEvents.Event<TPayload>()
+                {
+                    StartBeat = nowBeat,
+                    EndBeat = segmentEnd,
+                    StartValue = evt.GetValueAtBeat(nowBeat),
+                    EndValue = evt.GetValueAtBeat(segmentEnd),
+                }
+            );
 
             nowBeat = segmentEnd;
         }
@@ -55,14 +60,23 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<RpeEvents.Event<
     }
 
     /// <inheritdoc/>
-    public List<RpeEvents.Event<TPayload>> CutEventsInRange(List<RpeEvents.Event<TPayload>> events, Beat startBeat, Beat endBeat,
-        Beat cutLength)
+    public List<RpeEvents.Event<TPayload>> CutEventsInRange(
+        List<RpeEvents.Event<TPayload>> events,
+        Beat startBeat,
+        Beat endBeat,
+        Beat cutLength
+    )
     {
         if (cutLength <= new Beat(0))
-            throw new ArgumentOutOfRangeException(nameof(cutLength), "Cut length must be greater than zero.");
+            throw new ArgumentOutOfRangeException(
+                nameof(cutLength),
+                "Cut length must be greater than zero."
+            );
 
         var cutEvents = new List<RpeEvents.Event<TPayload>>();
-        var eventsToCut = events.Where(e => e.StartBeat < endBeat && e.EndBeat > startBeat).ToList();
+        var eventsToCut = events
+            .Where(e => e.StartBeat < endBeat && e.EndBeat > startBeat)
+            .ToList();
 
         foreach (var evt in eventsToCut)
         {
@@ -76,15 +90,18 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<RpeEvents.Event<
             {
                 var currentBeat = new Beat(cutStart + (cutLength * i));
                 var segmentEnd = new Beat(cutStart + (cutLength * (i + 1)));
-                if (segmentEnd > cutEnd) segmentEnd = cutEnd;
+                if (segmentEnd > cutEnd)
+                    segmentEnd = cutEnd;
 
-                cutEvents.Add(new RpeEvents.Event<TPayload>
-                {
-                    StartBeat = currentBeat,
-                    EndBeat = segmentEnd,
-                    StartValue = evt.GetValueAtBeat(currentBeat),
-                    EndValue = evt.GetValueAtBeat(segmentEnd),
-                });
+                cutEvents.Add(
+                    new RpeEvents.Event<TPayload>
+                    {
+                        StartBeat = currentBeat,
+                        EndBeat = segmentEnd,
+                        StartValue = evt.GetValueAtBeat(currentBeat),
+                        EndValue = evt.GetValueAtBeat(segmentEnd),
+                    }
+                );
             }
         }
 

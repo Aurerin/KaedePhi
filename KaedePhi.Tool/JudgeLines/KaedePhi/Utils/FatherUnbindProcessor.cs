@@ -20,10 +20,9 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
         Action<string>? logInfo = null,
         Action<string>? logWarning = null,
         Action<string>? logError = null,
-        Action<string>? logDebug = null)
-        : base(cache, logInfo, logWarning, logError, logDebug)
-    {
-    }
+        Action<string>? logDebug = null
+    )
+        : base(cache, logInfo, logWarning, logError, logDebug) { }
 
     /// <summary>
     /// 等间隔采样解绑（同步版）：将判定线与父线解绑，以等间隔拍步长采样保持原始行为。
@@ -32,7 +31,8 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
         int targetJudgeLineIndex,
         List<JudgeLine> allJudgeLines,
         double precision,
-        IProgress<ToolProgress>? progress = null)
+        IProgress<ToolProgress>? progress = null
+    )
     {
         JudgeLine judgeLineCopy;
         try
@@ -44,7 +44,8 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
                 allJudgeLines,
                 logTag: "FatherUnbind",
                 startAction: "开始解绑",
-                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, progress));
+                recursiveUnbind: (idx, lines) => FatherUnbind(idx, lines, precision, progress)
+            );
 
             judgeLineCopy = judgeLine;
             if (shouldReturn || fatherLine is null)
@@ -54,8 +55,11 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
             }
 
             progress?.Report(new ToolProgress(0.2, "合并通道"));
-            var mergedChannels =
-                FatherUnbindHelpers.MergeChannels(judgeLineCopy.EventLayers, fatherLine.EventLayers, Merge);
+            var mergedChannels = FatherUnbindHelpers.MergeChannels(
+                judgeLineCopy.EventLayers,
+                fatherLine.EventLayers,
+                Merge
+            );
 
             progress?.Report(new ToolProgress(0.4, "切割事件"));
             var cutLength = new Beat(1d / precision);
@@ -67,43 +71,78 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
 
             var cutTasks = new[]
             {
-                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Tx, txMin, txMax, cutLength)),
-                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Ty, tyMin, tyMax, cutLength)),
-                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fx, fxMin, fxMax, cutLength)),
-                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)),
-                Task.Run(() => _cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength))
+                Task.Run(() =>
+                    _cutter.CutEventsInRange(mergedChannels.Tx, txMin, txMax, cutLength)
+                ),
+                Task.Run(() =>
+                    _cutter.CutEventsInRange(mergedChannels.Ty, tyMin, tyMax, cutLength)
+                ),
+                Task.Run(() =>
+                    _cutter.CutEventsInRange(mergedChannels.Fx, fxMin, fxMax, cutLength)
+                ),
+                Task.Run(() =>
+                    _cutter.CutEventsInRange(mergedChannels.Fy, fyMin, fyMax, cutLength)
+                ),
+                Task.Run(() =>
+                    _cutter.CutEventsInRange(mergedChannels.Fr, frMin, frMax, cutLength)
+                ),
             };
             // ReSharper disable once CoVariantArrayConversion
             Task.WaitAll(cutTasks);
 
             var cutChannels = new FatherUnbindHelpers.EventChannels(
-                Fx: cutTasks[2].Result, Fy: cutTasks[3].Result, Fr: cutTasks[4].Result,
-                Tx: cutTasks[0].Result, Ty: cutTasks[1].Result);
+                Fx: cutTasks[2].Result,
+                Fy: cutTasks[3].Result,
+                Fr: cutTasks[4].Result,
+                Tx: cutTasks[0].Result,
+                Ty: cutTasks[1].Result
+            );
 
-            var overallMin = new Beat(Math.Min(Math.Min(Math.Min(txMin, tyMin), Math.Min(fxMin, fyMin)), frMin));
-            var overallMax = new Beat(Math.Max(Math.Max(Math.Max(txMax, tyMax), Math.Max(fxMax, fyMax)), frMax));
+            var overallMin = new Beat(
+                Math.Min(Math.Min(Math.Min(txMin, tyMin), Math.Min(fxMin, fyMin)), frMin)
+            );
+            var overallMax = new Beat(
+                Math.Max(Math.Max(Math.Max(txMax, tyMax), Math.Max(fxMax, fyMax)), frMax)
+            );
             var step = new Beat(1d / precision);
             var beats = FatherUnbindHelpers.BuildBeatList(overallMin, overallMax, step);
 
             progress?.Report(new ToolProgress(0.6, "等间隔采样"));
-            LogDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 等间隔采样 {beats.Count} 段，精度={precision}");
-            var (sortedX, sortedY) = FatherUnbindHelpers.EqualSpacingSampling(beats, overallMax, step, cutChannels);
+            LogDebug?.Invoke(
+                $"FatherUnbind[{targetJudgeLineIndex}]: 等间隔采样 {beats.Count} 段，精度={precision}"
+            );
+            var (sortedX, sortedY) = FatherUnbindHelpers.EqualSpacingSampling(
+                beats,
+                overallMax,
+                step,
+                cutChannels
+            );
 
             progress?.Report(new ToolProgress(0.9, "写回结果"));
             LogDebug?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 采样完成，写回");
-            FatherUnbindHelpers.WriteResultToLine(judgeLineCopy, sortedX, sortedY, cutChannels.Fr, Merge);
+            FatherUnbindHelpers.WriteResultToLine(
+                judgeLineCopy,
+                sortedX,
+                sortedY,
+                cutChannels.Fr,
+                Merge
+            );
 
             Cache.TryAdd(targetJudgeLineIndex, judgeLineCopy);
             LogInfo?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑完成");
             progress?.Report(new ToolProgress(1.0));
             return judgeLineCopy;
 
-            List<KpcEvents.Event<double>> Merge(List<KpcEvents.Event<double>> a, List<KpcEvents.Event<double>> b)
-                => _merger.EventListMerge(a, b, precision);
+            List<KpcEvents.Event<double>> Merge(
+                List<KpcEvents.Event<double>> a,
+                List<KpcEvents.Event<double>> b
+            ) => _merger.EventListMerge(a, b, precision);
         }
         catch (Exception ex)
         {
-            LogError?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message);
+            LogError?.Invoke(
+                $"FatherUnbind[{targetJudgeLineIndex}]: 解绑失败，返回原始数据: " + ex.Message
+            );
             return allJudgeLines[targetJudgeLineIndex].Clone();
         }
     }

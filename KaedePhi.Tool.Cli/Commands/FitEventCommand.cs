@@ -6,11 +6,13 @@ namespace KaedePhi.Tool.Cli.Commands;
 
 public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
 {
-    public sealed class Settings : OperationSettings
-    {
-    }
+    public sealed class Settings : OperationSettings { }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings s,
+        CancellationToken cancellationToken
+    )
     {
         var c = s.AppConfig.FitConfig;
         s.Tolerance ??= c.Tolerance;
@@ -31,11 +33,36 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
         var alFitter = new EventFit<int>();
         var roFitter = new EventFit<double>();
         var spFitter = new EventFit<float>();
-        mxFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
-        myFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
-        alFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
-        roFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
-        spFitter.SubscribeLog(info: ConsoleWriter.Info, warning: ConsoleWriter.Warn, error: ConsoleWriter.Error, debug: ConsoleWriter.Debug);
+        mxFitter.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error,
+            debug: ConsoleWriter.Debug
+        );
+        myFitter.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error,
+            debug: ConsoleWriter.Debug
+        );
+        alFitter.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error,
+            debug: ConsoleWriter.Debug
+        );
+        roFitter.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error,
+            debug: ConsoleWriter.Debug
+        );
+        spFitter.SubscribeLog(
+            info: ConsoleWriter.Info,
+            warning: ConsoleWriter.Warn,
+            error: ConsoleWriter.Error,
+            debug: ConsoleWriter.Debug
+        );
 
         var tolerance = s.Tolerance ?? 0.1d;
 
@@ -44,7 +71,8 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
             for (var j = 0; j < nrc.JudgeLineList[i].EventLayers.Count; j++)
             {
                 var el = nrc.JudgeLineList[i].EventLayers[j];
-                if (el == null) continue;
+                if (el == null)
+                    continue;
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var mxResult = mxFitter.FitEvents(el.MoveXEvents, tolerance);
@@ -61,8 +89,12 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
             }
         }
 
-        var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
-            s.DryRun ?? false, cancellationToken);
+        var output = await ChartService.SaveAsRpeAsync(
+            nrcCopy,
+            svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
+            s.DryRun ?? false,
+            cancellationToken
+        );
         ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
         return 0;
     }

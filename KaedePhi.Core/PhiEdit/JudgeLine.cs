@@ -61,10 +61,16 @@ namespace KaedePhi.Core.PhiEdit
         /// value 为精确帧值（未命中时无意义）；
         /// previousFrame 为最近的前置帧（不存在则为 null）。
         /// </returns>
-        private (bool foundExactFrame, (float, float) value, MoveFrame previousFrame) FindExactOrPreviousFrame(float beat)
+        private (
+            bool foundExactFrame,
+            (float, float) value,
+            MoveFrame previousFrame
+        ) FindExactOrPreviousFrame(float beat)
         {
             // 二分查找：定位 Beat <= beat 中 index 最大者（最近前置帧或精确帧）
-            int lo = 0, hi = MoveFrames.Count - 1, idx = -1;
+            int lo = 0,
+                hi = MoveFrames.Count - 1,
+                idx = -1;
             while (lo <= hi)
             {
                 var mid = (lo + hi) >> 1;
@@ -102,7 +108,9 @@ namespace KaedePhi.Core.PhiEdit
         {
             // 二分查找：定位 StartBeat <= beat + ε 中 index 最大者（主导事件）
             // 同 StartBeat 时取靠后者（index 更大），满足同起始拍 index 至上规则
-            int lo = 0, hi = MoveEvents.Count - 1, idx = -1;
+            int lo = 0,
+                hi = MoveEvents.Count - 1,
+                idx = -1;
             while (lo <= hi)
             {
                 var mid = (lo + hi) >> 1;
@@ -138,7 +146,9 @@ namespace KaedePhi.Core.PhiEdit
             // 然后向前扫描首个已结束事件——即主导已结束事件。
             // 由于列表按 StartBeat 升序，一旦遇到已结束事件，其前方所有事件必然也已结束，
             // 因此首个已结束事件即为 index 最大的已结束事件。
-            int lo = 0, hi = MoveEvents.Count - 1, idx = -1;
+            int lo = 0,
+                hi = MoveEvents.Count - 1,
+                idx = -1;
             while (lo <= hi)
             {
                 var mid = (lo + hi) >> 1;
@@ -175,7 +185,10 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="activeEvent">当前主导且活跃的事件。</param>
         /// <param name="hintPreviousFrame">查询拍点前最近的帧（用于无前驱事件时的兜底）。</param>
         /// <returns>activeEvent 插值起点的 (X, Y) 坐标。</returns>
-        private (float, float) ResolveMoveEventStartValue(MoveEvent activeEvent, MoveFrame? hintPreviousFrame)
+        private (float, float) ResolveMoveEventStartValue(
+            MoveEvent activeEvent,
+            MoveFrame? hintPreviousFrame
+        )
         {
             // 优先：activeEvent.StartBeat 处有精确帧
             var frameAtStart = FindMoveFrameExactAt(activeEvent.StartBeat);
@@ -210,9 +223,13 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="previousEvent">最近结束的历史事件。</param>
         /// <param name="previousFrame">最近的前置帧。</param>
         /// <returns>若应优先使用历史事件值则为 true，否则为 false。</returns>
-        private static bool IsEventCloserThanFrame(MoveEvent? previousEvent, MoveFrame? previousFrame)
+        private static bool IsEventCloserThanFrame(
+            MoveEvent? previousEvent,
+            MoveFrame? previousFrame
+        )
         {
-            return previousEvent != null && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat);
+            return previousEvent != null
+                && (previousFrame == null || previousEvent.EndBeat > previousFrame.Beat);
         }
 
         /// <summary>
@@ -233,7 +250,9 @@ namespace KaedePhi.Core.PhiEdit
         private MoveFrame? FindMoveFrameExactAt(float beat)
         {
             // 二分查找：定位 Beat <= beat 中 index 最大者，再检验是否精确命中
-            int lo = 0, hi = MoveFrames.Count - 1, idx = -1;
+            int lo = 0,
+                hi = MoveFrames.Count - 1,
+                idx = -1;
             while (lo <= hi)
             {
                 var mid = (lo + hi) >> 1;
@@ -283,7 +302,7 @@ namespace KaedePhi.Core.PhiEdit
                 AlphaEvents = AlphaEvents.Select(e => e.Clone()).ToList(),
                 MoveEvents = MoveEvents.Select(e => e.Clone()).ToList(),
                 RotateEvents = RotateEvents.Select(e => e.Clone()).ToList(),
-                NoteList = NoteList.Select(n => n.Clone()).ToList()
+                NoteList = NoteList.Select(n => n.Clone()).ToList(),
             };
         }
     }

@@ -174,7 +174,7 @@ namespace KaedePhi.Core.KaedePhi
                 AlphaControls = new List<Controls.AlphaControl>(),
                 SizeControls = new List<Controls.SizeControl>(),
                 SkewControls = new List<Controls.SkewControl>(),
-                YControls = new List<Controls.YControl>()
+                YControls = new List<Controls.YControl>(),
             };
 
             // 深拷贝列表

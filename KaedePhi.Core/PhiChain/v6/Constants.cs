@@ -5,4 +5,3 @@
         public const ulong CurrentFormat = 6;
     }
 }
-

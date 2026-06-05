@@ -10,15 +10,28 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
     private static void ValidateParams(double tolerance)
     {
         if (tolerance is > 100 or < 0)
-            throw new ArgumentOutOfRangeException(nameof(tolerance), "Tolerance must be between 0 and 100.");
-        if (typeof(TPayload) != typeof(int) && typeof(TPayload) != typeof(float) && typeof(TPayload) != typeof(double))
-            throw new NotSupportedException("EventListCompress only supports int, float, and double types.");
+            throw new ArgumentOutOfRangeException(
+                nameof(tolerance),
+                "Tolerance must be between 0 and 100."
+            );
+        if (
+            typeof(TPayload) != typeof(int)
+            && typeof(TPayload) != typeof(float)
+            && typeof(TPayload) != typeof(double)
+        )
+            throw new NotSupportedException(
+                "EventListCompress only supports int, float, and double types."
+            );
     }
 
     /// <summary>
     /// 判断两段线性事件能否合并（归一化垂直距离算法）。
     /// </summary>
-    private static bool TryMergeSqrt(KpcEvents.Event<TPayload> last, KpcEvents.Event<TPayload> cur, double relTol)
+    private static bool TryMergeSqrt(
+        KpcEvents.Event<TPayload> last,
+        KpcEvents.Event<TPayload> cur,
+        double relTol
+    )
     {
         var startBeat = (double)last.StartBeat;
         var midBeat = (double)last.EndBeat;
@@ -44,7 +57,8 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
             return false;
 
         var totalBeatSpan = endBeat - startBeat;
-        if (totalBeatSpan < 1e-12) return true;
+        if (totalBeatSpan < 1e-12)
+            return true;
 
         var normalizedMidBeat = (midBeat - startBeat) / totalBeatSpan;
         var normalizedValueDelta = (endValue - startValue) / scale;
@@ -57,7 +71,11 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
     /// <summary>
     /// 判断两段线性事件能否合并（归一化斜率差算法）。
     /// </summary>
-    private static bool TryMergeSlope(KpcEvents.Event<TPayload> last, KpcEvents.Event<TPayload> cur, double relTol)
+    private static bool TryMergeSlope(
+        KpcEvents.Event<TPayload> last,
+        KpcEvents.Event<TPayload> cur,
+        double relTol
+    )
     {
         var startBeat = (double)last.StartBeat;
         var midBeat = (double)last.EndBeat;
@@ -77,23 +95,32 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
             return false;
 
         var totalBeatSpan = endBeat - startBeat;
-        if (totalBeatSpan < 1e-12) return true;
+        if (totalBeatSpan < 1e-12)
+            return true;
 
         var firstSegmentDuration = midBeat - startBeat;
         var secondSegmentDuration = endBeat - midBeat;
-        var firstSlope = firstSegmentDuration < 1e-12 ? 0.0 : (midValueEnd - startValue) / firstSegmentDuration / scale;
-        var secondSlope = secondSegmentDuration < 1e-12
-            ? 0.0
-            : (endValue - midValueStart) / secondSegmentDuration / scale;
+        var firstSlope =
+            firstSegmentDuration < 1e-12
+                ? 0.0
+                : (midValueEnd - startValue) / firstSegmentDuration / scale;
+        var secondSlope =
+            secondSegmentDuration < 1e-12
+                ? 0.0
+                : (endValue - midValueStart) / secondSegmentDuration / scale;
         return Math.Abs(firstSlope - secondSlope) <= relTol;
     }
 
     /// <inheritdoc/>
     public List<KpcEvents.Event<TPayload>> EventListCompressSqrt(
-        List<KpcEvents.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
+        List<KpcEvents.Event<TPayload>>? events,
+        double tolerance,
+        IProgress<ToolProgress>? progress = null
+    )
     {
         ValidateParams(tolerance);
-        if (events == null || events.Count == 0) return [];
+        if (events == null || events.Count == 0)
+            return [];
 
         var compressed = new List<KpcEvents.Event<TPayload>> { events[0] };
         var relTol = tolerance / 100.0;
@@ -103,9 +130,12 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
             var lastEvent = compressed[^1];
             var currentEvent = events[i];
 
-            if (lastEvent.Easing == 1 && currentEvent.Easing == 1 &&
-                lastEvent.EndBeat == currentEvent.StartBeat &&
-                TryMergeSqrt(lastEvent, currentEvent, relTol))
+            if (
+                lastEvent.Easing == 1
+                && currentEvent.Easing == 1
+                && lastEvent.EndBeat == currentEvent.StartBeat
+                && TryMergeSqrt(lastEvent, currentEvent, relTol)
+            )
             {
                 lastEvent.EndBeat = currentEvent.EndBeat;
                 lastEvent.EndValue = currentEvent.EndValue;
@@ -122,10 +152,14 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
 
     /// <inheritdoc/>
     public List<KpcEvents.Event<TPayload>> EventListCompressSlope(
-        List<KpcEvents.Event<TPayload>>? events, double tolerance, IProgress<ToolProgress>? progress = null)
+        List<KpcEvents.Event<TPayload>>? events,
+        double tolerance,
+        IProgress<ToolProgress>? progress = null
+    )
     {
         ValidateParams(tolerance);
-        if (events == null || events.Count == 0) return [];
+        if (events == null || events.Count == 0)
+            return [];
 
         var compressed = new List<KpcEvents.Event<TPayload>> { events[0] };
         var relTol = tolerance / 100.0;
@@ -135,9 +169,12 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
             var lastEvent = compressed[^1];
             var currentEvent = events[i];
 
-            if (lastEvent.Easing == 1 && currentEvent.Easing == 1 &&
-                lastEvent.EndBeat == currentEvent.StartBeat &&
-                TryMergeSlope(lastEvent, currentEvent, relTol))
+            if (
+                lastEvent.Easing == 1
+                && currentEvent.Easing == 1
+                && lastEvent.EndBeat == currentEvent.StartBeat
+                && TryMergeSlope(lastEvent, currentEvent, relTol)
+            )
             {
                 lastEvent.EndBeat = currentEvent.EndBeat;
                 lastEvent.EndValue = currentEvent.EndValue;
@@ -155,12 +192,16 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
     /// <summary>
     /// 移除无用事件（起始值和结束值都为默认值的事件）。
     /// </summary>
-    public List<KpcEvents.Event<TPayload>>? RemoveUselessEvent(List<KpcEvents.Event<TPayload>>? events)
+    public List<KpcEvents.Event<TPayload>>? RemoveUselessEvent(
+        List<KpcEvents.Event<TPayload>>? events
+    )
     {
         var eventsCopy = events?.Select(e => e.Clone()).ToList();
-        if (eventsCopy is { Count: 1 } &&
-            EqualityComparer<TPayload>.Default.Equals(eventsCopy[0].StartValue, default) &&
-            EqualityComparer<TPayload>.Default.Equals(eventsCopy[0].EndValue, default))
+        if (
+            eventsCopy is { Count: 1 }
+            && EqualityComparer<TPayload>.Default.Equals(eventsCopy[0].StartValue, default)
+            && EqualityComparer<TPayload>.Default.Equals(eventsCopy[0].EndValue, default)
+        )
         {
             eventsCopy.RemoveAt(0);
         }

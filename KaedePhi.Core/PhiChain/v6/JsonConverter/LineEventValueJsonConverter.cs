@@ -6,11 +6,15 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
 {
     public sealed class LineEventValueJsonConverter : JsonConverter<LineEventValue>
     {
-        public override void WriteJson(JsonWriter writer, LineEventValue value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            LineEventValue value,
+            JsonSerializer serializer
+        )
         {
             var obj = new JObject
             {
-                ["kind"] = value.Type == LineEventValueType.Constant ? "constant" : "transition"
+                ["kind"] = value.Type == LineEventValueType.Constant ? "constant" : "transition",
             };
 
             if (value.Type == LineEventValueType.Constant)
@@ -27,8 +31,13 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             obj.WriteTo(writer);
         }
 
-        public override LineEventValue ReadJson(JsonReader reader, Type objectType, LineEventValue existingValue,
-            bool hasExistingValue, JsonSerializer serializer)
+        public override LineEventValue ReadJson(
+            JsonReader reader,
+            Type objectType,
+            LineEventValue existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             var obj = JObject.Load(reader);
             var type = obj.Value<string>("kind");

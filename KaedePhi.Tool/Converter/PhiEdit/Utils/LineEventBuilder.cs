@@ -1,5 +1,5 @@
-﻿using KaedePhi.Core.Common;
-using global::KaedePhi.Tool.Layer.KaedePhi;
+﻿using global::KaedePhi.Tool.Layer.KaedePhi;
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using KpcEasing = KaedePhi.Core.KaedePhi.Easing;
@@ -37,38 +37,50 @@ public class LineEventBuilder
     /// </summary>
     public void ConvertLineEvents(Pe.JudgeLine target, List<KpcEventLayer> layers)
     {
-        if (layers.Count == 0) return;
+        if (layers.Count == 0)
+            return;
 
         var primaryLayer = layers[0];
         for (var i = 1; i < layers.Count; i++)
         {
-            if (!HasAnyEventData(layers[i])) continue;
+            if (!HasAnyEventData(layers[i]))
+                continue;
             Warn("JudgeLine 存在多个事件层；PE 仅支持单层，将自动合并为一层");
             if (_options.MultiLayerMerge.ClassicMode)
             {
                 if (_options.MultiLayerMerge.Compress)
                 {
-                    var layer = _layerProcessor.LayerMerge(layers,
-                        _options.MultiLayerMerge.Precision);
+                    var layer = _layerProcessor.LayerMerge(
+                        layers,
+                        _options.MultiLayerMerge.Precision
+                    );
                     _layerProcessor.LayerEventsCompress(layer, _options.MultiLayerMerge.Tolerance);
                     primaryLayer = layer;
                 }
                 else
-                    primaryLayer = _layerProcessor.LayerMerge(layers,
-                        _options.MultiLayerMerge.Precision);
+                    primaryLayer = _layerProcessor.LayerMerge(
+                        layers,
+                        _options.MultiLayerMerge.Precision
+                    );
             }
             else
                 primaryLayer = _layerProcessor.LayerMergePlus(
                     layers,
                     _options.MultiLayerMerge.Precision,
-                    _options.MultiLayerMerge.Tolerance);
+                    _options.MultiLayerMerge.Tolerance
+                );
 
             break;
         }
 
         ConvertMoveEvents(target, primaryLayer);
-        ConvertScalarEvents(target.RotateFrames, target.RotateEvents, primaryLayer.RotateEvents,
-            value => Transform.TransformToPeAngle(value), "旋转");
+        ConvertScalarEvents(
+            target.RotateFrames,
+            target.RotateEvents,
+            primaryLayer.RotateEvents,
+            value => Transform.TransformToPeAngle(value),
+            "旋转"
+        );
         ConvertAlphaEvents(target, primaryLayer.AlphaEvents);
         ConvertSpeedFrames(target, primaryLayer.SpeedEvents);
     }
@@ -78,7 +90,8 @@ public class LineEventBuilder
     /// </summary>
     public void ConvertAlphaEvents(Pe.JudgeLine target, List<KpcEvents.Event<int>>? sourceEvents)
     {
-        if (sourceEvents == null || sourceEvents.Count == 0) return;
+        if (sourceEvents == null || sourceEvents.Count == 0)
+            return;
 
         WarnIfEventPayloadUnsupported(sourceEvents, "不透明度");
 
@@ -86,9 +99,15 @@ public class LineEventBuilder
             .OrderBy(e => (double)e.StartBeat)
             .SelectMany(srcEvent =>
             {
-                var sliced = _eventCutterInt.CutEventToLiner(srcEvent, 1d / _options.Alpha.CutPrecision);
+                var sliced = _eventCutterInt.CutEventToLiner(
+                    srcEvent,
+                    1d / _options.Alpha.CutPrecision
+                );
                 return _options.Alpha.CutCompress
-                    ? _eventCompressorInt.EventListCompressSlope(sliced, _options.Alpha.CutTolerance)
+                    ? _eventCompressorInt.EventListCompressSlope(
+                        sliced,
+                        _options.Alpha.CutTolerance
+                    )
                     : sliced;
             })
             .ToList();
@@ -104,23 +123,23 @@ public class LineEventBuilder
             var endValue = ToSingle(ev.EndValue);
 
             var disconnected = Math.Abs(previousEndBeat - startBeat) > FloatEpsilon;
-            var changed = float.IsNaN(previousEndValue) || Math.Abs(previousEndValue - startValue) > FloatEpsilon;
+            var changed =
+                float.IsNaN(previousEndValue)
+                || Math.Abs(previousEndValue - startValue) > FloatEpsilon;
             if (disconnected || changed)
             {
-                target.AlphaFrames.Add(new Pe.Frame
-                {
-                    Beat = startBeat,
-                    Value = startValue
-                });
+                target.AlphaFrames.Add(new Pe.Frame { Beat = startBeat, Value = startValue });
             }
 
-            target.AlphaEvents.Add(new Pe.Event
-            {
-                StartBeat = startBeat,
-                EndBeat = endBeat,
-                EasingType = new Pe.Easing(1),
-                EndValue = endValue
-            });
+            target.AlphaEvents.Add(
+                new Pe.Event
+                {
+                    StartBeat = startBeat,
+                    EndBeat = endBeat,
+                    EasingType = new Pe.Easing(1),
+                    EndValue = endValue,
+                }
+            );
 
             previousEndBeat = endBeat;
             previousEndValue = endValue;
@@ -132,25 +151,29 @@ public class LineEventBuilder
     /// </summary>
     public void ConvertSpeedFrames(Pe.JudgeLine target, List<KpcEvents.Event<float>>? sourceEvents)
     {
-        if (sourceEvents == null || sourceEvents.Count == 0) return;
+        if (sourceEvents == null || sourceEvents.Count == 0)
+            return;
 
         WarnIfEventPayloadUnsupported(sourceEvents, "速度");
 
         foreach (var srcEvent in sourceEvents.OrderBy(e => (double)e.StartBeat))
         {
-            var slices = _eventCutterFloat.CutEventToLiner(srcEvent, 1d / _options.Speed.CutPrecision);
+            var slices = _eventCutterFloat.CutEventToLiner(
+                srcEvent,
+                1d / _options.Speed.CutPrecision
+            );
             for (var i = 0; i < slices.Count; i++)
             {
                 var slice = slices[i];
                 var useStartValue = i < 2;
-                var beat = useStartValue ? (float)(double)slice.StartBeat : (float)(double)slice.EndBeat;
-                var value = (useStartValue ? ToSingle(slice.StartValue) : ToSingle(slice.EndValue)) * (14f / 9f);
+                var beat = useStartValue
+                    ? (float)(double)slice.StartBeat
+                    : (float)(double)slice.EndBeat;
+                var value =
+                    (useStartValue ? ToSingle(slice.StartValue) : ToSingle(slice.EndValue))
+                    * (14f / 9f);
 
-                target.SpeedFrames.Add(new Pe.Frame
-                {
-                    Beat = beat,
-                    Value = value
-                });
+                target.SpeedFrames.Add(new Pe.Frame { Beat = beat, Value = value });
             }
         }
     }
@@ -162,13 +185,15 @@ public class LineEventBuilder
     {
         var xEvents = ExpandEventsForUnsupportedEasing(layer.MoveXEvents ?? [], "移动X");
         var yEvents = ExpandEventsForUnsupportedEasing(layer.MoveYEvents ?? [], "移动Y");
-        if (xEvents.Count == 0 && yEvents.Count == 0) return;
+        if (xEvents.Count == 0 && yEvents.Count == 0)
+            return;
 
         WarnIfEventPayloadUnsupported(xEvents, "移动X");
         WarnIfEventPayloadUnsupported(yEvents, "移动Y");
 
         var boundaries = CollectBoundaries(xEvents, yEvents);
-        if (boundaries.Count < 2) return;
+        if (boundaries.Count < 2)
+            return;
 
         var lastX = 0d;
         var lastY = 0d;
@@ -177,7 +202,8 @@ public class LineEventBuilder
         {
             var start = boundaries[i];
             var end = boundaries[i + 1];
-            if (end - start <= FloatEpsilon) continue;
+            if (end - start <= FloatEpsilon)
+                continue;
             ProcessMoveInterval(target, xEvents, yEvents, start, end, ref lastX, ref lastY);
         }
     }
@@ -190,9 +216,16 @@ public class LineEventBuilder
         List<Pe.Event>? targetEvents,
         List<KpcEvents.Event<double>>? sourceEvents,
         Func<float, float> valueTransform,
-        string channelName)
+        string channelName
+    )
     {
-        ConvertScalarEventsInternal(targetFrames, targetEvents, sourceEvents, valueTransform, channelName);
+        ConvertScalarEventsInternal(
+            targetFrames,
+            targetEvents,
+            sourceEvents,
+            valueTransform,
+            channelName
+        );
     }
 
     #region Move Event Helpers
@@ -201,24 +234,32 @@ public class LineEventBuilder
         Pe.JudgeLine target,
         List<KpcEvents.Event<double>> xEvents,
         List<KpcEvents.Event<double>> yEvents,
-        float start, float end,
-        ref double lastX, ref double lastY)
+        float start,
+        float end,
+        ref double lastX,
+        ref double lastY
+    )
     {
         var activeX = FindActiveEvent(xEvents, new Beat(start));
         var activeY = FindActiveEvent(yEvents, new Beat(start));
 
-        if (activeX == null && activeY == null) return;
+        if (activeX == null && activeY == null)
+            return;
 
         var xAligned = IsExactlyCovering(activeX, start, end);
         var yAligned = IsExactlyCovering(activeY, start, end);
-        var sameEasing = xAligned && yAligned
-                                  && activeX != null && activeY != null
-                                  && (int)activeX.Easing == (int)activeY.Easing;
+        var sameEasing =
+            xAligned
+            && yAligned
+            && activeX != null
+            && activeY != null
+            && (int)activeX.Easing == (int)activeY.Easing;
         // 只有一轴活跃时（另一轴为 null），无论该轴是否精确覆盖当前区间，均可直接映射。
         // 跨越边界时用 GetValueAtBeat 取正确插值，保留原始缓动曲线，避免不必要的线性化切段。
-        var canDirectMap = (activeX is not null && activeY is null)
-                           || (activeY is not null && activeX is null)
-                           || sameEasing;
+        var canDirectMap =
+            (activeX is not null && activeY is null)
+            || (activeY is not null && activeX is null)
+            || sameEasing;
 
         if (canDirectMap)
         {
@@ -233,13 +274,20 @@ public class LineEventBuilder
 
     private void EmitAlignedMoveSegment(
         Pe.JudgeLine target,
-        float start, float end,
-        KpcEvents.Event<double>? activeX, KpcEvents.Event<double>? activeY,
-        ref double lastX, ref double lastY)
+        float start,
+        float end,
+        KpcEvents.Event<double>? activeX,
+        KpcEvents.Event<double>? activeY,
+        ref double lastX,
+        ref double lastY
+    )
     {
         // 对于精确覆盖当前区间的事件，直接取 StartValue/EndValue；
         // 对于跨越边界的事件（如单轴活跃但事件范围超出当前区间），用 GetValueAtBeat 插值，保留原始缓动曲线。
-        double startXv, endXv, startYv, endYv;
+        double startXv,
+            endXv,
+            startYv,
+            endYv;
         if (activeX != null)
         {
             var xAligned = IsExactlyCovering(activeX, start, end);
@@ -272,28 +320,36 @@ public class LineEventBuilder
         else
             easing = 1;
 
-        target.MoveFrames.Add(new Pe.MoveFrame
-        {
-            Beat = start,
-            XValue = Transform.TransformToPeX(startXv),
-            YValue = Transform.TransformToPeY(startYv)
-        });
-        target.MoveEvents.Add(new Pe.MoveEvent
-        {
-            StartBeat = start,
-            EndBeat = end,
-            EasingType = easing,
-            EndXValue = Transform.TransformToPeX(endXv),
-            EndYValue = Transform.TransformToPeY(endYv)
-        });
+        target.MoveFrames.Add(
+            new Pe.MoveFrame
+            {
+                Beat = start,
+                XValue = Transform.TransformToPeX(startXv),
+                YValue = Transform.TransformToPeY(startYv),
+            }
+        );
+        target.MoveEvents.Add(
+            new Pe.MoveEvent
+            {
+                StartBeat = start,
+                EndBeat = end,
+                EasingType = easing,
+                EndXValue = Transform.TransformToPeX(endXv),
+                EndYValue = Transform.TransformToPeY(endYv),
+            }
+        );
         lastX = endXv;
         lastY = endYv;
     }
 
     private void WarnMoveSegmentMisalignment(
-        KpcEvents.Event<double>? activeX, KpcEvents.Event<double>? activeY,
-        bool xAligned, bool yAligned,
-        float start, float end)
+        KpcEvents.Event<double>? activeX,
+        KpcEvents.Event<double>? activeY,
+        bool xAligned,
+        bool yAligned,
+        float start,
+        float end
+    )
     {
         switch (xAligned)
         {
@@ -304,32 +360,39 @@ public class LineEventBuilder
                 Warn($"Move 区间 [{start:F3}, {end:F3}] X 事件跨越 Y 边界（未对齐），将切段线性化");
                 break;
             default:
+            {
+                if (!yAligned)
+                    Warn(
+                        $"Move 区间 [{start:F3}, {end:F3}] Y 事件跨越 X 边界（未对齐），将切段线性化"
+                    );
+                else
                 {
-                    if (!yAligned)
-                        Warn($"Move 区间 [{start:F3}, {end:F3}] Y 事件跨越 X 边界（未对齐），将切段线性化");
-                    else
-                    {
-                        var xEasingNum = activeX != null ? (int)activeX.Easing : 0;
-                        var yEasingNum = activeY != null ? (int)activeY.Easing : 0;
-                        Warn($"Move 区间 [{start:F3}, {end:F3}] X/Y 缓动类型不一致（X={xEasingNum}, Y={yEasingNum}），将切段线性化");
-                    }
-
-                    break;
+                    var xEasingNum = activeX != null ? (int)activeX.Easing : 0;
+                    var yEasingNum = activeY != null ? (int)activeY.Easing : 0;
+                    Warn(
+                        $"Move 区间 [{start:F3}, {end:F3}] X/Y 缓动类型不一致（X={xEasingNum}, Y={yEasingNum}），将切段线性化"
+                    );
                 }
+
+                break;
+            }
         }
     }
 
-    private static bool IsExactlyCovering(KpcEvents.Event<double>? ev, float start, float end)
-        => ev != null
-           && Math.Abs((double)ev.StartBeat - start) <= FloatEpsilon
-           && Math.Abs((double)ev.EndBeat - end) <= FloatEpsilon;
+    private static bool IsExactlyCovering(KpcEvents.Event<double>? ev, float start, float end) =>
+        ev != null
+        && Math.Abs((double)ev.StartBeat - start) <= FloatEpsilon
+        && Math.Abs((double)ev.EndBeat - end) <= FloatEpsilon;
 
     private void EmitCutMoveSegments(
         Pe.JudgeLine target,
         List<KpcEvents.Event<double>> xEvents,
         List<KpcEvents.Event<double>> yEvents,
-        float start, float end,
-        ref double lastX, ref double lastY)
+        float start,
+        float end,
+        ref double lastX,
+        ref double lastY
+    )
     {
         var startBeat = new Beat(start);
         var endBeat = new Beat(end);
@@ -347,7 +410,8 @@ public class LineEventBuilder
         {
             var segStart = subBoundaries[i];
             var segEnd = subBoundaries[i + 1];
-            if (segEnd - segStart <= FloatEpsilon) continue;
+            if (segEnd - segStart <= FloatEpsilon)
+                continue;
 
             // CutEventsInRange 对每个原始事件独立按 cutLength 切割，cutX 与 cutY 的段边界不一定对齐。
             // CollectBoundaries(cutX, cutY) 会产生比任一列表更细的子区间，FindSegment 精确匹配会失败。
@@ -360,23 +424,29 @@ public class LineEventBuilder
             var startYv = ySeg?.GetValueAtBeat(new Beat(segStart)) ?? lastY;
             var endYv = ySeg?.GetValueAtBeat(new Beat(segEnd)) ?? lastY;
 
-            target.MoveFrames.Add(new Pe.MoveFrame
-            {
-                Beat = segStart,
-                XValue = Transform.TransformToPeX(startXv),
-                YValue = Transform.TransformToPeY(startYv)
-            });
-            target.MoveEvents.Add(new Pe.MoveEvent
-            {
-                StartBeat = segStart,
-                EndBeat = segEnd,
-                EasingType = 1,
-                EndXValue = Transform.TransformToPeX(endXv),
-                EndYValue = Transform.TransformToPeY(endYv)
-            });
+            target.MoveFrames.Add(
+                new Pe.MoveFrame
+                {
+                    Beat = segStart,
+                    XValue = Transform.TransformToPeX(startXv),
+                    YValue = Transform.TransformToPeY(startYv),
+                }
+            );
+            target.MoveEvents.Add(
+                new Pe.MoveEvent
+                {
+                    StartBeat = segStart,
+                    EndBeat = segEnd,
+                    EasingType = 1,
+                    EndXValue = Transform.TransformToPeX(endXv),
+                    EndYValue = Transform.TransformToPeY(endYv),
+                }
+            );
 
-            if (xSeg != null) lastX = endXv;
-            if (ySeg != null) lastY = endYv;
+            if (xSeg != null)
+                lastX = endXv;
+            if (ySeg != null)
+                lastY = endYv;
         }
     }
 
@@ -389,14 +459,18 @@ public class LineEventBuilder
         List<Pe.Event>? targetEvents,
         List<KpcEvents.Event<T>>? sourceEvents,
         Func<float, float> valueTransform,
-        string channelName)
+        string channelName
+    )
     {
-        if (sourceEvents == null || sourceEvents.Count == 0) return;
+        if (sourceEvents == null || sourceEvents.Count == 0)
+            return;
         WarnIfEventPayloadUnsupported(sourceEvents, channelName);
 
         var ordered = sourceEvents
             .OrderBy(e => (double)e.StartBeat)
-            .SelectMany(srcEvent => ExpandUnsupportedEasing(srcEvent, $"{channelName}@{(double)srcEvent.StartBeat:F3}"))
+            .SelectMany(srcEvent =>
+                ExpandUnsupportedEasing(srcEvent, $"{channelName}@{(double)srcEvent.StartBeat:F3}")
+            )
             .ToList();
 
         var previousEndBeat = float.MinValue;
@@ -410,33 +484,29 @@ public class LineEventBuilder
             var endValue = valueTransform(ToSingle(ev.EndValue));
 
             var disconnected = Math.Abs(previousEndBeat - startBeat) > FloatEpsilon;
-            var changed = float.IsNaN(previousEndValue) || Math.Abs(previousEndValue - startValue) > FloatEpsilon;
+            var changed =
+                float.IsNaN(previousEndValue)
+                || Math.Abs(previousEndValue - startValue) > FloatEpsilon;
             if (disconnected || changed)
             {
-                targetFrames.Add(new Pe.Frame
-                {
-                    Beat = startBeat,
-                    Value = startValue
-                });
+                targetFrames.Add(new Pe.Frame { Beat = startBeat, Value = startValue });
             }
 
             if (targetEvents != null)
             {
-                targetEvents.Add(new Pe.Event
-                {
-                    StartBeat = startBeat,
-                    EndBeat = endBeat,
-                    EasingType = EasingConverter.ConvertEasing(ev.Easing),
-                    EndValue = endValue
-                });
+                targetEvents.Add(
+                    new Pe.Event
+                    {
+                        StartBeat = startBeat,
+                        EndBeat = endBeat,
+                        EasingType = EasingConverter.ConvertEasing(ev.Easing),
+                        EndValue = endValue,
+                    }
+                );
             }
             else
             {
-                targetFrames.Add(new Pe.Frame
-                {
-                    Beat = endBeat,
-                    Value = endValue
-                });
+                targetFrames.Add(new Pe.Frame { Beat = endBeat, Value = endValue });
             }
 
             previousEndBeat = endBeat;
@@ -446,7 +516,8 @@ public class LineEventBuilder
 
     private List<KpcEvents.Event<double>> ExpandEventsForUnsupportedEasing(
         List<KpcEvents.Event<double>> source,
-        string channel)
+        string channel
+    )
     {
         var expanded = new List<KpcEvents.Event<double>>();
         foreach (var ev in source.OrderBy(e => (double)e.StartBeat))
@@ -457,7 +528,10 @@ public class LineEventBuilder
         return expanded;
     }
 
-    private List<KpcEvents.Event<T>> ExpandUnsupportedEasing<T>(KpcEvents.Event<T> src, string context)
+    private List<KpcEvents.Event<T>> ExpandUnsupportedEasing<T>(
+        KpcEvents.Event<T> src,
+        string context
+    )
     {
         try
         {
@@ -469,7 +543,8 @@ public class LineEventBuilder
         catch (EasingConverter.EasingNotSupportedException)
         {
             Warn(
-                $"{context}：检测到不支持的缓动，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件");
+                $"{context}：检测到不支持的缓动，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件"
+            );
             var cutter = GetOrCreateCutter<T>();
             return cutter.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
         }
@@ -506,7 +581,10 @@ public class LineEventBuilder
         return boundaries.ToList();
     }
 
-    private static KpcEvents.Event<double>? FindActiveEvent(List<KpcEvents.Event<double>> events, Beat beat)
+    private static KpcEvents.Event<double>? FindActiveEvent(
+        List<KpcEvents.Event<double>> events,
+        Beat beat
+    )
     {
         var beatValue = (double)beat;
         // 二分查找：找到最后一个 StartBeat <= beatValue + FloatEpsilon 的事件
@@ -526,7 +604,8 @@ public class LineEventBuilder
                 hi = mid - 1;
             }
         }
-        if (candidate < 0) return null;
+        if (candidate < 0)
+            return null;
         var ev = events[candidate];
         return beatValue < (double)ev.EndBeat - FloatEpsilon ? ev : null;
     }
@@ -544,29 +623,40 @@ public class LineEventBuilder
         }
     }
 
-    private static float ToSingle<T>(T value) => value switch
-    {
-        float v => v,
-        double v => (float)v,
-        int v => v,
-        _ => throw new NotSupportedException($"Unsupported scalar event value type: {typeof(T).Name}")
-    };
+    private static float ToSingle<T>(T value) =>
+        value switch
+        {
+            float v => v,
+            double v => (float)v,
+            int v => v,
+            _ => throw new NotSupportedException(
+                $"Unsupported scalar event value type: {typeof(T).Name}"
+            ),
+        };
 
-    private static bool HasAnyEventData(KpcEventLayer layer)
-        => (layer.MoveXEvents?.Count ?? 0) > 0
-           || (layer.MoveYEvents?.Count ?? 0) > 0
-           || (layer.RotateEvents?.Count ?? 0) > 0
-           || (layer.AlphaEvents?.Count ?? 0) > 0
-           || (layer.SpeedEvents?.Count ?? 0) > 0;
+    private static bool HasAnyEventData(KpcEventLayer layer) =>
+        (layer.MoveXEvents?.Count ?? 0) > 0
+        || (layer.MoveYEvents?.Count ?? 0) > 0
+        || (layer.RotateEvents?.Count ?? 0) > 0
+        || (layer.AlphaEvents?.Count ?? 0) > 0
+        || (layer.SpeedEvents?.Count ?? 0) > 0;
 
-    private void WarnIfEventPayloadUnsupported<T>(IEnumerable<KpcEvents.Event<T>> events, string channel)
+    private void WarnIfEventPayloadUnsupported<T>(
+        IEnumerable<KpcEvents.Event<T>> events,
+        string channel
+    )
     {
         foreach (var e in events)
         {
             if (e.IsBezier)
                 Warn($"{channel}：Bezier 事件不受 PE 原生事件模型支持，事件将被自动转换为线性事件");
-            if (Math.Abs(e.EasingLeft) > FloatEpsilon || Math.Abs(e.EasingRight - 1f) > FloatEpsilon)
-                Warn($"{channel}：PE 不支持 EasingLeft/EasingRight 裁剪，事件将被自动转换为线性事件");
+            if (
+                Math.Abs(e.EasingLeft) > FloatEpsilon
+                || Math.Abs(e.EasingRight - 1f) > FloatEpsilon
+            )
+                Warn(
+                    $"{channel}：PE 不支持 EasingLeft/EasingRight 裁剪，事件将被自动转换为线性事件"
+                );
             if (!string.IsNullOrWhiteSpace(e.Font))
                 Warn($"{channel}：PE 不支持 Font 字段，字段将被丢弃");
         }

@@ -5,21 +5,37 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 {
     public class SkewControl : ControlBase
     {
-        [JsonProperty("skew")] public float Skew { get; set; } = 1.0f;
+        [JsonProperty("skew")]
+        public float Skew { get; set; } = 1.0f;
 
         private static readonly List<SkewControl> DefaultInstance = new()
         {
-            new() { Easing = new Easing(1), Skew = 0.0f, X = 0.0f },
-            new() { Easing = new Easing(1), Skew = 0.0f, X = 9999999.0f }
+            new()
+            {
+                Easing = new Easing(1),
+                Skew = 0.0f,
+                X = 0.0f,
+            },
+            new()
+            {
+                Easing = new Easing(1),
+                Skew = 0.0f,
+                X = 9999999.0f,
+            },
         };
 
         [JsonIgnore]
-        public static List<SkewControl> Default
-            => DefaultInstance.ConvertAll(input => input.Clone() as SkewControl);
+        public static List<SkewControl> Default =>
+            DefaultInstance.ConvertAll(input => input.Clone() as SkewControl);
 
         public override ControlBase Clone()
         {
-            return new SkewControl { Easing = new Easing(Easing), X = X, Skew = Skew };
+            return new SkewControl
+            {
+                Easing = new Easing(Easing),
+                X = X,
+                Skew = Skew,
+            };
         }
     }
 }

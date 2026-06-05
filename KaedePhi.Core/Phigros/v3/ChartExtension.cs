@@ -17,7 +17,10 @@ namespace KaedePhi.Core.Phigros.v3
         [PublicAPI]
         public string ExportToJson(bool format)
         {
-            return JsonConvert.SerializeObject(this, format ? Formatting.Indented : Formatting.None);
+            return JsonConvert.SerializeObject(
+                this,
+                format ? Formatting.Indented : Formatting.None
+            );
         }
 
         /// <summary>
@@ -27,8 +30,15 @@ namespace KaedePhi.Core.Phigros.v3
         /// <param name="format">是否需要格式化</param>
         public void ExportToJsonStream(Stream stream, bool format)
         {
-            using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
-            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
+            using var streamWriter = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
+            var serializer = JsonDefaults.CreateSerializer(
+                format ? Formatting.Indented : Formatting.None
+            );
 
             using var jsonWriter = new JsonTextWriter(streamWriter) { CloseOutput = false };
             serializer.Serialize(jsonWriter, this);
@@ -43,9 +53,15 @@ namespace KaedePhi.Core.Phigros.v3
         /// <param name="format">是否需要格式化</param>
         public async Task ExportToJsonStreamAsync(Stream stream, bool format)
         {
-            await using var streamWriter =
-                new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
-            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
+            await using var streamWriter = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
+            var serializer = JsonDefaults.CreateSerializer(
+                format ? Formatting.Indented : Formatting.None
+            );
 
             await Task.Run(() =>
             {
@@ -62,9 +78,7 @@ namespace KaedePhi.Core.Phigros.v3
         /// </summary>
         /// <param name="format">是否需要格式化</param>
         /// <returns>json</returns>
-        public Task<string> ExportToJsonAsync(bool format)
-            => Task.Run(() => ExportToJson(format));
-
+        public Task<string> ExportToJsonAsync(bool format) => Task.Run(() => ExportToJson(format));
 
         /// <summary>
         /// 从Json反序列化
@@ -75,9 +89,9 @@ namespace KaedePhi.Core.Phigros.v3
         [PublicAPI]
         public static Chart LoadFromJson(string json)
         {
-            var chart = JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings) ??
-                        throw new InvalidOperationException(
-                            "Failed to deserialize Chart from JSON.");
+            var chart =
+                JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings)
+                ?? throw new InvalidOperationException("Failed to deserialize Chart from JSON.");
             return chart;
         }
 
@@ -86,8 +100,8 @@ namespace KaedePhi.Core.Phigros.v3
         /// </summary>
         /// <param name="json">谱面Json数据</param>
         /// <returns>谱面</returns>
-        public static Task<Chart> LoadFromJsonAsync(string json)
-            => Task.Run(() => LoadFromJson(json));
+        public static Task<Chart> LoadFromJsonAsync(string json) =>
+            Task.Run(() => LoadFromJson(json));
 
         /// <summary>
         /// 从流反序列化
@@ -102,12 +116,13 @@ namespace KaedePhi.Core.Phigros.v3
                 JsonDefaults.NoBomUtf8,
                 detectEncodingFromByteOrderMarks: true,
                 bufferSize: 1024,
-                leaveOpen: true);
+                leaveOpen: true
+            );
             using var jsonReader = new JsonTextReader(streamReader);
             var serializer = JsonDefaults.CreateSerializer(Formatting.None);
-            var chart = serializer.Deserialize<Chart>(jsonReader) ??
-                        throw new InvalidOperationException(
-                            "Failed to deserialize Chart from stream.");
+            var chart =
+                serializer.Deserialize<Chart>(jsonReader)
+                ?? throw new InvalidOperationException("Failed to deserialize Chart from stream.");
             return chart;
         }
 
@@ -126,12 +141,15 @@ namespace KaedePhi.Core.Phigros.v3
                     JsonDefaults.NoBomUtf8,
                     detectEncodingFromByteOrderMarks: true,
                     bufferSize: 1024,
-                    leaveOpen: true);
+                    leaveOpen: true
+                );
                 using var jsonReader = new JsonTextReader(streamReader);
                 var serializer = JsonDefaults.CreateSerializer(Formatting.None);
-                var chart = serializer.Deserialize<Chart>(jsonReader) ??
-                            throw new InvalidOperationException(
-                                "Failed to deserialize Chart from stream.");
+                var chart =
+                    serializer.Deserialize<Chart>(jsonReader)
+                    ?? throw new InvalidOperationException(
+                        "Failed to deserialize Chart from stream."
+                    );
 
                 return Task.FromResult(chart);
             }

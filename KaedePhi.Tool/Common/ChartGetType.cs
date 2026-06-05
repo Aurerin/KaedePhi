@@ -7,8 +7,8 @@ namespace KaedePhi.Tool.Common;
 public static class ChartGetType
 {
     private const string UnsupportedChartMessage =
-        "无法推断谱面类型，可能是因为谱面文本格式不正确或者不受支持的谱面类型。" +
-        "请确保输入的谱面文本格式正确，并且是受支持的谱面类型之一。";
+        "无法推断谱面类型，可能是因为谱面文本格式不正确或者不受支持的谱面类型。"
+        + "请确保输入的谱面文本格式正确，并且是受支持的谱面类型之一。";
 
     /// <summary>
     /// 使用谱面文本，推算谱面类型，推算失败则抛出错误
@@ -40,7 +40,12 @@ public static class ChartGetType
                 return ChartType.RePhiEdit;
 
             // 如果存在formatVersion字段，且字段类型为int，则根据版本号判断PhigrosV1/V3谱面
-            if (jsonObj["formatVersion"] is JValue { Type: JTokenType.Integer or JTokenType.Float } formatVersionValue)
+            if (
+                jsonObj["formatVersion"] is JValue
+                {
+                    Type: JTokenType.Integer or JTokenType.Float
+                } formatVersionValue
+            )
                 return GetTypeFromFormatVersion((int)formatVersionValue);
 
             // 如果存在info字段的同时，info字段为jsonObject，且存在lines字段，且lines字段为JsonArray，则这是PhiFans谱面
@@ -56,11 +61,12 @@ public static class ChartGetType
         throw new NotSupportedException(UnsupportedChartMessage);
     }
 
-    private static ChartType GetTypeFromFormatVersion(int formatVersion) => formatVersion switch
-    {
-        1 => ChartType.PhigrosV1,
-        3 => ChartType.PhigrosV3,
-        // 哈？这是啥
-        _ => throw new NotSupportedException(UnsupportedChartMessage)
-    };
+    private static ChartType GetTypeFromFormatVersion(int formatVersion) =>
+        formatVersion switch
+        {
+            1 => ChartType.PhigrosV1,
+            3 => ChartType.PhigrosV3,
+            // 哈？这是啥
+            _ => throw new NotSupportedException(UnsupportedChartMessage),
+        };
 }

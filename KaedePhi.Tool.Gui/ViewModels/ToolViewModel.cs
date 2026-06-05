@@ -55,9 +55,8 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             HasPrecision = true,
             HasTolerance = true,
             HasClassicMode = true,
-            HasDisableCompress = true
+            HasDisableCompress = true,
         },
-
         new()
         {
             Name = tool_layermerge_name,
@@ -67,9 +66,8 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             HasPrecision = true,
             HasTolerance = true,
             HasClassicMode = true,
-            HasDisableCompress = true
+            HasDisableCompress = true,
         },
-
         new()
         {
             Name = tool_cut_name,
@@ -78,9 +76,8 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             ToolId = "cut",
             HasPrecision = true,
             HasTolerance = true,
-            HasDisableCompress = true
+            HasDisableCompress = true,
         },
-
         new()
         {
             Name = tool_fit_name,
@@ -89,17 +86,16 @@ public sealed class ToolViewModel : INotifyPropertyChanged
             ToolId = "fit",
             HasTolerance = true,
             HasFitOptions = true,
-            DefaultTolerance = 0.5
+            DefaultTolerance = 0.5,
         },
-
         new()
         {
             Name = tool_render_name,
             Description = tool_render_desc,
             IconGlyph = Image,
             ToolId = "render",
-            HasRenderOptions = true
-        }
+            HasRenderOptions = true,
+        },
     ];
 
     public ToolOption? SelectedTool
@@ -258,13 +254,17 @@ public sealed class ToolViewModel : INotifyPropertyChanged
     public event Action? RequestReturnToImport;
 
     public void OnRunClicked() => RequestRun?.Invoke();
+
     public void OnExportClicked() => RequestExport?.Invoke();
+
     public void OnSettingsClicked() => RequestSettings?.Invoke();
+
     public void OnReturnToImportClicked() => RequestReturnToImport?.Invoke();
 
     public void ApplyConfigDefaults(GuiAppConfig config)
     {
-        if (SelectedTool == null) return;
+        if (SelectedTool == null)
+            return;
 
         switch (SelectedTool.ToolId)
         {
@@ -299,6 +299,6 @@ public sealed class ToolViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

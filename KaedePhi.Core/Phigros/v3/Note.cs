@@ -30,7 +30,8 @@ namespace KaedePhi.Core.Phigros.v3
                 if (Math.Abs(time - Math.Round(time)) > 1e-6)
                 {
                     throw new InvalidOperationException(
-                        $"TimeAsBeat must be a multiple of 1/32, but got {value} (time={time})");
+                        $"TimeAsBeat must be a multiple of 1/32, but got {value} (time={time})"
+                    );
                 }
 
                 Time = Convert.ToInt32(time);
@@ -55,7 +56,6 @@ namespace KaedePhi.Core.Phigros.v3
         [JsonProperty("speed")]
         public float Speed { get; set; }
 
-
         /// <summary>
         /// floorPosition，恒定为0，我懒得算。
         /// </summary>
@@ -68,6 +68,6 @@ namespace KaedePhi.Core.Phigros.v3
         Tap = 1,
         Drag = 2,
         Hold = 3,
-        Flick = 4
+        Flick = 4,
     }
 }

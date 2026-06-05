@@ -9,11 +9,14 @@ namespace KaedePhi.Core.PhiChain.v6
 {
     public sealed class BpmPoint
     {
-        [JsonProperty("beat")] public Beat Beat { get; set; } = new(new[] { 0, 0, 1 });
+        [JsonProperty("beat")]
+        public Beat Beat { get; set; } = new(new[] { 0, 0, 1 });
 
-        [JsonProperty("bpm")] public float Bpm { get; set; } = 120f;
+        [JsonProperty("bpm")]
+        public float Bpm { get; set; } = 120f;
 
-        [JsonIgnore] public float Time { get; internal set; }
+        [JsonIgnore]
+        public float Time { get; internal set; }
 
         /// <summary>
         /// 深克隆当前 BpmPoint 对象
@@ -24,7 +27,7 @@ namespace KaedePhi.Core.PhiChain.v6
             {
                 Beat = new Beat((int[])Beat),
                 Bpm = Bpm,
-                Time = Time
+                Time = Time,
             };
         }
     }

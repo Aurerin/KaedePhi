@@ -232,6 +232,7 @@ public class KpcToPhigrosV3ConvertOptions
         /// 抬高操作使用的渲染坐标系配置。
         /// 默认使用标准 675×450 编辑器坐标。
         /// </summary>
-        public CoordinateProfile RenderProfile { get; set; } = CoordinateProfile.DefaultRenderProfile;
+        public CoordinateProfile RenderProfile { get; set; } =
+            CoordinateProfile.DefaultRenderProfile;
     }
 }

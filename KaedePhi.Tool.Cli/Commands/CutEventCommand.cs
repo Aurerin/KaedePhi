@@ -10,8 +10,11 @@ public sealed class CutEventCommand : AsyncCommand<CutEventCommand.Settings>
 {
     public sealed class Settings : OperationSettings;
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s,
-        CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings s,
+        CancellationToken cancellationToken
+    )
     {
         var c = s.AppConfig.CutConfig;
         s.Precision ??= c.Precision;
@@ -35,18 +38,35 @@ public sealed class CutEventCommand : AsyncCommand<CutEventCommand.Settings>
         foreach (var line in nrcCopy.JudgeLineList)
         {
             line.EventLayers = layerProcessor.CutLayerEvents(line.EventLayers, s.Precision ?? 64d);
-            if (s.DisableCompress ?? false) continue;
+            if (s.DisableCompress ?? false)
+                continue;
             foreach (var el in line.EventLayers.OfType<EventLayer>())
             {
-                el.MoveXEvents = doubleCompressor.EventListCompressSqrt(el.MoveXEvents ?? [], s.Tolerance ?? 5d);
-                el.MoveYEvents = doubleCompressor.EventListCompressSqrt(el.MoveYEvents ?? [], s.Tolerance ?? 5d);
-                el.RotateEvents = doubleCompressor.EventListCompressSlope(el.RotateEvents ?? [], s.Tolerance ?? 5d);
-                el.AlphaEvents = intCompressor.EventListCompressSlope(el.AlphaEvents ?? [], s.Tolerance ?? 5d);
+                el.MoveXEvents = doubleCompressor.EventListCompressSqrt(
+                    el.MoveXEvents ?? [],
+                    s.Tolerance ?? 5d
+                );
+                el.MoveYEvents = doubleCompressor.EventListCompressSqrt(
+                    el.MoveYEvents ?? [],
+                    s.Tolerance ?? 5d
+                );
+                el.RotateEvents = doubleCompressor.EventListCompressSlope(
+                    el.RotateEvents ?? [],
+                    s.Tolerance ?? 5d
+                );
+                el.AlphaEvents = intCompressor.EventListCompressSlope(
+                    el.AlphaEvents ?? [],
+                    s.Tolerance ?? 5d
+                );
             }
         }
 
-        var output = await ChartService.SaveAsRpeAsync(nrcCopy, svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
-            s.DryRun ?? false, cancellationToken);
+        var output = await ChartService.SaveAsRpeAsync(
+            nrcCopy,
+            svc.ResolveOutputPath(s.Input, s.Output, s.Workspace),
+            s.DryRun ?? false,
+            cancellationToken
+        );
         ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
         return 0;
     }

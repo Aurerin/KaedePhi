@@ -37,7 +37,13 @@ public class App : Application
             var mainVm = new MainViewModel();
             var mainWindow = new MainWindow { DataContext = mainVm };
 
-            var controller = new AppController(mainVm, ChartService, LogService, ConfigService, mainWindow);
+            var controller = new AppController(
+                mainVm,
+                ChartService,
+                LogService,
+                ConfigService,
+                mainWindow
+            );
             controller.Initialize();
 
             desktop.MainWindow = mainWindow;

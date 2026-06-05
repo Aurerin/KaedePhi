@@ -17,57 +17,88 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
     private string _errorMessage = string.Empty;
     private string _logFilePath = string.Empty;
 
-    public List<string> Steps { get; } = new()
-    {
-        step_running_tool
-    };
+    public List<string> Steps { get; } = new() { step_running_tool };
 
     public double Progress
     {
         get => _progress;
-        set { _progress = value; OnPropertyChanged(); }
+        set
+        {
+            _progress = value;
+            OnPropertyChanged();
+        }
     }
 
     public double ToolProgressValue
     {
         get => _toolProgressValue;
-        set { _toolProgressValue = value; OnPropertyChanged(); }
+        set
+        {
+            _toolProgressValue = value;
+            OnPropertyChanged();
+        }
     }
 
     public string CurrentStep
     {
         get => _currentStep;
-        set { _currentStep = value; OnPropertyChanged(); }
+        set
+        {
+            _currentStep = value;
+            OnPropertyChanged();
+        }
     }
 
     public string StatusMessage
     {
         get => _statusMessage;
-        set { _statusMessage = value; OnPropertyChanged(); }
+        set
+        {
+            _statusMessage = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsCompleted
     {
         get => _isCompleted;
-        set { _isCompleted = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowSuccessIcon)); }
+        set
+        {
+            _isCompleted = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowSuccessIcon));
+        }
     }
 
     public bool HasError
     {
         get => _hasError;
-        set { _hasError = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowSuccessIcon)); }
+        set
+        {
+            _hasError = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowSuccessIcon));
+        }
     }
 
     public string ErrorMessage
     {
         get => _errorMessage;
-        set { _errorMessage = value; OnPropertyChanged(); }
+        set
+        {
+            _errorMessage = value;
+            OnPropertyChanged();
+        }
     }
 
     public string LogFilePath
     {
         get => _logFilePath;
-        set { _logFilePath = value; OnPropertyChanged(); }
+        set
+        {
+            _logFilePath = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool ShowSuccessIcon => IsCompleted && !HasError;
@@ -77,16 +108,20 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
     public event Action? RequestGoToExport;
 
     public void OnReturnToToolsClicked() => RequestReturnToTools?.Invoke();
+
     public void OnReturnToImportClicked() => RequestReturnToImport?.Invoke();
+
     public void OnGoToExportClicked() => RequestGoToExport?.Invoke();
 
     public void SetStep(int index, string detail = "")
     {
-        if (index < 0 || index >= Steps.Count) return;
+        if (index < 0 || index >= Steps.Count)
+            return;
         CurrentStep = Steps[index];
         StatusMessage = string.IsNullOrEmpty(detail) ? Steps[index] : detail;
         Progress = (double)(index + 1) / Steps.Count * 100;
-        if (index != 0) ToolProgressValue = 0;
+        if (index != 0)
+            ToolProgressValue = 0;
     }
 
     public void SetToolProgress(double toolProgress, double overallProgress, string? detail = null)
@@ -122,6 +157,6 @@ public sealed class ProcessingViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

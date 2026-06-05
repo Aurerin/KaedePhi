@@ -20,7 +20,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 5, 0, 100),
-            CreateEvent(3, 7, 200, 300)
+            CreateEvent(3, 7, 200, 300),
         };
         EventSort(events);
 
@@ -35,7 +35,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 5, 0, 100),
-            CreateEvent(3, 7, 200, 300)
+            CreateEvent(3, 7, 200, 300),
         };
         EventSort(events);
 
@@ -52,7 +52,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 5, 0, 100),
-            CreateEvent(3, 7, 200, 300)
+            CreateEvent(3, 7, 200, 300),
         };
         EventSort(events);
 
@@ -68,7 +68,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 5, 0, 100),
-            CreateEvent(3, 7, 200, 300)
+            CreateEvent(3, 7, 200, 300),
         };
         EventSort(events);
 
@@ -84,7 +84,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 5, 0, 100),
-            CreateEvent(3, 7, 200, 300)
+            CreateEvent(3, 7, 200, 300),
         };
         EventSort(events);
 
@@ -104,7 +104,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(3, 6, 200, 300)
+            CreateEvent(3, 6, 200, 300),
         };
         EventSort(events);
 
@@ -120,7 +120,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(3, 6, 200, 300)
+            CreateEvent(3, 6, 200, 300),
         };
         EventSort(events);
 
@@ -136,7 +136,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(3, 6, 200, 300)
+            CreateEvent(3, 6, 200, 300),
         };
         EventSort(events);
 
@@ -152,7 +152,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(3, 6, 200, 300)
+            CreateEvent(3, 6, 200, 300),
         };
         EventSort(events);
 
@@ -168,7 +168,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(3, 6, 200, 300)
+            CreateEvent(3, 6, 200, 300),
         };
         EventSort(events);
 
@@ -184,7 +184,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(3, 6, 200, 300)
+            CreateEvent(3, 6, 200, 300),
         };
         EventSort(events);
 
@@ -202,8 +202,8 @@ public class EventOverlapBehaviorTests
     {
         var events = new List<KpcEvents.Event<double>>
         {
-            CreateEvent(0, 10, 0, 100),   // index 0
-            CreateEvent(0, 5, 200, 300)    // index 1 (higher index wins)
+            CreateEvent(0, 10, 0, 100), // index 0
+            CreateEvent(0, 5, 200, 300), // index 1 (higher index wins)
         };
         EventSort(events);
 
@@ -218,8 +218,8 @@ public class EventOverlapBehaviorTests
     {
         var events = new List<KpcEvents.Event<double>>
         {
-            CreateEvent(0, 10, 0, 100),   // index 0 (longer, but lower index → ignored)
-            CreateEvent(0, 5, 200, 300)    // index 1 (higher index wins)
+            CreateEvent(0, 10, 0, 100), // index 0 (longer, but lower index → ignored)
+            CreateEvent(0, 5, 200, 300), // index 1 (higher index wins)
         };
         EventSort(events);
 
@@ -234,9 +234,9 @@ public class EventOverlapBehaviorTests
     {
         var events = new List<KpcEvents.Event<double>>
         {
-            CreateEvent(0, 10, 0, 100),    // index 0
-            CreateEvent(0, 8, 200, 300),   // index 1
-            CreateEvent(0, 4, 500, 600)    // index 2 (highest index wins)
+            CreateEvent(0, 10, 0, 100), // index 0
+            CreateEvent(0, 8, 200, 300), // index 1
+            CreateEvent(0, 4, 500, 600), // index 2 (highest index wins)
         };
         EventSort(events);
 
@@ -251,9 +251,9 @@ public class EventOverlapBehaviorTests
     {
         var events = new List<KpcEvents.Event<double>>
         {
-            CreateEvent(0, 10, 0, 100),    // index 0
-            CreateEvent(0, 8, 200, 300),   // index 1
-            CreateEvent(0, 4, 500, 600)    // index 2 (highest index wins)
+            CreateEvent(0, 10, 0, 100), // index 0
+            CreateEvent(0, 8, 200, 300), // index 1
+            CreateEvent(0, 4, 500, 600), // index 2 (highest index wins)
         };
         EventSort(events);
 
@@ -269,7 +269,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 10, 0, 100),
-            CreateEvent(0, 5, 200, 300)
+            CreateEvent(0, 5, 200, 300),
         };
         EventSort(events);
 
@@ -289,9 +289,9 @@ public class EventOverlapBehaviorTests
         // A: [0,10], B: [2,5] wraps inside A, C: [4,7] overlaps B's end
         var events = new List<KpcEvents.Event<double>>
         {
-            CreateEvent(0, 10, 0, 100),   // A
-            CreateEvent(2, 5, 200, 300),   // B
-            CreateEvent(4, 7, 500, 600)    // C
+            CreateEvent(0, 10, 0, 100), // A
+            CreateEvent(2, 5, 200, 300), // B
+            CreateEvent(4, 7, 500, 600), // C
         };
         EventSort(events);
 
@@ -299,10 +299,16 @@ public class EventOverlapBehaviorTests
         KpcEvents.EventLayer.GetValueAtBeat(events, Beat(1)).Should().BeApproximately(10.0, 1e-6);
 
         // During B: B active (B at beat 3: t=(3-2)/(5-2)=1/3, 200→300 → 233.33)
-        KpcEvents.EventLayer.GetValueAtBeat(events, Beat(3)).Should().BeApproximately(233.33, 0.01);
+        KpcEvents
+            .EventLayer.GetValueAtBeat(events, Beat(3))
+            .Should()
+            .BeApproximately(233.33, 0.01);
 
         // During C: C active (C at beat 5: t=(5-4)/(7-4)=1/3, 500→600 → 533.33)
-        KpcEvents.EventLayer.GetValueAtBeat(events, Beat(5)).Should().BeApproximately(533.33, 0.01);
+        KpcEvents
+            .EventLayer.GetValueAtBeat(events, Beat(5))
+            .Should()
+            .BeApproximately(533.33, 0.01);
 
         // After C ends: hold C.EndValue = 600
         KpcEvents.EventLayer.GetValueAtBeat(events, Beat(8)).Should().BeApproximately(600.0, 1e-6);
@@ -315,7 +321,7 @@ public class EventOverlapBehaviorTests
         var events = new List<KpcEvents.Event<double>>
         {
             CreateEvent(0, 5, 0, 100),
-            CreateEvent(3, 8, 200, 400)
+            CreateEvent(3, 8, 200, 400),
         };
         EventSort(events);
 
@@ -329,7 +335,10 @@ public class EventOverlapBehaviorTests
         KpcEvents.EventLayer.GetValueAtBeat(events, Beat(4)).Should().BeApproximately(240.0, 1e-6);
 
         // After B ends: hold B.EndValue = 400
-        KpcEvents.EventLayer.GetValueAtBeat(events, Beat(10)).Should().BeApproximately(400.0, 1e-6);
+        KpcEvents
+            .EventLayer.GetValueAtBeat(events, Beat(10))
+            .Should()
+            .BeApproximately(400.0, 1e-6);
     }
 
     #endregion
@@ -349,10 +358,7 @@ public class EventOverlapBehaviorTests
     [Fact]
     public void GetValueAtBeat_BeforeAllEvents_ReturnsDefault()
     {
-        var events = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(5, 10, 0, 100)
-        };
+        var events = new List<KpcEvents.Event<double>> { CreateEvent(5, 10, 0, 100) };
         EventSort(events);
 
         var result = KpcEvents.EventLayer.GetValueAtBeat(events, Beat(3));
@@ -363,10 +369,7 @@ public class EventOverlapBehaviorTests
     [Fact]
     public void GetValueAtBeat_SingleEvent_AfterEnd_HoldsEndValue()
     {
-        var events = new List<KpcEvents.Event<double>>
-        {
-            CreateEvent(0, 5, 0, 100)
-        };
+        var events = new List<KpcEvents.Event<double>> { CreateEvent(0, 5, 0, 100) };
         EventSort(events);
 
         var result = KpcEvents.EventLayer.GetValueAtBeat(events, Beat(10));
@@ -379,9 +382,12 @@ public class EventOverlapBehaviorTests
     #region Helper Methods
 
     private static KpcEvents.Event<double> CreateEvent(
-        double startBeat, double endBeat,
-        double startValue, double endValue,
-        int easingId = 1)
+        double startBeat,
+        double endBeat,
+        double startValue,
+        double endValue,
+        int easingId = 1
+    )
     {
         return new KpcEvents.Event<double>
         {
@@ -389,7 +395,7 @@ public class EventOverlapBehaviorTests
             EndBeat = new Beat(endBeat),
             StartValue = startValue,
             EndValue = endValue,
-            Easing = new Easing(easingId)
+            Easing = new Easing(easingId),
         };
     }
 

@@ -6,20 +6,21 @@ namespace KaedePhi.Tool.Cli.Commands;
 // Description set via WithDescription(CliLocalizationString.cmd_version_desc) in Program.cs
 public sealed class VersionCommand : AsyncCommand<VersionCommand.Settings>
 {
-    public sealed class Settings : CommandSettings
-    {
-    }
+    public sealed class Settings : CommandSettings { }
 
-    protected override Task<int> ExecuteAsync(CommandContext context, Settings settings,
-        CancellationToken cancellationToken)
+    protected override Task<int> ExecuteAsync(
+        CommandContext context,
+        Settings settings,
+        CancellationToken cancellationToken
+    )
     {
 #if PreRelease || Release
         var ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
 #else
         var ver = Assembly
             .GetExecutingAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-            .InformationalVersion;
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion;
 #endif
         ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
         return Task.FromResult(0);

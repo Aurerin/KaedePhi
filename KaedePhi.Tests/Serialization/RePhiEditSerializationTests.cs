@@ -272,55 +272,42 @@ public class RePhiEditSerializationTests
     private static string CreateMinimalJson()
     {
         return """
-        {
-            "BPMList": [{"bpm": 120, "startTime": [0, 0, 1]}],
-            "META": {"name": "Test Chart", "composer": "Test", "charter": "Test", "level": "HD"},
-            "judgeLineList": [{
-                "Group": 0,
-                "Name": "",
-                "Texture": "line.png",
-                "isCover": 1,
-                "eventLayers": null,
-                "father": -1,
-                "zOrder": 0
-            }],
-            "chartTime": 60,
-            "judgeLineGroup": ["Default"],
-            "multiLineString": "1",
-            "multiScale": 1.0,
-            "timeTags": [],
-            "xybind": true
-        }
-        """;
+            {
+                "BPMList": [{"bpm": 120, "startTime": [0, 0, 1]}],
+                "META": {"name": "Test Chart", "composer": "Test", "charter": "Test", "level": "HD"},
+                "judgeLineList": [{
+                    "Group": 0,
+                    "Name": "",
+                    "Texture": "line.png",
+                    "isCover": 1,
+                    "eventLayers": null,
+                    "father": -1,
+                    "zOrder": 0
+                }],
+                "chartTime": 60,
+                "judgeLineGroup": ["Default"],
+                "multiLineString": "1",
+                "multiScale": 1.0,
+                "timeTags": [],
+                "xybind": true
+            }
+            """;
     }
 
     private static Chart CreateMinimalChart()
     {
         return new Chart
         {
-            BpmList =
-            [
-                new BpmItem
-                {
-                    Bpm = 120,
-                    StartBeat = new Beat([0, 0, 1])
-                }
-            ],
+            BpmList = [new BpmItem { Bpm = 120, StartBeat = new Beat([0, 0, 1]) }],
             Meta = new Meta
             {
                 Name = "Test Chart",
                 Composer = "Test",
                 Charter = "Test",
-                Level = "HD"
+                Level = "HD",
             },
-            JudgeLineList =
-            [
-                new JudgeLine
-                {
-                    EventLayers = [new EventLayer()]
-                }
-            ],
-            ChartTime = 60
+            JudgeLineList = [new JudgeLine { EventLayers = [new EventLayer()] }],
+            ChartTime = 60,
         };
     }
 
@@ -334,8 +321,8 @@ public class RePhiEditSerializationTests
             [
                 new JudgeLine { EventLayers = [new EventLayer()] },
                 new JudgeLine { EventLayers = [new EventLayer()] },
-                new JudgeLine { EventLayers = [new EventLayer()] }
-            ]
+                new JudgeLine { EventLayers = [new EventLayer()] },
+            ],
         };
     }
 
@@ -354,9 +341,9 @@ public class RePhiEditSerializationTests
                     PositionControls = null,
                     SizeControls = null,
                     SkewControls = null,
-                    YControls = null
-                }
-            ]
+                    YControls = null,
+                },
+            ],
         };
     }
 

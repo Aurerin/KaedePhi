@@ -31,21 +31,34 @@ public class EventKpcToPhigrosV3
 
     public void ConvertLineEvents(Core.Phigros.v3.JudgeLine target, List<KpcEventLayer> layers)
     {
-        if (layers.Count == 0) return;
+        if (layers.Count == 0)
+            return;
 
         var primaryLayer = layers[0];
         for (var i = 1; i < layers.Count; i++)
         {
-            if (!HasAnyEventData(layers[i])) continue;
+            if (!HasAnyEventData(layers[i]))
+                continue;
             if (_options.MultiLayerMerge.ClassicMode)
-                primaryLayer = _layerProcessor.LayerMerge(layers, _options.MultiLayerMerge.Precision);
+                primaryLayer = _layerProcessor.LayerMerge(
+                    layers,
+                    _options.MultiLayerMerge.Precision
+                );
             else
-                primaryLayer = _layerProcessor.LayerMergePlus(layers, _options.MultiLayerMerge.Precision, _options.MultiLayerMerge.Tolerance);
+                primaryLayer = _layerProcessor.LayerMergePlus(
+                    layers,
+                    _options.MultiLayerMerge.Precision,
+                    _options.MultiLayerMerge.Tolerance
+                );
             break;
         }
 
         ConvertMoveEvents(target, primaryLayer);
-        ConvertScalarEvents(target.JudgeLineRotateEvents, primaryLayer.RotateEvents, Transform.ToPhigrosV3Angle);
+        ConvertScalarEvents(
+            target.JudgeLineRotateEvents,
+            primaryLayer.RotateEvents,
+            Transform.ToPhigrosV3Angle
+        );
         ConvertAlphaEvents(target, primaryLayer.AlphaEvents);
         ConvertSpeedEvents(target, primaryLayer.SpeedEvents);
     }
@@ -56,43 +69,62 @@ public class EventKpcToPhigrosV3
     {
         var xEvents = layer.MoveXEvents ?? [];
         var yEvents = layer.MoveYEvents ?? [];
-        if (xEvents.Count == 0 && yEvents.Count == 0) return;
+        if (xEvents.Count == 0 && yEvents.Count == 0)
+            return;
 
         var cutLength = 1d / _options.Cutting.MisalignedXyEventPrecision;
-        var cutX = xEvents.SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength)).ToList();
-        var cutY = yEvents.SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength)).ToList();
+        var cutX = xEvents
+            .SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength))
+            .ToList();
+        var cutY = yEvents
+            .SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength))
+            .ToList();
 
         var allEvents = MergeAndFill(cutX, cutY, 0d);
         foreach (var (start, end, xStart, xEnd, yStart, yEnd) in allEvents)
         {
-            target.JudgeLineMoveEvents.Add(new PhigrosEvent
-            {
-                StartTime = start * BeatToPhigrosTime,
-                EndTime = end * BeatToPhigrosTime,
-                Start = Transform.ToPhigrosV3X(xStart),
-                End = Transform.ToPhigrosV3X(xEnd),
-                Start2 = Transform.ToPhigrosV3Y(yStart),
-                End2 = Transform.ToPhigrosV3Y(yEnd)
-            });
+            target.JudgeLineMoveEvents.Add(
+                new PhigrosEvent
+                {
+                    StartTime = start * BeatToPhigrosTime,
+                    EndTime = end * BeatToPhigrosTime,
+                    Start = Transform.ToPhigrosV3X(xStart),
+                    End = Transform.ToPhigrosV3X(xEnd),
+                    Start2 = Transform.ToPhigrosV3Y(yStart),
+                    End2 = Transform.ToPhigrosV3Y(yEnd),
+                }
+            );
         }
 
         if (target.JudgeLineMoveEvents.Count > 0)
         {
             var last = target.JudgeLineMoveEvents[^1];
-            target.JudgeLineMoveEvents.Add(new PhigrosEvent
-            {
-                StartTime = last.EndTime,
-                EndTime = TailEventEndTime,
-                Start = last.End,
-                End = last.End,
-                Start2 = last.End2,
-                End2 = last.End2
-            });
+            target.JudgeLineMoveEvents.Add(
+                new PhigrosEvent
+                {
+                    StartTime = last.EndTime,
+                    EndTime = TailEventEndTime,
+                    Start = last.End,
+                    End = last.End,
+                    Start2 = last.End2,
+                    End2 = last.End2,
+                }
+            );
         }
     }
 
-    private static List<(float start, float end, double xStart, double xEnd, double yStart, double yEnd)> MergeAndFill(
-        List<KpcEvents.Event<double>> xEvents, List<KpcEvents.Event<double>> yEvents, double defaultValue)
+    private static List<(
+        float start,
+        float end,
+        double xStart,
+        double xEnd,
+        double yStart,
+        double yEnd
+    )> MergeAndFill(
+        List<KpcEvents.Event<double>> xEvents,
+        List<KpcEvents.Event<double>> yEvents,
+        double defaultValue
+    )
     {
         var boundaries = new SortedSet<float> { 0f };
         foreach (var ev in xEvents)
@@ -115,7 +147,8 @@ public class EventKpcToPhigrosV3
         {
             var start = boundaryList[i];
             var end = boundaryList[i + 1];
-            if (end - start <= FloatEpsilon) continue;
+            if (end - start <= FloatEpsilon)
+                continue;
 
             // 二分查找：找到 StartBeat <= start 的最靠右事件，再验证是否覆盖该区间
             var xEv = BinaryFindEventCovering(xEvents, start, end);
@@ -128,8 +161,10 @@ public class EventKpcToPhigrosV3
 
             result.Add((start, end, xStart, xEnd, yStart, yEnd));
 
-            if (xEv != null) lastX = xEnd;
-            if (yEv != null) lastY = yEnd;
+            if (xEv != null)
+                lastX = xEnd;
+            if (yEv != null)
+                lastY = yEnd;
         }
 
         return result;
@@ -140,10 +175,16 @@ public class EventKpcToPhigrosV3
     /// [<paramref name="start"/>, <paramref name="end"/>] 的事件。
     /// 若不存在则返回 <c>null</c>。
     /// </summary>
-    private static KpcEvents.Event<T>? BinaryFindEventCovering<T>(List<KpcEvents.Event<T>> sortedEvents, float start, float end)
+    private static KpcEvents.Event<T>? BinaryFindEventCovering<T>(
+        List<KpcEvents.Event<T>> sortedEvents,
+        float start,
+        float end
+    )
     {
         // 找到 StartBeat <= start + epsilon 的最靠右的候选项
-        int lo = 0, hi = sortedEvents.Count - 1, candidate = -1;
+        int lo = 0,
+            hi = sortedEvents.Count - 1,
+            candidate = -1;
         while (lo <= hi)
         {
             var mid = (lo + hi) >> 1;
@@ -157,7 +198,8 @@ public class EventKpcToPhigrosV3
                 hi = mid - 1;
             }
         }
-        if (candidate == -1) return null;
+        if (candidate == -1)
+            return null;
         var ev = sortedEvents[candidate];
         return (float)(double)ev.EndBeat >= end - FloatEpsilon ? ev : null;
     }
@@ -166,39 +208,51 @@ public class EventKpcToPhigrosV3
 
     #region 标量事件（旋转）
 
-    private void ConvertScalarEvents(List<PhigrosEvent> target, List<KpcEvents.Event<double>>? sourceEvents, Func<double, float> valueTransform)
+    private void ConvertScalarEvents(
+        List<PhigrosEvent> target,
+        List<KpcEvents.Event<double>>? sourceEvents,
+        Func<double, float> valueTransform
+    )
     {
-        if (sourceEvents is not { Count: > 0 }) return;
+        if (sourceEvents is not { Count: > 0 })
+            return;
 
         var cutLength = 1d / _options.Cutting.EasingPrecision;
-        var cutEvents = sourceEvents.SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength)).ToList();
+        var cutEvents = sourceEvents
+            .SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength))
+            .ToList();
         var filled = FillGaps(cutEvents, 0d);
 
         foreach (var ev in filled)
         {
             var startBeat = (float)(double)ev.StartBeat;
             var endBeat = (float)(double)ev.EndBeat;
-            if (endBeat <= startBeat) continue;
+            if (endBeat <= startBeat)
+                continue;
 
-            target.Add(new PhigrosEvent
-            {
-                StartTime = startBeat * BeatToPhigrosTime,
-                EndTime = endBeat * BeatToPhigrosTime,
-                Start = valueTransform(ev.StartValue),
-                End = valueTransform(ev.EndValue)
-            });
+            target.Add(
+                new PhigrosEvent
+                {
+                    StartTime = startBeat * BeatToPhigrosTime,
+                    EndTime = endBeat * BeatToPhigrosTime,
+                    Start = valueTransform(ev.StartValue),
+                    End = valueTransform(ev.EndValue),
+                }
+            );
         }
 
         if (target.Count > 0)
         {
             var last = target[^1];
-            target.Add(new PhigrosEvent
-            {
-                StartTime = last.EndTime,
-                EndTime = TailEventEndTime,
-                Start = last.End,
-                End = last.End
-            });
+            target.Add(
+                new PhigrosEvent
+                {
+                    StartTime = last.EndTime,
+                    EndTime = TailEventEndTime,
+                    Start = last.End,
+                    End = last.End,
+                }
+            );
         }
     }
 
@@ -206,39 +260,50 @@ public class EventKpcToPhigrosV3
 
     #region 不透明度事件
 
-    private void ConvertAlphaEvents(Core.Phigros.v3.JudgeLine target, List<KpcEvents.Event<int>>? sourceEvents)
+    private void ConvertAlphaEvents(
+        Core.Phigros.v3.JudgeLine target,
+        List<KpcEvents.Event<int>>? sourceEvents
+    )
     {
-        if (sourceEvents is not { Count: > 0 }) return;
+        if (sourceEvents is not { Count: > 0 })
+            return;
 
         var cutLength = 1d / _options.Alpha.CutPrecision;
-        var cutEvents = sourceEvents.SelectMany(e => _eventCutterInt.CutEventToLiner(e, cutLength)).ToList();
+        var cutEvents = sourceEvents
+            .SelectMany(e => _eventCutterInt.CutEventToLiner(e, cutLength))
+            .ToList();
         var filled = FillGaps(cutEvents, 255);
 
         foreach (var ev in filled)
         {
             var startBeat = (float)(double)ev.StartBeat;
             var endBeat = (float)(double)ev.EndBeat;
-            if (endBeat <= startBeat) continue;
+            if (endBeat <= startBeat)
+                continue;
 
-            target.JudgeLineDisappearEvents.Add(new PhigrosEvent
-            {
-                StartTime = startBeat * BeatToPhigrosTime,
-                EndTime = endBeat * BeatToPhigrosTime,
-                Start = ClampAlpha(ev.StartValue),
-                End = ClampAlpha(ev.EndValue)
-            });
+            target.JudgeLineDisappearEvents.Add(
+                new PhigrosEvent
+                {
+                    StartTime = startBeat * BeatToPhigrosTime,
+                    EndTime = endBeat * BeatToPhigrosTime,
+                    Start = ClampAlpha(ev.StartValue),
+                    End = ClampAlpha(ev.EndValue),
+                }
+            );
         }
 
         if (target.JudgeLineDisappearEvents.Count > 0)
         {
             var last = target.JudgeLineDisappearEvents[^1];
-            target.JudgeLineDisappearEvents.Add(new PhigrosEvent
-            {
-                StartTime = last.EndTime,
-                EndTime = TailEventEndTime,
-                Start = last.End,
-                End = last.End
-            });
+            target.JudgeLineDisappearEvents.Add(
+                new PhigrosEvent
+                {
+                    StartTime = last.EndTime,
+                    EndTime = TailEventEndTime,
+                    Start = last.End,
+                    End = last.End,
+                }
+            );
         }
     }
 
@@ -248,37 +313,48 @@ public class EventKpcToPhigrosV3
 
     #region 速度事件
 
-    private void ConvertSpeedEvents(Core.Phigros.v3.JudgeLine target, List<KpcEvents.Event<float>>? sourceEvents)
+    private void ConvertSpeedEvents(
+        Core.Phigros.v3.JudgeLine target,
+        List<KpcEvents.Event<float>>? sourceEvents
+    )
     {
-        if (sourceEvents is not { Count: > 0 }) return;
+        if (sourceEvents is not { Count: > 0 })
+            return;
 
         var cutLength = 1d / _options.Speed.CutPrecision;
-        var cutEvents = sourceEvents.SelectMany(e => _eventCutterFloat.CutEventToLiner(e, cutLength)).ToList();
+        var cutEvents = sourceEvents
+            .SelectMany(e => _eventCutterFloat.CutEventToLiner(e, cutLength))
+            .ToList();
         var filled = FillGaps(cutEvents, 1f);
 
         foreach (var ev in filled)
         {
             var startBeat = (float)(double)ev.StartBeat;
             var endBeat = (float)(double)ev.EndBeat;
-            if (endBeat <= startBeat) continue;
+            if (endBeat <= startBeat)
+                continue;
 
-            target.SpeedEvents.Add(new PhigrosSpeedEvent
-            {
-                StartTime = startBeat * BeatToPhigrosTime,
-                EndTime = endBeat * BeatToPhigrosTime,
-                Value = ev.StartValue / (float)SpeedValueRatio
-            });
+            target.SpeedEvents.Add(
+                new PhigrosSpeedEvent
+                {
+                    StartTime = startBeat * BeatToPhigrosTime,
+                    EndTime = endBeat * BeatToPhigrosTime,
+                    Value = ev.StartValue / (float)SpeedValueRatio,
+                }
+            );
         }
 
         if (target.SpeedEvents.Count > 0)
         {
             var last = target.SpeedEvents[^1];
-            target.SpeedEvents.Add(new PhigrosSpeedEvent
-            {
-                StartTime = last.EndTime,
-                EndTime = TailEventEndTime,
-                Value = last.Value
-            });
+            target.SpeedEvents.Add(
+                new PhigrosSpeedEvent
+                {
+                    StartTime = last.EndTime,
+                    EndTime = TailEventEndTime,
+                    Value = last.Value,
+                }
+            );
         }
     }
 
@@ -286,12 +362,18 @@ public class EventKpcToPhigrosV3
 
     #region 辅助方法
 
-    private static List<KpcEvents.Event<T>> FillGaps<T>(List<KpcEvents.Event<T>> events, T defaultValue)
+    private static List<KpcEvents.Event<T>> FillGaps<T>(
+        List<KpcEvents.Event<T>> events,
+        T defaultValue
+    )
     {
-        if (events.Count == 0) return events;
+        if (events.Count == 0)
+            return events;
 
         // CutEventToLiner 的输出已按拍数有序；仅在必要时排序（O(n log n) 保底）。
-        var sorted = IsSortedByStartBeat(events) ? events : [.. events.OrderBy(e => (double)e.StartBeat)];
+        var sorted = IsSortedByStartBeat(events)
+            ? events
+            : [.. events.OrderBy(e => (double)e.StartBeat)];
 
         var result = new List<KpcEvents.Event<T>>(sorted.Count * 2);
         var lastEndValue = defaultValue;
@@ -304,13 +386,15 @@ public class EventKpcToPhigrosV3
 
             if (startBeat > lastEndBeat + FloatEpsilon && result.Count > 0)
             {
-                result.Add(new KpcEvents.Event<T>
-                {
-                    StartBeat = new Beat(lastEndBeat),
-                    EndBeat = new Beat(startBeat),
-                    StartValue = lastEndValue,
-                    EndValue = lastEndValue
-                });
+                result.Add(
+                    new KpcEvents.Event<T>
+                    {
+                        StartBeat = new Beat(lastEndBeat),
+                        EndBeat = new Beat(startBeat),
+                        StartValue = lastEndValue,
+                        EndValue = lastEndValue,
+                    }
+                );
             }
 
             result.Add(ev);
@@ -335,12 +419,12 @@ public class EventKpcToPhigrosV3
         return true;
     }
 
-    private static bool HasAnyEventData(KpcEventLayer layer)
-        => (layer.MoveXEvents?.Count ?? 0) > 0
-           || (layer.MoveYEvents?.Count ?? 0) > 0
-           || (layer.RotateEvents?.Count ?? 0) > 0
-           || (layer.AlphaEvents?.Count ?? 0) > 0
-           || (layer.SpeedEvents?.Count ?? 0) > 0;
+    private static bool HasAnyEventData(KpcEventLayer layer) =>
+        (layer.MoveXEvents?.Count ?? 0) > 0
+        || (layer.MoveYEvents?.Count ?? 0) > 0
+        || (layer.RotateEvents?.Count ?? 0) > 0
+        || (layer.AlphaEvents?.Count ?? 0) > 0
+        || (layer.SpeedEvents?.Count ?? 0) > 0;
 
     private void Warn(string message) => _warnLogger?.Invoke(message);
 

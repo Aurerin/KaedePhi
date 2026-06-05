@@ -29,11 +29,7 @@ namespace KaedePhi.Core.PhiEdit
 
         public BpmItem Clone()
         {
-            return new BpmItem
-            {
-                Bpm = Bpm,
-                StartBeat = StartBeat
-            };
+            return new BpmItem { Bpm = Bpm, StartBeat = StartBeat };
         }
     }
 }

@@ -23,9 +23,11 @@ namespace KaedePhi.Core.PhiChain.v6
         {
             try
             {
-                var chart = JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings)
-                            ?? throw new InvalidOperationException(
-                                "Failed to deserialize Chart from JSON: result is null");
+                var chart =
+                    JsonConvert.DeserializeObject<Chart>(json, JsonDefaults.DeserializeSettings)
+                    ?? throw new InvalidOperationException(
+                        "Failed to deserialize Chart from JSON: result is null"
+                    );
 
                 // 确保 BpmList 状态正确
                 chart.BpmList.ComputeTimes();
@@ -34,7 +36,10 @@ namespace KaedePhi.Core.PhiChain.v6
             }
             catch (JsonException ex)
             {
-                throw new InvalidOperationException($"Failed to deserialize Chart from JSON: {ex.Message}", ex);
+                throw new InvalidOperationException(
+                    $"Failed to deserialize Chart from JSON: {ex.Message}",
+                    ex
+                );
             }
         }
 
@@ -45,8 +50,13 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <returns>Chart 对象</returns>
         public static async Task<Chart> LoadFromJsonStreamAsync(Stream stream)
         {
-            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
-                bufferSize: 4096, leaveOpen: true);
+            using var reader = new StreamReader(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                detectEncodingFromByteOrderMarks: true,
+                bufferSize: 4096,
+                leaveOpen: true
+            );
             using var jsonReader = new JsonTextReader(reader);
             return await Task.Run(() => DeserializeFromJsonReader(jsonReader));
         }
@@ -58,8 +68,13 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <returns>Chart 对象</returns>
         public static Chart LoadFromJsonStream(Stream stream)
         {
-            using var reader = new StreamReader(stream, JsonDefaults.NoBomUtf8, detectEncodingFromByteOrderMarks: true,
-                bufferSize: 4096, leaveOpen: true);
+            using var reader = new StreamReader(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                detectEncodingFromByteOrderMarks: true,
+                bufferSize: 4096,
+                leaveOpen: true
+            );
             using var jsonReader = new JsonTextReader(reader);
             return DeserializeFromJsonReader(jsonReader);
         }
@@ -69,15 +84,20 @@ namespace KaedePhi.Core.PhiChain.v6
             try
             {
                 var serializer = JsonSerializer.Create(JsonDefaults.DeserializeSettings);
-                var chart = serializer.Deserialize<Chart>(jsonReader)
-                            ?? throw new InvalidOperationException(
-                                "Failed to deserialize Chart from JSON: result is null");
+                var chart =
+                    serializer.Deserialize<Chart>(jsonReader)
+                    ?? throw new InvalidOperationException(
+                        "Failed to deserialize Chart from JSON: result is null"
+                    );
                 chart.BpmList.ComputeTimes();
                 return chart;
             }
             catch (JsonException ex)
             {
-                throw new InvalidOperationException($"Failed to deserialize Chart from JSON: {ex.Message}", ex);
+                throw new InvalidOperationException(
+                    $"Failed to deserialize Chart from JSON: {ex.Message}",
+                    ex
+                );
             }
         }
 
@@ -89,7 +109,10 @@ namespace KaedePhi.Core.PhiChain.v6
         [PublicAPI]
         public string ExportToJson(bool format = false)
         {
-            return JsonConvert.SerializeObject(this, format ? Formatting.Indented : Formatting.None);
+            return JsonConvert.SerializeObject(
+                this,
+                format ? Formatting.Indented : Formatting.None
+            );
         }
 
         /// <summary>
@@ -98,8 +121,8 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <param name="format">是否格式化输出</param>
         /// <returns>JSON 字符串</returns>
         [PublicAPI]
-        public Task<string> ExportToJsonAsync(bool format = false)
-            => Task.Run(() => ExportToJson(format));
+        public Task<string> ExportToJsonAsync(bool format = false) =>
+            Task.Run(() => ExportToJson(format));
 
         /// <summary>
         /// 序列化 Chart 为 JSON 并写入流
@@ -108,8 +131,15 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <param name="format">是否格式化输出</param>
         public void ExportToJsonStream(Stream stream, bool format = false)
         {
-            using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
-            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
+            using var streamWriter = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
+            var serializer = JsonDefaults.CreateSerializer(
+                format ? Formatting.Indented : Formatting.None
+            );
 
             using var jsonWriter = new JsonTextWriter(streamWriter) { CloseOutput = false };
             serializer.Serialize(jsonWriter, this);
@@ -124,8 +154,15 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <param name="format">是否格式化输出</param>
         public async Task ExportToJsonStreamAsync(Stream stream, bool format = false)
         {
-            await using var streamWriter = new StreamWriter(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
-            var serializer = JsonDefaults.CreateSerializer(format ? Formatting.Indented : Formatting.None);
+            await using var streamWriter = new StreamWriter(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                1024,
+                leaveOpen: true
+            );
+            var serializer = JsonDefaults.CreateSerializer(
+                format ? Formatting.Indented : Formatting.None
+            );
 
             await Task.Run(() =>
             {
@@ -143,8 +180,8 @@ namespace KaedePhi.Core.PhiChain.v6
         /// <param name="json">JSON 字符串</param>
         /// <returns>Chart 对象</returns>
         [PublicAPI]
-        public static Task<Chart> LoadFromJsonAsync(string json)
-            => Task.Run(() => LoadFromJson(json));
+        public static Task<Chart> LoadFromJsonAsync(string json) =>
+            Task.Run(() => LoadFromJson(json));
 
         /// <summary>
         /// 从文件路径加载 Chart
