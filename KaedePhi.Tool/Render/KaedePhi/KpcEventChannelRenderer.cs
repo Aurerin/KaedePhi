@@ -235,9 +235,12 @@ public static class KpcEventChannelRenderer
 
         return new Segment
         {
-            StartBeat = group[0].Start, EndBeat = group[^1].End,
-            MinValue = epMn, MaxValue = epMx,
-            RenderMin = renderMin, RenderMax = renderMax,
+            StartBeat = group[0].Start,
+            EndBeat = group[^1].End,
+            MinValue = epMn,
+            MaxValue = epMx,
+            RenderMin = renderMin,
+            RenderMax = renderMax,
             Events = group
         };
     }

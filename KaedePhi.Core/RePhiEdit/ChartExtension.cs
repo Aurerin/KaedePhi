@@ -41,7 +41,7 @@ namespace KaedePhi.Core.RePhiEdit
                     judgeLine.SkewControls = Controls.SkewControl.Default;
                 if (ControlsIsNullOrEmpty(judgeLine.YControls.Cast<Controls.ControlBase>().ToList()))
                     judgeLine.YControls = Controls.YControl.Default;
-                
+
                 // 如果判定线没有任何音符，则将音符列表设置为null
                 if (judgeLine.Notes?.Count == 0)
                     judgeLine.Notes = null;

@@ -114,36 +114,36 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         List<KpcEvents.Event<TPayload>> fromEventsCopy)
     {
         var newEvents = (from toEvent in toEventsCopy
-            let prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat)
-            let formOffset = prevForm is null ? default! : prevForm.EndValue
-            select new KpcEvents.Event<TPayload>
-            {
-                StartBeat = toEvent.StartBeat,
-                EndBeat = toEvent.EndBeat,
-                StartValue = NumericHelper.Add(toEvent.StartValue, formOffset),
-                EndValue = NumericHelper.Add(toEvent.EndValue, formOffset),
-                BezierPoints = toEvent.BezierPoints,
-                Easing = toEvent.Easing,
-                EasingLeft = toEvent.EasingLeft,
-                EasingRight = toEvent.EasingRight,
-                IsBezier = toEvent.IsBezier,
-            }).ToList();
+                         let prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat)
+                         let formOffset = prevForm is null ? default : prevForm.EndValue
+                         select new KpcEvents.Event<TPayload>
+                         {
+                             StartBeat = toEvent.StartBeat,
+                             EndBeat = toEvent.EndBeat,
+                             StartValue = NumericHelper.Add(toEvent.StartValue, formOffset),
+                             EndValue = NumericHelper.Add(toEvent.EndValue, formOffset),
+                             BezierPoints = toEvent.BezierPoints,
+                             Easing = toEvent.Easing,
+                             EasingLeft = toEvent.EasingLeft,
+                             EasingRight = toEvent.EasingRight,
+                             IsBezier = toEvent.IsBezier,
+                         }).ToList();
 
         newEvents.AddRange(from formEvent in fromEventsCopy
-            let prevTo = toEventsCopy.FindLast(e => e.EndBeat <= formEvent.StartBeat)
-            let toEventValue = prevTo != null ? prevTo.EndValue : default
-            select new KpcEvents.Event<TPayload>
-            {
-                StartBeat = formEvent.StartBeat,
-                EndBeat = formEvent.EndBeat,
-                StartValue = NumericHelper.Add(formEvent.StartValue, toEventValue),
-                EndValue = NumericHelper.Add(formEvent.EndValue, toEventValue),
-                BezierPoints = formEvent.BezierPoints,
-                Easing = formEvent.Easing,
-                EasingLeft = formEvent.EasingLeft,
-                EasingRight = formEvent.EasingRight,
-                IsBezier = formEvent.IsBezier,
-            });
+                           let prevTo = toEventsCopy.FindLast(e => e.EndBeat <= formEvent.StartBeat)
+                           let toEventValue = prevTo != null ? prevTo.EndValue : default
+                           select new KpcEvents.Event<TPayload>
+                           {
+                               StartBeat = formEvent.StartBeat,
+                               EndBeat = formEvent.EndBeat,
+                               StartValue = NumericHelper.Add(formEvent.StartValue, toEventValue),
+                               EndValue = NumericHelper.Add(formEvent.EndValue, toEventValue),
+                               BezierPoints = formEvent.BezierPoints,
+                               Easing = formEvent.Easing,
+                               EasingLeft = formEvent.EasingLeft,
+                               EasingRight = formEvent.EasingRight,
+                               IsBezier = formEvent.IsBezier,
+                           });
 
         SortByStartBeat(newEvents);
         return newEvents;
@@ -288,7 +288,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     }
 
     /// <summary>
-    /// 构建重叠区间之外的基础事件，并应用另一轨道的前序偏移。
+    /// 构建重叠区间之外的基础事件，并应用另一个轨道的前序偏移。
     /// </summary>
     /// <param name="toEventsCopy">目标事件拷贝。</param>
     /// <param name="fromEventsCopy">来源事件拷贝。</param>
@@ -309,7 +309,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
             {
                 // 整条事件在重叠区间外，直接输出（原逻辑）
                 var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= toEvent.StartBeat);
-                var formOffset = prevForm != null ? prevForm.EndValue : default!;
+                var formOffset = prevForm != null ? prevForm.EndValue : default;
                 newEvents.Add(new KpcEvents.Event<TPayload>
                 {
                     StartBeat = toEvent.StartBeat,
@@ -325,7 +325,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
             }
             else
             {
-                // 事件与重叠区间有交叉：补出超出重叠区间的片段。
+                // 事件与重叠区间有交叉：补充超出重叠区间的片段。
                 // 注意：gap 片段必须使用线性缓动（Easing=1），不能沿用原事件的缓动曲线。
                 // 原事件的缓动曲线是针对整个事件区间参数化的；若对子区间应用同一缓动，
                 // 子区间内的中间拍数值将与原事件实际数值不一致，产生"残根"错误。
@@ -338,10 +338,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
                     {
                         StartBeat = gapStart,
                         EndBeat = gapEnd,
-                        StartValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapStart), formOffset) ??
-                                     throw new InvalidOperationException("进行加法运算时遇到了意外的null"),
-                        EndValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapEnd), formOffset) ??
-                                   throw new InvalidOperationException("进行加法运算时遇到了意外的null"),
+                        StartValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapStart), formOffset),
+                        EndValue = NumericHelper.Add(toEvent.GetValueAtBeat(gapEnd), formOffset),
                         Easing = new Kpc.Easing(1), // linear — see comment above
                         IsBezier = false,
                     });
@@ -354,7 +352,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
             if (!TouchesAnyOverlap(formEvent))
             {
                 var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= formEvent.StartBeat);
-                var toEventValue = prevTo != null ? prevTo.EndValue : default!;
+                var toEventValue = prevTo != null ? prevTo.EndValue : default;
                 newEvents.Add(new KpcEvents.Event<TPayload>
                 {
                     StartBeat = formEvent.StartBeat,
@@ -374,7 +372,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
                 foreach (var (gapStart, gapEnd) in GapsOutsideOverlap(formEvent))
                 {
                     var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= gapStart);
-                    var toEventValue = prevTo != null ? prevTo.EndValue : default!;
+                    var toEventValue = prevTo != null ? prevTo.EndValue : default;
                     newEvents.Add(new KpcEvents.Event<TPayload>
                     {
                         StartBeat = gapStart,
@@ -469,8 +467,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         {
             var prevTo = toEventsForOffsetLookup.FindLast(e => e.EndBeat <= start);
             var prevForm = fromEventsCopy.FindLast(e => e.EndBeat <= start);
-            var toLastEnd = prevTo != null ? prevTo.EndValue : default!;
-            var formLastEnd = prevForm != null ? prevForm.EndValue : default!;
+            var toLastEnd = prevTo != null ? prevTo.EndValue : default;
+            var formLastEnd = prevForm != null ? prevForm.EndValue : default;
             allCutEvents.AddRange(
                 MergeSingleOverlapInterval(cutTo, cutFrom, start, end, cutLength, toLastEnd, formLastEnd));
         }

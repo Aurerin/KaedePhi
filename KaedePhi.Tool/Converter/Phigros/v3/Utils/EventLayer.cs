@@ -7,7 +7,7 @@ public static class EventLayer
     public static KpcEvents.EventLayer ConvertEventLayer(PhigrosJudgeLine src, double horizonBeat)
     {
         var result = new KpcEvents.EventLayer();
-        var eventListCompress = new Tool.Event.KaedePhi.EventCompressor<double>(); 
+        var eventListCompress = new Tool.Event.KaedePhi.EventCompressor<double>();
 
         var moveX = Event.ConvertMoveAxisEvents(
             src.JudgeLineMoveEvents, horizonBeat, e => e.Start, e => e.End, Transform.ToKpcX);

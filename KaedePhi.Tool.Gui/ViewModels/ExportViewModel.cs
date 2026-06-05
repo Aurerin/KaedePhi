@@ -11,7 +11,7 @@ public sealed class ExportViewModel : INotifyPropertyChanged
 {
     private ChartType _selectedFormat;
     private ChartType _sourceFormat;
-    
+
     /// <summary>
     /// 获取谱面格式的级别（数值越大级别越高）
     /// RePhiEdit > PhiChain > PhiEdit > PhiFans > PhigrosV3 > PhigrosV1

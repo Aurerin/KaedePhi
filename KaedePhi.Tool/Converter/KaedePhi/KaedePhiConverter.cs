@@ -5,7 +5,7 @@ namespace KaedePhi.Tool.Converter.KaedePhi;
 /// <summary>
 /// KPC 格式直通转换器（输入已是 KPC 格式时使用）。
 /// </summary>
-public class KaedePhiConverter : LoggableBase, IChartConverter<Kpc.Chart,Unit?,Unit?>
+public class KaedePhiConverter : LoggableBase, IChartConverter<Kpc.Chart, Unit?, Unit?>
 {
     /// <summary>
     /// 直接返回输入的 KPC 谱面。

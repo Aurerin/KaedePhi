@@ -166,14 +166,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 在所有原始事件的起止边界处采样候选缓动，验证每处的相对误差百分比均不超过容差。
     /// 相对误差（%）= 绝对偏差 / 整段值域跨度 × 100。
     /// </summary>
-    private static bool FitsWithinTolerance(
-        KpcEvents.Event<TPayload> candidate,
+    private static bool FitsWithinTolerance(KpcEvents.Event<TPayload> candidate,
         List<KpcEvents.Event<TPayload>> events,
         double tolerance,
         Beat segStartBeat, Beat segEndBeat,
         double segStartValue, double segEndValue)
     {
-        var segSpan = (double)segEndBeat - (double)segStartBeat;
+        var segSpan = segEndBeat - (double)segStartBeat;
         if (segSpan <= 1e-9)
             return true;
 
@@ -189,8 +188,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             var evtStart = (double)evt.StartBeat;
             var evtEnd = (double)evt.EndBeat;
 
-            var normStart = (evtStart - (double)segStartBeat) / segSpan;
-            var normEnd = (evtEnd - (double)segStartBeat) / segSpan;
+            var normStart = (evtStart - segStartBeat) / segSpan;
+            var normEnd = (evtEnd - segStartBeat) / segSpan;
 
             var easedStart = segStartValue + valueDelta * GetEasingValue(candidate.Easing, normStart);
             var easedEnd = segStartValue + valueDelta * GetEasingValue(candidate.Easing, normEnd);
@@ -256,8 +255,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// 使用指定缓动函数创建覆盖给定时间区间和值域的新事件。
     /// Font 字段从模板事件继承，其余字段均为合并后的值。
     /// </summary>
-    private static KpcEvents.Event<TPayload> CreateMergedEvent(
-        KpcEvents.Event<TPayload> template,
+    private static KpcEvents.Event<TPayload> CreateMergedEvent(KpcEvents.Event<TPayload> template,
         Beat startBeat, double startValue,
         Beat endBeat, double endValue,
         int easingId)

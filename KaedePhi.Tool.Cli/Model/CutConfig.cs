@@ -9,12 +9,12 @@ public class CutConfig
     /// 切割精度
     /// </summary>
     public double Precision { get; set; } = 64d;
-    
+
     /// <summary>
     /// 切割后压缩拟合容差
     /// </summary>
     public double Tolerance { get; set; } = 0.1d;
-    
+
     /// <summary>
     /// 切割后是否禁用压缩行为
     /// </summary>

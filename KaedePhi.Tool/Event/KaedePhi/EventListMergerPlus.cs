@@ -7,7 +7,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// 事件列表合并器（自适应采样）。
 /// <para>
 /// 继承 <see cref="EventListMerger{TPayload}"/> 的共享基础设施与固定采样合并，
-/// 新增自适应采样合并入口 <see cref="EventListMerge(KpcEvents.Event{TPayload}?, KpcEvents.Event{TPayload}?, double, double)"/>：
+/// 新增自适应采样合并入口 <see cref="EventListMerge(System.Collections.Generic.List{global::KaedePhi.Core.KaedePhi.Events.Event{TPayload}},System.Collections.Generic.List{global::KaedePhi.Core.KaedePhi.Events.Event{TPayload}},double,double)"/>：
 /// 仅在两轨道的事件边界处或叠加值偏离线性近似超过容差时才插入新分段，
 /// 在保证精度的前提下减少冗余事件数量。
 /// </para>
@@ -225,7 +225,7 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     private static TPayload? GetPreviousEndValue(List<KpcEvents.Event<TPayload>> events, Beat beat)
     {
         var prev = events.FindLast(e => e.EndBeat <= beat);
-        return prev != null ? prev.EndValue : default!;
+        return prev != null ? prev.EndValue : default;
     }
 
     private static TPayload? GetValueAtBeatOrPreviousEnd(List<KpcEvents.Event<TPayload>> events, Beat beat)
@@ -235,7 +235,8 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
     }
 
     private static (TPayload? Outgoing, TPayload? Incoming) GetNextBeatValues(
-        List<KpcEvents.Event<TPayload>> events, KpcEvents.Event<TPayload>? eventAtCurrent, KpcEvents.Event<TPayload>? eventAtNext,
+        List<KpcEvents.Event<TPayload>> events, KpcEvents.Event<TPayload>? eventAtCurrent,
+        KpcEvents.Event<TPayload>? eventAtNext,
         Beat nextBeat)
     {
         var prevEnd = GetPreviousEndValue(events, nextBeat);
@@ -285,13 +286,13 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
 
     protected static double ToDouble(TPayload? value)
     {
-        if (value == null)
-            throw new InvalidOperationException("Unexpected null numeric value.");
-        return NumericHelper.ToDouble(value);
+        return value is null
+            ? throw new InvalidOperationException("Unexpected null numeric value.")
+            : NumericHelper.ToDouble(value);
     }
 
     private static TPayload AddValues(TPayload? left, TPayload? right)
-        => NumericHelper.Add(left!, right!);
+        => NumericHelper.Add(left, right);
 
     private static void AddSegmentEvent(
         List<KpcEvents.Event<TPayload>> target, Beat startBeat, Beat endBeat,

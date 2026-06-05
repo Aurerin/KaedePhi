@@ -5,7 +5,7 @@ using KaedePhi.Tool.Cli.Commands.WorkSpace;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 #if !Release
-ConsoleWriter.Warn(string.Format(CliLocalizationString.warn_unstable_version,CliLocalizationString.project_link));
+ConsoleWriter.Warn(string.Format(CliLocalizationString.warn_unstable_version, CliLocalizationString.project_link));
 #endif
 
 var app = new CommandApp();

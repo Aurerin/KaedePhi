@@ -493,7 +493,7 @@ public class JudgeLineKpcToPhigrosV3
 
     private void WarnIfUnsupportedJudgeLineFields(KpcJudgeLine src)
     {
-        var textureRemoveHint  = _options.LineFilter.RemoveTextureLine  ? "判定线将被自动移除。" : "";
+        var textureRemoveHint = _options.LineFilter.RemoveTextureLine ? "判定线将被自动移除。" : "";
         var attachUiRemoveHint = _options.LineFilter.RemoveAttachUiLine ? "，判定线将被自动移除。" : "";
 
         if (!string.Equals(src.Name, "Untitled", StringComparison.Ordinal))

@@ -8,7 +8,7 @@ public sealed class WorkspaceListCommand : Command<WorkspaceListCommand.Settings
     {
     }
 
-    protected override int Execute(CommandContext context, Settings settings,CancellationToken cancellationToken)
+    protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var ws = new WorkspaceService();
         foreach (var id in ws.List())

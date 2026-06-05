@@ -88,17 +88,17 @@ public static class EventLayer
 
         rpe.ColorEvents = src.ColorEvents.ConvertAll(Event.ConvertByteArrayEvent);
         rpe.ScaleXEvents = [];
-        foreach (var e in src.ScaleXEvents) 
+        foreach (var e in src.ScaleXEvents)
             rpe.ScaleXEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         rpe.ScaleYEvents = [];
-        foreach (var e in src.ScaleYEvents) 
+        foreach (var e in src.ScaleYEvents)
             rpe.ScaleYEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         rpe.TextEvents = src.TextEvents.ConvertAll(Event.ConvertStringEvent);
         rpe.PaintEvents = [];
-        foreach (var e in src.PaintEvents) 
+        foreach (var e in src.PaintEvents)
             rpe.PaintEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         rpe.GifEvents = [];
-        foreach (var e in src.GifEvents) 
+        foreach (var e in src.GifEvents)
             rpe.GifEvents.AddRange(Event.ConvertFloatEventExpanding(e, options));
         rpe.InclineEvents = [];
         foreach (var e in src.InclineEvents)

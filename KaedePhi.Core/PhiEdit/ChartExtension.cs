@@ -100,8 +100,8 @@ namespace KaedePhi.Core.PhiEdit
                 throw new FormatException("Malformed chart file: first line is not a valid integer offset.");
             chart.Offset = offset;
 
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            string? line;
+            while ((line = reader.ReadLine()) is not null)
             {
                 if (!string.IsNullOrWhiteSpace(line))
                     ParseChartLine(line, reader, chart, judgeDict);
@@ -172,7 +172,7 @@ namespace KaedePhi.Core.PhiEdit
             else if (line.StartsWith('n'))
             {
                 var (speedPart, widthPart) = GetInlineNoteParts(part);
-                if (speedPart == null)
+                if (speedPart is null)
                 {
                     // 需要额外读取后续两行
                     speedPart = reader.ReadLine()?.Split(' ');
@@ -260,33 +260,35 @@ namespace KaedePhi.Core.PhiEdit
                     EnsureMinParts(part, 4, "cv");
                     Ensure();
                     judgeDict[judgeLineIndex].SpeedFrames.Add(new Frame
-                        { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
+                    { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
                     break;
                 case "cp":
                     EnsureMinParts(part, 5, "cp");
                     Ensure();
                     judgeDict[judgeLineIndex].MoveFrames.Add(new MoveFrame
-                        { Beat = float.Parse(part[2]), XValue = float.Parse(part[3]), YValue = float.Parse(part[4]) });
+                    { Beat = float.Parse(part[2]), XValue = float.Parse(part[3]), YValue = float.Parse(part[4]) });
                     break;
                 case "cd":
                     EnsureMinParts(part, 4, "cd");
                     Ensure();
                     judgeDict[judgeLineIndex].RotateFrames.Add(new Frame
-                        { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
+                    { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
                     break;
                 case "ca":
                     EnsureMinParts(part, 4, "ca");
                     Ensure();
                     judgeDict[judgeLineIndex].AlphaFrames.Add(new Frame
-                        { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
+                    { Beat = float.Parse(part[2]), Value = float.Parse(part[3]) });
                     break;
                 case "cm":
                     EnsureMinParts(part, 7, "cm");
                     Ensure();
                     judgeDict[judgeLineIndex].MoveEvents.Add(new MoveEvent
                     {
-                        StartBeat = float.Parse(part[2]), EndBeat = float.Parse(part[3]),
-                        EndXValue = float.Parse(part[4]), EndYValue = float.Parse(part[5]),
+                        StartBeat = float.Parse(part[2]),
+                        EndBeat = float.Parse(part[3]),
+                        EndXValue = float.Parse(part[4]),
+                        EndYValue = float.Parse(part[5]),
                         EasingType = new Easing(int.Parse(part[6]))
                     });
                     break;
@@ -295,8 +297,10 @@ namespace KaedePhi.Core.PhiEdit
                     Ensure();
                     judgeDict[judgeLineIndex].RotateEvents.Add(new Event
                     {
-                        StartBeat = float.Parse(part[2]), EndBeat = float.Parse(part[3]),
-                        EndValue = float.Parse(part[4]), EasingType = new Easing(int.Parse(part[5]))
+                        StartBeat = float.Parse(part[2]),
+                        EndBeat = float.Parse(part[3]),
+                        EndValue = float.Parse(part[4]),
+                        EasingType = new Easing(int.Parse(part[5]))
                     });
                     break;
                 case "cf":
@@ -304,8 +308,10 @@ namespace KaedePhi.Core.PhiEdit
                     Ensure();
                     judgeDict[judgeLineIndex].AlphaEvents.Add(new Event
                     {
-                        StartBeat = float.Parse(part[2]), EndBeat = float.Parse(part[3]),
-                        EndValue = float.Parse(part[4]), EasingType = new Easing(1)
+                        StartBeat = float.Parse(part[2]),
+                        EndBeat = float.Parse(part[3]),
+                        EndValue = float.Parse(part[4]),
+                        EasingType = new Easing(1)
                     });
                     break;
             }
@@ -358,7 +364,7 @@ namespace KaedePhi.Core.PhiEdit
         /// <summary>
         /// 从 Note 主指令字段数组中尝试提取内联的速度行和宽度行。
         /// <para>
-        /// PhiEditChart 允许将速度（<c># value</c>）和宽度（<c>&amp; value</c>）以空格连接内联在同一行中；
+        /// 部分不规范谱面允许将速度（<c># value</c>）和宽度（<c>&amp; value</c>）以空格连接内联在同一行中；
         /// 本方法通过查找 <c>#</c> 和 <c>&amp;</c> 标记判断是否为内联格式。
         /// </para>
         /// </summary>
@@ -367,7 +373,7 @@ namespace KaedePhi.Core.PhiEdit
         /// 若找到内联的速度和宽度信息，返回对应的两个字段数组元组 <c>(speedPart, widthPart)</c>；
         /// 否则两者均为 <see langword="null"/>，表示需要额外读取后续两行。
         /// </returns>
-        private static (string[] speedPart, string[] widthPart) GetInlineNoteParts(string[] part)
+        private static (string[]? speedPart, string[]? widthPart) GetInlineNoteParts(string[] part)
         {
             var hashIndex = Array.IndexOf(part, "#");
             var ampIndex = Array.IndexOf(part, "&");
