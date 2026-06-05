@@ -14,7 +14,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// <summary>
         /// 标签所在拍
         /// </summary>
-        [JsonProperty("time")] 
+        [JsonProperty("time")]
         public Beat Time { get; set; }
     }
 }

@@ -71,7 +71,7 @@ public sealed class GuiChartService
         var detectedType = ChartGetType.GetType(text);
         _log.Information(log_step_detected, detectedType);
 
-        
+
         // 在后台线程执行耗时的格式转换
         var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType), ct);
 
@@ -112,62 +112,62 @@ public sealed class GuiChartService
         switch (sourceType)
         {
             case ChartType.RePhiEdit:
-            {
-                var rpeChart = Core.RePhiEdit.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
-                var rpeConverter = new RePhiEditConverter();
-                rpeConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                var kpcConverter = new KaedePhiConverter();
-                kpcConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                return ChartPipeline
-                    .From(rpeChart, rpeConverter, null)
-                    .To(kpcConverter, null);
-            }
+                {
+                    var rpeChart = Core.RePhiEdit.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
+                    var rpeConverter = new RePhiEditConverter();
+                    rpeConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    var kpcConverter = new KaedePhiConverter();
+                    kpcConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    return ChartPipeline
+                        .From(rpeChart, rpeConverter, null)
+                        .To(kpcConverter, null);
+                }
             case ChartType.PhiEdit:
-            {
-                var peChart = Core.PhiEdit.Chart.LoadAsync(text).GetAwaiter().GetResult();
-                var peConverter = new PhiEditConverter();
-                peConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                var kpcConverter = new KaedePhiConverter();
-                kpcConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                return ChartPipeline
-                    .From(peChart, peConverter, new PhiEditToKpcConvertOptions())
-                    .To(kpcConverter, null);
-            }
+                {
+                    var peChart = Core.PhiEdit.Chart.LoadAsync(text).GetAwaiter().GetResult();
+                    var peConverter = new PhiEditConverter();
+                    peConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    var kpcConverter = new KaedePhiConverter();
+                    kpcConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    return ChartPipeline
+                        .From(peChart, peConverter, new PhiEditToKpcConvertOptions())
+                        .To(kpcConverter, null);
+                }
             case ChartType.PhigrosV3:
-            {
-                var v3Chart = Core.Phigros.v3.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
-                var v3Converter = new PhigrosV3Converter();
-                v3Converter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                var kpcConverter = new KaedePhiConverter();
-                kpcConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                return ChartPipeline
-                    .From(v3Chart, v3Converter, null)
-                    .To(kpcConverter, null);
-            }
+                {
+                    var v3Chart = Core.Phigros.v3.Chart.LoadFromJsonAsync(text).GetAwaiter().GetResult();
+                    var v3Converter = new PhigrosV3Converter();
+                    v3Converter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    var kpcConverter = new KaedePhiConverter();
+                    kpcConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    return ChartPipeline
+                        .From(v3Chart, v3Converter, null)
+                        .To(kpcConverter, null);
+                }
             default:
                 throw new NotSupportedException($"Unsupported chart format: {sourceType}");
         }
@@ -181,65 +181,65 @@ public sealed class GuiChartService
         switch (targetType)
         {
             case ChartType.RePhiEdit:
-            {
-                var rpeConverter = new RePhiEditConverter();
-                rpeConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                var rpeChart = rpeConverter.FromKpc(chart, new ConvertOption());
-                if (stream)
                 {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await rpeChart.ExportToJsonStreamAsync(s, indented);
+                    var rpeConverter = new RePhiEditConverter();
+                    rpeConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    var rpeChart = rpeConverter.FromKpc(chart, new ConvertOption());
+                    if (stream)
+                    {
+                        await using var s = new FileStream(outputPath, FileMode.Create);
+                        await rpeChart.ExportToJsonStreamAsync(s, indented);
+                    }
+                    else
+                    {
+                        await File.WriteAllTextAsync(outputPath, await rpeChart.ExportToJsonAsync(indented), ct);
+                    }
+                    break;
                 }
-                else
-                {
-                    await File.WriteAllTextAsync(outputPath, await rpeChart.ExportToJsonAsync(indented), ct);
-                }
-                break;
-            }
             case ChartType.PhiEdit:
-            {
-                var peConverter = new PhiEditConverter();
-                peConverter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                var peChart = peConverter.FromKpc(chart, new KpcToPhiEditConvertOptions());
-                if (stream)
                 {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await peChart.ExportToStreamAsync(s);
+                    var peConverter = new PhiEditConverter();
+                    peConverter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    var peChart = peConverter.FromKpc(chart, new KpcToPhiEditConvertOptions());
+                    if (stream)
+                    {
+                        await using var s = new FileStream(outputPath, FileMode.Create);
+                        await peChart.ExportToStreamAsync(s);
+                    }
+                    else
+                    {
+                        await File.WriteAllTextAsync(outputPath, await peChart.ExportAsync(), ct);
+                    }
+                    break;
                 }
-                else
-                {
-                    await File.WriteAllTextAsync(outputPath, await peChart.ExportAsync(), ct);
-                }
-                break;
-            }
             case ChartType.PhigrosV3:
-            {
-                var v3Converter = new PhigrosV3Converter();
-                v3Converter.SubscribeLog(
-                    info: msg => _log.Information(msg),
-                    warning: msg => _log.Warning(msg),
-                    error: msg => _log.Error(msg),
-                    debug: msg => _log.Debug(msg));
-                var phigrosChart = v3Converter.FromKpc(chart, phigrosOptions ?? new KpcToPhigrosV3ConvertOptions());
-                if (stream)
                 {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await phigrosChart.ExportToJsonStreamAsync(s, indented);
+                    var v3Converter = new PhigrosV3Converter();
+                    v3Converter.SubscribeLog(
+                        info: msg => _log.Information(msg),
+                        warning: msg => _log.Warning(msg),
+                        error: msg => _log.Error(msg),
+                        debug: msg => _log.Debug(msg));
+                    var phigrosChart = v3Converter.FromKpc(chart, phigrosOptions ?? new KpcToPhigrosV3ConvertOptions());
+                    if (stream)
+                    {
+                        await using var s = new FileStream(outputPath, FileMode.Create);
+                        await phigrosChart.ExportToJsonStreamAsync(s, indented);
+                    }
+                    else
+                    {
+                        await File.WriteAllTextAsync(outputPath, await phigrosChart.ExportToJsonAsync(indented), ct);
+                    }
+                    break;
                 }
-                else
-                {
-                    await File.WriteAllTextAsync(outputPath, await phigrosChart.ExportToJsonAsync(indented), ct);
-                }
-                break;
-            }
             default:
                 throw new NotSupportedException($"Cannot export to format: {targetType}");
         }

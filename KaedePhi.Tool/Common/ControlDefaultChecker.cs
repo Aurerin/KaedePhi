@@ -19,7 +19,7 @@ public static class ControlDefaultChecker
     public static bool IsDefaultControls<T>(List<T>? controls) where T : ControlBase
     {
         var defaultControls = GetDefaultControls<T>();
-        if (controls == null || controls.Count != defaultControls.Count) 
+        if (controls == null || controls.Count != defaultControls.Count)
             return false;
 
         for (var i = 0; i < defaultControls.Count; i++)
@@ -76,7 +76,7 @@ public static class ControlDefaultChecker
     private static bool AreDerivedPropertiesEqual<T>(T a, T b) where T : ControlBase
     {
         var type = typeof(T);
-        
+
         // 处理已知的 Control 类型
         if (type == typeof(XControl))
         {
@@ -84,28 +84,28 @@ public static class ControlDefaultChecker
             var xb = (XControl)(object)b;
             return Math.Abs(xa.Pos - xb.Pos) <= FloatEpsilon;
         }
-        
+
         if (type == typeof(AlphaControl))
         {
             var aa = (AlphaControl)(object)a;
             var ab = (AlphaControl)(object)b;
             return Math.Abs(aa.Alpha - ab.Alpha) <= FloatEpsilon;
         }
-        
+
         if (type == typeof(SizeControl))
         {
             var sa = (SizeControl)(object)a;
             var sb = (SizeControl)(object)b;
             return Math.Abs(sa.Size - sb.Size) <= FloatEpsilon;
         }
-        
+
         if (type == typeof(SkewControl))
         {
             var ska = (SkewControl)(object)a;
             var skb = (SkewControl)(object)b;
             return Math.Abs(ska.Skew - skb.Skew) <= FloatEpsilon;
         }
-        
+
         if (type == typeof(YControl))
         {
             var ya = (YControl)(object)a;
@@ -128,14 +128,14 @@ public static class ControlDefaultChecker
     private static bool ArePropertiesEqualByReflection<T>(T a, T b, Type type)
     {
         var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        
+
         foreach (var prop in properties)
         {
             if (!prop.CanRead) continue;
-            
+
             var valueA = prop.GetValue(a);
             var valueB = prop.GetValue(b);
-            
+
             if (prop.PropertyType == typeof(float))
             {
                 var floatA = (float)(valueA ?? 0f);
@@ -175,7 +175,7 @@ public static class ControlDefaultChecker
                 if (!Equals(valueA, valueB)) return false;
             }
         }
-        
+
         return true;
     }
 }

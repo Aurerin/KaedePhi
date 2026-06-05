@@ -25,7 +25,7 @@ public class GetTypeTestCommand : AsyncCommand<GetTypeTestCommand.Settings>
         ConsoleWriter.Warn("This command can only be executed on Debug builds.");
         await Task.CompletedTask;
 #endif
-        
+
         return 0;
     }
 }

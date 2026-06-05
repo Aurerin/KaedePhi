@@ -16,7 +16,7 @@ public static class Note
         Type = (Kpc.NoteType)(int)src.Type
     };
 
-    public static Pe.Note ConvertNote(Kpc.Note src,Action<string>? warnLogger)
+    public static Pe.Note ConvertNote(Kpc.Note src, Action<string>? warnLogger)
     {
         WarnIfUnsupportedNoteFields(src, warnLogger);
         return new Pe.Note
@@ -31,7 +31,7 @@ public static class Note
             Type = (Pe.NoteType)(int)src.Type
         };
     }
-    
+
     private static void WarnIfUnsupportedNoteFields(Kpc.Note src, Action<string>? warnLogger)
     {
         if (src.Alpha != 255)

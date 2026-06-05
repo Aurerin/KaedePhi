@@ -40,7 +40,7 @@ public static class FatherUnbindHelpers
     /// 同一谱面的所有解绑调用共享同一份缓存，allJudgeLines 被 GC 后自动释放。
     /// </summary>
     public static readonly ConditionalWeakTable<List<JudgeLine>, ConcurrentDictionary<int, JudgeLine>>
-        ChartCacheTable = new();
+        JudgeLineCacheTable = new();
 
     /// <summary>
     /// 根据父线绝对坐标和旋转角度，计算子线的绝对坐标。
@@ -264,7 +264,7 @@ public static class FatherUnbindHelpers
 
         if (line.EventLayers.Count == 0)
             line.EventLayers.Add(new EventLayer());
-        
+
         line.EventLayers[0].MoveXEvents = newXEvents;
         line.EventLayers[0].MoveYEvents = newYEvents;
 
@@ -476,9 +476,9 @@ public static class FatherUnbindHelpers
             if (isLast || NeedsAdaptiveCut(seg, nextPos, end, segStart, iEnd, next, tolerance))
             {
                 localX.Add(new KpcEvents.Event<double>
-                    { StartBeat = segStart, EndBeat = next, StartValue = seg.X, EndValue = nextPos.X });
+                { StartBeat = segStart, EndBeat = next, StartValue = seg.X, EndValue = nextPos.X });
                 localY.Add(new KpcEvents.Event<double>
-                    { StartBeat = segStart, EndBeat = next, StartValue = seg.Y, EndValue = nextPos.Y });
+                { StartBeat = segStart, EndBeat = next, StartValue = seg.Y, EndValue = nextPos.Y });
                 segStart = next;
                 seg = nextPos;
             }

@@ -26,11 +26,11 @@ public class JudgeLineUnbinder : LoggableBase, IJudgeLineUnbinder<JudgeLine>
     }
 
     private FatherUnbindProcessor CreateProcessor(List<JudgeLine> allJudgeLines)
-        => new(FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines),
+        => new(FatherUnbindHelpers.JudgeLineCacheTable.GetOrCreateValue(allJudgeLines),
             LogInfo, LogWarning, LogError, LogDebug);
 
     private FatherUnbindPlusProcessor CreatePlusProcessor(List<JudgeLine> allJudgeLines, double tolerance)
-        => new(FatherUnbindHelpers.ChartCacheTable.GetOrCreateValue(allJudgeLines), tolerance,
+        => new(FatherUnbindHelpers.JudgeLineCacheTable.GetOrCreateValue(allJudgeLines), tolerance,
             LogInfo, LogWarning, LogError, LogDebug);
 
     /// <inheritdoc/>

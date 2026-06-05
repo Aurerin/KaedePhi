@@ -69,8 +69,8 @@ namespace KaedePhi.Core.RePhiEdit.Events
             GifEvents = GifEvents?.OrderBy(e => e.StartBeat).ToList();
             InclineEvents = InclineEvents?.OrderBy(e => e.StartBeat).ToList();
         }
-        
-        
+
+
         /// <summary>
         /// 深克隆当前 ExtendLayer 对象
         /// </summary>

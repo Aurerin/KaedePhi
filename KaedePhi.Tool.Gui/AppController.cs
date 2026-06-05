@@ -245,12 +245,12 @@ internal sealed class AppController
     /// </summary>
     private static (string Extension, string TypeLabel) GetFormatFileInfo(ChartType format) => format switch
     {
-        ChartType.PhiEdit   => ("pec",  file_type_pe_chart),
+        ChartType.PhiEdit => ("pec", file_type_pe_chart),
         ChartType.RePhiEdit => ("json", file_type_rpe_json),
         ChartType.PhigrosV3 => ("json", file_type_phigros_json),
-        ChartType.PhiFans   => ("json", file_type_phifans_json),
-        ChartType.PhiChain  => ("json", file_type_phichain_json),
-        _                   => ("json", file_type_json)
+        ChartType.PhiFans => ("json", file_type_phifans_json),
+        ChartType.PhiChain => ("json", file_type_phichain_json),
+        _ => ("json", file_type_json)
     };
 
     private async void OnExportExecute()

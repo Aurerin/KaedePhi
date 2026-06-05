@@ -27,6 +27,6 @@ public sealed class LocalizedDescriptionAttribute : DescriptionAttribute
     /// </remarks>
     public override string Description =>
         CliLocalizationString.ResourceManager.GetString(_resourceKey, CultureInfo.CurrentUICulture)
-        ?? CliLocalizationString.ResourceManager.GetString(_resourceKey, CultureInfo.CurrentCulture) 
+        ?? CliLocalizationString.ResourceManager.GetString(_resourceKey, CultureInfo.CurrentCulture)
         ?? _resourceKey;
 }

@@ -29,7 +29,7 @@ namespace KaedePhi.Core.KaedePhi
         /// BPM 生效的起始拍。
         /// </summary>
         [PublicAPI]
-        public Beat StartBeat { get; set; }= new(new[] { 0, 0, 1 });
+        public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 });
 
         /// <summary>
         /// 深拷贝 BPM 节点。

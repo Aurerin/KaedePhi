@@ -12,8 +12,8 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
         public string? Input { get; set; }
     }
 
-        protected override async Task<int> ExecuteAsync(CommandContext context, GetTypeTestCommand.Settings settings,
-        CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, GetTypeTestCommand.Settings settings,
+    CancellationToken cancellationToken)
     {
 #if Debug
         var input = settings.Input;
@@ -22,7 +22,7 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
             ConsoleWriter.Error("Input file path cannot be null or whitespace.");
             return 1;
         }
-        
+
         // 创建文件流
         using var stream = File.OpenRead(input);
         // 测试pec
@@ -33,7 +33,7 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
         ConsoleWriter.Warn("This command can only be executed on Debug builds.");
         await Task.CompletedTask;
 #endif
-        
+
         return 0;
     }
 }

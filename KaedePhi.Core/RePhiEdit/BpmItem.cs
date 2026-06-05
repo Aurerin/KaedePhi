@@ -8,7 +8,7 @@ namespace KaedePhi.Core.RePhiEdit
         [JsonProperty("bpm")]
         public float Bpm { get; set; } = 120f;
 
-        [JsonProperty("startTime")] 
+        [JsonProperty("startTime")]
         public Beat StartBeat { get; set; } = new(BeatArray);
         private static readonly int[] BeatArray = { 0, 0, 1 };
 

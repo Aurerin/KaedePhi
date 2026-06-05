@@ -22,7 +22,7 @@ public class Note
         HitFxColor = src.HitFxColor?.ToArray(),
         HitSound = src.HitSound
     };
-    
+
     public static Rpe.Note ConvertNote(Kpc.Note src) => new()
     {
         Above = src.Above,

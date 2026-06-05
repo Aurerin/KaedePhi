@@ -23,7 +23,7 @@ public sealed class SaveCommand : AsyncCommand<SaveCommand.Settings>
         }
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings,CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var output = settings.Output ?? throw new InvalidOperationException(CliLocalizationString.err_output_required);
         var ws = new WorkspaceService();

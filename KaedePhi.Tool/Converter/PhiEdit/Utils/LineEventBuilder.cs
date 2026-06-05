@@ -304,18 +304,18 @@ public class LineEventBuilder
                 Warn($"Move 区间 [{start:F3}, {end:F3}] X 事件跨越 Y 边界（未对齐），将切段线性化");
                 break;
             default:
-            {
-                if (!yAligned)
-                    Warn($"Move 区间 [{start:F3}, {end:F3}] Y 事件跨越 X 边界（未对齐），将切段线性化");
-                else
                 {
-                    var xEasingNum = activeX != null ? (int)activeX.Easing : 0;
-                    var yEasingNum = activeY != null ? (int)activeY.Easing : 0;
-                    Warn($"Move 区间 [{start:F3}, {end:F3}] X/Y 缓动类型不一致（X={xEasingNum}, Y={yEasingNum}），将切段线性化");
-                }
+                    if (!yAligned)
+                        Warn($"Move 区间 [{start:F3}, {end:F3}] Y 事件跨越 X 边界（未对齐），将切段线性化");
+                    else
+                    {
+                        var xEasingNum = activeX != null ? (int)activeX.Easing : 0;
+                        var yEasingNum = activeY != null ? (int)activeY.Easing : 0;
+                        Warn($"Move 区间 [{start:F3}, {end:F3}] X/Y 缓动类型不一致（X={xEasingNum}, Y={yEasingNum}），将切段线性化");
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
     }
 

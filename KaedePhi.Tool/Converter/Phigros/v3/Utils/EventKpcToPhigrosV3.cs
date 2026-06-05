@@ -291,7 +291,7 @@ public class EventKpcToPhigrosV3
         if (events.Count == 0) return events;
 
         // CutEventToLiner 的输出已按拍数有序；仅在必要时排序（O(n log n) 保底）。
-        var sorted = IsSortedByStartBeat(events) ? events : [..events.OrderBy(e => (double)e.StartBeat)];
+        var sorted = IsSortedByStartBeat(events) ? events : [.. events.OrderBy(e => (double)e.StartBeat)];
 
         var result = new List<KpcEvents.Event<T>>(sorted.Count * 2);
         var lastEndValue = defaultValue;

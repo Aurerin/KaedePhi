@@ -11,7 +11,7 @@ public sealed class WorkspaceClearCommand : Command<WorkspaceClearCommand.Settin
         public string? Id { get; set; }
     }
 
-    protected override int Execute(CommandContext context, Settings settings,CancellationToken cancellationToken)
+    protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var ws = new WorkspaceService();
         ws.Clear(settings.Id);

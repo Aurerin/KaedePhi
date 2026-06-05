@@ -54,8 +54,8 @@ namespace KaedePhi.Core.Phigros.v3
         /// </summary>
         [JsonProperty("speed")]
         public float Speed { get; set; }
-        
-        
+
+
         /// <summary>
         /// floorPosition，恒定为0，我懒得算。
         /// </summary>

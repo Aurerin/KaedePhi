@@ -4,7 +4,7 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
 public static class JudgeLine
 {
-    public static Kpc.JudgeLine ConvertJudgeLine(PhigrosJudgeLine src, int index,float defaultBpm)
+    public static Kpc.JudgeLine ConvertJudgeLine(PhigrosJudgeLine src, int index, float defaultBpm)
     {
         var horizonBeat = Event.GetJudgeLineHorizonBeat(src);
 
