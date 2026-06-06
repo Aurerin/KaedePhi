@@ -8,24 +8,28 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
     {
         public override void WriteJson(
             JsonWriter writer,
-            LineEventValue value,
+            LineEventValue? value,
             JsonSerializer serializer
         )
         {
             var obj = new JObject
             {
-                ["kind"] = value.Type == LineEventValueType.Constant ? "constant" : "transition",
+                ["kind"] = value?.Type == LineEventValueType.Constant ? "constant" : "transition",
             };
 
-            if (value.Type == LineEventValueType.Constant)
+            if (value?.Type == LineEventValueType.Constant)
             {
                 obj["value"] = value.Value;
             }
             else
             {
-                obj["start"] = value.Start;
-                obj["end"] = value.End;
-                obj["easing"] = JToken.FromObject(value.Easing, serializer);
+                obj["start"] = value?.Start;
+                obj["end"] = value?.End;
+                obj["easing"] = JToken.FromObject(
+                    value?.Easing
+                        ?? throw new InvalidOperationException("Transition type must have easing"),
+                    serializer
+                );
             }
 
             obj.WriteTo(writer);
@@ -34,7 +38,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         public override LineEventValue ReadJson(
             JsonReader reader,
             Type objectType,
-            LineEventValue existingValue,
+            LineEventValue? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )

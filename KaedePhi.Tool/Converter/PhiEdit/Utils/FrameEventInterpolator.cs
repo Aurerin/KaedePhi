@@ -25,40 +25,35 @@ public class FrameEventInterpolator
     public double GetJudgeLineHorizonBeat(Pe.JudgeLine src)
     {
         var maxBeat = 0d;
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NoteList?.Select(note => (double)note.EndBeat)));
+        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NoteList.Select(note => (double)note.EndBeat)));
         maxBeat = Math.Max(
             maxBeat,
-            GetMaxBeat(src.NoteList?.Select(note => (double)note.StartBeat))
+            GetMaxBeat(src.NoteList.Select(note => (double)note.StartBeat))
         );
         maxBeat = Math.Max(
             maxBeat,
-            GetMaxBeat(src.SpeedFrames?.Select(frame => (double)frame.Beat))
+            GetMaxBeat(src.SpeedFrames.Select(frame => (double)frame.Beat))
+        );
+        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.MoveFrames.Select(frame => (double)frame.Beat)));
+        maxBeat = Math.Max(
+            maxBeat,
+            GetMaxBeat(src.RotateFrames.Select(frame => (double)frame.Beat))
         );
         maxBeat = Math.Max(
             maxBeat,
-            GetMaxBeat(src.MoveFrames?.Select(frame => (double)frame.Beat))
+            GetMaxBeat(src.AlphaFrames.Select(frame => (double)frame.Beat))
         );
         maxBeat = Math.Max(
             maxBeat,
-            GetMaxBeat(src.RotateFrames?.Select(frame => (double)frame.Beat))
+            GetMaxBeat(src.MoveEvents.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
         );
         maxBeat = Math.Max(
             maxBeat,
-            GetMaxBeat(src.AlphaFrames?.Select(frame => (double)frame.Beat))
+            GetMaxBeat(src.RotateEvents.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
         );
         maxBeat = Math.Max(
             maxBeat,
-            GetMaxBeat(src.MoveEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
-        );
-        maxBeat = Math.Max(
-            maxBeat,
-            GetMaxBeat(
-                src.RotateEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat })
-            )
-        );
-        maxBeat = Math.Max(
-            maxBeat,
-            GetMaxBeat(src.AlphaEvents?.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
+            GetMaxBeat(src.AlphaEvents.SelectMany(ev => new double[] { ev.StartBeat, ev.EndBeat }))
         );
         return maxBeat + _trailingBeatPadding;
     }

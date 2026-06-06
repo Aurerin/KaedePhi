@@ -43,10 +43,12 @@ namespace KaedePhi.Core.PhiEdit
             }
 
             var previousEvent = FindPreviousMoveEvent(beat);
+            if (previousEvent is null)
+                return (0, 0);
             if (IsEventCloserThanFrame(previousEvent, previousFrame))
                 return (previousEvent.EndXValue, previousEvent.EndYValue);
 
-            if (previousFrame != null)
+            if (previousFrame is not null)
                 return (previousFrame.XValue, previousFrame.YValue);
 
             return (0, 0);
@@ -64,7 +66,7 @@ namespace KaedePhi.Core.PhiEdit
         private (
             bool foundExactFrame,
             (float, float) value,
-            MoveFrame previousFrame
+            MoveFrame? previousFrame
         ) FindExactOrPreviousFrame(float beat)
         {
             // 二分查找：定位 Beat <= beat 中 index 最大者（最近前置帧或精确帧）

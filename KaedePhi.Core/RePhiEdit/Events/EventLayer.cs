@@ -69,7 +69,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// <param name="events">已按 StartBeat 升序排列的事件列表</param>
         /// <param name="beat">指定拍</param>
         /// <returns>在指定拍时，指定事件列表的数值</returns>
-        public static T GetValueAtBeat<T>(List<Event<T>> events, Beat beat)
+        public static T? GetValueAtBeat<T>(List<Event<T>> events, Beat beat)
         {
             // 二分查找：定位 StartBeat <= beat 中 index 最大者（主导事件）
             // 同 StartBeat 时取靠后者（index 更大），满足同起始拍 index 至上规则

@@ -10,13 +10,13 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         private static readonly List<XControl> DefaultInstance = new()
         {
-            new()
+            new XControl
             {
                 Easing = new Easing(1),
                 Pos = 1.0f,
                 X = 0.0f,
             },
-            new()
+            new XControl
             {
                 Easing = new Easing(1),
                 Pos = 1.0f,
@@ -26,7 +26,7 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         [JsonIgnore]
         public static List<XControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as XControl);
+            DefaultInstance.ConvertAll(input => (XControl)input.Clone());
 
         public override ControlBase Clone()
         {

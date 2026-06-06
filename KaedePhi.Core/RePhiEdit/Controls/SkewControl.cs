@@ -10,13 +10,13 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         private static readonly List<SkewControl> DefaultInstance = new()
         {
-            new()
+            new SkewControl
             {
                 Easing = new Easing(1),
                 Skew = 0.0f,
                 X = 0.0f,
             },
-            new()
+            new SkewControl
             {
                 Easing = new Easing(1),
                 Skew = 0.0f,
@@ -26,7 +26,7 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         [JsonIgnore]
         public static List<SkewControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as SkewControl);
+            DefaultInstance.ConvertAll(input => (SkewControl)input.Clone());
 
         public override ControlBase Clone()
         {

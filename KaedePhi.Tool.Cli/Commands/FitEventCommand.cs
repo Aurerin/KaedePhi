@@ -71,7 +71,7 @@ public sealed class FitEventCommand : AsyncCommand<FitEventCommand.Settings>
             for (var j = 0; j < nrc.JudgeLineList[i].EventLayers.Count; j++)
             {
                 var el = nrc.JudgeLineList[i].EventLayers[j];
-                if (el == null)
+                if ((object?)el is null)
                     continue;
                 cancellationToken.ThrowIfCancellationRequested();
 

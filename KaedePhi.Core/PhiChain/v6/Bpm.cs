@@ -61,7 +61,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 var point = this[i];
                 if (Math.Abs(lastBpm - (-1f)) > float.Epsilon)
                 {
-                    time += ((float)point.Beat - lastBeat) * (60f / lastBpm);
+                    time += (point.Beat - lastBeat) * (60f / lastBpm);
                 }
 
                 lastBeat = point.Beat;

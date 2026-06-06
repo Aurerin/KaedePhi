@@ -10,13 +10,13 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         private static readonly List<SizeControl> DefaultInstance = new()
         {
-            new()
+            new SizeControl
             {
                 Easing = new Easing(1),
                 Size = 1.0f,
                 X = 0.0f,
             },
-            new()
+            new SizeControl
             {
                 Easing = new Easing(1),
                 Size = 1.0f,
@@ -26,7 +26,7 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         [JsonIgnore]
         public static List<SizeControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as SizeControl);
+            DefaultInstance.ConvertAll(input => (SizeControl)input.Clone());
 
         public override ControlBase Clone()
         {

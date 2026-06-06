@@ -413,7 +413,7 @@ public class EventKpcToPhigrosV3
     {
         for (var i = 1; i < events.Count; i++)
         {
-            if ((double)events[i].StartBeat < (double)events[i - 1].StartBeat - FloatEpsilon)
+            if (events[i].StartBeat < (double)events[i - 1].StartBeat - FloatEpsilon)
                 return false;
         }
         return true;

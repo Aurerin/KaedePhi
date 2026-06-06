@@ -10,13 +10,13 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         private static readonly List<AlphaControl> DefaultInstance = new()
         {
-            new()
+            new AlphaControl
             {
                 Easing = new Easing(1),
                 Alpha = 1.0f,
                 X = 0.0f,
             },
-            new()
+            new AlphaControl
             {
                 Easing = new Easing(1),
                 Alpha = 1.0f,
@@ -26,7 +26,7 @@ namespace KaedePhi.Core.RePhiEdit.Controls
 
         [JsonIgnore]
         public static List<AlphaControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as AlphaControl);
+            DefaultInstance.ConvertAll(input => (AlphaControl)input.Clone());
 
         public override ControlBase Clone()
         {

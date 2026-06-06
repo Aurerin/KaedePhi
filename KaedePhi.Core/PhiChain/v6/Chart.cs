@@ -16,7 +16,7 @@ namespace KaedePhi.Core.PhiChain.v6
         public BpmList BpmList { get; set; } = new();
 
         [JsonProperty("lines")]
-        public List<SerializedLine> Lines { get; set; } = new() { SerializedLine.CreateDefault() };
+        public List<SerializedLine> Lines { get; set; } = new();
 
         public static Chart Empty()
         {

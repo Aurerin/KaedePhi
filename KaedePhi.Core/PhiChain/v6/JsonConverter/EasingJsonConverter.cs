@@ -6,9 +6,14 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
 {
     public sealed class EasingJsonConverter : JsonConverter<Easing>
     {
-        public override void WriteJson(JsonWriter writer, Easing value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Easing? value, JsonSerializer serializer)
         {
-            var obj = new JObject { ["kind"] = ToTypeString(value.EasingType) };
+            var obj = new JObject
+            {
+                ["kind"] = ToTypeString(
+                    value?.EasingType ?? throw new InvalidOperationException("kind is null")
+                ),
+            };
 
             if (value.EasingType == EasingKind.Custom)
             {
@@ -39,7 +44,10 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         {
             var obj = JObject.Load(reader);
             var easing = existingValue ?? new Easing();
-            easing.EasingType = ParseType(obj.Value<string>("kind"));
+            easing.EasingType = ParseType(
+                obj.Value<string>("kind")
+                    ?? throw new JsonSerializationException("Missing 'kind' property for Easing.")
+            );
 
             if (easing.EasingType == EasingKind.Custom)
             {

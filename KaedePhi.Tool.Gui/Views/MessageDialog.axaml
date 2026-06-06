@@ -1,6 +1,5 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:loc="using:KaedePhi.Tool.Localization"
         x:Class="KaedePhi.Tool.Gui.Views.MessageDialog"
         Title="KaedePhi"
         Width="400" MinHeight="180"

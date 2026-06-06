@@ -9,7 +9,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 标签名称
         /// </summary>
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "Wow";
 
         /// <summary>
         /// 标签所在拍

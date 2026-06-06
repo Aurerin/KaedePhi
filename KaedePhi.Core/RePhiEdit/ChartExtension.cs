@@ -20,7 +20,7 @@ namespace KaedePhi.Core.RePhiEdit
             foreach (var judgeLine in JudgeLineList)
             {
                 // 如果这个判定线层级上有null层级，移除它们
-                judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                judgeLine.EventLayers.RemoveAll(layer => (object?)layer is null);
                 // 对所有判定线的所有事件层级执行Anticipation()方法
                 foreach (var eventLayer in judgeLine.EventLayers)
                 {
@@ -160,7 +160,7 @@ namespace KaedePhi.Core.RePhiEdit
             foreach (
                 var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
                 {
-                    judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                    judgeLine.EventLayers.RemoveAll(layer => (object?)layer is null);
                     return judgeLine.EventLayers;
                 })
             )
@@ -201,7 +201,7 @@ namespace KaedePhi.Core.RePhiEdit
             foreach (
                 var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
                 {
-                    judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                    judgeLine.EventLayers.RemoveAll(layer => (object?)layer is null);
                     return judgeLine.EventLayers;
                 })
             )
@@ -238,7 +238,7 @@ namespace KaedePhi.Core.RePhiEdit
                 foreach (
                     var eventLayer in chart.JudgeLineList.SelectMany(judgeLine =>
                     {
-                        judgeLine.EventLayers.RemoveAll(layer => layer is null);
+                        judgeLine.EventLayers.RemoveAll(layer => (object?)layer is null);
                         return judgeLine.EventLayers;
                     })
                 )

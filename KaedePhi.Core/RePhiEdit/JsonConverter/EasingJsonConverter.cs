@@ -5,15 +5,17 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
 {
     public class EasingJsonConverter : JsonConverter<Easing>
     {
-        public override void WriteJson(JsonWriter writer, Easing value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Easing? value, JsonSerializer serializer)
         {
+            if (value is null)
+                return;
             writer.WriteValue((int)value);
         }
 
         public override Easing ReadJson(
             JsonReader reader,
             Type objectType,
-            Easing existingValue,
+            Easing? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )

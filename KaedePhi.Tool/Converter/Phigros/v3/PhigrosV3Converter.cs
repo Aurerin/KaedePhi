@@ -32,20 +32,18 @@ public class PhigrosV3Converter
         {
             BpmList = BpmItem.ConvertBpmList(input.JudgeLineList),
             Meta = Meta.ConvertMeta(input),
-            JudgeLineList =
-                input
-                    .JudgeLineList?.Select(
-                        (j, i) =>
-                            JudgeLine.ConvertJudgeLine(
-                                j,
-                                i,
-                                input.JudgeLineList.Count > 0
-                                    ? input.JudgeLineList[0].Bpm
-                                    : DefaultPhigrosBpm
-                            )
-                    )
-                    .ToList()
-                ?? [],
+            JudgeLineList = input
+                .JudgeLineList.Select(
+                    (j, i) =>
+                        JudgeLine.ConvertJudgeLine(
+                            j,
+                            i,
+                            input.JudgeLineList.Count > 0
+                                ? input.JudgeLineList[0].Bpm
+                                : DefaultPhigrosBpm
+                        )
+                )
+                .ToList(),
         };
     }
 
@@ -75,11 +73,9 @@ public class PhigrosV3Converter
         return new PhigrosChart
         {
             Offset = GetPhigrosV3Offset(input.Meta),
-            JudgeLineList =
-                input.JudgeLineList?.ConvertAll(j =>
-                    judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)
-                )
-                ?? [],
+            JudgeLineList = input.JudgeLineList.ConvertAll(j =>
+                judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)
+            ),
         };
     }
 

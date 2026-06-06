@@ -91,7 +91,7 @@ namespace KaedePhi.Core.RePhiEdit
 
         [JsonProperty("color", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ColorConverter))]
-        private byte[] ColorLegacyField
+        private byte[]? ColorLegacyField
         {
             get => null; // 序列化时不输出
             set
@@ -106,13 +106,13 @@ namespace KaedePhi.Core.RePhiEdit
         /// </summary>
         [JsonProperty("tintHitEffects", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ColorConverter))]
-        public byte[] HitFxColor { get; set; }
+        public byte[]? HitFxColor { get; set; }
 
         /// <summary>
         /// 音符打击音效相对路径
         /// </summary>
         [JsonProperty("hitsound", NullValueHandling = NullValueHandling.Ignore)]
-        public string HitSound { get; set; } // 音效
+        public string? HitSound { get; set; } // 音效
 
         public Note Clone()
         {

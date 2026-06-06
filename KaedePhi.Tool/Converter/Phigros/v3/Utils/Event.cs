@@ -114,26 +114,26 @@ public static class Event
     public static double GetJudgeLineHorizonBeat(PhigrosJudgeLine src)
     {
         var maxBeat = 0d;
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NotesAbove?.Select(n => (double)n.Time / 32)));
-        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NotesBelow?.Select(n => (double)n.Time / 32)));
+        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NotesAbove.Select(n => (double)n.Time / 32)));
+        maxBeat = Math.Max(maxBeat, GetMaxBeat(src.NotesBelow.Select(n => (double)n.Time / 32)));
         maxBeat = Math.Max(
             maxBeat,
             GetMaxBeat(
-                src.NotesAbove?.Where(n => n.Type == PhigrosNoteType.Hold)
+                src.NotesAbove.Where(n => n.Type == PhigrosNoteType.Hold)
                     .Select(n => (double)(n.Time + n.HoldTime) / 32)
             )
         );
         maxBeat = Math.Max(
             maxBeat,
             GetMaxBeat(
-                src.NotesBelow?.Where(n => n.Type == PhigrosNoteType.Hold)
+                src.NotesBelow.Where(n => n.Type == PhigrosNoteType.Hold)
                     .Select(n => (double)(n.Time + n.HoldTime) / 32)
             )
         );
         maxBeat = Math.Max(
             maxBeat,
             GetMaxBeat(
-                src.SpeedEvents?.Select(e =>
+                src.SpeedEvents.Select(e =>
                     Math.Min((double)e.EndTime / 32, Math.Max(0d, (double)e.StartTime / 32) + 1)
                 )
             )
@@ -141,7 +141,7 @@ public static class Event
         maxBeat = Math.Max(
             maxBeat,
             GetMaxBeat(
-                src.JudgeLineMoveEvents?.Select(e =>
+                src.JudgeLineMoveEvents.Select(e =>
                     Math.Abs(e.Start - e.End) < FloatTolerance
                         ? Math.Min(
                             (double)e.EndTime / 32,
@@ -154,7 +154,7 @@ public static class Event
         maxBeat = Math.Max(
             maxBeat,
             GetMaxBeat(
-                src.JudgeLineRotateEvents?.Select(e =>
+                src.JudgeLineRotateEvents.Select(e =>
                     Math.Abs(e.Start - e.End) < FloatTolerance
                         ? Math.Min(
                             (double)e.EndTime / 32,
@@ -167,7 +167,7 @@ public static class Event
         maxBeat = Math.Max(
             maxBeat,
             GetMaxBeat(
-                src.JudgeLineDisappearEvents?.Select(e =>
+                src.JudgeLineDisappearEvents.Select(e =>
                     Math.Abs(e.Start - e.End) < FloatTolerance
                         ? Math.Min(
                             (double)e.EndTime / 32,

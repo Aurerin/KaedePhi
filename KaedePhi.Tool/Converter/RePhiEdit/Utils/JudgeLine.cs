@@ -22,9 +22,11 @@ public class JudgeLine
             IsGif = src.IsGif,
             BpmFactor = src.BpmFactor,
             RotateWithFather = src.RotateWithFather,
-            Notes = src.Notes.ConvertAll(Note.ConvertNote),
+            Notes = src.Notes is not null
+                ? src.Notes.ConvertAll(Note.ConvertNote)
+                : new List<Kpc.Note>(),
             EventLayers = src.EventLayers.ConvertAll(EventLayer.ConvertEventLayer),
-            Extended = EventLayer.ConvertExtendLayer(src.Extended),
+            Extended = EventLayer.ConvertExtendLayer(src.Extended) ?? new KpcEvents.ExtendLayer(),
             PositionControls = src.PositionControls.ConvertAll(Control.ConvertXControl),
             AlphaControls = src.AlphaControls.ConvertAll(Control.ConvertAlphaControl),
             SizeControls = src.SizeControls.ConvertAll(Control.ConvertSizeControl),
@@ -50,7 +52,8 @@ public class JudgeLine
             RotateWithFather = src.RotateWithFather,
             Notes = src.Notes.ConvertAll(Note.ConvertNote),
             EventLayers = src.EventLayers.ConvertAll(r => EventLayer.ConvertEventLayer(r, options)),
-            Extended = EventLayer.ConvertExtendLayer(src.Extended, options),
+            Extended =
+                EventLayer.ConvertExtendLayer(src.Extended, options) ?? new RpeEvents.ExtendLayer(),
             PositionControls = src.PositionControls.ConvertAll(Control.ConvertXControl),
             AlphaControls = src.AlphaControls.ConvertAll(Control.ConvertAlphaControl),
             SizeControls = src.SizeControls.ConvertAll(Control.ConvertSizeControl),
