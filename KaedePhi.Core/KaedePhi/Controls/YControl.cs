@@ -32,7 +32,7 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// 获取默认控制点列表。
         /// </summary>
         public static List<YControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as YControl);
+            DefaultInstance.ConvertAll(input => (YControl)input.Clone());
 
         /// <summary>
         /// 深拷贝控制点。

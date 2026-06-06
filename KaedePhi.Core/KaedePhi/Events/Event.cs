@@ -36,13 +36,14 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// <summary>
         /// 事件开始数值
         /// </summary>
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 'required' 修饰符或声明为可以为 null。
         public T StartValue { get; set; } // 开始值
 
         /// <summary>
         /// 事件结束数值
         /// </summary>
         public T EndValue { get; set; } // 结束值
-
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 'required' 修饰符或声明为可以为 null。
         /// <summary>
         /// 事件开始拍
         /// </summary>
@@ -342,7 +343,7 @@ namespace KaedePhi.Core.KaedePhi.Events
         private static TValue DeepClone<TValue>(TValue value)
         {
             if (value is null)
-                return default;
+                throw new InvalidOperationException("Value cannot be null for cloning.");
 
             var type = typeof(TValue);
 
@@ -408,10 +409,14 @@ namespace KaedePhi.Core.KaedePhi.Events
                 // byte[]需要深拷贝
                 clone.StartValue = StartValue is not null
                     ? Cast<byte[], T>(Cast<T, byte[]>(StartValue).ToArray())
-                    : default;
+                    : throw new InvalidOperationException(
+                        "StartValue cannot be null for byte[] cloning."
+                    );
                 clone.EndValue = EndValue is not null
                     ? Cast<byte[], T>(Cast<T, byte[]>(EndValue).ToArray())
-                    : default;
+                    : throw new InvalidOperationException(
+                        "EndValue cannot be null for byte[] cloning."
+                    );
             }
             else
             {

@@ -44,7 +44,7 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
             }
 
             cutEvents.Add(
-                new KpcEvents.Event<TPayload>()
+                new KpcEvents.Event<TPayload>
                 {
                     StartBeat = nowBeat,
                     EndBeat = segmentEnd,

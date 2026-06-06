@@ -1,7 +1,7 @@
-﻿using global::KaedePhi.Tool.Layer.KaedePhi;
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Event.KaedePhi;
+using KaedePhi.Tool.Layer.KaedePhi;
 using KpcEasing = KaedePhi.Core.KaedePhi.Easing;
 using KpcEventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 
@@ -594,7 +594,7 @@ public class LineEventBuilder
         while (lo <= hi)
         {
             var mid = (lo + hi) >>> 1;
-            if ((double)events[mid].StartBeat <= beatValue + FloatEpsilon)
+            if (events[mid].StartBeat <= beatValue + FloatEpsilon)
             {
                 candidate = mid;
                 lo = mid + 1;

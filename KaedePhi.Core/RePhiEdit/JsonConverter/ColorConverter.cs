@@ -6,8 +6,10 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
 {
     public class ColorConverter : JsonConverter<byte[]>
     {
-        public override void WriteJson(JsonWriter writer, byte[] value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, byte[]? value, JsonSerializer serializer)
         {
+            if (value is null)
+                return;
             writer.WriteStartArray();
             foreach (var b in value)
             {

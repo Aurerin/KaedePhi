@@ -1,4 +1,5 @@
-﻿using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
+﻿using KaedePhi.Tool.Event.KaedePhi;
+using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
@@ -7,7 +8,7 @@ public static class EventLayer
     public static KpcEvents.EventLayer ConvertEventLayer(PhigrosJudgeLine src, double horizonBeat)
     {
         var result = new KpcEvents.EventLayer();
-        var eventListCompress = new Tool.Event.KaedePhi.EventCompressor<double>();
+        var eventListCompress = new EventCompressor<double>();
 
         var moveX = Event.ConvertMoveAxisEvents(
             src.JudgeLineMoveEvents,

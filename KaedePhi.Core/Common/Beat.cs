@@ -238,7 +238,7 @@ namespace KaedePhi.Core.Common
 
         public override string ToString() => $"{_whole}:{_numerator}/{_denominator}";
 
-        public override bool Equals(object obj) => obj is Beat other && Equals(other);
+        public override bool Equals(object? obj) => obj is Beat other && Equals(other);
 
         public bool Equals(Beat other) => _curBeatDouble.Equals(other._curBeatDouble);
 

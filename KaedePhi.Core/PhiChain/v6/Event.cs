@@ -75,7 +75,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 Type = Type,
                 Start = Start,
                 End = End,
-                Easing = Easing?.Clone(),
+                Easing = Easing.Clone(),
                 Value = Value,
             };
         }
@@ -105,7 +105,7 @@ namespace KaedePhi.Core.PhiChain.v6
                 Type = Type,
                 StartBeat = new Beat((int[])StartBeat),
                 EndBeat = new Beat((int[])EndBeat),
-                Value = Value?.Clone(),
+                Value = Value.Clone(),
             };
         }
     }

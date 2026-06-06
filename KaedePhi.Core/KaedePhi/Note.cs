@@ -83,12 +83,12 @@ namespace KaedePhi.Core.KaedePhi
         /// <summary>
         /// 打击特效颜色（RGB，顶点颜色乘法）
         /// </summary>
-        public byte[] HitFxColor { get; set; }
+        public byte[]? HitFxColor { get; set; }
 
         /// <summary>
         /// 音符打击音效相对路径
         /// </summary>
-        public string HitSound { get; set; }
+        public string? HitSound { get; set; }
 
         /// <summary>
         /// 保留字段

@@ -143,13 +143,7 @@ public static class KpcEventChannelRenderer
             foreach (var evt in events)
             {
                 var captured = evt;
-                list.Add(
-                    (
-                        (double)evt.StartBeat,
-                        (double)evt.EndBeat,
-                        bd => getValue(captured, new Beat(bd))
-                    )
-                );
+                list.Add((evt.StartBeat, evt.EndBeat, bd => getValue(captured, new Beat(bd))));
             }
         }
 

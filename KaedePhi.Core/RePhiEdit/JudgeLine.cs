@@ -83,7 +83,7 @@ namespace KaedePhi.Core.RePhiEdit
             DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore
         )]
-        public Events.ExtendLayer Extended { get; set; } = new Events.ExtendLayer();
+        public Events.ExtendLayer Extended { get; set; } = new();
 
         /// <summary>
         /// 判定线的Z轴顺序
@@ -130,7 +130,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                _positionControls ??= new List<Controls.XControl>();
+                _positionControls ??= Controls.XControl.Default;
 
                 return _positionControls;
             }
@@ -138,7 +138,7 @@ namespace KaedePhi.Core.RePhiEdit
         }
 
         [JsonIgnore]
-        private List<Controls.XControl> _positionControls;
+        private List<Controls.XControl>? _positionControls;
 
         /// <summary>
         /// Alpha Control 控制点列表
@@ -148,7 +148,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                _alphaControls ??= new List<Controls.AlphaControl>();
+                _alphaControls ??= Controls.AlphaControl.Default;
 
                 return _alphaControls;
             }
@@ -156,7 +156,7 @@ namespace KaedePhi.Core.RePhiEdit
         }
 
         [JsonIgnore]
-        private List<Controls.AlphaControl> _alphaControls;
+        private List<Controls.AlphaControl>? _alphaControls;
 
         /// <summary>
         /// Size Control 控制点列表
@@ -166,7 +166,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                _sizeControls ??= new List<Controls.SizeControl>();
+                _sizeControls ??= Controls.SizeControl.Default;
 
                 return _sizeControls;
             }
@@ -174,7 +174,7 @@ namespace KaedePhi.Core.RePhiEdit
         }
 
         [JsonIgnore]
-        private List<Controls.SizeControl> _sizeControls;
+        private List<Controls.SizeControl>? _sizeControls;
 
         /// <summary>
         /// Skew Control 控制点列表
@@ -184,7 +184,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                _skewControls ??= new List<Controls.SkewControl>();
+                _skewControls ??= Controls.SkewControl.Default;
 
                 return _skewControls;
             }
@@ -192,7 +192,7 @@ namespace KaedePhi.Core.RePhiEdit
         }
 
         [JsonIgnore]
-        private List<Controls.SkewControl> _skewControls;
+        private List<Controls.SkewControl>? _skewControls;
 
         /// <summary>
         /// Y Control 控制点列表
@@ -202,7 +202,7 @@ namespace KaedePhi.Core.RePhiEdit
         {
             get
             {
-                _yControls ??= new List<Controls.YControl>();
+                _yControls ??= Controls.YControl.Default;
 
                 return _yControls;
             }
@@ -210,48 +210,28 @@ namespace KaedePhi.Core.RePhiEdit
         }
 
         [JsonIgnore]
-        private List<Controls.YControl> _yControls;
+        private List<Controls.YControl>? _yControls;
 
         public JudgeLine Clone()
         {
-            var clone = new JudgeLine
-            {
-                Name = Name,
-                Texture = Texture,
-                Anchor = (float[])Anchor.Clone(),
-                Father = Father,
-                IsCover = IsCover,
-                ZOrder = ZOrder,
-                IsGif = IsGif,
-                Group = Group,
-                BpmFactor = BpmFactor,
-                RotateWithFather = RotateWithFather,
-                AttachUi = AttachUi,
-                EventLayers = new List<Events.EventLayer>(),
-                Notes = new List<Note>(),
-                Extended = Extended?.Clone(),
-                PositionControls = new List<Controls.XControl>(),
-                AlphaControls = new List<Controls.AlphaControl>(),
-                SizeControls = new List<Controls.SizeControl>(),
-                SkewControls = new List<Controls.SkewControl>(),
-                YControls = new List<Controls.YControl>(),
-            };
+            var clone = new JudgeLine { Notes = new List<Note>() };
 
             // 深拷贝列表
             foreach (var eventLayer in EventLayers)
                 clone.EventLayers.Add(eventLayer.Clone());
-            foreach (var note in Notes)
-                clone.Notes.Add(note.Clone());
+            if (Notes is not null)
+                foreach (var note in Notes)
+                    clone.Notes.Add(note.Clone());
             foreach (var control in PositionControls)
-                clone.PositionControls.Add(control.Clone() as Controls.XControl);
+                clone.PositionControls.Add((Controls.XControl)control.Clone());
             foreach (var control in AlphaControls)
-                clone.AlphaControls.Add(control.Clone() as Controls.AlphaControl);
+                clone.AlphaControls.Add((Controls.AlphaControl)control.Clone());
             foreach (var control in SizeControls)
-                clone.SizeControls.Add(control.Clone() as Controls.SizeControl);
+                clone.SizeControls.Add((Controls.SizeControl)control.Clone());
             foreach (var control in SkewControls)
-                clone.SkewControls.Add(control.Clone() as Controls.SkewControl);
+                clone.SkewControls.Add((Controls.SkewControl)control.Clone());
             foreach (var control in YControls)
-                clone.YControls.Add(control.Clone() as Controls.YControl);
+                clone.YControls.Add((Controls.YControl)control.Clone());
 
             return clone;
         }

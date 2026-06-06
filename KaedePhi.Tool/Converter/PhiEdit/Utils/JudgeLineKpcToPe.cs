@@ -1,6 +1,6 @@
-using global::KaedePhi.Tool.JudgeLines.KaedePhi;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
+using KaedePhi.Tool.JudgeLines.KaedePhi;
 using ExtendLayer = KaedePhi.Core.KaedePhi.Events.ExtendLayer;
 using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 
@@ -32,7 +32,7 @@ public class JudgeLineKpcToPe
         var trueSrc = src;
         var pe = new Pe.JudgeLine
         {
-            NoteList = trueSrc.Notes?.ConvertAll(n => Note.ConvertNote(n, _warnLogger)) ?? [],
+            NoteList = trueSrc.Notes.ConvertAll(n => Note.ConvertNote(n, _warnLogger)),
         };
 
         if (
@@ -65,7 +65,7 @@ public class JudgeLineKpcToPe
                 );
         }
 
-        _eventBuilder.ConvertLineEvents(pe, trueSrc.EventLayers ?? []);
+        _eventBuilder.ConvertLineEvents(pe, trueSrc.EventLayers);
         if (pe.AlphaEvents.Count == 0 && pe.AlphaFrames.Count == 0)
             pe.AlphaFrames.Add(new Pe.Frame());
 
@@ -128,12 +128,12 @@ public class JudgeLineKpcToPe
     private static bool HasNonDefaultExtendLayer(ExtendLayer? layer) =>
         layer != null
         && (
-            layer.ColorEvents.Count > 0
-            || layer.ScaleXEvents.Count > 0
-            || layer.ScaleYEvents.Count > 0
-            || layer.TextEvents.Count > 0
-            || layer.PaintEvents.Count > 0
-            || layer.GifEvents.Count > 0
+            (layer.ColorEvents?.Count > 0)
+            || (layer.ScaleXEvents?.Count > 0)
+            || (layer.ScaleYEvents?.Count > 0)
+            || (layer.TextEvents?.Count > 0)
+            || (layer.PaintEvents?.Count > 0)
+            || (layer.GifEvents?.Count > 0)
         );
 
     private static bool IsDefaultAnchor(float[]? anchor) =>

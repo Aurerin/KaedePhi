@@ -30,7 +30,7 @@ public class BeatTests
     [Fact]
     public void Constructor_WithNullArray_ThrowsArgumentException()
     {
-        var act = () => new Beat((int[])null!);
+        var act = () => new Beat(null);
 
         act.Should().Throw<ArgumentException>();
     }

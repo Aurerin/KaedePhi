@@ -14,7 +14,7 @@ namespace KaedePhi.Core.RePhiEdit
 
         public BpmItem Clone()
         {
-            return new BpmItem() { Bpm = Bpm, StartBeat = new Beat((int[])StartBeat) };
+            return new BpmItem { Bpm = Bpm, StartBeat = new Beat((int[])StartBeat) };
         }
     }
 }

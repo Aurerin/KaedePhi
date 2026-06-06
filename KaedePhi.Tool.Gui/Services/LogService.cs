@@ -36,7 +36,7 @@ public sealed class LogService : IDisposable
     /// 若在会话启动前调用，返回 <see cref="Serilog.Core.Logger.None"/>（静默丢弃所有日志）。
     /// </para>
     /// </summary>
-    public ILogger ForContext<T>() => _rootLogger?.ForContext<T>() ?? Serilog.Core.Logger.None;
+    public ILogger ForContext<T>() => _rootLogger?.ForContext<T>() ?? Logger.None;
 
     /// <summary>
     /// 启动一个新的日志会话：创建带时间戳的日志文件，配置全局 <see cref="Log.Logger"/>。

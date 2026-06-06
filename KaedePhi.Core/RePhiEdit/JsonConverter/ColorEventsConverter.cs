@@ -9,10 +9,12 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
     {
         public override void WriteJson(
             JsonWriter writer,
-            List<RePhiEdit.Events.Event<byte[]>> value,
+            List<RePhiEdit.Events.Event<byte[]>>? value,
             JsonSerializer serializer
         )
         {
+            if (value is null)
+                return;
             writer.WriteStartArray();
             foreach (var evt in value)
             {
@@ -61,7 +63,7 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
         public override List<RePhiEdit.Events.Event<byte[]>> ReadJson(
             JsonReader reader,
             Type objectType,
-            List<RePhiEdit.Events.Event<byte[]>> existingValue,
+            List<RePhiEdit.Events.Event<byte[]>>? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )
@@ -73,8 +75,18 @@ namespace KaedePhi.Core.RePhiEdit.JsonConverter
             {
                 var evt = new RePhiEdit.Events.Event<byte[]>
                 {
-                    StartBeat = new Beat(item["startTime"]?.ToObject<int[]>()),
-                    EndBeat = new Beat(item["endTime"]?.ToObject<int[]>()),
+                    StartBeat = new Beat(
+                        item["startTime"]?.ToObject<int[]>()
+                            ?? throw new JsonSerializationException(
+                                "startTime is required for Event."
+                            )
+                    ),
+                    EndBeat = new Beat(
+                        item["endTime"]?.ToObject<int[]>()
+                            ?? throw new JsonSerializationException(
+                                "endTime is required for Event."
+                            )
+                    ),
                     StartValue = Array.ConvertAll(
                         item["start"]?.ToObject<int[]>() ?? Array.Empty<int>(),
                         i => (byte)i

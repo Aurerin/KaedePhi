@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -154,7 +155,7 @@ internal sealed class AppController
                 CancellationToken.None
             );
 
-            _toolVm.CurrentFileName = System.IO.Path.GetFileName(filePath);
+            _toolVm.CurrentFileName = Path.GetFileName(filePath);
             _toolVm.DetectedFormat = detectedType.ToString();
             _toolVm.SourceChartType = detectedType;
             _toolVm.SelectedTool = null;

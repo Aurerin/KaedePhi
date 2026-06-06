@@ -32,7 +32,7 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// 获取默认控制点列表。
         /// </summary>
         public static List<AlphaControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as AlphaControl);
+            DefaultInstance.ConvertAll(input => (AlphaControl)input.Clone());
 
         /// <summary>
         /// 深拷贝控制点。

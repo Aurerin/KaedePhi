@@ -32,7 +32,7 @@ namespace KaedePhi.Core.KaedePhi.Controls
         /// 获取默认控制点列表。
         /// </summary>
         public static List<SkewControl> Default =>
-            DefaultInstance.ConvertAll(input => input.Clone() as SkewControl);
+            DefaultInstance.ConvertAll(input => (SkewControl)input.Clone());
 
         /// <summary>
         /// 深拷贝控制点。

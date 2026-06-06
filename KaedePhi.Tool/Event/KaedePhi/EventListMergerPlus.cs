@@ -207,7 +207,7 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
             GetValueAtBeatOrPreviousEnd(fromEventsCopy, subEnd)
         );
 
-        for (var cur = subStart; cur < subEnd;)
+        for (var cur = subStart; cur < subEnd; )
         {
             var nextBeat = cur + cutLength;
             if (nextBeat > subEnd)

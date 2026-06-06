@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using KaedePhi.Core.KaedePhi.Events;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter;
 using KaedePhi.Tool.Converter.KaedePhi;
@@ -309,7 +311,7 @@ public sealed class GuiChartService
             error: msg => _log.Error(msg),
             debug: msg => _log.Debug(msg)
         );
-        var linesToProcess = new System.Collections.Generic.List<int>();
+        var linesToProcess = new List<int>();
         for (var i = 0; i < chart.JudgeLineList.Count; i++)
         {
             if (chart.JudgeLineList[i].Father != -1)
@@ -482,7 +484,7 @@ public sealed class GuiChartService
     }
 
     private static void FitLayer(
-        Core.KaedePhi.Events.EventLayer layer,
+        EventLayer layer,
         EventFit<double> doubleFit,
         EventFit<int> intFit,
         EventFit<float> floatFit,
@@ -503,7 +505,7 @@ public sealed class GuiChartService
         progress?.Report(new ToolProgress(1.0));
     }
 
-    public System.Collections.Generic.IReadOnlyList<string> RunRender(
+    public IReadOnlyList<string> RunRender(
         Chart chart,
         int pixelsPerBeat,
         int channelWidth,

@@ -160,7 +160,7 @@ namespace KaedePhi.Core.PhiEdit
                 );
             chart.Offset = offset;
 
-            string line;
+            string? line;
             while ((line = await reader.ReadLineAsync()) != null)
             {
                 if (!string.IsNullOrWhiteSpace(line))
@@ -404,9 +404,11 @@ namespace KaedePhi.Core.PhiEdit
         private static Note BuildNote(
             string[] part,
             string[] noteSpeedMultiplierPart,
-            string[] noteWidthRatioPart
+            string[]? noteWidthRatioPart
         )
         {
+            if (noteWidthRatioPart is null)
+                throw new FormatException("Malformed note: missing width ratio part.");
             if (part.Length < 4)
                 throw new FormatException(
                     $"Malformed note command: expected at least 4 parts, got {part.Length}."

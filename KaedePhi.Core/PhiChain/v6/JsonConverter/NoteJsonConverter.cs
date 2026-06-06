@@ -7,11 +7,14 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
 {
     public sealed class NoteJsonConverter : JsonConverter<Note>
     {
-        public override void WriteJson(JsonWriter writer, Note value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Note? value, JsonSerializer serializer)
         {
             var obj = new JObject
             {
-                ["kind"] = ToKindString(value.Type),
+                ["kind"] = ToKindString(
+                    value?.Type
+                        ?? throw new JsonSerializationException("Note value cannot be null.")
+                ),
                 ["above"] = value.Above,
                 ["beat"] = JToken.FromObject(value.Beat, serializer),
                 ["x"] = value.X,
@@ -37,7 +40,10 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             var obj = JObject.Load(reader);
             var note = existingValue ?? new Note();
 
-            note.Type = ParseKind(obj.Value<string>("kind"));
+            note.Type = ParseKind(
+                obj.Value<string>("kind")
+                    ?? throw new JsonSerializationException("Note kind is required.")
+            );
             note.Above = obj.Value<bool?>("above") ?? false;
             note.Beat = obj["beat"]?.ToObject<Beat>(serializer) ?? new Beat(new[] { 0, 0, 1 });
             note.X = obj.Value<float?>("x") ?? 0f;

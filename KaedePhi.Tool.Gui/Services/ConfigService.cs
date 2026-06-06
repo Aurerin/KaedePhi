@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using KaedePhi.Tool.Gui.Models;
 using YamlDotNet.Serialization;
@@ -41,9 +42,7 @@ public sealed class ConfigService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"[ConfigService] Failed to load config: {ex.Message}"
-            );
+            Debug.WriteLine($"[ConfigService] Failed to load config: {ex.Message}");
         }
 
         var defaults = new GuiAppConfig();
@@ -65,9 +64,7 @@ public sealed class ConfigService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"[ConfigService] Failed to save config: {ex.Message}"
-            );
+            Debug.WriteLine($"[ConfigService] Failed to save config: {ex.Message}");
         }
     }
 }

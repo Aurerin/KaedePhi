@@ -85,8 +85,7 @@ public static class FatherUnbindHelpers
     )
     {
         var segmentLength = (double)(intervalEndBeat - segmentStartBeat);
-        var progress =
-            segmentLength > 1e-12 ? (double)(nextBeat - segmentStartBeat) / segmentLength : 1.0;
+        var progress = segmentLength > 1e-12 ? (nextBeat - segmentStartBeat) / segmentLength : 1.0;
         var predicted = (
             X: segmentStart.X + (intervalEnd.X - segmentStart.X) * progress,
             Y: segmentStart.Y + (intervalEnd.Y - segmentStart.Y) * progress
@@ -319,8 +318,8 @@ public static class FatherUnbindHelpers
     {
         for (var i = 1; i < line.EventLayers.Count; i++)
         {
-            line.EventLayers[i].MoveXEvents.Clear();
-            line.EventLayers[i].MoveYEvents.Clear();
+            line.EventLayers[i].MoveXEvents?.Clear();
+            line.EventLayers[i].MoveYEvents?.Clear();
         }
 
         if (line.EventLayers.Count == 0)
@@ -331,7 +330,10 @@ public static class FatherUnbindHelpers
 
         if (line.RotateWithFather)
         {
-            var merged = merge(line.EventLayers[0].RotateEvents, fatherRotateEvents);
+            var merged = merge(
+                line.EventLayers[0].RotateEvents ?? new List<KpcEvents.Event<double>>(),
+                fatherRotateEvents
+            );
             line.EventLayers[0].RotateEvents = merged;
         }
 

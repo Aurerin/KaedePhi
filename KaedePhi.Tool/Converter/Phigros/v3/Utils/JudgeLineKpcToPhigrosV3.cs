@@ -1,7 +1,7 @@
-﻿using global::KaedePhi.Tool.JudgeLines.KaedePhi;
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
+using KaedePhi.Tool.JudgeLines.KaedePhi;
 using KpcEventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;
@@ -36,32 +36,32 @@ public class JudgeLineKpcToPhigrosV3
     public PhigrosJudgeLine ConvertJudgeLine(KpcJudgeLine src, List<KpcJudgeLine> allLine)
     {
         WarnIfUnsupportedJudgeLineFields(src);
-        var trueSrc = src;
+        var preprocessedSrc = src;
 
         if (
-            !string.Equals(trueSrc.Texture, "line.png", StringComparison.Ordinal)
+            !string.Equals(preprocessedSrc.Texture, "line.png", StringComparison.Ordinal)
             || _options.LineFilter.RemoveTextureLine
-            || trueSrc.AttachUi.HasValue
+            || preprocessedSrc.AttachUi.HasValue
             || _options.LineFilter.RemoveAttachUiLine
         )
         {
-            return new PhigrosJudgeLine() { Bpm = _globalBpm / trueSrc.BpmFactor };
+            return new PhigrosJudgeLine { Bpm = _globalBpm / preprocessedSrc.BpmFactor };
         }
 
-        if (trueSrc.Father != -1)
+        if (preprocessedSrc.Father != -1)
         {
             Warn($"PhigrosV3 不支持 JudgeLine.Father（值={src.Father}），将自动解除父子绑定");
             var unbinder = new JudgeLineUnbinder();
             if (_options.FatherLineUnbind.ClassicMode)
             {
-                trueSrc = unbinder.FatherUnbind(
+                preprocessedSrc = unbinder.FatherUnbind(
                     allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
                     allLine,
                     _options.FatherLineUnbind.Precision
                 );
             }
             else
-                trueSrc = unbinder.FatherUnbind(
+                preprocessedSrc = unbinder.FatherUnbind(
                     allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
                     allLine,
                     _options.FatherLineUnbind.Precision,
@@ -69,14 +69,14 @@ public class JudgeLineKpcToPhigrosV3
                 );
         }
 
-        var lineBpm = _globalBpm / trueSrc.BpmFactor;
-        var speedEvents = CollectSpeedEvents(trueSrc.EventLayers);
+        var lineBpm = _globalBpm / preprocessedSrc.BpmFactor;
+        var speedEvents = CollectSpeedEvents(preprocessedSrc.EventLayers);
 
         if (_options.NegativeAlpha.Enabled)
-            ApplyNegativeAlphaElevation(trueSrc);
+            ApplyNegativeAlphaElevation(preprocessedSrc);
 
         var (notesAbove, notesBelow) = NoteKpcToPhigrosV3.ConvertNotes(
-            trueSrc.Notes,
+            preprocessedSrc.Notes,
             speedEvents,
             _warnLogger,
             _options.NoteFilter.FilterFakeNotes
@@ -89,7 +89,7 @@ public class JudgeLineKpcToPhigrosV3
             NotesBelow = notesBelow,
         };
 
-        _eventConverter.ConvertLineEvents(phigrosLine, trueSrc.EventLayers ?? []);
+        _eventConverter.ConvertLineEvents(phigrosLine, preprocessedSrc.EventLayers);
 
         if (phigrosLine.JudgeLineDisappearEvents.Count == 0)
         {
@@ -107,7 +107,7 @@ public class JudgeLineKpcToPhigrosV3
         return phigrosLine;
     }
 
-    private static List<KpcSpeedEvent> CollectSpeedEvents(List<KpcEvents.EventLayer>? layers)
+    private static List<KpcSpeedEvent> CollectSpeedEvents(List<KpcEventLayer>? layers)
     {
         if (layers is not { Count: > 0 })
             return [];
@@ -188,7 +188,6 @@ public class JudgeLineKpcToPhigrosV3
         int lastEndValue = 0;
         Beat lastEndBeat = new(0);
         Beat? segStart = null;
-        Beat segEnd = new(0);
 
         foreach (var ev in sorted)
         {
@@ -199,7 +198,6 @@ public class JudgeLineKpcToPhigrosV3
                 {
                     // 空隙中 Alpha 保持负值
                     segStart ??= lastEndBeat;
-                    segEnd = ev.StartBeat;
                 }
                 else if (segStart.HasValue)
                 {
@@ -217,7 +215,6 @@ public class JudgeLineKpcToPhigrosV3
             {
                 // 全负段
                 segStart ??= ev.StartBeat;
-                segEnd = ev.EndBeat;
             }
             else if (!evNegStart && !evNegEnd)
             {
@@ -245,7 +242,6 @@ public class JudgeLineKpcToPhigrosV3
                     segments.Add((segStart.Value, zeroBeat));
                 }
                 segStart = zeroBeat;
-                segEnd = ev.EndBeat;
             }
 
             lastEndValue = ev.EndValue;
@@ -281,7 +277,7 @@ public class JudgeLineKpcToPhigrosV3
             return ev.StartBeat;
 
         var t = absStart / total;
-        return new Beat((double)ev.StartBeat + t * duration);
+        return new Beat(ev.StartBeat + t * duration);
     }
 
     /// <summary>
@@ -329,7 +325,7 @@ public class JudgeLineKpcToPhigrosV3
     /// <summary>
     /// 获取指定拍点上判定线的屏幕坐标。
     /// </summary>
-    private (double X, double Y) GetScreenPosition(KpcEventLayer layer, Beat beat)
+    private static (double X, double Y) GetScreenPosition(KpcEventLayer layer, Beat beat)
     {
         var x = layer.MoveXEvents is { Count: > 0 }
             ? GetCurrentValueAtBeat(layer.MoveXEvents, beat)
@@ -343,7 +339,7 @@ public class JudgeLineKpcToPhigrosV3
     /// <summary>
     /// 判断 KPC 坐标点在考虑旋转后是否仍在屏幕内。
     /// </summary>
-    private bool IsOnScreen(
+    private static bool IsOnScreen(
         double kpcX,
         double kpcY,
         double angleDegrees,
@@ -422,7 +418,7 @@ public class JudgeLineKpcToPhigrosV3
             // 回正事件
             var resetEnd = segEnd + fillLength;
             events.Add(
-                new()
+                new KpcEvents.Event<double>
                 {
                     StartBeat = segEnd,
                     EndBeat = resetEnd,

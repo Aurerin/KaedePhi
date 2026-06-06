@@ -39,7 +39,7 @@ public class JudgeLineConverter
         return new Kpc.JudgeLine
         {
             Name = $"PeJudgeLine_{index}",
-            Notes = src.NoteList?.ConvertAll(Note.ConvertNote) ?? [],
+            Notes = src.NoteList.ConvertAll(Note.ConvertNote) ?? [],
             EventLayers = [eventLayer],
         };
     }

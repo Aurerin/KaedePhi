@@ -8,7 +8,7 @@
     <Authors>NuanR_Star Ciallo Team</Authors>
     <Description>即使身处无人角落，我仍要继续向前，直到我无法前进。但，可曾记得启程的初衷？</Description>
     <PackageProjectUrl>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</PackageProjectUrl>
-    <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.html</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
     <PackageIcon>KaedePhiIcon.png</PackageIcon>
     <RepositoryUrl>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -18,8 +18,6 @@
     <Platforms>x64</Platforms>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
-    <!-- 存量 nullable 警告待逐步修复，详见各 #nullable disable 文件 -->
-    <NoWarn>$(NoWarn);CS8618;CS8625;CS8604;CS8619;CS8765;CS8600;CS8601;CS8603;CS8767</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +34,6 @@
     <None Include="../KaedePhiIcon.png" Pack="true" PackagePath="\" />
     <None Update="KaedePhiIcon.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 </Project>

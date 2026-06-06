@@ -7,7 +7,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
 {
     public sealed class BpmListJsonConverter : JsonConverter<BpmList>
     {
-        public override void WriteJson(JsonWriter writer, BpmList value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, BpmList? value, JsonSerializer serializer)
         {
             serializer.Serialize(writer, value);
         }
@@ -15,7 +15,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         public override BpmList ReadJson(
             JsonReader reader,
             Type objectType,
-            BpmList existingValue,
+            BpmList? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )

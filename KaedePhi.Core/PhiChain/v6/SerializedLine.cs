@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using KaedePhi.Core.Common;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.PhiChain.v6
@@ -15,7 +14,7 @@ namespace KaedePhi.Core.PhiChain.v6
         public Line Line
         {
             get => new() { Name = Name };
-            set => Name = value?.Name ?? "PhiChain Line";
+            set => Name = value.Name;
         }
 
         [JsonProperty("notes")]
@@ -30,11 +29,6 @@ namespace KaedePhi.Core.PhiChain.v6
         [JsonProperty("curve_note_tracks")]
         public List<CurveNoteTrack> CurveNoteTracks { get; set; } = new();
 
-        public static SerializedLine CreateDefault()
-        {
-            return new SerializedLine();
-        }
-
         /// <summary>
         /// 深克隆当前 SerializedLine 对象
         /// </summary>
@@ -47,17 +41,6 @@ namespace KaedePhi.Core.PhiChain.v6
                 Events = Events.Select(e => e.Clone()).ToList(),
                 Children = Children.Select(c => c.Clone()).ToList(),
                 CurveNoteTracks = CurveNoteTracks.Select(t => t.Clone()).ToList(),
-            };
-        }
-
-        private static LineEvent NewConstEvent(LineEventType type, float value)
-        {
-            return new LineEvent
-            {
-                Type = type,
-                Value = LineEventValue.Constant(value),
-                StartBeat = new Beat(new[] { 0, 0, 1 }),
-                EndBeat = new Beat(new[] { 1, 0, 1 }),
             };
         }
     }

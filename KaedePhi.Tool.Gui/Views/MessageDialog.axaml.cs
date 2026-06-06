@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 
 namespace KaedePhi.Tool.Gui.Views;
 
@@ -48,16 +49,10 @@ public partial class MessageDialog : Window
 
         dialog.IconText.Foreground = type switch
         {
-            DialogType.Success => new Avalonia.Media.SolidColorBrush(
-                Avalonia.Media.Color.Parse("#4CAF50")
-            ),
-            DialogType.Warning => new Avalonia.Media.SolidColorBrush(
-                Avalonia.Media.Color.Parse("#FF9800")
-            ),
-            DialogType.Error => new Avalonia.Media.SolidColorBrush(
-                Avalonia.Media.Color.Parse("#F44336")
-            ),
-            _ => new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#2196F3")),
+            DialogType.Success => new SolidColorBrush(Color.Parse("#4CAF50")),
+            DialogType.Warning => new SolidColorBrush(Color.Parse("#FF9800")),
+            DialogType.Error => new SolidColorBrush(Color.Parse("#F44336")),
+            _ => new SolidColorBrush(Color.Parse("#2196F3")),
         };
 
         dialog.ShowDialog(owner);

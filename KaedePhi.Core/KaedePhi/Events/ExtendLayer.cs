@@ -10,37 +10,37 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// <summary>
         /// 判定线纹理颜色事件列表，颜色格式为RGB字节数组，使用顶点颜色乘法
         /// </summary>
-        public List<Event<byte[]>> ColorEvents { get; set; }
+        public List<Event<byte[]>>? ColorEvents { get; set; }
 
         /// <summary>
         /// 判定线纹理宽度缩放事件列表
         /// </summary>
-        public List<Event<float>> ScaleXEvents { get; set; }
+        public List<Event<float>>? ScaleXEvents { get; set; }
 
         /// <summary>
         /// 判定线纹理高度缩放事件列表
         /// </summary>
-        public List<Event<float>> ScaleYEvents { get; set; }
+        public List<Event<float>>? ScaleYEvents { get; set; }
 
         /// <summary>
         /// 判定线文字纹理事件列表
         /// </summary>
-        public List<Event<string>> TextEvents { get; set; }
+        public List<Event<string>>? TextEvents { get; set; }
 
         /// <summary>
         /// 画笔事件列表，值为画笔大小
         /// </summary>
-        public List<Event<float>> PaintEvents { get; set; }
+        public List<Event<float>>? PaintEvents { get; set; }
 
         /// <summary>
         /// 判定线动图播放进度事件列表，值为动图帧进度（0~1之间）
         /// </summary>
-        public List<Event<float>> GifEvents { get; set; }
+        public List<Event<float>>? GifEvents { get; set; }
 
         /// <summary>
         /// 判定线倾斜事件列表，值为Z轴倾斜角度，顺时针为正
         /// </summary>
-        public List<Event<float>> InclineEvents { get; set; }
+        public List<Event<float>>? InclineEvents { get; set; }
 
         /// <summary>
         /// 深拷贝扩展事件层。

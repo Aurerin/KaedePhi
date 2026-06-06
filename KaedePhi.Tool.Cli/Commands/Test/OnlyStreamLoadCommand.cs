@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using KaedePhi.Core.PhiEdit;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands.Test;
@@ -29,7 +30,7 @@ public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
         // 创建文件流
         using var stream = File.OpenRead(input);
         // 测试pec
-        var chart = await Core.PhiEdit.Chart.LoadStreamAsync(stream);
+        var chart = await Chart.LoadStreamAsync(stream);
         ConsoleWriter.Info(chart.Offset.ToString());
         Console.ReadLine();
 #else

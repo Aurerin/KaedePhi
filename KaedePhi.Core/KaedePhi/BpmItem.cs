@@ -42,7 +42,7 @@ namespace KaedePhi.Core.KaedePhi
         /// <returns>BPM 节点副本</returns>
         public BpmItem Clone()
         {
-            return new BpmItem() { Bpm = Bpm, StartBeat = new Beat((int[])StartBeat) };
+            return new BpmItem { Bpm = Bpm, StartBeat = new Beat((int[])StartBeat) };
         }
     }
 }
