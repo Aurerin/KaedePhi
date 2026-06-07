@@ -246,28 +246,24 @@ public class LineEventBuilder
         if (activeX == null && activeY == null)
             return;
 
+        // 只有两轴都精确覆盖当前区间且缓动相同时，才能直接映射
         var xAligned = IsExactlyCovering(activeX, start, end);
         var yAligned = IsExactlyCovering(activeY, start, end);
-        var sameEasing =
+        var canDirectMap =
             xAligned
             && yAligned
             && activeX != null
             && activeY != null
             && (int)activeX.Easing == (int)activeY.Easing;
-        // 只有一轴活跃时（另一轴为 null），无论该轴是否精确覆盖当前区间，均可直接映射。
-        // 跨越边界时用 GetValueAtBeat 取正确插值，保留原始缓动曲线，避免不必要的线性化切段。
-        var canDirectMap =
-            (activeX is not null && activeY is null)
-            || (activeY is not null && activeX is null)
-            || sameEasing;
 
         if (canDirectMap)
         {
-            EmitAlignedMoveSegment(target, start, end, activeX, activeY, ref lastX, ref lastY);
+            EmitAlignedMoveSegment(target, start, end, activeX!, activeY!, ref lastX, ref lastY);
         }
         else
         {
-            WarnMoveSegmentMisalignment(activeX, activeY, xAligned, yAligned, start, end);
+            if (!xAligned || !yAligned)
+                WarnMoveSegmentMisalignment(activeX, activeY, xAligned, yAligned, start, end);
             EmitCutMoveSegments(target, xEvents, yEvents, start, end, ref lastX, ref lastY);
         }
     }
@@ -276,49 +272,18 @@ public class LineEventBuilder
         Pe.JudgeLine target,
         float start,
         float end,
-        KpcEvents.Event<double>? activeX,
-        KpcEvents.Event<double>? activeY,
+        KpcEvents.Event<double> activeX,
+        KpcEvents.Event<double> activeY,
         ref double lastX,
         ref double lastY
     )
     {
-        // 对于精确覆盖当前区间的事件，直接取 StartValue/EndValue；
-        // 对于跨越边界的事件（如单轴活跃但事件范围超出当前区间），用 GetValueAtBeat 插值，保留原始缓动曲线。
-        double startXv,
-            endXv,
-            startYv,
-            endYv;
-        if (activeX != null)
-        {
-            var xAligned = IsExactlyCovering(activeX, start, end);
-            startXv = xAligned ? activeX.StartValue : activeX.GetValueAtBeat(new Beat(start));
-            endXv = xAligned ? activeX.EndValue : activeX.GetValueAtBeat(new Beat(end));
-        }
-        else
-        {
-            startXv = lastX;
-            endXv = lastX;
-        }
-
-        if (activeY != null)
-        {
-            var yAligned = IsExactlyCovering(activeY, start, end);
-            startYv = yAligned ? activeY.StartValue : activeY.GetValueAtBeat(new Beat(start));
-            endYv = yAligned ? activeY.EndValue : activeY.GetValueAtBeat(new Beat(end));
-        }
-        else
-        {
-            startYv = lastY;
-            endYv = lastY;
-        }
-
-        int easing;
-        if (activeX != null)
-            easing = SafeConvertEasingToInt(activeX.Easing, $"移动@{start:F3}");
-        else if (activeY != null)
-            easing = SafeConvertEasingToInt(activeY.Easing, $"移动@{start:F3}");
-        else
-            easing = 1;
+        // 两轴都精确覆盖且缓动相同，直接取 StartValue/EndValue
+        var startXv = activeX.StartValue;
+        var endXv = activeX.EndValue;
+        var startYv = activeY.StartValue;
+        var endYv = activeY.EndValue;
+        var easing = SafeConvertEasingToInt(activeX.Easing, $"移动@{start:F3}");
 
         target.MoveFrames.Add(
             new Pe.MoveFrame
@@ -543,7 +508,6 @@ public class LineEventBuilder
             if (src.IsBezier)
                 throw new EasingConverter.EasingNotSupportedException(-1, isBezier: true);
             _ = EasingConverter.ConvertEasing(src.Easing);
-            return [src];
         }
         catch (EasingConverter.EasingNotSupportedException)
         {
@@ -553,6 +517,21 @@ public class LineEventBuilder
             var cutter = GetOrCreateCutter<T>();
             return cutter.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
         }
+
+        // PE 不支持 EasingLeft/EasingRight 截取，需要切割成线性事件
+        if (
+            Math.Abs(src.EasingLeft) > FloatEpsilon
+            || Math.Abs(src.EasingRight - 1f) > FloatEpsilon
+        )
+        {
+            Warn(
+                $"{context}：PE 不支持 EasingLeft/EasingRight 截取，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件"
+            );
+            var cutter = GetOrCreateCutter<T>();
+            return cutter.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
+        }
+
+        return [src];
     }
 
     private EventCutter<T> GetOrCreateCutter<T>()

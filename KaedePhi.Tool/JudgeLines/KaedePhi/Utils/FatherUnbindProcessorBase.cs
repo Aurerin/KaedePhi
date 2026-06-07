@@ -78,7 +78,8 @@ public abstract class FatherUnbindProcessorBase
             $"{logTag}[{targetJudgeLineIndex}]: {startAction}，父线索引={judgeLineCopy.Father}"
         );
 
-        var fatherLineCopy = allJudgeLinesCopy[judgeLineCopy.Father].Clone();
+        // allJudgeLinesCopy 已经是克隆列表，直接使用其中的元素，无需再次克隆
+        var fatherLineCopy = allJudgeLinesCopy[judgeLineCopy.Father];
         if (fatherLineCopy.Father >= 0)
         {
             LogDebug?.Invoke(

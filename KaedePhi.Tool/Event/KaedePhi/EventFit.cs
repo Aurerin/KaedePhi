@@ -21,9 +21,23 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
         if (events == null || events.Count == 0)
             return [];
 
-        var sortedEvents = events.OrderBy(e => e.StartBeat).ToList();
+        // 检查是否已排序，避免不必要的列表分配
+        var sortedEvents = IsSortedByStartBeat(events!) ? events! : events!.OrderBy(e => e.StartBeat).ToList();
 
         return FitEventsCore(sortedEvents, tolerance);
+    }
+
+    /// <summary>
+    /// 检查事件列表是否已按 StartBeat 升序排列。
+    /// </summary>
+    private static bool IsSortedByStartBeat(List<KpcEvents.Event<TPayload>> events)
+    {
+        for (var i = 1; i < events.Count; i++)
+        {
+            if (events[i].StartBeat < events[i - 1].StartBeat)
+                return false;
+        }
+        return true;
     }
 
     /// <summary>
@@ -50,30 +64,28 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
                 continue;
             }
 
-            var run = CollectRun(sortedEvents, i, out var nextI);
-            FitRunInto(run, result, tolerance);
-            i = nextI;
+            var runEnd = CollectRunEnd(sortedEvents, i);
+            FitRunInto(sortedEvents, i, runEnd, result, tolerance);
+            i = runEnd;
         }
 
         return result;
     }
 
     /// <summary>
-    /// 从指定位置起收集一段时间连续、数值连续、方向一致的线性事件序列（run）。
+    /// 从指定位置起收集一段时间连续、数值连续、方向一致的线性事件序列的结束索引（不含）。
     /// </summary>
-    private static List<KpcEvents.Event<TPayload>> CollectRun(
+    private static int CollectRunEnd(
         List<KpcEvents.Event<TPayload>> events,
-        int start,
-        out int nextIndex
+        int start
     )
     {
-        var run = new List<KpcEvents.Event<TPayload>> { events[start] };
         var firstDir = GetDirection(
             events[start].GetStartValueAsDouble(),
             events[start].GetEndValueAsDouble()
         );
 
-        nextIndex = start + 1;
+        var nextIndex = start + 1;
         while (nextIndex < events.Count)
         {
             var next = events[nextIndex];
@@ -81,41 +93,43 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
                 break;
             if (!IsLinear(next))
                 break;
-            if (!IsContiguous(run[^1], next))
+            if (!IsContiguous(events[nextIndex - 1], next))
                 break;
             if (GetDirection(next.GetStartValueAsDouble(), next.GetEndValueAsDouble()) != firstDir)
                 break;
 
-            run.Add(next);
             nextIndex++;
         }
 
-        return run;
+        return nextIndex;
     }
 
     /// <summary>
     /// 对 run 中的事件序列进行贪心迭代拟合：
     /// 优先尝试整段拟合，失败后逐步缩短前缀，直到每段都能拟合或退化为单个事件。
-    /// 使用迭代替代递归以避免深层调用栈。
+    /// 使用索引范围避免 GetRange 分配。
     /// </summary>
     private static void FitRunInto(
-        List<KpcEvents.Event<TPayload>> run,
+        List<KpcEvents.Event<TPayload>> source,
+        int runStart,
+        int runEnd,
         List<KpcEvents.Event<TPayload>> target,
         double tolerance
     )
     {
-        var remaining = run;
+        var currentStart = runStart;
 
-        while (remaining.Count > 0)
+        while (currentStart < runEnd)
         {
-            if (remaining.Count == 1)
+            var remainingCount = runEnd - currentStart;
+            if (remainingCount == 1)
             {
-                target.Add(remaining[0].Clone());
+                target.Add(source[currentStart].Clone());
                 return;
             }
 
             // 尝试将当前剩余序列整体拟合为单一缓动事件
-            var fitted = TryFitEasing(remaining, tolerance);
+            var fitted = TryFitEasing(source, currentStart, runEnd, tolerance);
             if (fitted != null)
             {
                 target.Add(fitted);
@@ -124,13 +138,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
 
             // 整体拟合失败，寻找可拟合的最长前缀
             var found = false;
-            for (var split = remaining.Count - 1; split >= 2; split--)
+            for (var splitLen = remainingCount - 1; splitLen >= 2; splitLen--)
             {
-                fitted = TryFitEasing(remaining.GetRange(0, split), tolerance);
+                fitted = TryFitEasing(source, currentStart, currentStart + splitLen, tolerance);
                 if (fitted != null)
                 {
                     target.Add(fitted);
-                    remaining = remaining.GetRange(split, remaining.Count - split);
+                    currentStart += splitLen;
                     found = true;
                     break;
                 }
@@ -139,26 +153,29 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             if (!found)
             {
                 // 无法拟合任何长度 >= 2 的前缀，输出第一个事件并继续处理剩余
-                target.Add(remaining[0].Clone());
-                remaining = remaining.GetRange(1, remaining.Count - 1);
+                target.Add(source[currentStart].Clone());
+                currentStart++;
             }
         }
     }
 
     /// <summary>
     /// 遍历所有支持的缓动函数，返回第一个在容差范围内能覆盖所有事件边界的拟合结果；
-    /// 无法拟合时返回 null。
+    /// 无法拟合时返回 null。使用索引范围避免 List 分配。
     /// </summary>
     private static KpcEvents.Event<TPayload>? TryFitEasing(
         List<KpcEvents.Event<TPayload>> events,
+        int start,
+        int end,
         double tolerance
     )
     {
-        if (events.Count <= 1)
+        var count = end - start;
+        if (count <= 1)
             return null;
 
-        var first = events[0];
-        var last = events[^1];
+        var first = events[start];
+        var last = events[end - 1];
         var startBeat = first.StartBeat;
         var endBeat = last.EndBeat;
         var startValue = first.GetStartValueAsDouble();
@@ -179,6 +196,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
                 FitsWithinTolerance(
                     candidate,
                     events,
+                    start,
+                    end,
                     tolerance,
                     startBeat,
                     endBeat,
@@ -194,11 +213,13 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
 
     /// <summary>
     /// 在所有原始事件的起止边界处采样候选缓动，验证每处的相对误差百分比均不超过容差。
-    /// 相对误差（%）= 绝对偏差 / 整段值域跨度 × 100。
+    /// 相对误差（%）= 绝对偏差 / 整段值域跨度 × 100。使用索引范围避免 List 分配。
     /// </summary>
     private static bool FitsWithinTolerance(
         KpcEvents.Event<TPayload> candidate,
         List<KpcEvents.Event<TPayload>> events,
+        int start,
+        int end,
         double tolerance,
         Beat segStartBeat,
         Beat segEndBeat,
@@ -217,8 +238,9 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
         if (valueRange <= 1e-9)
             return true;
 
-        foreach (var evt in events)
+        for (var i = start; i < end; i++)
         {
+            var evt = events[i];
             var evtStart = (double)evt.StartBeat;
             var evtEnd = (double)evt.EndBeat;
 

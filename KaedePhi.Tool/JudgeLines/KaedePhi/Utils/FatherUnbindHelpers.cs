@@ -383,7 +383,11 @@ public static class FatherUnbindHelpers
     /// </summary>
     public static List<Beat> BuildBeatList(Beat min, Beat max, Beat step)
     {
-        var beats = new List<Beat>();
+        // 预计算容量，避免多次内部扩容
+        var range = (double)(max - min);
+        var stepSize = (double)step;
+        var estimatedCount = stepSize > 0 ? (int)Math.Ceiling(range / stepSize) : 0;
+        var beats = new List<Beat>(Math.Max(0, estimatedCount));
         for (var b = min; b < max; b += step)
             beats.Add(b);
         return beats;

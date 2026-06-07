@@ -196,16 +196,20 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
         List<KpcEvents.Event<TPayload>>? events
     )
     {
-        var eventsCopy = events?.Select(e => e.Clone()).ToList();
+        if (events == null || events.Count == 0)
+            return events;
+
+        // 只有当列表只有一个事件且该事件为默认值时才需要修改
         if (
-            eventsCopy is { Count: 1 }
-            && EqualityComparer<TPayload>.Default.Equals(eventsCopy[0].StartValue, default)
-            && EqualityComparer<TPayload>.Default.Equals(eventsCopy[0].EndValue, default)
+            events.Count == 1
+            && EqualityComparer<TPayload>.Default.Equals(events[0].StartValue, default)
+            && EqualityComparer<TPayload>.Default.Equals(events[0].EndValue, default)
         )
         {
-            eventsCopy.RemoveAt(0);
+            return new List<KpcEvents.Event<TPayload>>();
         }
 
-        return eventsCopy;
+        // 其他情况直接返回原列表，无需克隆
+        return events;
     }
 }
