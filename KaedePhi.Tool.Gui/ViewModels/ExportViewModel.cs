@@ -131,8 +131,11 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         {
             field = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(HasStatusText));
         }
     } = string.Empty;
+
+    public bool HasStatusText => !string.IsNullOrEmpty(StatusText);
 
     #region PE 转换选项
 

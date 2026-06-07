@@ -300,9 +300,6 @@ internal sealed class AppController
 
     private async void OnExportExecute()
     {
-        _exportVm.IsExporting = true;
-        _exportVm.StatusText = status_exporting;
-
         try
         {
             var topLevel = TopLevel.GetTopLevel(_window);
@@ -334,22 +331,33 @@ internal sealed class AppController
                 var outputPath = file.TryGetLocalPath();
                 if (!string.IsNullOrEmpty(outputPath))
                 {
+                    // 用户已选择文件，此时再显示导出动画
+                    _exportVm.IsExporting = true;
+                    _exportVm.StatusText = status_exporting;
+                    _cts = new CancellationTokenSource();
+
                     // 若 OS 未自动附加扩展名，则手动补全
                     var expectedExt = $".{ext}";
                     if (!outputPath.EndsWith(expectedExt, StringComparison.OrdinalIgnoreCase))
                         outputPath = outputPath + expectedExt;
 
-                    // 直接从内存中的 KPC 图表导出，无需重新加载
+                    // 在后台线程执行耗时的导出操作，避免阻塞 UI
                     var phigrosOptions =
                         targetFormat == ChartType.PhigrosV3 ? BuildPhigrosOptions(_exportVm) : null;
-                    await _chart.ExportChartAsync(
-                        targetFormat,
-                        outputPath,
-                        _exportVm.UseStream,
-                        _exportVm.IndentedOutput,
-                        phigrosOptions,
-                        CancellationToken.None
-                    );
+                    var useStream = _exportVm.UseStream;
+                    var indented = _exportVm.IndentedOutput;
+
+                    await Task.Run(async () =>
+                    {
+                        await _chart.ExportChartAsync(
+                            targetFormat,
+                            outputPath,
+                            useStream,
+                            indented,
+                            phigrosOptions,
+                            _cts.Token
+                        );
+                    }, _cts.Token);
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
                     _log.Information(log_export_done);
@@ -366,6 +374,11 @@ internal sealed class AppController
                 _log.Information(log_export_cancelled);
             }
         }
+        catch (OperationCanceledException)
+        {
+            _exportVm.StatusText = status_export_cancelled;
+            _log.Information(log_export_cancelled);
+        }
         catch (Exception ex)
         {
             _log.Error(ex, log_export_failed);
@@ -379,6 +392,8 @@ internal sealed class AppController
         finally
         {
             _exportVm.IsExporting = false;
+            _cts?.Dispose();
+            _cts = null;
         }
     }
 
