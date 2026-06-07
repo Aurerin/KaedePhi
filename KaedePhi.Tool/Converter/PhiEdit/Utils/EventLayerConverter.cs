@@ -43,7 +43,7 @@ public class EventLayerConverter
                 src.AlphaFrames,
                 src.AlphaEvents,
                 horizonBeat,
-                value => Math.Clamp((int)Math.Round(value), 0, 255)
+                value => (int)Math.Round(value)
             ),
             SpeedEvents = _frameEventInterpolator.BuildScalarEvents(
                 src.SpeedFrames,
