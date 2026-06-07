@@ -492,7 +492,12 @@ public class LineEventBuilder
                 targetFrames.Add(new Pe.Frame { Beat = startBeat, Value = startValue });
             }
 
-            if (targetEvents != null)
+            // 头尾值相同时，只需一个起始 Frame 即可表示，无需生成 Event
+            if (Math.Abs(startValue - endValue) <= FloatEpsilon)
+            {
+                // 已在上方添加过起始 Frame，此处无需额外操作
+            }
+            else if (targetEvents != null)
             {
                 targetEvents.Add(
                     new Pe.Event

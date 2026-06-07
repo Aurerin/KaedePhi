@@ -138,18 +138,51 @@
         <!-- Bottom buttons -->
         <Border Grid.Row="1" Padding="16,12"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-                <Button Padding="20,8" Click="OnReturnClick">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="&#xf060;" Classes="fa-icon"
-                                   FontSize="13" VerticalAlignment="Center"/>
-                        <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
-                    </StackPanel>
-                </Button>
-                <Button Classes="accent" Padding="24,8" FontSize="14"
-                        Content="{x:Static loc:GuiLocalizationString.btn_export}"
-                        Click="OnExportClick"
-                        IsEnabled="{Binding !IsExporting}"/>
+            <StackPanel Spacing="12">
+                <!-- Status text -->
+                <TextBlock Text="{Binding StatusText}" FontSize="12" Opacity="0.7"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding HasStatusText}"/>
+
+                <!-- Exporting indicator -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8"
+                            IsVisible="{Binding IsExporting}">
+                    <TextBlock Text="&#xf110;" Classes="fa-icon" FontSize="16"
+                               Foreground="{DynamicResource SystemAccentColor}">
+                        <TextBlock.Styles>
+                            <Style Selector="TextBlock">
+                                <Style.Animations>
+                                    <Animation Duration="0:0:1" IterationCount="Infinite">
+                                        <KeyFrame Cue="0%">
+                                            <Setter Property="RotateTransform.Angle" Value="0"/>
+                                        </KeyFrame>
+                                        <KeyFrame Cue="100%">
+                                            <Setter Property="RotateTransform.Angle" Value="360"/>
+                                        </KeyFrame>
+                                    </Animation>
+                                </Style.Animations>
+                            </Style>
+                        </TextBlock.Styles>
+                    </TextBlock>
+                    <TextBlock Text="{x:Static loc:GuiLocalizationString.status_exporting}" FontSize="13"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                    <Button Padding="20,8" Click="OnReturnClick"
+                            IsEnabled="{Binding !IsExporting}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="&#xf060;" Classes="fa-icon"
+                                       FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Static loc:GuiLocalizationString.btn_back_to_import}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="accent" Padding="24,8" FontSize="14"
+                            Content="{x:Static loc:GuiLocalizationString.btn_export}"
+                            Click="OnExportClick"
+                            IsEnabled="{Binding !IsExporting}"/>
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>
