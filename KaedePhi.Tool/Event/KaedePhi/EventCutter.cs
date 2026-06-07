@@ -74,12 +74,14 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
             );
 
         var cutEvents = new List<KpcEvents.Event<TPayload>>();
-        var eventsToCut = events
-            .Where(e => e.StartBeat < endBeat && e.EndBeat > startBeat)
-            .ToList();
 
-        foreach (var evt in eventsToCut)
+        // 直接遍历并过滤，避免 Where().ToList() 中间分配
+        foreach (var evt in events)
         {
+            // 跳过不在范围内的事件
+            if (evt.StartBeat >= endBeat || evt.EndBeat <= startBeat)
+                continue;
+
             var cutStart = evt.StartBeat < startBeat ? startBeat : evt.StartBeat;
             var cutEnd = evt.EndBeat > endBeat ? endBeat : evt.EndBeat;
 
