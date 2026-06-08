@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Core.KaedePhi
+namespace KaedePhi.Core.Common
 {
     /// <summary>
     /// 绑定UI枚举
@@ -16,7 +16,7 @@
         ComboNumber = 2,
 
         /// <summary>
-        /// 连击数字下方的“combo”文字
+        /// 连击数字下方的"combo"文字
         /// </summary>
         Combo = 3,
 

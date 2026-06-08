@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using KaedePhi.Core.Common;
 
 namespace KaedePhi.Core.KaedePhi
 {

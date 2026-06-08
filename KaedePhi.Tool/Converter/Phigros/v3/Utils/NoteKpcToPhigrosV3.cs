@@ -1,6 +1,5 @@
 ﻿using KaedePhi.Core.Common;
 using KpcNote = KaedePhi.Core.KaedePhi.Note;
-using KpcNoteType = KaedePhi.Core.KaedePhi.NoteType;
 using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;
 using PhigrosNote = KaedePhi.Core.Phigros.v3.Note;
 using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;
@@ -94,13 +93,13 @@ public static class NoteKpcToPhigrosV3
         return (float)(speedEvents[^1].EndValue / SpeedValueRatio);
     }
 
-    public static PhigrosNoteType ConvertNoteType(KpcNoteType type) =>
+    public static PhigrosNoteType ConvertNoteType(NoteType type) =>
         type switch
         {
-            KpcNoteType.Tap => PhigrosNoteType.Tap,
-            KpcNoteType.Hold => PhigrosNoteType.Hold,
-            KpcNoteType.Flick => PhigrosNoteType.Flick,
-            KpcNoteType.Drag => PhigrosNoteType.Drag,
+            NoteType.Tap => PhigrosNoteType.Tap,
+            NoteType.Hold => PhigrosNoteType.Hold,
+            NoteType.Flick => PhigrosNoteType.Flick,
+            NoteType.Drag => PhigrosNoteType.Drag,
             _ => PhigrosNoteType.Tap,
         };
 
