@@ -27,6 +27,7 @@ namespace KaedePhi.Core.PhiZonePlayerExtended
         /// true：对速度缓动函数进行积分以获得高度函数。
         /// </summary>
         [JsonProperty("integrateSpeedEasings")]
+        [DefaultValue(true)]
         public bool IntegrateSpeedEasings { get; set; } = true;
 
         /// <summary>
@@ -34,6 +35,7 @@ namespace KaedePhi.Core.PhiZonePlayerExtended
         /// 有关默认值，请参阅<see>https://github.com/PhiZone/player#z-indexes</see>
         /// </summary>
         [JsonProperty("zIndex", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [DefaultValue(2)]
         public float ZIndex { get; set; } = 2;
     }
 }
