@@ -7,15 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.CodeDom.Compiler;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Resources;
-using System.Runtime.CompilerServices;
-
 namespace KaedePhi.Tool.Localization {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,27 +18,27 @@ namespace KaedePhi.Tool.Localization {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
-    [DebuggerNonUserCode()]
-    [CompilerGenerated()]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class GuiLocalizationString {
         
-        private static ResourceManager resourceMan;
+        private static global::System.Resources.ResourceManager resourceMan;
         
-        private static CultureInfo resourceCulture;
+        private static global::System.Globalization.CultureInfo resourceCulture;
         
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal GuiLocalizationString() {
         }
         
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static ResourceManager ResourceManager {
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
-                if (ReferenceEquals(resourceMan, null)) {
-                    ResourceManager temp = new ResourceManager("KaedePhi.Tool.Localization.GuiLocalizationString", typeof(GuiLocalizationString).Assembly);
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KaedePhi.Tool.Localization.GuiLocalizationString", typeof(GuiLocalizationString).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -54,8 +49,8 @@ namespace KaedePhi.Tool.Localization {
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static CultureInfo Culture {
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -173,7 +168,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Alpha事件容差百分比.
+        ///   Looks up a localized string similar to Alpha事件容差（百分比）.
         /// </summary>
         public static string convert_alpha_tolerance {
             get {
@@ -191,38 +186,11 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 默认BPM.
+        ///   Looks up a localized string similar to 回退BPM.
         /// </summary>
         public static string convert_default_bpm {
             get {
                 return ResourceManager.GetString("convert_default_bpm", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 过滤假音符（删除 IsFake 音符）.
-        /// </summary>
-        public static string convert_filter_fake_notes {
-            get {
-                return ResourceManager.GetString("convert_filter_fake_notes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 负透明度段判定线抬高至屏幕外.
-        /// </summary>
-        public static string convert_negative_alpha_elevation {
-            get {
-                return ResourceManager.GetString("convert_negative_alpha_elevation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 负透明度抬高步长（KPC Y）.
-        /// </summary>
-        public static string convert_negative_alpha_step {
-            get {
-                return ResourceManager.GetString("convert_negative_alpha_step", resourceCulture);
             }
         }
         
@@ -232,6 +200,15 @@ namespace KaedePhi.Tool.Localization {
         public static string convert_easing_precision {
             get {
                 return ResourceManager.GetString("convert_easing_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 过滤假音符（删除假音符）.
+        /// </summary>
+        public static string convert_filter_fake_notes {
+            get {
+                return ResourceManager.GetString("convert_filter_fake_notes", resourceCulture);
             }
         }
         
@@ -290,6 +267,24 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 负透明度段判定线抬高至屏幕外.
+        /// </summary>
+        public static string convert_negative_alpha_elevation {
+            get {
+                return ResourceManager.GetString("convert_negative_alpha_elevation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 负透明度抬高步长（归一化Y）.
+        /// </summary>
+        public static string convert_negative_alpha_step {
+            get {
+                return ResourceManager.GetString("convert_negative_alpha_step", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 转换选项.
         /// </summary>
         public static string convert_options_title {
@@ -299,7 +294,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 转换到 PhiEdit 选项.
+        ///   Looks up a localized string similar to 转换到 PhiEdit 格式选项.
         /// </summary>
         public static string convert_pe_options {
             get {
@@ -308,7 +303,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 转换到 PhigrosV3 选项.
+        ///   Looks up a localized string similar to 转换到 PhigrosV3 格式选项.
         /// </summary>
         public static string convert_phigros_options {
             get {
@@ -326,7 +321,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 移除带有自定义材质的判定线.
+        ///   Looks up a localized string similar to 移除带有自定义纹理的判定线.
         /// </summary>
         public static string convert_remove_texture {
             get {
@@ -344,7 +339,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 速度事件值转换比率.
+        ///   Looks up a localized string similar to 速度事件值转换比率（不建议修改）.
         /// </summary>
         public static string convert_speed_ratio {
             get {
@@ -353,7 +348,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 解绑父线经典模式.
+        ///   Looks up a localized string similar to 使用经典模式解绑父线.
         /// </summary>
         public static string convert_unbind_classic {
             get {
@@ -389,7 +384,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 解绑父线容差百分比.
+        ///   Looks up a localized string similar to 解绑父线容差（百分比）.
         /// </summary>
         public static string convert_unbind_tolerance {
             get {
@@ -470,7 +465,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PhiEdit 谱面.
+        ///   Looks up a localized string similar to PhiEditer 谱面.
         /// </summary>
         public static string file_type_pe_chart {
             get {

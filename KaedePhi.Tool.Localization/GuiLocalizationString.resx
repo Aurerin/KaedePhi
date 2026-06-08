@@ -338,13 +338,13 @@
     <value>转换选项</value>
   </data>
   <data name="convert_pe_options" xml:space="preserve">
-    <value>转换到 PhiEdit 选项</value>
+    <value>转换到 PhiEdit 格式选项</value>
   </data>
   <data name="convert_phigros_options" xml:space="preserve">
-    <value>转换到 PhigrosV3 选项</value>
+    <value>转换到 PhigrosV3 格式选项</value>
   </data>
   <data name="convert_speed_ratio" xml:space="preserve">
-    <value>速度事件值转换比率</value>
+    <value>速度事件值转换比率（不建议修改）</value>
   </data>
   <data name="convert_easing_precision" xml:space="preserve">
     <value>缓动切割精度</value>
@@ -353,22 +353,22 @@
     <value>Alpha事件切割精度</value>
   </data>
   <data name="convert_alpha_tolerance" xml:space="preserve">
-    <value>Alpha事件容差百分比</value>
+    <value>Alpha事件容差（百分比）</value>
   </data>
   <data name="convert_speed_precision" xml:space="preserve">
     <value>速度事件切割精度</value>
   </data>
   <data name="convert_default_bpm" xml:space="preserve">
-    <value>默认BPM</value>
+    <value>回退BPM</value>
   </data>
   <data name="convert_filter_fake_notes" xml:space="preserve">
-    <value>过滤假音符（删除 IsFake 音符）</value>
+    <value>过滤假音符（删除假音符）</value>
   </data>
   <data name="convert_negative_alpha_elevation" xml:space="preserve">
     <value>负透明度段判定线抬高至屏幕外</value>
   </data>
   <data name="convert_negative_alpha_step" xml:space="preserve">
-    <value>负透明度抬高步长（KPC Y）</value>
+    <value>负透明度抬高步长（归一化Y）</value>
   </data>
   <data name="convert_common_options" xml:space="preserve">
     <value>通用选项</value>
@@ -380,10 +380,10 @@
     <value>解绑父线精度</value>
   </data>
   <data name="convert_unbind_tolerance" xml:space="preserve">
-    <value>解绑父线容差百分比</value>
+    <value>解绑父线容差（百分比）</value>
   </data>
   <data name="convert_unbind_classic" xml:space="preserve">
-    <value>解绑父线经典模式</value>
+    <value>使用经典模式解绑父线</value>
   </data>
   <data name="convert_unbind_compress" xml:space="preserve">
     <value>解绑父线后压缩</value>
@@ -410,7 +410,7 @@
     <value>移除绑定UI的判定线</value>
   </data>
   <data name="convert_remove_texture" xml:space="preserve">
-    <value>移除带有自定义材质的判定线</value>
+    <value>移除带有自定义纹理的判定线</value>
   </data>
   <data name="btn_back" xml:space="preserve">
     <value>返回</value>
@@ -434,7 +434,7 @@
     <value>所有文件</value>
   </data>
   <data name="file_type_pe_chart" xml:space="preserve">
-    <value>PhiEdit 谱面</value>
+    <value>PhiEditer 谱面</value>
   </data>
   <data name="file_type_rpe_json" xml:space="preserve">
     <value>RePhiEdit JSON</value>
