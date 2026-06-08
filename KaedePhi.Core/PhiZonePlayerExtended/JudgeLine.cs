@@ -21,7 +21,6 @@ namespace KaedePhi.Core.PhiZonePlayerExtended
         [DefaultValue(AppearanceOnAttach.Hidden)]
         public AppearanceOnAttach AppearanceOnAttach { get; set; } = AppearanceOnAttach.Hidden;
 
-
         /// <summary>
         /// false：将非线性速度缓动函数直接视为随时间变化的高度；
         /// true：对速度缓动函数进行积分以获得高度函数。

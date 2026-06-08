@@ -22,7 +22,9 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             return [];
 
         // 检查是否已排序，避免不必要的列表分配
-        var sortedEvents = IsSortedByStartBeat(events!) ? events! : events!.OrderBy(e => e.StartBeat).ToList();
+        var sortedEvents = IsSortedByStartBeat(events!)
+            ? events!
+            : events!.OrderBy(e => e.StartBeat).ToList();
 
         return FitEventsCore(sortedEvents, tolerance);
     }
@@ -75,10 +77,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     /// <summary>
     /// 从指定位置起收集一段时间连续、数值连续、方向一致的线性事件序列的结束索引（不含）。
     /// </summary>
-    private static int CollectRunEnd(
-        List<KpcEvents.Event<TPayload>> events,
-        int start
-    )
+    private static int CollectRunEnd(List<KpcEvents.Event<TPayload>> events, int start)
     {
         var firstDir = GetDirection(
             events[start].GetStartValueAsDouble(),

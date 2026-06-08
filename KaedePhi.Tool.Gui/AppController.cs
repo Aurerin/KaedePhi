@@ -347,17 +347,20 @@ internal sealed class AppController
                     var useStream = _exportVm.UseStream;
                     var indented = _exportVm.IndentedOutput;
 
-                    await Task.Run(async () =>
-                    {
-                        await _chart.ExportChartAsync(
-                            targetFormat,
-                            outputPath,
-                            useStream,
-                            indented,
-                            phigrosOptions,
-                            _cts.Token
-                        );
-                    }, _cts.Token);
+                    await Task.Run(
+                        async () =>
+                        {
+                            await _chart.ExportChartAsync(
+                                targetFormat,
+                                outputPath,
+                                useStream,
+                                indented,
+                                phigrosOptions,
+                                _cts.Token
+                            );
+                        },
+                        _cts.Token
+                    );
 
                     _exportVm.StatusText = string.Format(status_exported_to, outputPath);
                     _log.Information(log_export_done);

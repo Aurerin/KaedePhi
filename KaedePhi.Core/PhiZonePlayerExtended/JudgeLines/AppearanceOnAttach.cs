@@ -9,10 +9,12 @@
         /// 隐藏
         /// </summary>
         Hidden = 0,
+
         /// <summary>
         /// 白色
         /// </summary>
         WhiteColored = 1,
+
         /// <summary>
         /// FullCombo/AllPrefect指示器颜色
         /// </summary>
