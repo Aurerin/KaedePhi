@@ -23,7 +23,7 @@ jobs:
         uses: JetBrains/qodana-action@v2026.1
         with:
           pr-mode: false
-          args: --solution KaedePhi.sln
+          args: --solution KaedePhi.sln --baseline baseline.sarif.json
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_114685005 }}
           QODANA_ENDPOINT: 'https://qodana.cloud'
