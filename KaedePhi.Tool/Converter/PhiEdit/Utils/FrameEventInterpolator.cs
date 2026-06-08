@@ -182,39 +182,38 @@ public class FrameEventInterpolator
 
             var sampleBeat = GetMidBeat(startBeat, endBeat);
             var activeEvent = FindActiveScalarEvent(orderedEvents, sampleBeat);
-            if (activeEvent != null)
-            {
-                var eventStartSource = ResolveScalarEventStartValue(
-                    activeEvent,
-                    orderedFrames,
-                    orderedEvents,
-                    orderedEventsByEnd
-                );
-                result.Add(
-                    new KpcEvents.Event<T>
-                    {
-                        StartBeat = new Beat(startBeat),
-                        EndBeat = new Beat(endBeat),
-                        Easing = EasingConverter.ConvertEasing(activeEvent.EasingType),
-                        EasingLeft = GetEventBoundary(
-                            activeEvent.StartBeat,
-                            activeEvent.EndBeat,
-                            startBeat
-                        ),
-                        EasingRight = GetEventBoundary(
-                            activeEvent.StartBeat,
-                            activeEvent.EndBeat,
-                            endBeat
-                        ),
-                        StartValue = valueTransformer(
-                            InterpolateScalarValue(activeEvent, startBeat, eventStartSource)
-                        ),
-                        EndValue = valueTransformer(
-                            InterpolateScalarValue(activeEvent, endBeat, eventStartSource)
-                        ),
-                    }
-                );
-            }
+            if (activeEvent is null)
+                continue;
+            var eventStartSource = ResolveScalarEventStartValue(
+                activeEvent,
+                orderedFrames,
+                orderedEvents,
+                orderedEventsByEnd
+            );
+            result.Add(
+                new KpcEvents.Event<T>
+                {
+                    StartBeat = new Beat(startBeat),
+                    EndBeat = new Beat(endBeat),
+                    Easing = EasingConverter.ConvertEasing(activeEvent.EasingType),
+                    EasingLeft = GetEventBoundary(
+                        activeEvent.StartBeat,
+                        activeEvent.EndBeat,
+                        startBeat
+                    ),
+                    EasingRight = GetEventBoundary(
+                        activeEvent.StartBeat,
+                        activeEvent.EndBeat,
+                        endBeat
+                    ),
+                    StartValue = valueTransformer(
+                        InterpolateScalarValue(activeEvent, startBeat, eventStartSource)
+                    ),
+                    EndValue = valueTransformer(
+                        InterpolateScalarValue(activeEvent, endBeat, eventStartSource)
+                    ),
+                }
+            );
         }
 
         return result.Count == 0 ? null : result;
@@ -448,13 +447,7 @@ public class FrameEventInterpolator
             }
         }
 
-        return ResolveMoveEventStartValueImpl(
-            ev,
-            evIndex,
-            frames,
-            orderedEvents,
-            eventsByEnd
-        );
+        return ResolveMoveEventStartValueImpl(ev, evIndex, frames, orderedEvents, eventsByEnd);
     }
 
     private static (float X, float Y) ResolveMoveEventStartValueImpl(
@@ -483,40 +476,23 @@ public class FrameEventInterpolator
             }
         }
 
-        if (precedingDominant != null)
-        {
-            if (precedingDominant.EndBeat >= ev.StartBeat - BeatComparisonEpsilon)
-            {
-                // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
-                var innerStartSource = ResolveMoveEventStartValueImpl(
-                    precedingDominant,
-                    precedingDominantIndex,
-                    frames,
-                    orderedEvents,
-                    eventsByEnd
-                );
-                return (
-                    InterpolateMoveValue(
-                        precedingDominant,
-                        ev.StartBeat,
-                        innerStartSource,
-                        v => v.X
-                    ),
-                    InterpolateMoveValue(
-                        precedingDominant,
-                        ev.StartBeat,
-                        innerStartSource,
-                        v => v.Y
-                    )
-                );
-            }
-
-            // 前驱事件已结束，检查中间是否有帧覆盖
+        if (
+            precedingDominant is null
+            || !(precedingDominant.EndBeat >= ev.StartBeat - BeatComparisonEpsilon)
+        )
             return ResolveMoveValueAfterBoundary(frames, eventsByEnd, ev.StartBeat);
-        }
-
-        // 无前驱事件，降级到帧/默认
-        return ResolveMoveValueAfterBoundary(frames, eventsByEnd, ev.StartBeat);
+        // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
+        var innerStartSource = ResolveMoveEventStartValueImpl(
+            precedingDominant,
+            precedingDominantIndex,
+            frames,
+            orderedEvents,
+            eventsByEnd
+        );
+        return (
+            InterpolateMoveValue(precedingDominant, ev.StartBeat, innerStartSource, v => v.X),
+            InterpolateMoveValue(precedingDominant, ev.StartBeat, innerStartSource, v => v.Y)
+        );
     }
 
     private static float ResolveScalarEventStartValue(
@@ -537,13 +513,7 @@ public class FrameEventInterpolator
             }
         }
 
-        return ResolveScalarEventStartValueImpl(
-            ev,
-            evIndex,
-            frames,
-            orderedEvents,
-            eventsByEnd
-        );
+        return ResolveScalarEventStartValueImpl(ev, evIndex, frames, orderedEvents, eventsByEnd);
     }
 
     private static float ResolveScalarEventStartValueImpl(

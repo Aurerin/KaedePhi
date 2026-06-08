@@ -22,6 +22,7 @@ namespace KaedePhi.Core.PhiZonePlayerExtended
         /// <summary>
         /// 与RPE标准不同的是，他们仅仅字段名称不同，作用完全一致，表示判定区域的倍率。
         /// </summary>
-        [JsonProperty("judgeSize")] public float JudgeSize => JudgeArea;
+        [JsonProperty("judgeSize")]
+        public float JudgeSize => JudgeArea;
     }
 }

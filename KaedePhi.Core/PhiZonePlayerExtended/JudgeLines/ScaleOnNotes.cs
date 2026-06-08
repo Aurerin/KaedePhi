@@ -18,6 +18,6 @@
         /// <summary>
         /// 裁剪
         /// </summary>
-        Clip = 2
+        Clip = 2,
     }
 }
