@@ -35,6 +35,7 @@ public partial class ImportPage : UserControl
                     FileTypeFilter = new[]
                     {
                         new FilePickerFileType(file_type_json) { Patterns = new[] { "*.json" } },
+                        new FilePickerFileType(file_type_pe_chart) { Patterns = new[] { "*.pec" } },
                         new FilePickerFileType(file_type_all) { Patterns = new[] { "*.*" } },
                     },
                 }
