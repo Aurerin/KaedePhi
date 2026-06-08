@@ -24,19 +24,19 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static Chart Load(string pec)
         {
-            var chart = new Chart();
-            var judgeDict = new Dictionary<int, JudgeLine>();
             var lines = pec.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             if (!int.TryParse(lines[0], out var offset))
                 throw new FormatException(
                     "Malformed chart file: first line is not a valid integer offset."
                 );
-            chart.Offset = offset;
 
-            var i = 1;
-            while (i < lines.Length)
-                i = ProcessLine(lines, i, chart, judgeDict);
+            var chart = new Chart { Offset = offset };
+            var judgeDict = new Dictionary<int, JudgeLine>();
+
+            var lineIndex = 1;
+            while (lineIndex < lines.Length)
+                lineIndex = ProcessLine(lines, lineIndex, chart, judgeDict);
 
             SortAndBuild(chart, judgeDict);
             return chart;
@@ -45,9 +45,8 @@ namespace KaedePhi.Core.PhiEdit
         /// <summary>
         /// 处理 <paramref name="lines"/> 中索引为 <paramref name="i"/> 的单行，并返回下一行的索引。
         /// <para>
-        /// 空白行直接跳过（返回 <c>i + 1</c>）；<c>bp</c> 行追加到 BPM 列表；
-        /// 以 <c>n</c> 开头的行交由 <see cref="ParseNote"/> 处理（Note 可能消耗后续两行）；
-        /// 其余行交由 <see cref="ParseLineCommand"/> 处理。
+        /// 空白行直接跳过（返回 <c>i + 1</c>）；其余行交由
+        /// <see cref="ParseChartLineCore(string,string[],int,Chart,Dictionary{int,JudgeLine})"/> 处理。
         /// </para>
         /// </summary>
         /// <param name="lines">谱面全部文本行数组。</param>
@@ -67,22 +66,7 @@ namespace KaedePhi.Core.PhiEdit
             if (string.IsNullOrWhiteSpace(line))
                 return i + 1;
 
-            var part = line.Split(' ');
-            var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
-
-            if (part[0] == "bp")
-            {
-                EnsureMinParts(part, 3, "bp");
-                chart.BpmList.Add(
-                    new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) }
-                );
-            }
-            else if (line.StartsWith('n'))
-                i = ParseNote(lines, i, part, judgeLineIndex, judgeDict);
-            else
-                ParseLineCommand(part, judgeLineIndex, judgeDict);
-
-            return i + 1;
+            return i + ParseChartLineCore(line, lines, i, chart, judgeDict);
         }
 
         /// <summary>
@@ -99,29 +83,14 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static Chart LoadStream(Stream stream)
         {
-            using var reader = new StreamReader(
-                stream,
-                JsonDefaults.NoBomUtf8,
-                detectEncodingFromByteOrderMarks: true,
-                1024,
-                leaveOpen: true
-            );
-
-            var chart = new Chart();
-            var judgeDict = new Dictionary<int, JudgeLine>();
-
-            var firstLine = reader.ReadLine();
-            if (!int.TryParse(firstLine, out var offset))
-                throw new FormatException(
-                    "Malformed chart file: first line is not a valid integer offset."
-                );
-            chart.Offset = offset;
+            using var reader = CreateStreamReader(stream);
+            var (chart, judgeDict) = InitializeChart(reader.ReadLine);
 
             string? line;
             while ((line = reader.ReadLine()) is not null)
             {
                 if (!string.IsNullOrWhiteSpace(line))
-                    ParseChartLine(line, reader, chart, judgeDict);
+                    ParseChartLineCore(line, reader.ReadLine, chart, judgeDict);
             }
 
             SortAndBuild(chart, judgeDict);
@@ -142,23 +111,9 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static async Task<Chart> LoadStreamAsync(Stream stream)
         {
-            using var reader = new StreamReader(
-                stream,
-                JsonDefaults.NoBomUtf8,
-                detectEncodingFromByteOrderMarks: true,
-                1024,
-                leaveOpen: true
-            );
-
-            var chart = new Chart();
-            var judgeDict = new Dictionary<int, JudgeLine>();
-
+            using var reader = CreateStreamReader(stream);
             var firstLine = await reader.ReadLineAsync();
-            if (!int.TryParse(firstLine, out var offset))
-                throw new FormatException(
-                    "Malformed chart file: first line is not a valid integer offset."
-                );
-            chart.Offset = offset;
+            var (chart, judgeDict) = InitializeChart(() => firstLine);
 
             string? line;
             while ((line = await reader.ReadLineAsync()) != null)
@@ -171,18 +126,7 @@ namespace KaedePhi.Core.PhiEdit
             return chart;
         }
 
-        /// <summary>
-        /// 同步解析谱面中的一行文本，将结果写入 <paramref name="chart"/> 或 <paramref name="judgeDict"/>。
-        /// <para>
-        /// 若当前行为 Note 指令且未内联速度/宽度信息，则通过 <paramref name="reader"/> 额外读取紧跟的两行。
-        /// </para>
-        /// </summary>
-        /// <param name="line">当前非空白文本行。</param>
-        /// <param name="reader">用于按需读取后续行（Note 多行格式）的流读取器。</param>
-        /// <param name="chart">正在构建的谱面对象。</param>
-        /// <param name="judgeDict">判定线暂存字典。</param>
-        /// <exception cref="FormatException">指令字段数不足，或 Note 缺失速度/宽度行。</exception>
-        private static void ParseChartLine(
+        private static async Task ParseChartLineAsync(
             string line,
             StreamReader reader,
             Chart chart,
@@ -204,9 +148,8 @@ namespace KaedePhi.Core.PhiEdit
                 var (speedPart, widthPart) = GetInlineNoteParts(part);
                 if (speedPart is null)
                 {
-                    // 需要额外读取后续两行
-                    speedPart = reader.ReadLine()?.Split(' ');
-                    widthPart = reader.ReadLine()?.Split(' ');
+                    speedPart = (await reader.ReadLineAsync())?.Split(' ');
+                    widthPart = (await reader.ReadLineAsync())?.Split(' ');
                     if (speedPart == null || widthPart == null)
                         throw new FormatException("Malformed note: missing speed or width lines.");
                 }
@@ -217,20 +160,46 @@ namespace KaedePhi.Core.PhiEdit
                 ParseLineCommand(part, judgeLineIndex, judgeDict);
         }
 
+        private static StreamReader CreateStreamReader(Stream stream) =>
+            new(
+                stream,
+                JsonDefaults.NoBomUtf8,
+                detectEncodingFromByteOrderMarks: true,
+                1024,
+                leaveOpen: true
+            );
+
+        private static (Chart chart, Dictionary<int, JudgeLine> judgeDict) InitializeChart(
+            Func<string?> readFirstLineFunc
+        )
+        {
+            var chart = new Chart();
+            var judgeDict = new Dictionary<int, JudgeLine>();
+
+            var firstLine = readFirstLineFunc();
+            if (!int.TryParse(firstLine, out var offset))
+                throw new FormatException(
+                    "Malformed chart file: first line is not a valid integer offset."
+                );
+            chart.Offset = offset;
+
+            return (chart, judgeDict);
+        }
+
         /// <summary>
-        /// 异步解析谱面中的一行文本，将结果写入 <paramref name="chart"/> 或 <paramref name="judgeDict"/>。
+        /// 解析谱面中的一行文本，将结果写入 <paramref name="chart"/> 或 <paramref name="judgeDict"/>。
         /// <para>
-        /// 若当前行为 Note 指令且未内联速度/宽度信息，则通过 <paramref name="reader"/> 额外异步读取紧跟的两行。
+        /// 若当前行为 Note 指令且未内联速度/宽度信息，则通过 <paramref name="readNextLineFunc"/> 额外读取紧跟的两行。
         /// </para>
         /// </summary>
         /// <param name="line">当前非空白文本行。</param>
-        /// <param name="reader">用于按需异步读取后续行（Note 多行格式）的流读取器。</param>
+        /// <param name="readNextLineFunc">用于按需读取后续行（Note 多行格式）的函数。</param>
         /// <param name="chart">正在构建的谱面对象。</param>
         /// <param name="judgeDict">判定线暂存字典。</param>
         /// <exception cref="FormatException">指令字段数不足，或 Note 缺失速度/宽度行。</exception>
-        private static async Task ParseChartLineAsync(
+        private static void ParseChartLineCore(
             string line,
-            StreamReader reader,
+            Func<string?> readNextLineFunc,
             Chart chart,
             Dictionary<int, JudgeLine> judgeDict
         )
@@ -248,11 +217,10 @@ namespace KaedePhi.Core.PhiEdit
             else if (line.StartsWith('n'))
             {
                 var (speedPart, widthPart) = GetInlineNoteParts(part);
-                if (speedPart == null)
+                if (speedPart is null)
                 {
-                    // 需要额外读取后续两行
-                    speedPart = (await reader.ReadLineAsync())?.Split(' ');
-                    widthPart = (await reader.ReadLineAsync())?.Split(' ');
+                    speedPart = readNextLineFunc()?.Split(' ');
+                    widthPart = readNextLineFunc()?.Split(' ');
                     if (speedPart == null || widthPart == null)
                         throw new FormatException("Malformed note: missing speed or width lines.");
                 }
@@ -261,6 +229,60 @@ namespace KaedePhi.Core.PhiEdit
             }
             else
                 ParseLineCommand(part, judgeLineIndex, judgeDict);
+        }
+
+        /// <summary>
+        /// 解析谱面中的一行文本，将结果写入 <paramref name="chart"/> 或 <paramref name="judgeDict"/>。
+        /// <para>
+        /// 若当前行为 Note 指令且未内联速度/宽度信息，则从 <paramref name="lines"/> 额外读取紧跟的两行。
+        /// </para>
+        /// </summary>
+        /// <param name="line">当前非空白文本行。</param>
+        /// <param name="lines">谱面全部文本行数组。</param>
+        /// <param name="index">当前行在 <paramref name="lines"/> 中的索引。</param>
+        /// <param name="chart">正在构建的谱面对象。</param>
+        /// <param name="judgeDict">判定线暂存字典。</param>
+        /// <returns>消耗的行数（1 为仅当前行，3 为包含后续两行）。</returns>
+        /// <exception cref="FormatException">指令字段数不足，或 Note 缺失速度/宽度行。</exception>
+        private static int ParseChartLineCore(
+            string line,
+            string[] lines,
+            int index,
+            Chart chart,
+            Dictionary<int, JudgeLine> judgeDict
+        )
+        {
+            var part = line.Split(' ');
+            var judgeLineIndex = part[0] != "bp" && part.Length > 1 ? int.Parse(part[1]) : -1;
+
+            if (part[0] == "bp")
+            {
+                EnsureMinParts(part, 3, "bp");
+                chart.BpmList.Add(
+                    new BpmItem { StartBeat = float.Parse(part[1]), Bpm = float.Parse(part[2]) }
+                );
+            }
+            else if (line.StartsWith('n'))
+            {
+                var (speedPart, widthPart) = GetInlineNoteParts(part);
+                if (speedPart is null)
+                {
+                    if (index + 2 >= lines.Length)
+                        throw new FormatException(
+                            $"Malformed note at line {index + 1}: missing speed or width lines."
+                        );
+                    speedPart = lines[index + 1].Split(' ');
+                    widthPart = lines[index + 2].Split(' ');
+                    AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
+                    return 3;
+                }
+
+                AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
+            }
+            else
+                ParseLineCommand(part, judgeLineIndex, judgeDict);
+
+            return 1;
         }
 
         /// <summary>
@@ -482,44 +504,6 @@ namespace KaedePhi.Core.PhiEdit
         }
 
         /// <summary>
-        /// 解析 <paramref name="lines"/>[<paramref name="i"/>] 处的 Note 指令，并将结果追加到 <paramref name="judgeDict"/>。
-        /// <para>
-        /// 若该行未内联速度/宽度信息，则读取紧跟的 <c>i+1</c>（速度行）和 <c>i+2</c>（宽度行），
-        /// 并将 <paramref name="i"/> 向后推进 2。
-        /// </para>
-        /// </summary>
-        /// <param name="lines">谱面全部文本行数组。</param>
-        /// <param name="i">Note 主指令所在行的索引。</param>
-        /// <param name="part">当前行已按空格拆分的字段数组。</param>
-        /// <param name="judgeLineIndex">音符所属判定线的索引。</param>
-        /// <param name="judgeDict">判定线暂存字典。</param>
-        /// <returns>消耗完本 Note 所有行后的行索引（调用方应在此基础上再 +1 以推进到下一条指令）。</returns>
-        /// <exception cref="FormatException">多行 Note 缺失速度或宽度行。</exception>
-        private static int ParseNote(
-            string[] lines,
-            int i,
-            string[] part,
-            int judgeLineIndex,
-            Dictionary<int, JudgeLine> judgeDict
-        )
-        {
-            var (speedPart, widthPart) = GetInlineNoteParts(part);
-            if (speedPart == null)
-            {
-                if (i + 2 >= lines.Length)
-                    throw new FormatException(
-                        $"Malformed note at line {i + 1}: missing speed or width lines."
-                    );
-                speedPart = lines[i + 1].Split(' ');
-                widthPart = lines[i + 2].Split(' ');
-                i += 2;
-            }
-
-            AddNoteToDict(BuildNote(part, speedPart, widthPart), judgeLineIndex, judgeDict);
-            return i;
-        }
-
-        /// <summary>
         /// 对 <paramref name="chart"/> 和 <paramref name="judgeDict"/> 执行最终的排序与组装。
         /// <para>
         /// BPM 列表按起始拍升序排序；每条判定线的关键帧列表、事件列表和音符列表分别按拍数/起始拍升序排序；
@@ -628,14 +612,8 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="stream">可写的目标流。</param>
         public void ExportToStream(Stream stream)
         {
-            using var writer = new StreamWriter(
-                stream,
-                JsonDefaults.NoBomUtf8,
-                1024,
-                leaveOpen: true
-            );
-            foreach (var line in GetExportLines())
-                writer.WriteLine(line);
+            using var writer = CreateStreamWriter(stream);
+            WriteExportLines(writer.WriteLine);
         }
 
         /// <summary>
@@ -645,14 +623,18 @@ namespace KaedePhi.Core.PhiEdit
         /// <param name="stream">可写的目标流。</param>
         public async Task ExportToStreamAsync(Stream stream)
         {
-            await using var writer = new StreamWriter(
-                stream,
-                JsonDefaults.NoBomUtf8,
-                1024,
-                leaveOpen: true
-            );
+            await using var writer = CreateStreamWriter(stream);
             foreach (var line in GetExportLines())
                 await writer.WriteLineAsync(line);
+        }
+
+        private static StreamWriter CreateStreamWriter(Stream stream) =>
+            new(stream, JsonDefaults.NoBomUtf8, 1024, leaveOpen: true);
+
+        private void WriteExportLines(Action<string> writeLineFunc)
+        {
+            foreach (var line in GetExportLines())
+                writeLineFunc(line);
         }
     }
 }
