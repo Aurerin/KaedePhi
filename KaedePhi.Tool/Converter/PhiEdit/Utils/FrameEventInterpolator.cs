@@ -437,20 +437,48 @@ public class FrameEventInterpolator
         List<Pe.MoveEvent> eventsByEnd
     )
     {
+        // 查找事件索引：直接搜索而不是线性遍历
+        var evIndex = 0;
+        for (var i = 0; i < orderedEvents.Count; i++)
+        {
+            if (ReferenceEquals(orderedEvents[i], ev))
+            {
+                evIndex = i;
+                break;
+            }
+        }
+
+        return ResolveMoveEventStartValueImpl(
+            ev,
+            evIndex,
+            frames,
+            orderedEvents,
+            eventsByEnd
+        );
+    }
+
+    private static (float X, float Y) ResolveMoveEventStartValueImpl(
+        Pe.MoveEvent ev,
+        int evIndex,
+        List<Pe.MoveFrame> frames,
+        List<Pe.MoveEvent> orderedEvents,
+        List<Pe.MoveEvent> eventsByEnd
+    )
+    {
         // 优先：ev.StartBeat 处有精确帧
         var frameAtStart = FindMoveFrameAtBeat(frames, ev.StartBeat);
         if (frameAtStart != null)
             return (frameAtStart.XValue, frameAtStart.YValue);
 
-        // 查找前驱主导事件：orderedEvents 中位于 ev 之前（index 更小）且
-        // StartBeat <= ev.StartBeat 的最后一个事件
-        var evIndex = orderedEvents.IndexOf(ev);
+        // 查找前驱主导事件：从 evIndex 向前查找
         Pe.MoveEvent? precedingDominant = null;
+        var precedingDominantIndex = -1;
         for (var i = evIndex - 1; i >= 0; i--)
         {
             if (orderedEvents[i].StartBeat <= ev.StartBeat + BeatComparisonEpsilon)
             {
                 precedingDominant = orderedEvents[i];
+                precedingDominantIndex = i;
                 break;
             }
         }
@@ -460,8 +488,9 @@ public class FrameEventInterpolator
             if (precedingDominant.EndBeat >= ev.StartBeat - BeatComparisonEpsilon)
             {
                 // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
-                var innerStartSource = ResolveMoveEventStartValue(
+                var innerStartSource = ResolveMoveEventStartValueImpl(
                     precedingDominant,
+                    precedingDominantIndex,
                     frames,
                     orderedEvents,
                     eventsByEnd
@@ -497,20 +526,48 @@ public class FrameEventInterpolator
         List<Pe.Event> eventsByEnd
     )
     {
+        // 查找事件索引：直接搜索而不是线性遍历
+        var evIndex = 0;
+        for (var i = 0; i < orderedEvents.Count; i++)
+        {
+            if (ReferenceEquals(orderedEvents[i], ev))
+            {
+                evIndex = i;
+                break;
+            }
+        }
+
+        return ResolveScalarEventStartValueImpl(
+            ev,
+            evIndex,
+            frames,
+            orderedEvents,
+            eventsByEnd
+        );
+    }
+
+    private static float ResolveScalarEventStartValueImpl(
+        Pe.Event ev,
+        int evIndex,
+        List<Pe.Frame> frames,
+        List<Pe.Event> orderedEvents,
+        List<Pe.Event> eventsByEnd
+    )
+    {
         // 优先：ev.StartBeat 处有精确帧
         var frameAtStart = FindScalarFrameAtBeat(frames, ev.StartBeat);
         if (frameAtStart != null)
             return frameAtStart.Value;
 
-        // 查找前驱主导事件：orderedEvents 中位于 ev 之前（index 更小）且
-        // StartBeat <= ev.StartBeat 的最后一个事件
-        var evIndex = orderedEvents.IndexOf(ev);
+        // 查找前驱主导事件：从 evIndex 向前查找
         Pe.Event? precedingDominant = null;
+        var precedingDominantIndex = -1;
         for (var i = evIndex - 1; i >= 0; i--)
         {
             if (orderedEvents[i].StartBeat <= ev.StartBeat + (float)BeatComparisonEpsilon)
             {
                 precedingDominant = orderedEvents[i];
+                precedingDominantIndex = i;
                 break;
             }
         }
@@ -520,8 +577,9 @@ public class FrameEventInterpolator
             if (precedingDominant.EndBeat >= ev.StartBeat - (float)BeatComparisonEpsilon)
             {
                 // 前驱事件在 ev 开始时仍活跃（重叠）→ 递归计算其在该拍点的值
-                var innerStart = ResolveScalarEventStartValue(
+                var innerStart = ResolveScalarEventStartValueImpl(
                     precedingDominant,
+                    precedingDominantIndex,
                     frames,
                     orderedEvents,
                     eventsByEnd
