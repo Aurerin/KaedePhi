@@ -1,8 +1,9 @@
-﻿using KaedePhi.Tool.Converter.RePhiEdit.Model;
+﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Converter.RePhiEdit.Model;
 
 namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
-public class JudgeLine
+public static class JudgeLine
 {
     /// <summary>
     /// 转换RePhiEdit的JudgeLine到KaedePhi的JudgeLine
@@ -18,7 +19,7 @@ public class JudgeLine
             Father = src.Father,
             IsCover = src.IsCover,
             ZOrder = src.ZOrder,
-            AttachUi = src.AttachUi.HasValue ? (Kpc.AttachUi?)(int)src.AttachUi.Value : null,
+            AttachUi = src.AttachUi.HasValue ? (AttachUi?)(int)src.AttachUi.Value : null,
             IsGif = src.IsGif,
             BpmFactor = src.BpmFactor,
             RotateWithFather = src.RotateWithFather,
@@ -46,7 +47,7 @@ public class JudgeLine
             Father = src.Father,
             IsCover = src.IsCover,
             ZOrder = src.ZOrder,
-            AttachUi = src.AttachUi.HasValue ? (Rpe.AttachUi?)(int)src.AttachUi.Value : null,
+            AttachUi = src.AttachUi.HasValue ? (AttachUi?)(int)src.AttachUi.Value : null,
             IsGif = src.IsGif,
             BpmFactor = src.BpmFactor,
             RotateWithFather = src.RotateWithFather,

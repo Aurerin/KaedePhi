@@ -40,13 +40,13 @@ public static class Note
             Type = ConvertNoteType(src.Type),
         };
 
-    public static Kpc.NoteType ConvertNoteType(PhigrosNoteType type) =>
+    public static NoteType ConvertNoteType(PhigrosNoteType type) =>
         type switch
         {
-            PhigrosNoteType.Tap => Kpc.NoteType.Tap,
-            PhigrosNoteType.Drag => Kpc.NoteType.Drag,
-            PhigrosNoteType.Hold => Kpc.NoteType.Hold,
-            PhigrosNoteType.Flick => Kpc.NoteType.Flick,
-            _ => Kpc.NoteType.Tap,
+            PhigrosNoteType.Tap => NoteType.Tap,
+            PhigrosNoteType.Drag => NoteType.Drag,
+            PhigrosNoteType.Hold => NoteType.Hold,
+            PhigrosNoteType.Flick => NoteType.Flick,
+            _ => NoteType.Tap,
         };
 }

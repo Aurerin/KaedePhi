@@ -14,7 +14,7 @@ public static class Note
             PositionX = Transform.TransformToKpcX(src.PositionX) + Kpc.Chart.CoordinateSystem.MaxX,
             WidthRatio = src.WidthRatio,
             SpeedMultiplier = src.SpeedMultiplier,
-            Type = (Kpc.NoteType)(int)src.Type,
+            Type = (NoteType)(int)src.Type,
         };
 
     public static Pe.Note ConvertNote(Kpc.Note src, Action<string>? warnLogger)

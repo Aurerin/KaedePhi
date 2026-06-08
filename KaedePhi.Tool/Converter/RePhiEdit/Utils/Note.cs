@@ -2,7 +2,7 @@
 
 namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
-public class Note
+public static class Note
 {
     public static Kpc.Note ConvertNote(Rpe.Note src) =>
         new()
@@ -16,7 +16,7 @@ public class Note
             WidthRatio = src.Size,
             JudgeArea = src.JudgeArea,
             SpeedMultiplier = src.SpeedMultiplier,
-            Type = (Kpc.NoteType)(int)src.Type,
+            Type = (NoteType)(int)src.Type,
             VisibleTime = src.VisibleTime,
             YOffset = Transform.TransformToKpcY(src.YOffset),
             Tint = src.Color.ToArray(),
@@ -36,7 +36,7 @@ public class Note
             Size = src.WidthRatio,
             JudgeArea = src.JudgeArea,
             SpeedMultiplier = src.SpeedMultiplier,
-            Type = (Rpe.NoteType)(int)src.Type,
+            Type = (NoteType)(int)src.Type,
             VisibleTime = src.VisibleTime,
             YOffset = Transform.FloatTransformToRpeY(src.YOffset),
             Color = src.Tint.ToArray(),
