@@ -82,8 +82,7 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// 是否显示通用转换选项（格式不同且目标格式支持解绑/合并/线过滤）
     /// </summary>
     public bool ShowGenericOptions =>
-        ShowConversionOptions
-        && _selectedFormat is ChartType.PhiEdit or ChartType.PhigrosV3;
+        ShowConversionOptions && _selectedFormat is ChartType.PhiEdit or ChartType.PhigrosV3;
 
     public bool UseStream
     {
