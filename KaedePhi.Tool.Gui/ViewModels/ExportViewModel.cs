@@ -30,6 +30,7 @@ public sealed class ExportViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ShowConversionOptions));
             OnPropertyChanged(nameof(ShowPeOptions));
             OnPropertyChanged(nameof(ShowPhigrosOptions));
+            OnPropertyChanged(nameof(ShowGenericOptions));
         }
     }
 
@@ -44,6 +45,7 @@ public sealed class ExportViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ShowConversionOptions));
             OnPropertyChanged(nameof(ShowPeOptions));
             OnPropertyChanged(nameof(ShowPhigrosOptions));
+            OnPropertyChanged(nameof(ShowGenericOptions));
             if (!IsJsonFormat)
                 IndentedOutput = false;
         }
@@ -60,9 +62,10 @@ public sealed class ExportViewModel : INotifyPropertyChanged
         };
 
     /// <summary>
-    /// 是否需要显示转换选项（格式不同时显示）
+    /// 是否需要显示转换选项面板（格式不同且目标格式存在可用选项时显示）
     /// </summary>
-    public bool ShowConversionOptions => IsFormatChanged;
+    public bool ShowConversionOptions =>
+        IsFormatChanged && _selectedFormat is ChartType.PhiEdit or ChartType.PhigrosV3;
 
     /// <summary>
     /// 是否显示 PhiEdit 专属转换选项（格式不同且目标为 PhiEdit）
@@ -74,6 +77,13 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// </summary>
     public bool ShowPhigrosOptions =>
         ShowConversionOptions && _selectedFormat == ChartType.PhigrosV3;
+
+    /// <summary>
+    /// 是否显示通用转换选项（格式不同且目标格式支持解绑/合并/线过滤）
+    /// </summary>
+    public bool ShowGenericOptions =>
+        ShowConversionOptions
+        && _selectedFormat is ChartType.PhiEdit or ChartType.PhigrosV3;
 
     public bool UseStream
     {

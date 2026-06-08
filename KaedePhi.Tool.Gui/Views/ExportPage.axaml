@@ -89,7 +89,7 @@
                             </StackPanel>
 
                             <!-- 通用选项 -->
-                            <StackPanel Spacing="8">
+                            <StackPanel Spacing="8" IsVisible="{Binding ShowGenericOptions}">
                                 <TextBlock Text="{x:Static loc:GuiLocalizationString.convert_common_options}" FontSize="12" Opacity="0.7"/>
 
                                 <!-- 解绑选项 -->
