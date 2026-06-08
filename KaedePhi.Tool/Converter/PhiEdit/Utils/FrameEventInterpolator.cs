@@ -511,8 +511,8 @@ public class FrameEventInterpolator
                 );
             }
 
-            // 前驱事件已结束，直接使用其终值
-            return (precedingDominant.EndXValue, precedingDominant.EndYValue);
+            // 前驱事件已结束，检查中间是否有帧覆盖
+            return ResolveMoveValueAfterBoundary(frames, eventsByEnd, ev.StartBeat);
         }
 
         // 无前驱事件，降级到帧/默认
@@ -587,8 +587,8 @@ public class FrameEventInterpolator
                 return InterpolateScalarValue(precedingDominant, ev.StartBeat, innerStart);
             }
 
-            // 前驱事件已结束，直接使用其终值
-            return precedingDominant.EndValue;
+            // 前驱事件已结束，检查中间是否有帧覆盖
+            return ResolveScalarValueAfterBoundary(frames, eventsByEnd, ev.StartBeat);
         }
 
         // 无前驱事件，降级到帧/默认
