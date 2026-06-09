@@ -331,7 +331,7 @@ public static class FatherUnbindHelpers
         if (line.RotateWithFather)
         {
             var merged = merge(
-                line.EventLayers[0].RotateEvents ?? new List<KpcEvents.Event<double>>(),
+                line.EventLayers[0].RotateEvents ?? [],
                 fatherRotateEvents
             );
             line.EventLayers[0].RotateEvents = merged;

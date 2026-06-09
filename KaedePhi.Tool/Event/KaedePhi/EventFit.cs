@@ -39,6 +39,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             if (events[i].StartBeat < events[i - 1].StartBeat)
                 return false;
         }
+
         return true;
     }
 
@@ -140,21 +141,17 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             for (var splitLen = remainingCount - 1; splitLen >= 2; splitLen--)
             {
                 fitted = TryFitEasing(source, currentStart, currentStart + splitLen, tolerance);
-                if (fitted != null)
-                {
-                    target.Add(fitted);
-                    currentStart += splitLen;
-                    found = true;
-                    break;
-                }
+                if (fitted is null) continue;
+                target.Add(fitted);
+                currentStart += splitLen;
+                found = true;
+                break;
             }
 
-            if (!found)
-            {
-                // 无法拟合任何长度 >= 2 的前缀，输出第一个事件并继续处理剩余
-                target.Add(source[currentStart].Clone());
-                currentStart++;
-            }
+            if (found) continue;
+            // 无法拟合任何长度 >= 2 的前缀，输出第一个事件并继续处理剩余
+            target.Add(source[currentStart].Clone());
+            currentStart++;
         }
     }
 
@@ -180,34 +177,10 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
         var startValue = first.GetStartValueAsDouble();
         var endValue = last.GetEndValueAsDouble();
 
-        foreach (var easingId in AllEasingIds)
-        {
-            var candidate = CreateMergedEvent(
-                first,
-                startBeat,
-                startValue,
-                endBeat,
-                endValue,
-                easingId
-            );
-
-            if (
-                FitsWithinTolerance(
-                    candidate,
-                    events,
-                    start,
-                    end,
-                    tolerance,
-                    startBeat,
-                    endBeat,
-                    startValue,
-                    endValue
-                )
-            )
-                return candidate;
-        }
-
-        return null;
+        return AllEasingIds
+            .Select(easingId => CreateMergedEvent(first, startBeat, startValue, endBeat, endValue, easingId))
+            .FirstOrDefault(candidate => FitsWithinTolerance(candidate, events, start, end, tolerance, startBeat,
+                endBeat, startValue, endValue));
     }
 
     /// <summary>
@@ -281,7 +254,7 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     )
     {
         return first.EndBeat == second.StartBeat
-            && Math.Abs(first.GetEndValueAsDouble() - second.GetStartValueAsDouble()) < 1e-9;
+               && Math.Abs(first.GetEndValueAsDouble() - second.GetStartValueAsDouble()) < 1e-9;
     }
 
     /// <summary>
@@ -298,8 +271,8 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
     private static bool IsLinear(KpcEvents.Event<TPayload> evt)
     {
         return (int)evt.Easing == 1
-            && Math.Abs(evt.EasingLeft) < 1e-6f
-            && Math.Abs(evt.EasingRight - 1f) < 1e-6f;
+               && Math.Abs(evt.EasingLeft) < 1e-6f
+               && Math.Abs(evt.EasingRight - 1f) < 1e-6f;
     }
 
     /// <summary>

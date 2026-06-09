@@ -70,7 +70,7 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
         if (cutLength <= new Beat(0))
             throw new ArgumentOutOfRangeException(
                 nameof(cutLength),
-                "Cut length must be greater than zero."
+                "切割长度必须大于0."
             );
 
         var cutEvents = new List<KpcEvents.Event<TPayload>>();
