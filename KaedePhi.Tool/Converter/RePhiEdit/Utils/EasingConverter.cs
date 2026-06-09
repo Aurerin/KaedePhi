@@ -1,18 +1,27 @@
-﻿using KaedePhi.Tool.Converter.PhiEdit.Utils;
+﻿namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
-namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
-
-public static class Easing
+/// <summary>
+/// RPE 与 KPC 缓动类型之间的映射与转换工具。
+/// </summary>
+public static class EasingConverter
 {
-    public static Rpe.Easing ConvertEasing(Kpc.Easing src, bool isBezier) =>
-        isBezier ? new Rpe.Easing(1) : new Rpe.Easing(MapToPe((int)src));
+    /// <summary>
+    /// 将 KPC 缓动转换为 RPE 缓动；贝塞尔事件强制降级为线性。
+    /// </summary>
+    /// <param name="src">KPC 缓动实例。</param>
+    /// <param name="isBezier">是否为贝塞尔事件。</param>
+    /// <returns>RPE 缓动实例。</returns>
+    public static Rpe.Easing ConvertEasing(Kpc.Easing src, bool isBezier)
+    {
+        return isBezier ? new Rpe.Easing(1) : new Rpe.Easing(MapToPe((int)src));
+    }
 
     public static Kpc.Easing ConvertEasing(Rpe.Easing src) => new(MapToKpc((int)src));
 
     public static Rpe.Easing ConvertEasing(Kpc.Easing src) => new(MapToPe((int)src));
 
-    public static int MapToKpc(int rpe) =>
-        rpe switch
+    public static int MapToKpc(int rpeEasingNum) =>
+        rpeEasingNum switch
         {
             1 => 1,
             2 => 3,
@@ -46,5 +55,6 @@ public static class Easing
             _ => 1,
         };
 
-    public static int MapToPe(int nrcEasing) => EasingConverter.MapToPe(nrcEasing);
+    public static int MapToPe(int kpcEasingNum) =>
+        PhiEdit.Utils.EasingConverter.MapToPe(kpcEasingNum);
 }

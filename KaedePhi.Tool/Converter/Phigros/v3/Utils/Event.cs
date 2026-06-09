@@ -6,7 +6,10 @@ using PhigrosSpeedEvent = KaedePhi.Core.Phigros.v3.SpeedEvent;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
-public static class Event
+/// <summary>
+/// PhigrosV3 事件到 KPC 事件的转换工具。
+/// </summary>
+public static class EventBuilder
 {
     private const double TrailingBeatPadding = 1d / 64d;
     private const double SpeedValueRatio = 4.5d;

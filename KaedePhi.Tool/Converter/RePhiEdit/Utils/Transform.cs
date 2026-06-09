@@ -2,6 +2,9 @@
 
 namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
+/// <summary>
+/// RPE 坐标系与 KPC 坐标系之间的坐标变换工具。
+/// </summary>
 public static class Transform
 {
     public static double TransformToKpcX(float x) => CoordinateGeometry.ToKpcX(x);

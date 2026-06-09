@@ -4,9 +4,13 @@ using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
-public static class Note
+/// <summary>
+/// PhigrosV3 音符到 KPC 音符的转换工具。
+/// </summary>
+public static class NoteBuilder
 {
     private const float NotePositionXRatio = 0.1125f;
+    private const float NoteSegmentation = 32f;
 
     public static List<Kpc.Note> ConvertNotes(
         List<PhigrosNote>? notesAbove,
@@ -29,18 +33,18 @@ public static class Note
         new()
         {
             Above = above,
-            StartBeat = new Beat(src.Time / 32.0),
+            StartBeat = new Beat(src.Time / NoteSegmentation),
             EndBeat = new Beat(
                 src.Type == PhigrosNoteType.Hold
-                    ? (src.Time + src.HoldTime) / 32.0
-                    : src.Time / 32.0
+                    ? (src.Time + src.HoldTime) / NoteSegmentation
+                    : src.Time / NoteSegmentation
             ),
             PositionX = src.PositionX * NotePositionXRatio,
             SpeedMultiplier = src.Type != PhigrosNoteType.Hold ? src.Speed : 1f,
             Type = ConvertNoteType(src.Type),
         };
 
-    public static NoteType ConvertNoteType(PhigrosNoteType type) =>
+    private static NoteType ConvertNoteType(PhigrosNoteType type) =>
         type switch
         {
             PhigrosNoteType.Tap => NoteType.Tap,

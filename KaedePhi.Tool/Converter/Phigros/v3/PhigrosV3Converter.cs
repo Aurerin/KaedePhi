@@ -30,12 +30,12 @@ public class PhigrosV3Converter
 
         return new Kpc.Chart
         {
-            BpmList = BpmItem.ConvertBpmList(input.JudgeLineList),
-            Meta = Meta.ConvertMeta(input),
+            BpmList = BpmItemBuilder.ConvertBpmList(input.JudgeLineList),
+            Meta = MetaBuilder.ConvertMeta(input),
             JudgeLineList = input
                 .JudgeLineList.Select(
                     (j, i) =>
-                        JudgeLine.ConvertJudgeLine(
+                        KpcJudgeLineBuilder.ConvertJudgeLine(
                             j,
                             i,
                             input.JudgeLineList.Count > 0
@@ -63,7 +63,7 @@ public class PhigrosV3Converter
         var globalBpm = input.BpmList is { Count: > 0 } ? input.BpmList[0].Bpm : options.DefaultBpm;
         var chartEndBeat = CalculateChartEndBeat(input);
 
-        var judgeLineConverter = new JudgeLineKpcToPhigrosV3(
+        var judgeLineConverter = new PhigrosV3JudgeLineBuilder(
             options,
             globalBpm,
             chartEndBeat,

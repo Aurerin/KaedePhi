@@ -2,7 +2,10 @@ using KaedePhi.Core.Common;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
-public static class BpmItem
+/// <summary>
+/// PE 与 KPC BPM 项之间的双向转换工具。
+/// </summary>
+public static class BpmItemBuilder
 {
     public static Kpc.BpmItem ConvertBpmItem(Pe.BpmItem src) =>
         new() { Bpm = src.Bpm, StartBeat = new Beat(src.StartBeat) };

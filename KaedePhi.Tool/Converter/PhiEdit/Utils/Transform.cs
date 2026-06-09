@@ -2,6 +2,9 @@
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
+/// <summary>
+/// PE 坐标系与 KPC 坐标系之间的坐标变换工具。
+/// </summary>
 public static class Transform
 {
     private static readonly CoordinateProfile PeCoordinateProfile = new(

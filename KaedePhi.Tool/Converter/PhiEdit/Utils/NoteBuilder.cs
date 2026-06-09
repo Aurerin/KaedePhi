@@ -2,7 +2,10 @@
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
-public static class Note
+/// <summary>
+/// PE 与 KPC 音符之间的双向转换工具。
+/// </summary>
+public static class NoteBuilder
 {
     public static Kpc.Note ConvertNote(Pe.Note src) =>
         new()

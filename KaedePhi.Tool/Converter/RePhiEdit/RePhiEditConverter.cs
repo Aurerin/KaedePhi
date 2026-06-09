@@ -20,8 +20,8 @@ public class RePhiEditConverter : LoggableBase, IChartConverter<Rpe.Chart, Unit?
         new()
         {
             BpmList = source.BpmList.ConvertAll(ConvertBpmItem),
-            Meta = Meta.ConvertMeta(source.Meta),
-            JudgeLineList = source.JudgeLineList.ConvertAll(JudgeLine.ConvertJudgeLine),
+            Meta = MetaBuilder.ConvertMeta(source.Meta),
+            JudgeLineList = source.JudgeLineList.ConvertAll(JudgeLineBuilder.ConvertJudgeLine),
         };
 
     /// <summary>
@@ -34,9 +34,9 @@ public class RePhiEditConverter : LoggableBase, IChartConverter<Rpe.Chart, Unit?
         new()
         {
             BpmList = input.BpmList.ConvertAll(ConvertBpmItem),
-            Meta = Meta.ConvertMeta(input.Meta),
+            Meta = MetaBuilder.ConvertMeta(input.Meta),
             JudgeLineList = input.JudgeLineList.ConvertAll(r =>
-                JudgeLine.ConvertJudgeLine(r, options.Cutting)
+                JudgeLineBuilder.ConvertJudgeLine(r, options.Cutting)
             ),
         };
 

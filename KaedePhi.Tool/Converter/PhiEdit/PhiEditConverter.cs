@@ -24,9 +24,9 @@ public class PhiEditConverter
 
         return new Kpc.Chart
         {
-            BpmList = source.BpmList.ConvertAll(Utils.BpmItem.ConvertBpmItem),
-            Meta = Utils.Meta.ConvertMeta(source),
-            JudgeLineList = new Utils.JudgeLineConverter(option).ConvertJudgeLines(
+            BpmList = source.BpmList.ConvertAll(Utils.BpmItemBuilder.ConvertBpmItem),
+            Meta = Utils.MetaBuilder.ConvertMeta(source),
+            JudgeLineList = new Utils.KaedePhiJudgeLineBuilder(option).ConvertJudgeLines(
                 source.JudgeLineList
             ),
         };
@@ -44,12 +44,12 @@ public class PhiEditConverter
 
         WarnIfUnsupportedMeta(input.Meta);
 
-        var judgeLineConverter = new Utils.JudgeLineKpcToPe(options, OnWarning);
+        var judgeLineConverter = new Utils.PhiEditJudgeLineBuilder(options, OnWarning);
 
         return new Pe.Chart
         {
-            Offset = Utils.Meta.GetPeOffset(input.Meta),
-            BpmList = input.BpmList.ConvertAll(Utils.BpmItem.ConvertBpmItem),
+            Offset = Utils.MetaBuilder.GetPeOffset(input.Meta),
+            BpmList = input.BpmList.ConvertAll(Utils.BpmItemBuilder.ConvertBpmItem),
             JudgeLineList = input.JudgeLineList.ConvertAll(j =>
                 judgeLineConverter.ConvertJudgeLine(j, input.JudgeLineList)
             ),

@@ -5,7 +5,7 @@ using KaedePhi.Tool.Event.KaedePhi;
 
 namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
-public static class Event
+public static class EventBuilder
 {
     private static readonly EventCutter<float> FloatCutter = new();
     private static readonly EventCutter<double> DoubleCutter = new();
@@ -25,7 +25,7 @@ public static class Event
             BezierPoints = src.BezierPoints.ToArray(),
             EasingLeft = src.EasingLeft,
             EasingRight = src.EasingRight,
-            Easing = Easing.ConvertEasing(src.Easing),
+            Easing = EasingConverter.ConvertEasing(src.Easing),
             StartValue = valueTransformer(valueCopier(src.StartValue)),
             EndValue = valueTransformer(valueCopier(src.EndValue)),
             StartBeat = new Beat((int[])src.StartBeat),
@@ -48,7 +48,7 @@ public static class Event
             BezierPoints = src.BezierPoints.ToArray(),
             EasingLeft = src.EasingLeft,
             EasingRight = src.EasingRight,
-            Easing = Easing.ConvertEasing(src.Easing, src.IsBezier),
+            Easing = EasingConverter.ConvertEasing(src.Easing, src.IsBezier),
             StartValue = valueTransformer(valueCopier(src.StartValue)),
             EndValue = valueTransformer(valueCopier(src.EndValue)),
             StartBeat = new Beat((int[])src.StartBeat),
@@ -68,7 +68,7 @@ public static class Event
             BezierPoints = src.BezierPoints.ToArray(),
             EasingLeft = src.EasingLeft,
             EasingRight = src.EasingRight,
-            Easing = Easing.ConvertEasing(src.Easing),
+            Easing = EasingConverter.ConvertEasing(src.Easing),
             StartValue = valueTransformer(src.StartValue),
             EndValue = valueTransformer(src.EndValue),
             StartBeat = new Beat((int[])src.StartBeat),
@@ -116,7 +116,7 @@ public static class Event
         {
             return [ConvertEvent(src)];
         }
-        catch (EasingConverter.EasingNotSupportedException)
+        catch (PhiEdit.Utils.EasingConverter.EasingNotSupportedException)
         {
             return FloatCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
@@ -148,7 +148,7 @@ public static class Event
                     BezierPoints = src.BezierPoints.ToArray(),
                     EasingLeft = src.EasingLeft,
                     EasingRight = src.EasingRight,
-                    Easing = Easing.ConvertEasing(src.Easing, src.IsBezier),
+                    Easing = EasingConverter.ConvertEasing(src.Easing, src.IsBezier),
                     StartValue = (float)valueTransformer(src.StartValue),
                     EndValue = (float)valueTransformer(src.EndValue),
                     StartBeat = new Beat((int[])src.StartBeat),
@@ -157,7 +157,7 @@ public static class Event
                 },
             ];
         }
-        catch (EasingConverter.EasingNotSupportedException)
+        catch (PhiEdit.Utils.EasingConverter.EasingNotSupportedException)
         {
             return DoubleCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)
@@ -181,7 +181,7 @@ public static class Event
         {
             return [ConvertEvent(src)];
         }
-        catch (EasingConverter.EasingNotSupportedException)
+        catch (PhiEdit.Utils.EasingConverter.EasingNotSupportedException)
         {
             return IntCutter
                 .CutEventToLiner(src, 1d / options.UnsupportedEasingPrecision)

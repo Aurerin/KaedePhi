@@ -10,16 +10,19 @@ using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
-public class JudgeLineKpcToPhigrosV3
+/// <summary>
+/// KPC 判定线到 PhigrosV3 判定线的构建器。
+/// </summary>
+public class PhigrosV3JudgeLineBuilder
 {
     private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhigrosV3ConvertOptions _options;
-    private readonly EventKpcToPhigrosV3 _eventConverter;
+    private readonly PhigrosV3EventBuilder _phigrosV3EventBuilder;
     private readonly float _globalBpm;
     private readonly float _chartEndBeat;
     private readonly Action<string>? _warnLogger;
 
-    public JudgeLineKpcToPhigrosV3(
+    public PhigrosV3JudgeLineBuilder(
         KpcToPhigrosV3ConvertOptions options,
         float globalBpm,
         float chartEndBeat,
@@ -27,7 +30,7 @@ public class JudgeLineKpcToPhigrosV3
     )
     {
         _options = options;
-        _eventConverter = new EventKpcToPhigrosV3(options, warnLogger);
+        _phigrosV3EventBuilder = new PhigrosV3EventBuilder(options, warnLogger);
         _globalBpm = globalBpm;
         _chartEndBeat = chartEndBeat;
         _warnLogger = warnLogger;
@@ -75,7 +78,7 @@ public class JudgeLineKpcToPhigrosV3
         if (_options.NegativeAlpha.Enabled)
             ApplyNegativeAlphaElevation(preprocessedSrc);
 
-        var (notesAbove, notesBelow) = NoteKpcToPhigrosV3.ConvertNotes(
+        var (notesAbove, notesBelow) = PhigrosV3NoteBuilder.ConvertNotes(
             preprocessedSrc.Notes,
             speedEvents,
             _warnLogger,
@@ -89,7 +92,7 @@ public class JudgeLineKpcToPhigrosV3
             NotesBelow = notesBelow,
         };
 
-        _eventConverter.ConvertLineEvents(phigrosLine, preprocessedSrc.EventLayers);
+        _phigrosV3EventBuilder.ConvertLineEvents(phigrosLine, preprocessedSrc.EventLayers);
 
         if (phigrosLine.JudgeLineDisappearEvents.Count == 0)
         {
@@ -113,10 +116,9 @@ public class JudgeLineKpcToPhigrosV3
             return [];
 
         var firstLayer = layers[0];
-        if (firstLayer.SpeedEvents is not { Count: > 0 })
-            return [];
-
-        return firstLayer.SpeedEvents.OrderBy(e => (double)e.StartBeat).ToList();
+        return firstLayer.SpeedEvents is not { Count: > 0 }
+            ? []
+            : firstLayer.SpeedEvents.OrderBy(e => (double)e.StartBeat).ToList();
     }
 
     #region 负不透明度段判定线抬高
@@ -185,7 +187,7 @@ public class JudgeLineKpcToPhigrosV3
         var sorted = alphaEvents.OrderBy(e => (double)e.StartBeat).ToList();
         var segments = new List<(Beat, Beat)>();
 
-        int lastEndValue = 0;
+        var lastEndValue = 0;
         Beat lastEndBeat = new(0);
         Beat? segStart = null;
 
@@ -211,37 +213,44 @@ public class JudgeLineKpcToPhigrosV3
             var evNegStart = ev.StartValue < 0;
             var evNegEnd = ev.EndValue < 0;
 
-            if (evNegStart && evNegEnd)
+            switch (evNegStart)
             {
-                // 全负段
-                segStart ??= ev.StartBeat;
-            }
-            else if (!evNegStart && !evNegEnd)
-            {
-                // 全非负
-                if (segStart.HasValue)
+                case true when evNegEnd:
+                    // 全负段
+                    segStart ??= ev.StartBeat;
+                    break;
+                case false when !evNegEnd:
                 {
-                    segments.Add((segStart.Value, ev.StartBeat));
-                    segStart = null;
+                    // 全非负
+                    if (segStart.HasValue)
+                    {
+                        segments.Add((segStart.Value, ev.StartBeat));
+                        segStart = null;
+                    }
+
+                    break;
                 }
-            }
-            else if (evNegStart && !evNegEnd)
-            {
-                // 负→正：在零点处拆分
-                var zeroBeat = FindZeroCrossingBeat(ev);
-                segStart ??= ev.StartBeat;
-                segments.Add((segStart.Value, zeroBeat));
-                segStart = null;
-            }
-            else
-            {
-                // 正→负：在零点处拆分
-                var zeroBeat = FindZeroCrossingBeat(ev);
-                if (segStart.HasValue)
+                case true when !evNegEnd:
                 {
+                    // 负→正：在零点处拆分
+                    var zeroBeat = FindZeroCrossingBeat(ev);
+                    segStart ??= ev.StartBeat;
                     segments.Add((segStart.Value, zeroBeat));
+                    segStart = null;
+                    break;
                 }
-                segStart = zeroBeat;
+                default:
+                {
+                    // 正→负：在零点处拆分
+                    var zeroBeat = FindZeroCrossingBeat(ev);
+                    if (segStart.HasValue)
+                    {
+                        segments.Add((segStart.Value, zeroBeat));
+                    }
+
+                    segStart = zeroBeat;
+                    break;
+                }
             }
 
             lastEndValue = ev.EndValue;
@@ -381,6 +390,7 @@ public class JudgeLineKpcToPhigrosV3
             else
                 hi = mid - 1;
         }
+
         if (idx < 0)
             return 0;
         var ev = events[idx];
@@ -567,9 +577,11 @@ public class JudgeLineKpcToPhigrosV3
                     }
                 );
             }
+
             if (e > cursor)
                 cursor = e;
         }
+
         if (cursor < segEnd)
         {
             var end = cursor + fillLength;
