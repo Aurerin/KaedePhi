@@ -2,15 +2,18 @@
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
-public class EventLayerConverter
+/// <summary>
+/// PE 判定线事件层到 KPC 事件层的构建器。
+/// </summary>
+public class EventLayerBuilder
 {
-    private readonly FrameEventInterpolator _frameEventInterpolator;
+    private readonly PhiEditFrameEventBuilder _phiEditFrameEvent;
     private readonly PhiEditToKpcConvertOptions _options;
 
-    public EventLayerConverter(PhiEditToKpcConvertOptions options)
+    public EventLayerBuilder(PhiEditToKpcConvertOptions options)
     {
         _options = options;
-        _frameEventInterpolator = new FrameEventInterpolator(options);
+        _phiEditFrameEvent = new PhiEditFrameEventBuilder(options);
     }
 
     /// <summary>
@@ -19,33 +22,33 @@ public class EventLayerConverter
     public KpcEvents.EventLayer ConvertEventLayer(Pe.JudgeLine src, double horizonBeat) =>
         new()
         {
-            MoveXEvents = _frameEventInterpolator.BuildMoveAxisEvents(
+            MoveXEvents = _phiEditFrameEvent.BuildMoveAxisEvents(
                 src.MoveFrames,
                 src.MoveEvents,
                 horizonBeat,
                 point => point.X,
                 Transform.TransformToKpcX
             ),
-            MoveYEvents = _frameEventInterpolator.BuildMoveAxisEvents(
+            MoveYEvents = _phiEditFrameEvent.BuildMoveAxisEvents(
                 src.MoveFrames,
                 src.MoveEvents,
                 horizonBeat,
                 point => point.Y,
                 Transform.TransformToKpcY
             ),
-            RotateEvents = _frameEventInterpolator.BuildScalarEvents(
+            RotateEvents = _phiEditFrameEvent.BuildScalarEvents(
                 src.RotateFrames,
                 src.RotateEvents,
                 horizonBeat,
                 Transform.TransformToKpcAngle
             ),
-            AlphaEvents = _frameEventInterpolator.BuildScalarEvents(
+            AlphaEvents = _phiEditFrameEvent.BuildScalarEvents(
                 src.AlphaFrames,
                 src.AlphaEvents,
                 horizonBeat,
                 value => (int)Math.Round(value)
             ),
-            SpeedEvents = _frameEventInterpolator.BuildScalarEvents(
+            SpeedEvents = _phiEditFrameEvent.BuildScalarEvents(
                 src.SpeedFrames,
                 [],
                 horizonBeat,

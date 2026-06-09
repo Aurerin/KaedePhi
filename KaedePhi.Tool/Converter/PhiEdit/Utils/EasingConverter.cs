@@ -1,5 +1,8 @@
 ﻿namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
+/// <summary>
+/// PE 与 KPC 缓动类型之间的映射与转换工具。
+/// </summary>
 public static class EasingConverter
 {
     /// <summary>
@@ -14,7 +17,7 @@ public static class EasingConverter
                 : $"KPC easing {nrcEasing} is unsupported in PE and requires linear slicing"
         )
     {
-        /// <summary>触发异常的 KPC 缓动编号（贝塞尔事件为 -1）。</summary>
+        /// <summary>触发异常的 KPC 缓动编号。</summary>
         public int NrcEasing { get; } = nrcEasing;
 
         /// <summary>是否因贝塞尔事件触发。</summary>

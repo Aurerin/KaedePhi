@@ -6,7 +6,10 @@ using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
-public static class NoteKpcToPhigrosV3
+/// <summary>
+/// KPC 音符到 PhigrosV3 音符的转换工具。
+/// </summary>
+public static class PhigrosV3NoteBuilder
 {
     private const float NotePositionXRatio = 0.1125f;
     private const float FloatEpsilon = 1e-6f;
@@ -53,8 +56,8 @@ public static class NoteKpcToPhigrosV3
 
         var phigrosType = ConvertNoteType(src.Type);
 
-        float holdTime = 0;
-        float speed = src.SpeedMultiplier;
+        var holdTime = 0f;
+        var speed = src.SpeedMultiplier;
 
         if (phigrosType == PhigrosNoteType.Hold)
         {
@@ -79,15 +82,15 @@ public static class NoteKpcToPhigrosV3
             return 1f;
 
         var beatObj = new Beat(beat);
-        foreach (var ev in speedEvents)
+        foreach (
+            var ev in from ev in speedEvents
+            let startBeat = (double)ev.StartBeat
+            let endBeat = (double)ev.EndBeat
+            where beat >= startBeat - FloatEpsilon && beat < endBeat - FloatEpsilon
+            select ev
+        )
         {
-            var startBeat = (double)ev.StartBeat;
-            var endBeat = (double)ev.EndBeat;
-
-            if (beat >= startBeat - FloatEpsilon && beat < endBeat - FloatEpsilon)
-            {
-                return (float)(ev.GetValueAtBeat(beatObj) / SpeedValueRatio);
-            }
+            return (float)(ev.GetValueAtBeat(beatObj) / SpeedValueRatio);
         }
 
         return (float)(speedEvents[^1].EndValue / SpeedValueRatio);

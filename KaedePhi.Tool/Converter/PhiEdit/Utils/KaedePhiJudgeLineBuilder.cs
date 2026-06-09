@@ -2,15 +2,18 @@ using KaedePhi.Tool.Converter.PhiEdit.Model;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
-public class JudgeLineConverter
+/// <summary>
+/// PE 判定线到 KPC 判定线的构建器。
+/// </summary>
+public class KaedePhiJudgeLineBuilder
 {
-    private readonly FrameEventInterpolator _frameEventInterpolator;
-    private readonly EventLayerConverter _eventLayerConverter;
+    private readonly PhiEditFrameEventBuilder _phiEditFrameEvent;
+    private readonly EventLayerBuilder _eventLayerConverter;
 
-    public JudgeLineConverter(PhiEditToKpcConvertOptions options)
+    public KaedePhiJudgeLineBuilder(PhiEditToKpcConvertOptions options)
     {
-        _eventLayerConverter = new EventLayerConverter(options);
-        _frameEventInterpolator = new FrameEventInterpolator(options);
+        _eventLayerConverter = new EventLayerBuilder(options);
+        _phiEditFrameEvent = new PhiEditFrameEventBuilder(options);
     }
 
     /// <summary>
@@ -22,8 +25,7 @@ public class JudgeLineConverter
             return [];
 
         var result = new List<Kpc.JudgeLine>(judgeLines.Count);
-        for (var i = 0; i < judgeLines.Count; i++)
-            result.Add(ConvertJudgeLine(judgeLines[i], i));
+        result.AddRange(judgeLines.Select(ConvertJudgeLine));
         return result;
     }
 
@@ -32,14 +34,14 @@ public class JudgeLineConverter
     /// </summary>
     public Kpc.JudgeLine ConvertJudgeLine(Pe.JudgeLine src, int index)
     {
-        var horizonBeat = _frameEventInterpolator.GetJudgeLineHorizonBeat(src);
+        var horizonBeat = _phiEditFrameEvent.GetJudgeLineHorizonBeat(src);
         var eventLayer = _eventLayerConverter.ConvertEventLayer(src, horizonBeat);
         eventLayer.Anticipation();
 
         return new Kpc.JudgeLine
         {
             Name = $"PeJudgeLine_{index}",
-            Notes = src.NoteList.ConvertAll(Note.ConvertNote) ?? [],
+            Notes = src.NoteList.ConvertAll(NoteBuilder.ConvertNote) ?? [],
             EventLayers = [eventLayer],
         };
     }

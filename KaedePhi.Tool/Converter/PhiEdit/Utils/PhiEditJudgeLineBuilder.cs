@@ -7,16 +7,16 @@ using KpcJudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
 /// <summary>
-/// KPC 判定线到 PE 判定线的转换器。
+/// KPC 判定线到 PE 判定线的构建器。
 /// </summary>
-public class JudgeLineKpcToPe
+public class PhiEditJudgeLineBuilder
 {
     private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhiEditConvertOptions _options;
     private readonly LineEventBuilder _eventBuilder;
     private readonly Action<string>? _warnLogger;
 
-    public JudgeLineKpcToPe(KpcToPhiEditConvertOptions options, Action<string>? warnLogger)
+    public PhiEditJudgeLineBuilder(KpcToPhiEditConvertOptions options, Action<string>? warnLogger)
     {
         _options = options;
         _eventBuilder = new LineEventBuilder(options, warnLogger);
@@ -32,7 +32,7 @@ public class JudgeLineKpcToPe
         var trueSrc = src;
         var pe = new Pe.JudgeLine
         {
-            NoteList = trueSrc.Notes.ConvertAll(n => Note.ConvertNote(n, _warnLogger)),
+            NoteList = trueSrc.Notes.ConvertAll(n => NoteBuilder.ConvertNote(n, _warnLogger)),
         };
 
         if (

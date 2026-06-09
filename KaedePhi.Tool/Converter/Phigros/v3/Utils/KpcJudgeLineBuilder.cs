@@ -2,17 +2,20 @@
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
-public static class JudgeLine
+/// <summary>
+/// PhigrosV3 判定线到 KPC 判定线的构建器。
+/// </summary>
+public static class KpcJudgeLineBuilder
 {
     public static Kpc.JudgeLine ConvertJudgeLine(PhigrosJudgeLine src, int index, float defaultBpm)
     {
-        var horizonBeat = Event.GetJudgeLineHorizonBeat(src);
+        var horizonBeat = EventBuilder.GetJudgeLineHorizonBeat(src);
 
         return new Kpc.JudgeLine
         {
             Name = $"PhigrosLine_{index}",
-            Notes = Note.ConvertNotes(src.NotesAbove, src.NotesBelow),
-            EventLayers = [EventLayer.ConvertEventLayer(src, horizonBeat)],
+            Notes = NoteBuilder.ConvertNotes(src.NotesAbove, src.NotesBelow),
+            EventLayers = [EventLayerBuilder.ConvertEventLayer(src, horizonBeat)],
             BpmFactor = defaultBpm / src.Bpm,
         };
     }

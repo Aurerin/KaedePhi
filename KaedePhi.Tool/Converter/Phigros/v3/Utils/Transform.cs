@@ -3,6 +3,9 @@ using PhigrosV3 = KaedePhi.Core.Phigros.v3.Chart;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
+/// <summary>
+/// PhigrosV3 坐标系与 KPC 坐标系之间的坐标变换工具。
+/// </summary>
 public static class Transform
 {
     private static readonly CoordinateProfile PhigrosV3Profile = new(

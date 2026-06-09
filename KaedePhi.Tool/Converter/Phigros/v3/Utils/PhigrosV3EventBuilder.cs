@@ -8,7 +8,10 @@ using PhigrosSpeedEvent = KaedePhi.Core.Phigros.v3.SpeedEvent;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 
-public class EventKpcToPhigrosV3
+/// <summary>
+/// KPC 事件到 PhigrosV3 事件的构建器。
+/// </summary>
+public class PhigrosV3EventBuilder
 {
     private const float FloatEpsilon = 1e-6f;
     private const double SpeedValueRatio = 4.5d;
@@ -23,7 +26,7 @@ public class EventKpcToPhigrosV3
     private readonly EventCutter<float> _eventCutterFloat = new();
     private readonly LayerProcessor _layerProcessor = new();
 
-    public EventKpcToPhigrosV3(KpcToPhigrosV3ConvertOptions options, Action<string>? warnLogger)
+    public PhigrosV3EventBuilder(KpcToPhigrosV3ConvertOptions options, Action<string>? warnLogger)
     {
         _options = options;
         _warnLogger = warnLogger;
@@ -96,21 +99,20 @@ public class EventKpcToPhigrosV3
             );
         }
 
-        if (target.JudgeLineMoveEvents.Count > 0)
-        {
-            var last = target.JudgeLineMoveEvents[^1];
-            target.JudgeLineMoveEvents.Add(
-                new PhigrosEvent
-                {
-                    StartTime = last.EndTime,
-                    EndTime = TailEventEndTime,
-                    Start = last.End,
-                    End = last.End,
-                    Start2 = last.End2,
-                    End2 = last.End2,
-                }
-            );
-        }
+        if (target.JudgeLineMoveEvents.Count <= 0)
+            return;
+        var last = target.JudgeLineMoveEvents[^1];
+        target.JudgeLineMoveEvents.Add(
+            new PhigrosEvent
+            {
+                StartTime = last.EndTime,
+                EndTime = TailEventEndTime,
+                Start = last.End,
+                End = last.End,
+                Start2 = last.End2,
+                End2 = last.End2,
+            }
+        );
     }
 
     private static List<(
@@ -223,37 +225,32 @@ public class EventKpcToPhigrosV3
             .ToList();
         var filled = FillGaps(cutEvents, 0d);
 
-        foreach (var ev in filled)
-        {
-            var startBeat = (float)(double)ev.StartBeat;
-            var endBeat = (float)(double)ev.EndBeat;
-            if (endBeat <= startBeat)
-                continue;
+        target.AddRange(
+            from ev in filled
+            let startBeat = (float)(double)ev.StartBeat
+            let endBeat = (float)(double)ev.EndBeat
+            where !(endBeat <= startBeat)
+            select new PhigrosEvent
+            {
+                StartTime = startBeat * BeatToPhigrosTime,
+                EndTime = endBeat * BeatToPhigrosTime,
+                Start = valueTransform(ev.StartValue),
+                End = valueTransform(ev.EndValue),
+            }
+        );
 
-            target.Add(
-                new PhigrosEvent
-                {
-                    StartTime = startBeat * BeatToPhigrosTime,
-                    EndTime = endBeat * BeatToPhigrosTime,
-                    Start = valueTransform(ev.StartValue),
-                    End = valueTransform(ev.EndValue),
-                }
-            );
-        }
-
-        if (target.Count > 0)
-        {
-            var last = target[^1];
-            target.Add(
-                new PhigrosEvent
-                {
-                    StartTime = last.EndTime,
-                    EndTime = TailEventEndTime,
-                    Start = last.End,
-                    End = last.End,
-                }
-            );
-        }
+        if (target.Count <= 0)
+            return;
+        var last = target[^1];
+        target.Add(
+            new PhigrosEvent
+            {
+                StartTime = last.EndTime,
+                EndTime = TailEventEndTime,
+                Start = last.End,
+                End = last.End,
+            }
+        );
     }
 
     #endregion
@@ -292,19 +289,18 @@ public class EventKpcToPhigrosV3
             );
         }
 
-        if (target.JudgeLineDisappearEvents.Count > 0)
-        {
-            var last = target.JudgeLineDisappearEvents[^1];
-            target.JudgeLineDisappearEvents.Add(
-                new PhigrosEvent
-                {
-                    StartTime = last.EndTime,
-                    EndTime = TailEventEndTime,
-                    Start = last.End,
-                    End = last.End,
-                }
-            );
-        }
+        if (target.JudgeLineDisappearEvents.Count <= 0)
+            return;
+        var last = target.JudgeLineDisappearEvents[^1];
+        target.JudgeLineDisappearEvents.Add(
+            new PhigrosEvent
+            {
+                StartTime = last.EndTime,
+                EndTime = TailEventEndTime,
+                Start = last.End,
+                End = last.End,
+            }
+        );
     }
 
     private static float ClampAlpha(int alpha) => (float)Math.Clamp(alpha / AlphaMax, 0d, 1d);
@@ -344,18 +340,17 @@ public class EventKpcToPhigrosV3
             );
         }
 
-        if (target.SpeedEvents.Count > 0)
-        {
-            var last = target.SpeedEvents[^1];
-            target.SpeedEvents.Add(
-                new PhigrosSpeedEvent
-                {
-                    StartTime = last.EndTime,
-                    EndTime = TailEventEndTime,
-                    Value = last.Value,
-                }
-            );
-        }
+        if (target.SpeedEvents.Count <= 0)
+            return;
+        var last = target.SpeedEvents[^1];
+        target.SpeedEvents.Add(
+            new PhigrosSpeedEvent
+            {
+                StartTime = last.EndTime,
+                EndTime = TailEventEndTime,
+                Value = last.Value,
+            }
+        );
     }
 
     #endregion

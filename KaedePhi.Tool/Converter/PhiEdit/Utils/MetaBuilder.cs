@@ -1,6 +1,9 @@
 ﻿namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
-public static class Meta
+/// <summary>
+/// PE 与 KPC 元数据之间的转换工具。
+/// </summary>
+public static class MetaBuilder
 {
     private const int OffsetOffset = 175;
 
