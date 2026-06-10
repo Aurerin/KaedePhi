@@ -18,9 +18,16 @@ namespace KaedePhi.Core.PhiChain.v6
         [JsonProperty("lines")]
         public List<SerializedLine> Lines { get; set; } = new();
 
-        public static Chart Empty()
+        /// <summary>
+        /// 坐标系边界
+        /// </summary>
+        public static class CoordinateSystem
         {
-            return new Chart { Lines = new List<SerializedLine>() };
+            public const float MaxX = 675f;
+            public const float MinX = -675f;
+            public const float MaxY = 450f;
+            public const float MinY = -450f;
+            public const bool ClockwiseRotation = false;
         }
 
         /// <summary>

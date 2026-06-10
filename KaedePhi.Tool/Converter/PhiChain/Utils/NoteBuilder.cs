@@ -1,0 +1,227 @@
+﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.PhiChain.v6;
+using KpcNoteType = KaedePhi.Core.Common.NoteType;
+using PhichainNoteType = KaedePhi.Core.PhiChain.v6.NoteType;
+
+namespace KaedePhi.Tool.Converter.PhiChain.Utils;
+
+/// <summary>
+/// PhiChain 与 KPC 音符之间的双向转换工具。
+/// </summary>
+public static class NoteBuilder
+{
+    /// <summary>
+    /// 将 PhiChain 音符转换为 KPC 音符。
+    /// </summary>
+    /// <param name="src">PhiChain 音符</param>
+    /// <returns>KPC 音符</returns>
+    public static Kpc.Note ConvertNote(Note src)
+    {
+        var kpcNote = new Kpc.Note
+        {
+            Above = src.Above,
+            StartBeat = new Beat((int[])src.Beat),
+            PositionX = Transform.TransformToKpcX(src.X),
+            SpeedMultiplier = src.Speed,
+            Type = ConvertNoteType(src.Type),
+        };
+
+        // Hold 音符需要设置 EndBeat
+        if (src.Type == PhichainNoteType.Hold)
+        {
+            kpcNote.EndBeat = new Beat((int[])src.Beat) + new Beat((int[])src.HoldBeat);
+        }
+
+        return kpcNote;
+    }
+
+    /// <summary>
+    /// 将 KPC 音符转换为 PhiChain 音符。
+    /// </summary>
+    /// <param name="src">KPC 音符</param>
+    /// <returns>PhiChain 音符</returns>
+    public static Note ConvertNote(Kpc.Note src)
+    {
+        var note = new Note
+        {
+            Above = src.Above,
+            Beat = new Beat((int[])src.StartBeat),
+            X = Transform.TransformToPhichainX(src.PositionX),
+            Speed = src.SpeedMultiplier,
+            Type = ConvertNoteType(src.Type),
+        };
+
+        // Hold 音符需要设置 HoldBeat
+        if (src.Type == KpcNoteType.Hold)
+        {
+            note.HoldBeat = new Beat((int[])(src.EndBeat - src.StartBeat));
+        }
+
+        return note;
+    }
+
+    /// <summary>
+    /// 将 CurveNoteTrack 展开为普通音符列表。
+    /// </summary>
+    /// <param name="track">曲线音符轨道</param>
+    /// <param name="fromNote">起始音符</param>
+    /// <param name="toNote">结束音符</param>
+    /// <returns>展开后的音符列表</returns>
+    public static List<Kpc.Note> ExpandCurveNoteTrack(CurveNoteTrack track, Note fromNote, Note toNote)
+    {
+        var notes = new List<Kpc.Note>();
+        var density = track.Density;
+        if (density == 0) density = 16;
+
+        var startBeat = new Beat((int[])fromNote.Beat);
+        var endBeat = new Beat((int[])toNote.Beat);
+
+        var startBeatVal = (double)startBeat;
+        var endBeatVal = (double)endBeat;
+        var totalBeats = endBeatVal - startBeatVal;
+        if (totalBeats <= 0)
+            return notes;
+
+        var noteType = ConvertNoteType(track.NoteType);
+        var step = 1.0 / density;
+
+        // 与 phichain 一致：从 start 开始按步长生成，skip(1) 跳过起始音符
+        var beat = startBeatVal + step;
+        var i = 1;
+        while (beat < endBeatVal)
+        {
+            var t = (beat - startBeatVal) / totalBeats;
+            var easedT = ApplyCurve(t, track.Curve);
+
+            var x = fromNote.X + (toNote.X - fromNote.X) * (float)easedT;
+            var noteBeat = new Beat(beat);
+
+            var note = new Kpc.Note
+            {
+                Above = fromNote.Above,
+                StartBeat = noteBeat,
+                PositionX = Transform.TransformToKpcX(x),
+                SpeedMultiplier = fromNote.Speed,
+                Type = noteType,
+            };
+
+            if (noteType == KpcNoteType.Hold && track.HoldBeat != null)
+            {
+                note.EndBeat = noteBeat + new Beat((int[])track.HoldBeat);
+            }
+
+            notes.Add(note);
+
+            i++;
+            beat = startBeatVal + i * step;
+        }
+
+        return notes;
+    }
+
+    /// <summary>
+    /// 应用曲线缓动函数。
+    /// </summary>
+    private static double ApplyCurve(double t, Easing curve)
+    {
+        return curve.EasingType switch
+        {
+            // 线性直接返回
+            EasingKind.Linear => t,
+            // Steps 缓动：阶梯式量化
+            EasingKind.Steps => curve.Count > 0
+                ? Math.Round(t * curve.Count) / curve.Count
+                : t,
+            // Elastic 缓动：弹性振荡
+            EasingKind.Elastic => ApplyElastic(t, curve.Omega),
+            // 自定义贝塞尔曲线
+            EasingKind.Custom => ApplyBezier(t, curve.X1, curve.Y1, curve.X2, curve.Y2),
+            // 其他标准缓动
+            _ => ApplyStandardEasing(t, curve),
+        };
+    }
+
+    /// <summary>
+    /// 应用弹性缓动函数，与 phichain 原始实现一致。
+    /// </summary>
+    private static double ApplyElastic(double t, float omega)
+    {
+        if (omega == 0) return t;
+        var omegad = (double)omega;
+        return 1.0 - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omegad * t) / omegad + Math.Cos(omegad * t));
+    }
+
+    /// <summary>
+    /// 应用三次贝塞尔缓动。
+    /// </summary>
+    private static double ApplyBezier(double t, float x1, float y1, float x2, float y2)
+    {
+        // 使用 Newton-Raphson 方法求解贝塞尔曲线
+        var cx = 3.0 * x1;
+        var bx = 3.0 * (x2 - x1) - cx;
+        var ax = 1.0 - cx - bx;
+        var cy = 3.0 * y1;
+        var by = 3.0 * (y2 - y1) - cy;
+        var ay = 1.0 - cy - by;
+
+        // 求解 x(t) = input 的 t 值
+        var guess = t;
+        for (var i = 0; i < 8; i++)
+        {
+            var currentX = ((ax * guess + bx) * guess + cx) * guess;
+            var currentSlope = (3.0 * ax * guess + 2.0 * bx) * guess + cx;
+            if (Math.Abs(currentSlope) < 1e-7) break;
+            guess -= (currentX - t) / currentSlope;
+        }
+
+        return ((ay * guess + by) * guess + cy) * guess;
+    }
+
+    /// <summary>
+    /// 应用标准缓动函数。
+    /// </summary>
+    private static double ApplyStandardEasing(double t, Easing curve)
+    {
+        try
+        {
+            var easingNumber = EasingConverter.ConvertToKpcEasingNumber(curve);
+            var kpcEasing = new Kpc.Easing(easingNumber);
+            return kpcEasing.Interpolate(0f, 1f, 0.0, 1.0, t);
+        }
+        catch (EasingConverter.EasingNotSupportedException)
+        {
+            // 不支持的缓动类型回退到线性
+            return t;
+        }
+    }
+
+    /// <summary>
+    /// 转换音符类型。
+    /// </summary>
+    private static KpcNoteType ConvertNoteType(PhichainNoteType src)
+    {
+        return src switch
+        {
+            PhichainNoteType.Tap => KpcNoteType.Tap,
+            PhichainNoteType.Drag => KpcNoteType.Drag,
+            PhichainNoteType.Hold => KpcNoteType.Hold,
+            PhichainNoteType.Flick => KpcNoteType.Flick,
+            _ => KpcNoteType.Tap,
+        };
+    }
+
+    /// <summary>
+    /// 转换音符类型（反向）。
+    /// </summary>
+    private static PhichainNoteType ConvertNoteType(KpcNoteType src)
+    {
+        return src switch
+        {
+            KpcNoteType.Tap => PhichainNoteType.Tap,
+            KpcNoteType.Drag => PhichainNoteType.Drag,
+            KpcNoteType.Hold => PhichainNoteType.Hold,
+            KpcNoteType.Flick => PhichainNoteType.Flick,
+            _ => PhichainNoteType.Tap,
+        };
+    }
+}
