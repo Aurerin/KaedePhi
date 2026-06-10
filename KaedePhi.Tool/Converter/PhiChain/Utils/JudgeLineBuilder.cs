@@ -1,6 +1,8 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6;
 using KaedePhi.Tool.Converter.PhiChain.Model;
+using KaedePhi.Tool.JudgeLines.KaedePhi;
+using KaedePhi.Tool.Layer.KaedePhi;
 using PhichainEasingKind = KaedePhi.Core.PhiChain.v6.EasingKind;
 
 namespace KaedePhi.Tool.Converter.PhiChain.Utils;
@@ -165,83 +167,33 @@ public static class JudgeLineBuilder
         if (!options.UnbindNonRotatingChildren)
             return kpcLines;
 
-        var result = new List<Kpc.JudgeLine>();
+        var unbinder = new JudgeLineUnbinder();
+        var result = kpcLines.Select(l => l.Clone()).ToList();
 
-        for (var i = 0; i < kpcLines.Count; i++)
+        // 找出所有需要解绑的子线（rotateWithFather 为 false）
+        var linesToUnbind = new List<int>();
+        for (var i = 0; i < result.Count; i++)
         {
-            var line = kpcLines[i];
-
-            // 如果是子线且 rotateWithFather 为 false，将其提升为根线
-            if (line.Father >= 0 && !line.RotateWithFather)
+            if (result[i].Father >= 0 && !result[i].RotateWithFather)
             {
-                // 合并父线的位置事件到子线
-                var mergedLine = MergeFatherEvents(line, kpcLines);
-                result.Add(mergedLine);
+                linesToUnbind.Add(i);
+            }
+        }
+
+        // 使用 JudgeLineUnbinder 解绑
+        foreach (var lineIndex in linesToUnbind)
+        {
+            if (options.UnbindClassicMode)
+            {
+                result[lineIndex] = unbinder.FatherUnbind(lineIndex, result, options.UnbindPrecision);
             }
             else
             {
-                result.Add(line);
+                result[lineIndex] = unbinder.FatherUnbind(lineIndex, result, options.UnbindPrecision, options.UnbindTolerance);
             }
         }
 
-        // 更新父子关系索引
-        UpdateFatherIndices(result);
-
         return result;
-    }
-
-    /// <summary>
-    /// 合并父线的 X/Y 事件到子线（不包含旋转）。
-    /// </summary>
-    private static Kpc.JudgeLine MergeFatherEvents(
-        Kpc.JudgeLine childLine,
-        List<Kpc.JudgeLine> allLines)
-    {
-        if (childLine.Father < 0 || childLine.Father >= allLines.Count)
-            return childLine;
-
-        var fatherLine = allLines[childLine.Father];
-        var mergedLine = childLine.Clone();
-
-        // 获取父线的所有事件层
-        var fatherEvents = new List<LineEvent>();
-        foreach (var layer in fatherLine.EventLayers)
-        {
-            fatherEvents.AddRange(EventBuilder.ConvertEventLayer(layer));
-        }
-
-        // 只取 X 和 Y 事件（不取旋转）
-        var fatherXYEvents = fatherEvents
-            .Where(e => e.Type == LineEventType.X || e.Type == LineEventType.Y)
-            .ToList();
-
-        if (fatherXYEvents.Count == 0)
-            return mergedLine;
-
-        // 合并事件
-        var childEvents = new List<LineEvent>();
-        foreach (var layer in mergedLine.EventLayers)
-        {
-            childEvents.AddRange(EventBuilder.ConvertEventLayer(layer));
-        }
-
-        // 合并父线事件
-        childEvents.AddRange(fatherXYEvents);
-
-        // 重建事件层
-        mergedLine.EventLayers.Clear();
-        mergedLine.EventLayers.Add(EventBuilder.ConvertEvents(childEvents));
-
-        return mergedLine;
-    }
-
-    /// <summary>
-    /// 更新父子关系索引（解绑后需要重新映射）。
-    /// </summary>
-    private static void UpdateFatherIndices(List<Kpc.JudgeLine> lines)
-    {
-        // 简单实现：保持原有索引
-        // 更复杂的实现需要重新映射索引
     }
 
     /// <summary>
@@ -284,14 +236,28 @@ public static class JudgeLineBuilder
             Notes = src.Notes.ConvertAll(NoteBuilder.ConvertNote),
         };
 
-        // 合并所有事件层为一个事件列表（phichain 不支持多层级）
-        var allEvents = new List<LineEvent>();
-        foreach (var layer in src.EventLayers)
+        // 使用 LayerProcessor 合并多个事件层（phichain 不支持多层级）
+        if (src.EventLayers.Count > 0)
         {
-            allEvents.AddRange(EventBuilder.ConvertEventLayer(layer));
-        }
+            var processor = new LayerProcessor();
+            KpcEvents.EventLayer mergedLayer;
 
-        line.Events = allEvents;
+            if (options.MultiLayerMergeClassicMode)
+            {
+                mergedLayer = processor.LayerMerge(src.EventLayers, options.MultiLayerMergePrecision);
+            }
+            else
+            {
+                mergedLayer = processor.LayerMergePlus(src.EventLayers, options.MultiLayerMergePrecision, options.MultiLayerMergeTolerance);
+            }
+
+            // 转换合并后的事件层为 PhiChain 事件列表
+            line.Events = EventBuilder.ConvertEventLayer(mergedLayer, options);
+        }
+        else
+        {
+            line.Events = new List<LineEvent>();
+        }
 
         return line;
     }
