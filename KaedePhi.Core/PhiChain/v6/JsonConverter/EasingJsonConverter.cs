@@ -10,7 +10,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         {
             var obj = new JObject
             {
-                ["kind"] = ToTypeString(
+                ["type"] = ToTypeString(
                     value?.EasingType ?? throw new InvalidOperationException("kind is null")
                 ),
             };

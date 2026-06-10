@@ -1,5 +1,6 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6;
+using KaedePhi.Tool.Event.KaedePhi;
 using PhichainEventType = KaedePhi.Core.PhiChain.v6.LineEventType;
 using PhichainEventValueType = KaedePhi.Core.PhiChain.v6.LineEventValueType;
 
@@ -10,6 +11,14 @@ namespace KaedePhi.Tool.Converter.PhiChain.Utils;
 /// </summary>
 public static class EventBuilder
 {
+    private static readonly EventCutter<double> DoubleCutter = new();
+    private static readonly EventCutter<int> IntCutter = new();
+    private static readonly EventCutter<float> FloatCutter = new();
+
+    /// <summary>
+    /// 默认切割精度（每拍细分数量）
+    /// </summary>
+    private const int DefaultCutPrecision = 64;
     /// <summary>
     /// 将 PhiChain 事件列表转换为 KPC 事件层。
     /// </summary>
@@ -59,21 +68,93 @@ public static class EventBuilder
         var events = new List<LineEvent>();
 
         if (layer.MoveXEvents != null)
-            events.AddRange(layer.MoveXEvents.ConvertAll(e => ConvertEventWithTransform(e, PhichainEventType.X, Transform.TransformToPhichainX)));
+            events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhichainX));
 
         if (layer.MoveYEvents != null)
-            events.AddRange(layer.MoveYEvents.ConvertAll(e => ConvertEventWithTransform(e, PhichainEventType.Y, Transform.TransformToPhichainY)));
+            events.AddRange(ConvertEventsWithTransform(layer.MoveYEvents, PhichainEventType.Y, Transform.TransformToPhichainY));
 
         if (layer.RotateEvents != null)
-            events.AddRange(layer.RotateEvents.ConvertAll(e => ConvertEventWithTransform(e, PhichainEventType.Rotation, v => (float)Transform.TransformToPhichainAngle(v))));
+            events.AddRange(ConvertEventsWithTransform(layer.RotateEvents, PhichainEventType.Rotation, v => (float)Transform.TransformToPhichainAngle(v)));
 
         if (layer.AlphaEvents != null)
-            events.AddRange(layer.AlphaEvents.ConvertAll(e => ConvertEvent(e, PhichainEventType.Opacity)));
+            events.AddRange(ConvertIntEventsWithCutting(layer.AlphaEvents, PhichainEventType.Opacity));
 
         if (layer.SpeedEvents != null)
-            events.AddRange(layer.SpeedEvents.ConvertAll(e => ConvertEvent(e, PhichainEventType.Speed)));
+            events.AddRange(ConvertFloatEventsWithCutting(layer.SpeedEvents, PhichainEventType.Speed));
 
         return events;
+    }
+
+    /// <summary>
+    /// 转换 double 事件列表，对使用缓动截取的事件进行切割。
+    /// </summary>
+    private static List<LineEvent> ConvertEventsWithTransform(List<KpcEvents.Event<double>> events, PhichainEventType eventType, Func<double, float> transform)
+    {
+        var result = new List<LineEvent>();
+        foreach (var evt in events)
+        {
+            if (NeedsCutting(evt))
+            {
+                // 使用 CutEvent 切割为线性事件
+                var cutEvents = DoubleCutter.CutEventToLiner(evt, 1.0 / DefaultCutPrecision);
+                result.AddRange(cutEvents.Select(e => ConvertEventWithTransform(e, eventType, transform)));
+            }
+            else
+            {
+                result.Add(ConvertEventWithTransform(evt, eventType, transform));
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 转换 int 事件列表，对使用缓动截取的事件进行切割。
+    /// </summary>
+    private static List<LineEvent> ConvertIntEventsWithCutting(List<KpcEvents.Event<int>> events, PhichainEventType eventType)
+    {
+        var result = new List<LineEvent>();
+        foreach (var evt in events)
+        {
+            if (NeedsCutting(evt))
+            {
+                var cutEvents = IntCutter.CutEventToLiner(evt, 1.0 / DefaultCutPrecision);
+                result.AddRange(cutEvents.Select(e => ConvertEvent(e, eventType)));
+            }
+            else
+            {
+                result.Add(ConvertEvent(evt, eventType));
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 转换 float 事件列表，对使用缓动截取的事件进行切割。
+    /// </summary>
+    private static List<LineEvent> ConvertFloatEventsWithCutting(List<KpcEvents.Event<float>> events, PhichainEventType eventType)
+    {
+        var result = new List<LineEvent>();
+        foreach (var evt in events)
+        {
+            if (NeedsCutting(evt))
+            {
+                var cutEvents = FloatCutter.CutEventToLiner(evt, 1.0 / DefaultCutPrecision);
+                result.AddRange(cutEvents.Select(e => ConvertEvent(e, eventType)));
+            }
+            else
+            {
+                result.Add(ConvertEvent(evt, eventType));
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 检查事件是否需要切割（使用了非默认的缓动截取）。
+    /// </summary>
+    private static bool NeedsCutting<T>(KpcEvents.Event<T> evt)
+    {
+        return Math.Abs(evt.EasingLeft) > 0.0001f || Math.Abs(evt.EasingRight - 1.0f) > 0.0001f;
     }
 
     /// <summary>
