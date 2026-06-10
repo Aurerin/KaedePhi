@@ -45,8 +45,8 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
             var obj = JObject.Load(reader);
             var easing = existingValue ?? new Easing();
             easing.EasingType = ParseType(
-                obj.Value<string>("kind")
-                    ?? throw new JsonSerializationException("Missing 'kind' property for Easing.")
+                obj.Value<string>("type")
+                    ?? throw new JsonSerializationException("Missing 'type' property for Easing.")
             );
 
             if (easing.EasingType == EasingKind.Custom)

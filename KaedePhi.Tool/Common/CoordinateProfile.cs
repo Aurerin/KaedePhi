@@ -1,4 +1,5 @@
 ﻿using Chart = KaedePhi.Core.KaedePhi.Chart;
+using PhichainChart = KaedePhi.Core.PhiChain.v6.Chart;
 
 namespace KaedePhi.Tool.Common;
 
@@ -35,5 +36,16 @@ public readonly record struct CoordinateProfile(
         -450d,
         450d,
         true
+    );
+
+    /// <summary>
+    /// PhiChain 坐标系配置。
+    /// </summary>
+    public static readonly CoordinateProfile PhichainProfile = new(
+        PhichainChart.CoordinateSystem.MinX,
+        PhichainChart.CoordinateSystem.MaxX,
+        PhichainChart.CoordinateSystem.MinY,
+        PhichainChart.CoordinateSystem.MaxY,
+        PhichainChart.CoordinateSystem.ClockwiseRotation
     );
 }

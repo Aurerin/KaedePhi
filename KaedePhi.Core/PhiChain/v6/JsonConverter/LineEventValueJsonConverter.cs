@@ -44,7 +44,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         )
         {
             var obj = JObject.Load(reader);
-            var type = obj.Value<string>("kind");
+            var type = obj.Value<string>("type");
 
             if (type == "constant")
             {
