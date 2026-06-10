@@ -72,8 +72,10 @@ public static class EventBuilder
     /// <returns>PhiChain 事件列表</returns>
     public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer, KpcToPhichainConvertOptions options)
     {
-        var events = new List<LineEvent>();
+        if (options.EasingCutPrecision <= 0)
+            throw new ArgumentOutOfRangeException(nameof(options.EasingCutPrecision), "EasingCutPrecision must be > 0.");
 
+        var events = new List<LineEvent>();
         if (layer.MoveXEvents != null)
             events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhichainX, options));
 
