@@ -25,7 +25,7 @@ namespace KaedePhi.Core.Utils
                 return default;
 
             var beatArray = serializer.Deserialize<int[]>(reader);
-            if (beatArray == null)
+            if (beatArray is null)
                 return default;
 
             return new Beat(beatArray);
