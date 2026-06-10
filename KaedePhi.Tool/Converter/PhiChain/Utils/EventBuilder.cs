@@ -1,5 +1,6 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6;
+using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using PhichainEventType = KaedePhi.Core.PhiChain.v6.LineEventType;
 using PhichainEventValueType = KaedePhi.Core.PhiChain.v6.LineEventValueType;
@@ -14,11 +15,6 @@ public static class EventBuilder
     private static readonly EventCutter<double> DoubleCutter = new();
     private static readonly EventCutter<int> IntCutter = new();
     private static readonly EventCutter<float> FloatCutter = new();
-
-    /// <summary>
-    /// 默认切割精度（每拍细分数量）
-    /// </summary>
-    private const int DefaultCutPrecision = 64;
     /// <summary>
     /// 将 PhiChain 事件列表转换为 KPC 事件层。
     /// </summary>
@@ -59,28 +55,39 @@ public static class EventBuilder
     }
 
     /// <summary>
-    /// 将 KPC 事件层转换为 PhiChain 事件列表。
+    /// 将 KPC 事件层转换为 PhiChain 事件列表（使用默认选项）。
     /// </summary>
     /// <param name="layer">KPC 事件层</param>
     /// <returns>PhiChain 事件列表</returns>
     public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer)
     {
+        return ConvertEventLayer(layer, new KpcToPhichainConvertOptions());
+    }
+
+    /// <summary>
+    /// 将 KPC 事件层转换为 PhiChain 事件列表。
+    /// </summary>
+    /// <param name="layer">KPC 事件层</param>
+    /// <param name="options">转换选项</param>
+    /// <returns>PhiChain 事件列表</returns>
+    public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer, KpcToPhichainConvertOptions options)
+    {
         var events = new List<LineEvent>();
 
         if (layer.MoveXEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhichainX));
+            events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhichainX, options));
 
         if (layer.MoveYEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.MoveYEvents, PhichainEventType.Y, Transform.TransformToPhichainY));
+            events.AddRange(ConvertEventsWithTransform(layer.MoveYEvents, PhichainEventType.Y, Transform.TransformToPhichainY, options));
 
         if (layer.RotateEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.RotateEvents, PhichainEventType.Rotation, v => (float)Transform.TransformToPhichainAngle(v)));
+            events.AddRange(ConvertEventsWithTransform(layer.RotateEvents, PhichainEventType.Rotation, v => (float)Transform.TransformToPhichainAngle(v), options));
 
         if (layer.AlphaEvents != null)
-            events.AddRange(ConvertIntEventsWithCutting(layer.AlphaEvents, PhichainEventType.Opacity));
+            events.AddRange(ConvertIntEventsWithCutting(layer.AlphaEvents, PhichainEventType.Opacity, options));
 
         if (layer.SpeedEvents != null)
-            events.AddRange(ConvertFloatEventsWithCutting(layer.SpeedEvents, PhichainEventType.Speed));
+            events.AddRange(ConvertFloatEventsWithCutting(layer.SpeedEvents, PhichainEventType.Speed, options));
 
         return events;
     }
@@ -88,15 +95,14 @@ public static class EventBuilder
     /// <summary>
     /// 转换 double 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertEventsWithTransform(List<KpcEvents.Event<double>> events, PhichainEventType eventType, Func<double, float> transform)
+    private static List<LineEvent> ConvertEventsWithTransform(List<KpcEvents.Event<double>> events, PhichainEventType eventType, Func<double, float> transform, KpcToPhichainConvertOptions options)
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
         {
             if (NeedsCutting(evt))
             {
-                // 使用 CutEvent 切割为线性事件
-                var cutEvents = DoubleCutter.CutEventToLiner(evt, 1.0 / DefaultCutPrecision);
+                var cutEvents = DoubleCutter.CutEventToLiner(evt, 1.0 / options.EasingCutPrecision);
                 result.AddRange(cutEvents.Select(e => ConvertEventWithTransform(e, eventType, transform)));
             }
             else
@@ -110,14 +116,14 @@ public static class EventBuilder
     /// <summary>
     /// 转换 int 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertIntEventsWithCutting(List<KpcEvents.Event<int>> events, PhichainEventType eventType)
+    private static List<LineEvent> ConvertIntEventsWithCutting(List<KpcEvents.Event<int>> events, PhichainEventType eventType, KpcToPhichainConvertOptions options)
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
         {
             if (NeedsCutting(evt))
             {
-                var cutEvents = IntCutter.CutEventToLiner(evt, 1.0 / DefaultCutPrecision);
+                var cutEvents = IntCutter.CutEventToLiner(evt, 1.0 / options.EasingCutPrecision);
                 result.AddRange(cutEvents.Select(e => ConvertEvent(e, eventType)));
             }
             else
@@ -131,14 +137,14 @@ public static class EventBuilder
     /// <summary>
     /// 转换 float 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertFloatEventsWithCutting(List<KpcEvents.Event<float>> events, PhichainEventType eventType)
+    private static List<LineEvent> ConvertFloatEventsWithCutting(List<KpcEvents.Event<float>> events, PhichainEventType eventType, KpcToPhichainConvertOptions options)
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
         {
             if (NeedsCutting(evt))
             {
-                var cutEvents = FloatCutter.CutEventToLiner(evt, 1.0 / DefaultCutPrecision);
+                var cutEvents = FloatCutter.CutEventToLiner(evt, 1.0 / options.EasingCutPrecision);
                 result.AddRange(cutEvents.Select(e => ConvertEvent(e, eventType)));
             }
             else
