@@ -22,6 +22,10 @@ public class PhiChainConverter : LoggableBase, IChartConverter<Chart, PhichainTo
         var kpcChart = new Kpc.Chart
         {
             BpmList = source.BpmList.ConvertAll(BpmBuilder.ConvertBpmPoint),
+            Meta = new Kpc.Meta
+            {
+                Offset = (int)source.Offset, // PhiChain 和 KPC 的 offset 单位均为毫秒
+            },
         };
 
         // 展开树形线结构为扁平列表
@@ -44,6 +48,7 @@ public class PhiChainConverter : LoggableBase, IChartConverter<Chart, PhichainTo
     {
         var chart = new Chart
         {
+            Offset = input.Meta.Offset, // PhiChain 和 KPC 的 offset 单位均为毫秒
             BpmList = new BpmList(input.BpmList.ConvertAll(BpmBuilder.ConvertBpmItem)),
         };
 
