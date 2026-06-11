@@ -215,7 +215,7 @@ public sealed class GuiChartService
                     debug: msg => _log.Debug(msg)
                 );
                 return ChartPipeline
-                    .From(pcChart, pcConverter, new PhichainToKpcConvertOptions())
+                    .From(pcChart, pcConverter, new PhiChainToKpcConvertOptions())
                     .To(kpcConverter, null);
             }
             default:
@@ -319,7 +319,7 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var pcChart = pcConverter.FromKpc(chart, new KpcToPhichainConvertOptions());
+                var pcChart = pcConverter.FromKpc(chart, new KpcToPhiChainConvertOptions());
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);

@@ -1,5 +1,6 @@
 ﻿using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6;
+using KaedePhi.Core.Utils;
 using KpcNoteType = KaedePhi.Core.Common.NoteType;
 using PhichainNoteType = KaedePhi.Core.PhiChain.v6.NoteType;
 
@@ -46,7 +47,7 @@ public static class NoteBuilder
         {
             Above = src.Above,
             Beat = new Beat((int[])src.StartBeat),
-            X = Transform.TransformToPhichainX(src.PositionX),
+            X = Transform.TransformToPhiChainX(src.PositionX),
             Speed = src.SpeedMultiplier,
             Type = ConvertNoteType(src.Type),
         };
@@ -135,7 +136,12 @@ public static class NoteBuilder
             // Elastic 缓动：弹性振荡
             EasingKind.Elastic => ApplyElastic(t, curve.Omega),
             // 自定义贝塞尔曲线
-            EasingKind.Custom => ApplyBezier(t, curve.X1, curve.Y1, curve.X2, curve.Y2),
+            EasingKind.Custom => Bezier.Do(
+                [curve.X1, curve.Y1, curve.X2, curve.Y2],
+                (float)t,
+                0d,
+                1d
+            ),
             // 其他标准缓动
             _ => ApplyStandardEasing(t, curve),
         };
@@ -151,31 +157,6 @@ public static class NoteBuilder
         return 1.0 - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omegad * t) / omegad + Math.Cos(omegad * t));
     }
 
-    /// <summary>
-    /// 应用三次贝塞尔缓动。
-    /// </summary>
-    private static double ApplyBezier(double t, float x1, float y1, float x2, float y2)
-    {
-        // 使用 Newton-Raphson 方法求解贝塞尔曲线
-        var cx = 3.0 * x1;
-        var bx = 3.0 * (x2 - x1) - cx;
-        var ax = 1.0 - cx - bx;
-        var cy = 3.0 * y1;
-        var by = 3.0 * (y2 - y1) - cy;
-        var ay = 1.0 - cy - by;
-
-        // 求解 x(t) = input 的 t 值
-        var guess = t;
-        for (var i = 0; i < 8; i++)
-        {
-            var currentX = ((ax * guess + bx) * guess + cx) * guess;
-            var currentSlope = (3.0 * ax * guess + 2.0 * bx) * guess + cx;
-            if (Math.Abs(currentSlope) < 1e-7) break;
-            guess -= (currentX - t) / currentSlope;
-        }
-
-        return ((ay * guess + by) * guess + cy) * guess;
-    }
 
     /// <summary>
     /// 应用标准缓动函数。

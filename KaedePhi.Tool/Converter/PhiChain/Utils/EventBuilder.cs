@@ -61,7 +61,7 @@ public static class EventBuilder
     /// <returns>PhiChain 事件列表</returns>
     public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer)
     {
-        return ConvertEventLayer(layer, new KpcToPhichainConvertOptions());
+        return ConvertEventLayer(layer, new KpcToPhiChainConvertOptions());
     }
 
     /// <summary>
@@ -70,20 +70,20 @@ public static class EventBuilder
     /// <param name="layer">KPC 事件层</param>
     /// <param name="options">转换选项</param>
     /// <returns>PhiChain 事件列表</returns>
-    public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer, KpcToPhichainConvertOptions options)
+    public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer, KpcToPhiChainConvertOptions options)
     {
         if (options.EasingCutPrecision <= 0)
             throw new ArgumentOutOfRangeException(nameof(options.EasingCutPrecision), "EasingCutPrecision must be > 0.");
 
         var events = new List<LineEvent>();
         if (layer.MoveXEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhichainX, options));
+            events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhiChainX, options));
 
         if (layer.MoveYEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.MoveYEvents, PhichainEventType.Y, Transform.TransformToPhichainY, options));
+            events.AddRange(ConvertEventsWithTransform(layer.MoveYEvents, PhichainEventType.Y, Transform.TransformToPhiChainY, options));
 
         if (layer.RotateEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.RotateEvents, PhichainEventType.Rotation, v => (float)Transform.TransformToPhichainAngle(v), options));
+            events.AddRange(ConvertEventsWithTransform(layer.RotateEvents, PhichainEventType.Rotation, v => (float)Transform.TransformToPhiChainAngle(v), options));
 
         if (layer.AlphaEvents != null)
             events.AddRange(ConvertIntEventsWithCutting(layer.AlphaEvents, PhichainEventType.Opacity, options));
@@ -97,7 +97,7 @@ public static class EventBuilder
     /// <summary>
     /// 转换 double 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertEventsWithTransform(List<KpcEvents.Event<double>> events, PhichainEventType eventType, Func<double, float> transform, KpcToPhichainConvertOptions options)
+    private static List<LineEvent> ConvertEventsWithTransform(List<KpcEvents.Event<double>> events, PhichainEventType eventType, Func<double, float> transform, KpcToPhiChainConvertOptions options)
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
@@ -118,7 +118,7 @@ public static class EventBuilder
     /// <summary>
     /// 转换 int 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertIntEventsWithCutting(List<KpcEvents.Event<int>> events, PhichainEventType eventType, KpcToPhichainConvertOptions options)
+    private static List<LineEvent> ConvertIntEventsWithCutting(List<KpcEvents.Event<int>> events, PhichainEventType eventType, KpcToPhiChainConvertOptions options)
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
@@ -139,7 +139,7 @@ public static class EventBuilder
     /// <summary>
     /// 转换 float 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertFloatEventsWithCutting(List<KpcEvents.Event<float>> events, PhichainEventType eventType, KpcToPhichainConvertOptions options)
+    private static List<LineEvent> ConvertFloatEventsWithCutting(List<KpcEvents.Event<float>> events, PhichainEventType eventType, KpcToPhiChainConvertOptions options)
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
