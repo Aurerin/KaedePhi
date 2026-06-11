@@ -23,7 +23,7 @@ public class BeatJsonConverterTests
         var beat = JsonConvert.DeserializeObject<Beat>(json);
 
         beat.Should().NotBeNull();
-        beat![0].Should().Be(2);
+        beat[0].Should().Be(2);
         beat[1].Should().Be(3);
         beat[2].Should().Be(4);
     }
@@ -37,7 +37,7 @@ public class BeatJsonConverterTests
         var deserialized = JsonConvert.DeserializeObject<Beat>(json);
 
         deserialized.Should().NotBeNull();
-        ((double)deserialized!).Should().BeApproximately((double)original, 1e-10);
+        ((double)deserialized).Should().BeApproximately(original, 1e-10);
         deserialized[0].Should().Be(original[0]);
         deserialized[1].Should().Be(original[1]);
         deserialized[2].Should().Be(original[2]);
@@ -51,7 +51,7 @@ public class BeatJsonConverterTests
         var beat = JsonConvert.DeserializeObject<Beat>(json);
 
         beat.Should().NotBeNull();
-        ((double)beat!).Should().Be(0.0);
+        ((double)beat).Should().Be(0.0);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class BeatJsonConverterTests
         var beat = JsonConvert.DeserializeObject<Beat>(json);
 
         beat.Should().NotBeNull();
-        ((double)beat!).Should().BeApproximately(-1.75, 1e-10);
+        ((double)beat).Should().BeApproximately(-1.75, 1e-10);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class BeatJsonConverterTests
         var obj = JsonConvert.DeserializeObject<TestObject>(json);
 
         obj.Should().NotBeNull();
-        obj!.Name.Should().Be("test");
+        obj.Name.Should().Be("test");
         ((double)obj.Beat).Should().BeApproximately(1.5, 1e-10);
     }
 
@@ -96,8 +96,8 @@ public class BeatJsonConverterTests
         var deserialized = JsonConvert.DeserializeObject<TestObject>(json);
 
         deserialized.Should().NotBeNull();
-        deserialized!.Name.Should().Be(original.Name);
-        ((double)deserialized.Beat).Should().BeApproximately((double)original.Beat, 1e-10);
+        deserialized.Name.Should().Be(original.Name);
+        ((double)deserialized.Beat).Should().BeApproximately(original.Beat, 1e-10);
     }
 
     [Fact]
