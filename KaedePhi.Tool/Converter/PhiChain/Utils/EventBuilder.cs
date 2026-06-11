@@ -73,7 +73,7 @@ public static class EventBuilder
     public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer, KpcToPhiChainConvertOptions options)
     {
         if (options.EasingCutPrecision <= 0)
-            throw new ArgumentOutOfRangeException(nameof(options.EasingCutPrecision), "EasingCutPrecision must be > 0.");
+            throw new ArgumentOutOfRangeException(nameof(options), "EasingCutPrecision必须大于0。");
 
         var events = new List<LineEvent>();
         if (layer.MoveXEvents != null)
@@ -166,49 +166,6 @@ public static class EventBuilder
     }
 
     /// <summary>
-    /// 将 PhiChain 事件转换为 KPC double 事件。
-    /// </summary>
-    private static KpcEvents.Event<double> ConvertEventToDouble(LineEvent src)
-    {
-        var kpcEvent = new KpcEvents.Event<double>
-        {
-            StartBeat = new Beat((int[])src.StartBeat),
-            EndBeat = new Beat((int[])src.EndBeat),
-        };
-
-        if (src.Value.Type == PhichainEventValueType.Transition)
-        {
-            kpcEvent.StartValue = src.Value.Start;
-            kpcEvent.EndValue = src.Value.End;
-
-            // 检查是否为贝塞尔曲线
-            if (src.Value.Easing.EasingType == EasingKind.Custom)
-            {
-                kpcEvent.IsBezier = true;
-                kpcEvent.BezierPoints = new[]
-                {
-                    src.Value.Easing.X1,
-                    src.Value.Easing.Y1,
-                    src.Value.Easing.X2,
-                    src.Value.Easing.Y2,
-                };
-            }
-            else
-            {
-                kpcEvent.Easing = EasingConverter.ConvertEasing(src.Value.Easing);
-            }
-        }
-        else
-        {
-            // Constant 类型：开始和结束值相同
-            kpcEvent.StartValue = src.Value.Value;
-            kpcEvent.EndValue = src.Value.Value;
-        }
-
-        return kpcEvent;
-    }
-
-    /// <summary>
     /// 将 PhiChain 事件转换为 KPC double 事件，带坐标变换。
     /// </summary>
     private static KpcEvents.Event<double> ConvertEventToDoubleWithTransform(LineEvent src, Func<float, double> transform)
@@ -227,13 +184,13 @@ public static class EventBuilder
             if (src.Value.Easing.EasingType == EasingKind.Custom)
             {
                 kpcEvent.IsBezier = true;
-                kpcEvent.BezierPoints = new[]
-                {
+                kpcEvent.BezierPoints =
+                [
                     src.Value.Easing.X1,
                     src.Value.Easing.Y1,
                     src.Value.Easing.X2,
-                    src.Value.Easing.Y2,
-                };
+                    src.Value.Easing.Y2
+                ];
             }
             else
             {
@@ -269,13 +226,13 @@ public static class EventBuilder
             if (src.Value.Easing.EasingType == EasingKind.Custom)
             {
                 kpcEvent.IsBezier = true;
-                kpcEvent.BezierPoints = new[]
-                {
+                kpcEvent.BezierPoints =
+                [
                     src.Value.Easing.X1,
                     src.Value.Easing.Y1,
                     src.Value.Easing.X2,
-                    src.Value.Easing.Y2,
-                };
+                    src.Value.Easing.Y2
+                ];
             }
             else
             {
@@ -310,13 +267,13 @@ public static class EventBuilder
             if (src.Value.Easing.EasingType == EasingKind.Custom)
             {
                 kpcEvent.IsBezier = true;
-                kpcEvent.BezierPoints = new[]
-                {
+                kpcEvent.BezierPoints =
+                [
                     src.Value.Easing.X1,
                     src.Value.Easing.Y1,
                     src.Value.Easing.X2,
-                    src.Value.Easing.Y2,
-                };
+                    src.Value.Easing.Y2
+                ];
             }
             else
             {
@@ -368,49 +325,6 @@ public static class EventBuilder
             lineEvent.Value = LineEventValue.Transition(
                 transform(src.StartValue),
                 transform(src.EndValue),
-                EasingConverter.ConvertEasing(src.Easing, false)
-            );
-        }
-
-        return lineEvent;
-    }
-
-    /// <summary>
-    /// 将 KPC double 事件转换为 PhiChain 事件。
-    /// </summary>
-    private static LineEvent ConvertEvent(KpcEvents.Event<double> src, PhichainEventType eventType)
-    {
-        var lineEvent = new LineEvent
-        {
-            Type = eventType,
-            StartBeat = new Beat((int[])src.StartBeat),
-            EndBeat = new Beat((int[])src.EndBeat),
-        };
-
-        if (src.IsBezier)
-        {
-            lineEvent.Value = LineEventValue.Transition(
-                (float)src.StartValue,
-                (float)src.EndValue,
-                new Easing
-                {
-                    EasingType = EasingKind.Custom,
-                    X1 = src.BezierPoints[0],
-                    Y1 = src.BezierPoints[1],
-                    X2 = src.BezierPoints[2],
-                    Y2 = src.BezierPoints[3],
-                }
-            );
-        }
-        else if (Math.Abs(src.StartValue - src.EndValue) < 0.0001)
-        {
-            lineEvent.Value = LineEventValue.Constant((float)src.StartValue);
-        }
-        else
-        {
-            lineEvent.Value = LineEventValue.Transition(
-                (float)src.StartValue,
-                (float)src.EndValue,
                 EasingConverter.ConvertEasing(src.Easing, false)
             );
         }
@@ -513,7 +427,7 @@ public static class EventBuilder
     public static List<LineEvent> SliceUnsupportedEasing(LineEvent src, int precision)
     {
         if (src.Value.Type != PhichainEventValueType.Transition)
-            return new List<LineEvent> { src };
+            return [src];
 
         var events = new List<LineEvent>();
         var startBeat = new Beat((int[])src.StartBeat);
