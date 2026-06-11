@@ -7,7 +7,7 @@ namespace KaedePhi.Tool.Converter.PhiChain.Utils;
 /// </summary>
 public static class Transform
 {
-    private static readonly CoordinateProfile PhiChainProfile = CoordinateProfile.PhichainProfile;
+    private static readonly CoordinateProfile PhiChainProfile = CoordinateProfile.PhiChainProfile;
 
     /// <summary>
     /// 将 PhiChain X 坐标转换为 KPC X 坐标。

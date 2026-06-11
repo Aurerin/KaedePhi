@@ -41,7 +41,7 @@ public readonly record struct CoordinateProfile(
     /// <summary>
     /// PhiChain 坐标系配置。
     /// </summary>
-    public static readonly CoordinateProfile PhichainProfile = new(
+    public static readonly CoordinateProfile PhiChainProfile = new(
         PhichainChart.CoordinateSystem.MinX,
         PhichainChart.CoordinateSystem.MaxX,
         PhichainChart.CoordinateSystem.MinY,
