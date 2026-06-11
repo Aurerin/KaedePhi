@@ -7,35 +7,35 @@ namespace KaedePhi.Tool.Converter.PhiChain.Utils;
 /// </summary>
 public static class Transform
 {
-    private static readonly CoordinateProfile PhichainProfile = CoordinateProfile.PhichainProfile;
+    private static readonly CoordinateProfile PhiChainProfile = CoordinateProfile.PhichainProfile;
 
     /// <summary>
     /// 将 PhiChain X 坐标转换为 KPC X 坐标。
     /// </summary>
-    public static double TransformToKpcX(float x) => CoordinateGeometry.ToKpcX(x, PhichainProfile);
+    public static double TransformToKpcX(float x) => CoordinateGeometry.ToKpcX(x, PhiChainProfile);
 
     /// <summary>
     /// 将 PhiChain Y 坐标转换为 KPC Y 坐标。
     /// </summary>
-    public static double TransformToKpcY(float y) => CoordinateGeometry.ToKpcY(y, PhichainProfile);
+    public static double TransformToKpcY(float y) => CoordinateGeometry.ToKpcY(y, PhiChainProfile);
 
     /// <summary>
     /// 将 PhiChain 角度转换为 KPC 角度。
     /// </summary>
-    public static double TransformToKpcAngle(float angle) => CoordinateGeometry.ToKpcAngle(angle, PhichainProfile);
+    public static double TransformToKpcAngle(float angle) => CoordinateGeometry.ToKpcAngle(angle, PhiChainProfile);
 
     /// <summary>
     /// 将 KPC X 坐标转换为 PhiChain X 坐标。
     /// </summary>
-    public static float TransformToPhichainX(double x) => CoordinateGeometry.ToTargetXf(x, PhichainProfile);
+    public static float TransformToPhiChainX(double x) => CoordinateGeometry.ToTargetXf(x, PhiChainProfile);
 
     /// <summary>
     /// 将 KPC Y 坐标转换为 PhiChain Y 坐标。
     /// </summary>
-    public static float TransformToPhichainY(double y) => CoordinateGeometry.ToTargetYf(y, PhichainProfile);
+    public static float TransformToPhiChainY(double y) => CoordinateGeometry.ToTargetYf(y, PhiChainProfile);
 
     /// <summary>
     /// 将 KPC 角度转换为 PhiChain 角度。
     /// </summary>
-    public static double TransformToPhichainAngle(double angle) => CoordinateGeometry.ToTargetAngle(angle, PhichainProfile);
+    public static double TransformToPhiChainAngle(double angle) => CoordinateGeometry.ToTargetAngle(angle, PhiChainProfile);
 }

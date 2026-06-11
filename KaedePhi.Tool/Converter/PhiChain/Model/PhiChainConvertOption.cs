@@ -3,7 +3,7 @@
 /// <summary>
 /// Phichain 转 KPC 的转换选项。
 /// </summary>
-public class PhichainToKpcConvertOptions
+public class PhiChainToKpcConvertOptions
 {
     /// <summary>
     /// 不支持的缓动切段精度（每拍细分数量），默认 64。
@@ -14,7 +14,7 @@ public class PhichainToKpcConvertOptions
 /// <summary>
 /// KPC 转 Phichain 的转换选项。
 /// </summary>
-public class KpcToPhichainConvertOptions
+public class KpcToPhiChainConvertOptions
 {
     #region 父子线解绑选项
 

@@ -1,9 +1,7 @@
-﻿using KaedePhi.Core.Common;
-using KaedePhi.Core.PhiChain.v6;
+﻿using KaedePhi.Core.PhiChain.v6;
 using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.JudgeLines.KaedePhi;
 using KaedePhi.Tool.Layer.KaedePhi;
-using PhichainEasingKind = KaedePhi.Core.PhiChain.v6.EasingKind;
 
 namespace KaedePhi.Tool.Converter.PhiChain.Utils;
 
@@ -26,7 +24,7 @@ public static class JudgeLineBuilder
         int fatherIndex,
         List<Kpc.JudgeLine> result,
         ref int currentIndex,
-        PhichainToKpcConvertOptions options)
+        PhiChainToKpcConvertOptions options)
     {
         var kpcLine = ConvertLine(line, fatherIndex, currentIndex, options);
         result.Add(kpcLine);
@@ -49,7 +47,7 @@ public static class JudgeLineBuilder
     /// <param name="lineIndex">当前线索引</param>
     /// <param name="options">转换选项</param>
     /// <returns>KPC 判定线</returns>
-    public static Kpc.JudgeLine ConvertLine(SerializedLine src, int fatherIndex, int lineIndex, PhichainToKpcConvertOptions options)
+    public static Kpc.JudgeLine ConvertLine(SerializedLine src, int fatherIndex, int lineIndex, PhiChainToKpcConvertOptions options)
     {
         var kpcLine = new Kpc.JudgeLine
         {
@@ -125,7 +123,7 @@ public static class JudgeLineBuilder
     /// <returns>PhiChain 序列化线列表</returns>
     public static List<SerializedLine> BuildLineTree(
         List<Kpc.JudgeLine> kpcLines,
-        KpcToPhichainConvertOptions options)
+        KpcToPhiChainConvertOptions options)
     {
         // 预处理：解绑 rotateWithFather 为 false 的子线
         var processedLines = PreprocessLines(kpcLines, options);
@@ -162,7 +160,7 @@ public static class JudgeLineBuilder
     /// </summary>
     private static List<Kpc.JudgeLine> PreprocessLines(
         List<Kpc.JudgeLine> kpcLines,
-        KpcToPhichainConvertOptions options)
+        KpcToPhiChainConvertOptions options)
     {
         if (!options.UnbindNonRotatingChildren)
             return kpcLines;
@@ -203,7 +201,7 @@ public static class JudgeLineBuilder
         List<Kpc.JudgeLine> kpcLines,
         int lineIndex,
         Dictionary<int, List<int>> childMap,
-        KpcToPhichainConvertOptions options)
+        KpcToPhiChainConvertOptions options)
     {
         var kpcLine = kpcLines[lineIndex];
         var serializedLine = ConvertLineToPhichain(kpcLine, options);
@@ -228,7 +226,7 @@ public static class JudgeLineBuilder
     /// <param name="src">KPC 判定线</param>
     /// <param name="options">转换选项</param>
     /// <returns>PhiChain 序列化线</returns>
-    private static SerializedLine ConvertLineToPhichain(Kpc.JudgeLine src, KpcToPhichainConvertOptions options)
+    private static SerializedLine ConvertLineToPhichain(Kpc.JudgeLine src, KpcToPhiChainConvertOptions options)
     {
         var line = new SerializedLine
         {

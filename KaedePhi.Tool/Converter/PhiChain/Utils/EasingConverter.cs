@@ -1,6 +1,5 @@
-﻿using KaedePhi.Core.PhiChain.v6;
-using PhichainEasing = KaedePhi.Core.PhiChain.v6.Easing;
-using PhichainEasingKind = KaedePhi.Core.PhiChain.v6.EasingKind;
+﻿using PhiChainEasing = KaedePhi.Core.PhiChain.v6.Easing;
+using PhiChainEasingKind = KaedePhi.Core.PhiChain.v6.EasingKind;
 
 namespace KaedePhi.Tool.Converter.PhiChain.Utils;
 
@@ -12,10 +11,10 @@ public static class EasingConverter
     /// <summary>
     /// KPC 缓动在 PhiChain 中无对应项时抛出，用于触发切段拟合。
     /// </summary>
-    public sealed class EasingNotSupportedException(PhichainEasingKind easingKind)
+    public sealed class EasingNotSupportedException(PhiChainEasingKind easingKind)
         : Exception($"PhiChain easing {easingKind} is unsupported in KPC and requires linear slicing")
     {
-        public PhichainEasingKind EasingKind { get; } = easingKind;
+        public PhiChainEasingKind EasingKind { get; } = easingKind;
     }
 
     /// <summary>
@@ -23,46 +22,46 @@ public static class EasingConverter
     /// </summary>
     /// <param name="src">PhiChain 缓动实例</param>
     /// <returns>KPC 缓动编号，不支持的类型抛出异常</returns>
-    public static int ConvertToKpcEasingNumber(PhichainEasing src)
+    public static int ConvertToKpcEasingNumber(PhiChainEasing src)
     {
         return src.EasingType switch
         {
-            PhichainEasingKind.Linear => 1,
-            PhichainEasingKind.EaseInSine => 2,
-            PhichainEasingKind.EaseOutSine => 3,
-            PhichainEasingKind.EaseInOutSine => 4,
-            PhichainEasingKind.EaseInQuad => 5,
-            PhichainEasingKind.EaseOutQuad => 6,
-            PhichainEasingKind.EaseInOutQuad => 7,
-            PhichainEasingKind.EaseInCubic => 8,
-            PhichainEasingKind.EaseOutCubic => 9,
-            PhichainEasingKind.EaseInOutCubic => 10,
-            PhichainEasingKind.EaseInQuart => 11,
-            PhichainEasingKind.EaseOutQuart => 12,
-            PhichainEasingKind.EaseInOutQuart => 13,
-            PhichainEasingKind.EaseInQuint => 14,
-            PhichainEasingKind.EaseOutQuint => 15,
-            PhichainEasingKind.EaseInOutQuint => 16,
-            PhichainEasingKind.EaseInExpo => 17,
-            PhichainEasingKind.EaseOutExpo => 18,
-            PhichainEasingKind.EaseInOutExpo => 19,
-            PhichainEasingKind.EaseInCirc => 20,
-            PhichainEasingKind.EaseOutCirc => 21,
-            PhichainEasingKind.EaseInOutCirc => 22,
-            PhichainEasingKind.EaseInBack => 23,
-            PhichainEasingKind.EaseOutBack => 24,
-            PhichainEasingKind.EaseInOutBack => 25,
-            PhichainEasingKind.EaseInElastic => 26,
-            PhichainEasingKind.EaseOutElastic => 27,
-            PhichainEasingKind.EaseInOutElastic => 28,
-            PhichainEasingKind.EaseInBounce => 29,
-            PhichainEasingKind.EaseOutBounce => 30,
-            PhichainEasingKind.EaseInOutBounce => 31,
+            PhiChainEasingKind.Linear => 1,
+            PhiChainEasingKind.EaseInSine => 2,
+            PhiChainEasingKind.EaseOutSine => 3,
+            PhiChainEasingKind.EaseInOutSine => 4,
+            PhiChainEasingKind.EaseInQuad => 5,
+            PhiChainEasingKind.EaseOutQuad => 6,
+            PhiChainEasingKind.EaseInOutQuad => 7,
+            PhiChainEasingKind.EaseInCubic => 8,
+            PhiChainEasingKind.EaseOutCubic => 9,
+            PhiChainEasingKind.EaseInOutCubic => 10,
+            PhiChainEasingKind.EaseInQuart => 11,
+            PhiChainEasingKind.EaseOutQuart => 12,
+            PhiChainEasingKind.EaseInOutQuart => 13,
+            PhiChainEasingKind.EaseInQuint => 14,
+            PhiChainEasingKind.EaseOutQuint => 15,
+            PhiChainEasingKind.EaseInOutQuint => 16,
+            PhiChainEasingKind.EaseInExpo => 17,
+            PhiChainEasingKind.EaseOutExpo => 18,
+            PhiChainEasingKind.EaseInOutExpo => 19,
+            PhiChainEasingKind.EaseInCirc => 20,
+            PhiChainEasingKind.EaseOutCirc => 21,
+            PhiChainEasingKind.EaseInOutCirc => 22,
+            PhiChainEasingKind.EaseInBack => 23,
+            PhiChainEasingKind.EaseOutBack => 24,
+            PhiChainEasingKind.EaseInOutBack => 25,
+            PhiChainEasingKind.EaseInElastic => 26,
+            PhiChainEasingKind.EaseOutElastic => 27,
+            PhiChainEasingKind.EaseInOutElastic => 28,
+            PhiChainEasingKind.EaseInBounce => 29,
+            PhiChainEasingKind.EaseOutBounce => 30,
+            PhiChainEasingKind.EaseInOutBounce => 31,
             // Steps 和自定义 Elastic 不支持，需要切段处理
-            PhichainEasingKind.Steps => throw new EasingNotSupportedException(PhichainEasingKind.Steps),
-            PhichainEasingKind.Elastic => throw new EasingNotSupportedException(PhichainEasingKind.Elastic),
+            PhiChainEasingKind.Steps => throw new EasingNotSupportedException(PhiChainEasingKind.Steps),
+            PhiChainEasingKind.Elastic => throw new EasingNotSupportedException(PhiChainEasingKind.Elastic),
             // Custom 贝塞尔曲线由调用方处理
-            PhichainEasingKind.Custom => 1,
+            PhiChainEasingKind.Custom => 1,
             _ => 1,
         };
     }
@@ -72,44 +71,44 @@ public static class EasingConverter
     /// </summary>
     /// <param name="kpcEasingNumber">KPC 缓动编号</param>
     /// <returns>PhiChain 缓动实例</returns>
-    public static PhichainEasing ConvertFromKpcEasingNumber(int kpcEasingNumber)
+    public static PhiChainEasing ConvertFromKpcEasingNumber(int kpcEasingNumber)
     {
         var kind = kpcEasingNumber switch
         {
-            1 => PhichainEasingKind.Linear,
-            2 => PhichainEasingKind.EaseInSine,
-            3 => PhichainEasingKind.EaseOutSine,
-            4 => PhichainEasingKind.EaseInOutSine,
-            5 => PhichainEasingKind.EaseInQuad,
-            6 => PhichainEasingKind.EaseOutQuad,
-            7 => PhichainEasingKind.EaseInOutQuad,
-            8 => PhichainEasingKind.EaseInCubic,
-            9 => PhichainEasingKind.EaseOutCubic,
-            10 => PhichainEasingKind.EaseInOutCubic,
-            11 => PhichainEasingKind.EaseInQuart,
-            12 => PhichainEasingKind.EaseOutQuart,
-            13 => PhichainEasingKind.EaseInOutQuart,
-            14 => PhichainEasingKind.EaseInQuint,
-            15 => PhichainEasingKind.EaseOutQuint,
-            16 => PhichainEasingKind.EaseInOutQuint,
-            17 => PhichainEasingKind.EaseInExpo,
-            18 => PhichainEasingKind.EaseOutExpo,
-            19 => PhichainEasingKind.EaseInOutExpo,
-            20 => PhichainEasingKind.EaseInCirc,
-            21 => PhichainEasingKind.EaseOutCirc,
-            22 => PhichainEasingKind.EaseInOutCirc,
-            23 => PhichainEasingKind.EaseInBack,
-            24 => PhichainEasingKind.EaseOutBack,
-            25 => PhichainEasingKind.EaseInOutBack,
-            26 => PhichainEasingKind.EaseInElastic,
-            27 => PhichainEasingKind.EaseOutElastic,
-            28 => PhichainEasingKind.EaseInOutElastic,
-            29 => PhichainEasingKind.EaseInBounce,
-            30 => PhichainEasingKind.EaseOutBounce,
-            31 => PhichainEasingKind.EaseInOutBounce,
-            _ => PhichainEasingKind.Linear,
+            1 => PhiChainEasingKind.Linear,
+            2 => PhiChainEasingKind.EaseInSine,
+            3 => PhiChainEasingKind.EaseOutSine,
+            4 => PhiChainEasingKind.EaseInOutSine,
+            5 => PhiChainEasingKind.EaseInQuad,
+            6 => PhiChainEasingKind.EaseOutQuad,
+            7 => PhiChainEasingKind.EaseInOutQuad,
+            8 => PhiChainEasingKind.EaseInCubic,
+            9 => PhiChainEasingKind.EaseOutCubic,
+            10 => PhiChainEasingKind.EaseInOutCubic,
+            11 => PhiChainEasingKind.EaseInQuart,
+            12 => PhiChainEasingKind.EaseOutQuart,
+            13 => PhiChainEasingKind.EaseInOutQuart,
+            14 => PhiChainEasingKind.EaseInQuint,
+            15 => PhiChainEasingKind.EaseOutQuint,
+            16 => PhiChainEasingKind.EaseInOutQuint,
+            17 => PhiChainEasingKind.EaseInExpo,
+            18 => PhiChainEasingKind.EaseOutExpo,
+            19 => PhiChainEasingKind.EaseInOutExpo,
+            20 => PhiChainEasingKind.EaseInCirc,
+            21 => PhiChainEasingKind.EaseOutCirc,
+            22 => PhiChainEasingKind.EaseInOutCirc,
+            23 => PhiChainEasingKind.EaseInBack,
+            24 => PhiChainEasingKind.EaseOutBack,
+            25 => PhiChainEasingKind.EaseInOutBack,
+            26 => PhiChainEasingKind.EaseInElastic,
+            27 => PhiChainEasingKind.EaseOutElastic,
+            28 => PhiChainEasingKind.EaseInOutElastic,
+            29 => PhiChainEasingKind.EaseInBounce,
+            30 => PhiChainEasingKind.EaseOutBounce,
+            31 => PhiChainEasingKind.EaseInOutBounce,
+            _ => PhiChainEasingKind.Linear,
         };
-        return new PhichainEasing { EasingType = kind };
+        return new PhiChainEasing { EasingType = kind };
     }
 
     /// <summary>
@@ -118,10 +117,10 @@ public static class EasingConverter
     /// <param name="src">KPC 缓动实例</param>
     /// <param name="isBezier">是否为贝塞尔事件</param>
     /// <returns>PhiChain 缓动实例</returns>
-    public static PhichainEasing ConvertEasing(Kpc.Easing src, bool isBezier)
+    public static PhiChainEasing ConvertEasing(Kpc.Easing src, bool isBezier)
     {
         return isBezier
-            ? new PhichainEasing { EasingType = PhichainEasingKind.Linear }
+            ? new PhiChainEasing { EasingType = PhiChainEasingKind.Linear }
             : ConvertFromKpcEasingNumber((int)src);
     }
 
@@ -130,7 +129,7 @@ public static class EasingConverter
     /// </summary>
     /// <param name="src">PhiChain 缓动实例</param>
     /// <returns>KPC 缓动实例</returns>
-    public static Kpc.Easing ConvertEasing(PhichainEasing src)
+    public static Kpc.Easing ConvertEasing(PhiChainEasing src)
     {
         return new Kpc.Easing(ConvertToKpcEasingNumber(src));
     }
@@ -140,8 +139,8 @@ public static class EasingConverter
     /// </summary>
     /// <param name="src">PhiChain 缓动实例</param>
     /// <returns>如果需要切段返回 true</returns>
-    public static bool NeedsLinearSlicing(PhichainEasing src)
+    public static bool NeedsLinearSlicing(PhiChainEasing src)
     {
-        return src.EasingType is PhichainEasingKind.Steps or PhichainEasingKind.Elastic;
+        return src.EasingType is PhiChainEasingKind.Steps or PhiChainEasingKind.Elastic;
     }
 }

@@ -116,7 +116,7 @@ public sealed class ChartService
                 var kaedePhiConverter = new KaedePhiConverter();
                 var phiChainChart = Core.PhiChain.v6.Chart.LoadFromJson(text);
                 return ChartPipeline
-                    .From(phiChainChart, phiChainConverter, new PhichainToKpcConvertOptions())
+                    .From(phiChainChart, phiChainConverter, new PhiChainToKpcConvertOptions())
                     .To(kaedePhiConverter, null);
             }
 
@@ -233,7 +233,7 @@ public sealed class ChartService
             }
             case ChartType.PhiChain:
             {
-                var phiChainChart = new PhiChainConverter().FromKpc(chart, new KpcToPhichainConvertOptions());
+                var phiChainChart = new PhiChainConverter().FromKpc(chart, new KpcToPhiChainConvertOptions());
                 if (options.Stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
