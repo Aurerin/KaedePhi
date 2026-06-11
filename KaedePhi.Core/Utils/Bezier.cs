@@ -82,7 +82,7 @@ namespace KaedePhi.Core.Utils
                 return (T)(object)(byte)(s + easing * (e - s));
             }
 
-            throw new NotSupportedException("T must be float, double, int, or byte");
+            throw new NotSupportedException("T必须是float、double、int或byte");
         }
 
         #region 核心数学

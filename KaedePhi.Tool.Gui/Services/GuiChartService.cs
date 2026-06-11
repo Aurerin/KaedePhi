@@ -7,6 +7,8 @@ using KaedePhi.Core.KaedePhi.Events;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter;
 using KaedePhi.Tool.Converter.KaedePhi;
+using KaedePhi.Tool.Converter.PhiChain;
+using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.Converter.PhiEdit;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Converter.Phigros.v3;
@@ -195,6 +197,27 @@ public sealed class GuiChartService
                 );
                 return ChartPipeline.From(v3Chart, v3Converter, null).To(kpcConverter, null);
             }
+            case ChartType.PhiChain:
+            {
+                var pcChart = Core.PhiChain.v6.Chart.LoadFromJson(text);
+                var pcConverter = new PhiChainConverter();
+                pcConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg)
+                );
+                var kpcConverter = new KaedePhiConverter();
+                kpcConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg)
+                );
+                return ChartPipeline
+                    .From(pcChart, pcConverter, new PhiChainToKpcConvertOptions())
+                    .To(kpcConverter, null);
+            }
             default:
                 throw new NotSupportedException($"Unsupported chart format: {sourceType}");
         }
@@ -282,6 +305,31 @@ public sealed class GuiChartService
                     await File.WriteAllTextAsync(
                         outputPath,
                         await phigrosChart.ExportToJsonAsync(indented),
+                        ct
+                    );
+                }
+                break;
+            }
+            case ChartType.PhiChain:
+            {
+                var pcConverter = new PhiChainConverter();
+                pcConverter.SubscribeLog(
+                    info: msg => _log.Information(msg),
+                    warning: msg => _log.Warning(msg),
+                    error: msg => _log.Error(msg),
+                    debug: msg => _log.Debug(msg)
+                );
+                var pcChart = pcConverter.FromKpc(chart, new KpcToPhiChainConvertOptions());
+                if (stream)
+                {
+                    await using var s = new FileStream(outputPath, FileMode.Create);
+                    await pcChart.ExportToJsonStreamAsync(s, indented);
+                }
+                else
+                {
+                    await File.WriteAllTextAsync(
+                        outputPath,
+                        await pcChart.ExportToJsonAsync(indented),
                         ct
                     );
                 }

@@ -14,7 +14,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         {
             var obj = new JObject
             {
-                ["kind"] = value?.Type == LineEventValueType.Constant ? "constant" : "transition",
+                ["type"] = value?.Type == LineEventValueType.Constant ? "constant" : "transition",
             };
 
             if (value?.Type == LineEventValueType.Constant)
@@ -44,7 +44,7 @@ namespace KaedePhi.Core.PhiChain.v6.JsonConverter
         )
         {
             var obj = JObject.Load(reader);
-            var type = obj.Value<string>("kind");
+            var type = obj.Value<string>("type");
 
             if (type == "constant")
             {
