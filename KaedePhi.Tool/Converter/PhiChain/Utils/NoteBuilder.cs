@@ -2,7 +2,7 @@
 using KaedePhi.Core.PhiChain.v6;
 using KaedePhi.Core.Utils;
 using KpcNoteType = KaedePhi.Core.Common.NoteType;
-using PhichainNoteType = KaedePhi.Core.PhiChain.v6.NoteType;
+using PhiChainNoteType = KaedePhi.Core.PhiChain.v6.NoteType;
 
 namespace KaedePhi.Tool.Converter.PhiChain.Utils;
 
@@ -28,7 +28,7 @@ public static class NoteBuilder
         };
 
         // Hold 音符需要设置 EndBeat
-        if (src.Type == PhichainNoteType.Hold)
+        if (src.Type == PhiChainNoteType.Hold)
         {
             kpcNote.EndBeat = new Beat((int[])src.Beat) + new Beat((int[])src.HoldBeat);
         }
@@ -62,6 +62,36 @@ public static class NoteBuilder
     }
 
     /// <summary>
+    /// 检查 KPC 音符字段是否会被 PhiChain 丢弃，发出警告。
+    /// </summary>
+    /// <param name="src">KPC 音符</param>
+    /// <param name="warn">警告回调</param>
+    public static void WarnIfUnsupportedNoteFields(Kpc.Note src, Action<string>? warn)
+    {
+        if (warn == null) return;
+
+        var defaults = new Kpc.Note();
+        if (src.Alpha != defaults.Alpha)
+            warn($"PhiChain 不支持 Note.Alpha（值={src.Alpha}）");
+        if (src.IsFake)
+            warn($"PhiChain 不支持 Note.IsFake（值=true）");
+        if (Math.Abs(src.WidthRatio - defaults.WidthRatio) > 0.0001f)
+            warn($"PhiChain 不支持 Note.WidthRatio（值={src.WidthRatio}）");
+        if (Math.Abs(src.JudgeArea - defaults.JudgeArea) > 0.0001f)
+            warn($"PhiChain 不支持 Note.JudgeArea（值={src.JudgeArea}）");
+        if (Math.Abs(src.VisibleTime - defaults.VisibleTime) > 0.0001f)
+            warn($"PhiChain 不支持 Note.VisibleTime（值={src.VisibleTime}）");
+        if (Math.Abs(src.YOffset - defaults.YOffset) > 0.0001)
+            warn($"PhiChain 不支持 Note.YOffset（值={src.YOffset}）");
+        if (src.Tint[0] != defaults.Tint[0] || src.Tint[1] != defaults.Tint[1] || src.Tint[2] != defaults.Tint[2])
+            warn($"PhiChain 不支持 Note.Tint（值=[{src.Tint[0]}, {src.Tint[1]}, {src.Tint[2]}]）");
+        if (src.HitFxColor != null)
+            warn($"PhiChain 不支持 Note.HitFxColor");
+        if (src.HitSound != null)
+            warn($"PhiChain 不支持 Note.HitSound（值='{src.HitSound}'）");
+    }
+
+    /// <summary>
     /// 将 CurveNoteTrack 展开为普通音符列表。
     /// </summary>
     /// <param name="track">曲线音符轨道</param>
@@ -86,7 +116,7 @@ public static class NoteBuilder
         var noteType = ConvertNoteType(track.NoteType);
         var step = 1.0 / density;
 
-        // 与 phichain 一致：从 start 开始按步长生成，skip(1) 跳过起始音符
+        // 从 start 开始按步长生成，skip(1) 跳过起始音符
         var beat = startBeatVal + step;
         var i = 1;
         while (beat < endBeatVal)
@@ -148,7 +178,7 @@ public static class NoteBuilder
     }
 
     /// <summary>
-    /// 应用弹性缓动函数，与 phichain 原始实现一致。
+    /// 应用弹性缓动函数
     /// </summary>
     private static double ApplyElastic(double t, float omega)
     {
@@ -179,14 +209,14 @@ public static class NoteBuilder
     /// <summary>
     /// 转换音符类型。
     /// </summary>
-    private static KpcNoteType ConvertNoteType(PhichainNoteType src)
+    private static KpcNoteType ConvertNoteType(PhiChainNoteType src)
     {
         return src switch
         {
-            PhichainNoteType.Tap => KpcNoteType.Tap,
-            PhichainNoteType.Drag => KpcNoteType.Drag,
-            PhichainNoteType.Hold => KpcNoteType.Hold,
-            PhichainNoteType.Flick => KpcNoteType.Flick,
+            PhiChainNoteType.Tap => KpcNoteType.Tap,
+            PhiChainNoteType.Drag => KpcNoteType.Drag,
+            PhiChainNoteType.Hold => KpcNoteType.Hold,
+            PhiChainNoteType.Flick => KpcNoteType.Flick,
             _ => KpcNoteType.Tap,
         };
     }
@@ -194,15 +224,15 @@ public static class NoteBuilder
     /// <summary>
     /// 转换音符类型（反向）。
     /// </summary>
-    private static PhichainNoteType ConvertNoteType(KpcNoteType src)
+    private static PhiChainNoteType ConvertNoteType(KpcNoteType src)
     {
         return src switch
         {
-            KpcNoteType.Tap => PhichainNoteType.Tap,
-            KpcNoteType.Drag => PhichainNoteType.Drag,
-            KpcNoteType.Hold => PhichainNoteType.Hold,
-            KpcNoteType.Flick => PhichainNoteType.Flick,
-            _ => PhichainNoteType.Tap,
+            KpcNoteType.Tap => PhiChainNoteType.Tap,
+            KpcNoteType.Drag => PhiChainNoteType.Drag,
+            KpcNoteType.Hold => PhiChainNoteType.Hold,
+            KpcNoteType.Flick => PhiChainNoteType.Flick,
+            _ => PhiChainNoteType.Tap,
         };
     }
 }

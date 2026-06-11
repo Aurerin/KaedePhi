@@ -2,13 +2,15 @@
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.Converter.PhiChain.Utils;
+using PhiChainChart = KaedePhi.Core.PhiChain.v6.Chart;
 
 namespace KaedePhi.Tool.Converter.PhiChain;
 
 /// <summary>
 /// PhiChain 格式转换器。
 /// </summary>
-public class PhiChainConverter : LoggableBase, IChartConverter<Chart, PhiChainToKpcConvertOptions, KpcToPhiChainConvertOptions>
+public class PhiChainConverter : LoggableBase,
+    IChartConverter<PhiChainChart, PhiChainToKpcConvertOptions, KpcToPhiChainConvertOptions>
 {
     /// <summary>
     /// 将 PhiChain 格式转换为 KPC 内部格式。
@@ -16,7 +18,7 @@ public class PhiChainConverter : LoggableBase, IChartConverter<Chart, PhiChainTo
     /// <param name="source">PhiChain 谱面</param>
     /// <param name="options">转换选项</param>
     /// <returns>KPC 谱面</returns>
-    public Kpc.Chart ToKpc(Chart source, PhiChainToKpcConvertOptions options)
+    public Kpc.Chart ToKpc(PhiChainChart source, PhiChainToKpcConvertOptions options)
     {
         var kpcChart = new Kpc.Chart
         {
@@ -31,7 +33,7 @@ public class PhiChainConverter : LoggableBase, IChartConverter<Chart, PhiChainTo
         var lineIndex = 0;
         foreach (var line in source.Lines)
         {
-            JudgeLineBuilder.FlattenLine(line, -1, kpcChart.JudgeLineList, ref lineIndex, options);
+            JudgeLineBuilder.FlattenLine(line, -1, kpcChart.JudgeLineList, ref lineIndex, options, OnWarning);
         }
 
         return kpcChart;
@@ -43,16 +45,41 @@ public class PhiChainConverter : LoggableBase, IChartConverter<Chart, PhiChainTo
     /// <param name="input">KPC 谱面</param>
     /// <param name="options">输出转换选项</param>
     /// <returns>PhiChain 谱面</returns>
-    public Chart FromKpc(Kpc.Chart input, KpcToPhiChainConvertOptions options)
+    public PhiChainChart FromKpc(Kpc.Chart input, KpcToPhiChainConvertOptions options)
     {
-        var chart = new Chart
+        WarnIfUnsupportedMeta(input.Meta);
+
+        var chart = new PhiChainChart
         {
             Offset = input.Meta.Offset, // PhiChain 和 KPC 的 offset 单位均为毫秒
             BpmList = new BpmList(input.BpmList.ConvertAll(BpmBuilder.ConvertBpmItem)),
             // 构建父子关系树
-            Lines = JudgeLineBuilder.BuildLineTree(input.JudgeLineList, options)
+            Lines = JudgeLineBuilder.BuildLineTree(input.JudgeLineList, options, OnWarning)
         };
 
         return chart;
+    }
+
+    /// <summary>
+    /// 检查 KPC Meta 字段是否会被 PhiChain 丢弃，发出警告。
+    /// </summary>
+    /// <param name="src">KPC 元数据</param>
+    private void WarnIfUnsupportedMeta(Kpc.Meta src)
+    {
+        var defaults = new Kpc.Meta();
+        if (src.Background != defaults.Background)
+            LogWarning($"PhiChain 不支持 Meta.Background（值='{src.Background}'）");
+        if (src.Author != defaults.Author)
+            LogWarning($"PhiChain 不支持 Meta.Author（值='{src.Author}'）");
+        if (src.Composer != defaults.Composer)
+            LogWarning($"PhiChain 不支持 Meta.Composer（值='{src.Composer}'）");
+        if (src.Artist != defaults.Artist)
+            LogWarning($"PhiChain 不支持 Meta.Artist（值='{src.Artist}'）");
+        if (src.Level != defaults.Level)
+            LogWarning($"PhiChain 不支持 Meta.Level（值='{src.Level}'）");
+        if (src.Name != defaults.Name)
+            LogWarning($"PhiChain 不支持 Meta.Name（值='{src.Name}'）");
+        if (src.Song != defaults.Song)
+            LogWarning($"PhiChain 不支持 Meta.Song（值='{src.Song}'）");
     }
 }

@@ -184,16 +184,7 @@ public static class ControlDefaultChecker
                 if (strA != strB)
                     return false;
             }
-            else if (prop.PropertyType.IsEnum)
-            {
-                if (!Equals(valueA, valueB))
-                    return false;
-            }
-            else if (prop.PropertyType.IsClass)
-            {
-                if (!Equals(valueA, valueB))
-                    return false;
-            }
+            else if ((prop.PropertyType.IsEnum || prop.PropertyType.IsClass) && !Equals(valueA, valueB)) return false;
         }
 
         return true;

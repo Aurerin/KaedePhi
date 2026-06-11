@@ -32,6 +32,8 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
         Beat cutLength
     )
     {
+        if (cutLength <= 0)
+            throw new ArgumentOutOfRangeException(nameof(cutLength), "切割长度必须大于0.");
         var cutEvents = new List<KpcEvents.Event<TPayload>>();
         // 在evt中均匀采样，并返回
         var nowBeat = evt.StartBeat;
