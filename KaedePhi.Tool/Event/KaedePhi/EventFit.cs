@@ -22,9 +22,9 @@ public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPaylo
             return [];
 
         // 检查是否已排序，避免不必要的列表分配
-        var sortedEvents = IsSortedByStartBeat(events!)
-            ? events!
-            : events!.OrderBy(e => e.StartBeat).ToList();
+        var sortedEvents = IsSortedByStartBeat(events)
+            ? events
+            : events.OrderBy(e => e.StartBeat).ToList();
 
         return FitEventsCore(sortedEvents, tolerance);
     }
