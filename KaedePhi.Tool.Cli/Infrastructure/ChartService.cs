@@ -1,6 +1,8 @@
 ﻿using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter;
 using KaedePhi.Tool.Converter.KaedePhi;
+using KaedePhi.Tool.Converter.PhiChain;
+using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.Converter.PhiEdit;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Converter.Phigros.v3;
@@ -108,6 +110,16 @@ public sealed class ChartService
                     .To(kaedePhiConverter, null);
             }
 
+            case ChartType.PhiChain:
+            {
+                var phiChainConverter = new PhiChainConverter();
+                var kaedePhiConverter = new KaedePhiConverter();
+                var phiChainChart = Core.PhiChain.v6.Chart.LoadFromJson(text);
+                return ChartPipeline
+                    .From(phiChainChart, phiChainConverter, new PhiChainToKpcConvertOptions())
+                    .To(kaedePhiConverter, null);
+            }
+
             default:
                 return null;
         }
@@ -154,7 +166,7 @@ public sealed class ChartService
     )
     {
         if (options.DryRun)
-            return target is ChartType.RePhiEdit or ChartType.PhiEdit or ChartType.PhigrosV3
+            return target is ChartType.RePhiEdit or ChartType.PhiEdit or ChartType.PhigrosV3 or ChartType.PhiChain
                 ? outputPath
                 : null;
         switch (target)
@@ -213,6 +225,25 @@ public sealed class ChartService
                     await File.WriteAllTextAsync(
                         outputPath,
                         await phigrosChart.ExportToJsonAsync(options.Format),
+                        ct
+                    );
+                }
+
+                return outputPath;
+            }
+            case ChartType.PhiChain:
+            {
+                var phiChainChart = new PhiChainConverter().FromKpc(chart, new KpcToPhiChainConvertOptions());
+                if (options.Stream)
+                {
+                    await using var s = new FileStream(outputPath, FileMode.Create);
+                    await phiChainChart.ExportToJsonStreamAsync(s, options.Format);
+                }
+                else
+                {
+                    await File.WriteAllTextAsync(
+                        outputPath,
+                        await phiChainChart.ExportToJsonAsync(options.Format),
                         ct
                     );
                 }

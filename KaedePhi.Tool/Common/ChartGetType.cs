@@ -51,6 +51,17 @@ public static class ChartGetType
             // 如果存在info字段的同时，info字段为jsonObject，且存在lines字段，且lines字段为JsonArray，则这是PhiFans谱面
             if (jsonObj["info"] is JObject && jsonObj["lines"] is JArray)
                 return ChartType.PhiFans;
+
+            // 如果存在format字段（整数值为6）且存在bpm_list字段，则这是PhiChain v6谱面
+            if (
+                jsonObj["format"] is JValue
+                {
+                    Type: JTokenType.Integer
+                } formatValue
+                && (ulong)formatValue == 6
+                && jsonObj["bpm_list"] is JArray
+            )
+                return ChartType.PhiChain;
         }
         catch (JsonException e)
         {
