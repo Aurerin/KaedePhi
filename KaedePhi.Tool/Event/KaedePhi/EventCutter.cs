@@ -21,13 +21,13 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
     }
 
     /// <inheritdoc/>
-    public List<KpcEvents.Event<TPayload>> CutEventToLiner(
+    public List<KpcEvents.Event<TPayload>> CutEventToLinear(
         KpcEvents.Event<TPayload> evt,
         double cutLength
-    ) => CutEventToLiner(evt, new Beat(cutLength));
+    ) => CutEventToLinear(evt, new Beat(cutLength));
 
     /// <inheritdoc/>
-    public List<KpcEvents.Event<TPayload>> CutEventToLiner(
+    public List<KpcEvents.Event<TPayload>> CutEventToLinear(
         KpcEvents.Event<TPayload> evt,
         Beat cutLength
     )

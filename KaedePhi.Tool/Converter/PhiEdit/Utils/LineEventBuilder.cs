@@ -99,7 +99,7 @@ public class LineEventBuilder
             .OrderBy(e => (double)e.StartBeat)
             .SelectMany(srcEvent =>
             {
-                var sliced = _eventCutterInt.CutEventToLiner(
+                var sliced = _eventCutterInt.CutEventToLinear(
                     srcEvent,
                     1d / _options.Alpha.CutPrecision
                 );
@@ -158,7 +158,7 @@ public class LineEventBuilder
 
         foreach (var srcEvent in sourceEvents.OrderBy(e => (double)e.StartBeat))
         {
-            var slices = _eventCutterFloat.CutEventToLiner(
+            var slices = _eventCutterFloat.CutEventToLinear(
                 srcEvent,
                 1d / _options.Speed.CutPrecision
             );
@@ -515,7 +515,7 @@ public class LineEventBuilder
                 $"{context}：检测到不支持的缓动，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件"
             );
             var cutter = GetOrCreateCutter<T>();
-            return cutter.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
+            return cutter.CutEventToLinear(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
         }
 
         // PE 不支持 EasingLeft/EasingRight 截取，需要切割成线性事件
@@ -528,7 +528,7 @@ public class LineEventBuilder
                 $"{context}：PE 不支持 EasingLeft/EasingRight 截取，将切分为 {(src.EndBeat - src.StartBeat) / _options.Cutting.UnsupportedEasingPrecision} 段线性事件"
             );
             var cutter = GetOrCreateCutter<T>();
-            return cutter.CutEventToLiner(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
+            return cutter.CutEventToLinear(src, 1d / _options.Cutting.UnsupportedEasingPrecision);
         }
 
         return [src];

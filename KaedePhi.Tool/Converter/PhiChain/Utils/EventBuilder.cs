@@ -104,7 +104,7 @@ public static class EventBuilder
         {
             if (NeedsCutting(evt))
             {
-                var cutEvents = DoubleCutter.CutEventToLiner(evt, 1.0 / options.EasingCutPrecision);
+                var cutEvents = DoubleCutter.CutEventToLinear(evt, 1.0 / options.EasingCutPrecision);
                 result.AddRange(cutEvents.Select(e => ConvertEventWithTransform(e, eventType, transform)));
             }
             else
@@ -125,7 +125,7 @@ public static class EventBuilder
         {
             if (NeedsCutting(evt))
             {
-                var cutEvents = IntCutter.CutEventToLiner(evt, 1.0 / options.EasingCutPrecision);
+                var cutEvents = IntCutter.CutEventToLinear(evt, 1.0 / options.EasingCutPrecision);
                 result.AddRange(cutEvents.Select(e => ConvertEvent(e, eventType)));
             }
             else
@@ -146,7 +146,7 @@ public static class EventBuilder
         {
             if (NeedsCutting(evt))
             {
-                var cutEvents = FloatCutter.CutEventToLiner(evt, 1.0 / options.EasingCutPrecision);
+                var cutEvents = FloatCutter.CutEventToLinear(evt, 1.0 / options.EasingCutPrecision);
                 result.AddRange(cutEvents.Select(e => ConvertEvent(e, eventType)));
             }
             else
