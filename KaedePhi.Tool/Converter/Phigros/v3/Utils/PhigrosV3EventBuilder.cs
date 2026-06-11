@@ -77,10 +77,10 @@ public class PhigrosV3EventBuilder
 
         var cutLength = 1d / _options.Cutting.MisalignedXyEventPrecision;
         var cutX = xEvents
-            .SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength))
+            .SelectMany(e => _eventCutterDouble.CutEventToLinear(e, cutLength))
             .ToList();
         var cutY = yEvents
-            .SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength))
+            .SelectMany(e => _eventCutterDouble.CutEventToLinear(e, cutLength))
             .ToList();
 
         var allEvents = MergeAndFill(cutX, cutY, 0d);
@@ -221,7 +221,7 @@ public class PhigrosV3EventBuilder
 
         var cutLength = 1d / _options.Cutting.EasingPrecision;
         var cutEvents = sourceEvents
-            .SelectMany(e => _eventCutterDouble.CutEventToLiner(e, cutLength))
+            .SelectMany(e => _eventCutterDouble.CutEventToLinear(e, cutLength))
             .ToList();
         var filled = FillGaps(cutEvents, 0d);
 
@@ -267,7 +267,7 @@ public class PhigrosV3EventBuilder
 
         var cutLength = 1d / _options.Alpha.CutPrecision;
         var cutEvents = sourceEvents
-            .SelectMany(e => _eventCutterInt.CutEventToLiner(e, cutLength))
+            .SelectMany(e => _eventCutterInt.CutEventToLinear(e, cutLength))
             .ToList();
         var filled = FillGaps(cutEvents, 255);
 
@@ -319,7 +319,7 @@ public class PhigrosV3EventBuilder
 
         var cutLength = 1d / _options.Speed.CutPrecision;
         var cutEvents = sourceEvents
-            .SelectMany(e => _eventCutterFloat.CutEventToLiner(e, cutLength))
+            .SelectMany(e => _eventCutterFloat.CutEventToLinear(e, cutLength))
             .ToList();
         var filled = FillGaps(cutEvents, 1f);
 
@@ -365,7 +365,7 @@ public class PhigrosV3EventBuilder
         if (events.Count == 0)
             return events;
 
-        // CutEventToLiner 的输出已按拍数有序；仅在必要时排序（O(n log n) 保底）。
+        // CutEventToLinear 的输出已按拍数有序；仅在必要时排序（O(n log n) 保底）。
         var sorted = IsSortedByStartBeat(events)
             ? events
             : [.. events.OrderBy(e => (double)e.StartBeat)];
