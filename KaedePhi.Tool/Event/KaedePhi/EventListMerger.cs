@@ -599,6 +599,14 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         TPayload? formLastEndValue
     )
     {
+        // 预索引：O(n) 构建，后续 O(1) 查找
+        var toIndex = new Dictionary<(double, double), KpcEvents.Event<TPayload>>();
+        foreach (var e in cutTo)
+            toIndex.TryAdd(((double)e.StartBeat, (double)e.EndBeat), e);
+        var fromIndex = new Dictionary<(double, double), KpcEvents.Event<TPayload>>();
+        foreach (var e in cutFrom)
+            fromIndex.TryAdd(((double)e.StartBeat, (double)e.EndBeat), e);
+
         var merged = new List<KpcEvents.Event<TPayload>>();
         var currentBeat = start;
         while (currentBeat < end)
@@ -606,12 +614,9 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
             var nextBeat = currentBeat + cutLength;
             if (nextBeat > end)
                 nextBeat = end;
-            var toEvent = cutTo.FirstOrDefault(e =>
-                e.StartBeat == currentBeat && e.EndBeat == nextBeat
-            );
-            var formEvent = cutFrom.FirstOrDefault(e =>
-                e.StartBeat == currentBeat && e.EndBeat == nextBeat
-            );
+            var key = ((double)currentBeat, (double)nextBeat);
+            toIndex.TryGetValue(key, out var toEvent);
+            fromIndex.TryGetValue(key, out var formEvent);
 
             var toStart = toEvent is not null ? toEvent.StartValue : toLastEndValue;
             var formStart = formEvent is not null ? formEvent.StartValue : formLastEndValue;
