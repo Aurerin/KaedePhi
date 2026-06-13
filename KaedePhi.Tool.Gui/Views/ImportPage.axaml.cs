@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using KaedePhi.Tool.Gui.ViewModels;
@@ -9,10 +10,64 @@ namespace KaedePhi.Tool.Gui.Views;
 public partial class ImportPage : UserControl
 {
     private bool _isPicking;
+    private Border? _dropOverlay;
 
     public ImportPage()
     {
         InitializeComponent();
+        AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
+        AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
+        AddHandler(DragDrop.DropEvent, OnDrop);
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        _dropOverlay = this.FindControl<Border>("DropOverlay");
+    }
+
+    private void OnDragEnter(object? sender, DragEventArgs e)
+    {
+        if (DataContext is ImportViewModel vm && vm.IsLoading)
+            return;
+        if (e.DataTransfer.Contains(DataFormat.File))
+        {
+            e.DragEffects = DragDropEffects.Copy;
+            if (_dropOverlay != null)
+                _dropOverlay.IsVisible = true;
+        }
+        else
+        {
+            e.DragEffects = DragDropEffects.None;
+        }
+    }
+
+    private void OnDragLeave(object? sender, DragEventArgs e)
+    {
+        if (_dropOverlay != null)
+            _dropOverlay.IsVisible = false;
+    }
+
+    private void OnDrop(object? sender, DragEventArgs e)
+    {
+        if (_dropOverlay != null)
+            _dropOverlay.IsVisible = false;
+
+        if (DataContext is not ImportViewModel vm || vm.IsLoading)
+            return;
+
+        foreach (var item in e.DataTransfer.Items)
+        {
+            if (item.TryGetRaw(DataFormat.File) is IStorageItem storageItem)
+            {
+                var path = storageItem.TryGetLocalPath();
+                if (!string.IsNullOrEmpty(path))
+                {
+                    vm.OnFileSelected(path);
+                    return;
+                }
+            }
+        }
     }
 
     private async void OnImportClick(object? sender, RoutedEventArgs e)

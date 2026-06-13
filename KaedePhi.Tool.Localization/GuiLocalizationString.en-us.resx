@@ -451,6 +451,12 @@
   <data name="import_loading" xml:space="preserve">
     <value>Loading chart...</value>
   </data>
+  <data name="import_drop_hint" xml:space="preserve">
+    <value>or drag and drop a file here</value>
+  </data>
+  <data name="import_drop_active" xml:space="preserve">
+    <value>Release to load chart</value>
+  </data>
   <data name="tool_success_title" xml:space="preserve">
     <value>Tool Completed</value>
   </data>

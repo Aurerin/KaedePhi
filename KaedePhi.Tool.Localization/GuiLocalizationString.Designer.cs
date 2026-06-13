@@ -555,6 +555,24 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 或将文件拖放到此处.
+        /// </summary>
+        public static string import_drop_hint {
+            get {
+                return ResourceManager.GetString("import_drop_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 释放以加载谱面.
+        /// </summary>
+        public static string import_drop_active {
+            get {
+                return ResourceManager.GetString("import_drop_active", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 流式加载.
         /// </summary>
         public static string import_stream_loading {
