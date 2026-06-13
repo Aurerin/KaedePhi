@@ -16,6 +16,7 @@ public partial class ImportPage : UserControl
     {
         InitializeComponent();
         AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
         AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
     }
@@ -26,15 +27,17 @@ public partial class ImportPage : UserControl
         _dropOverlay = this.FindControl<Border>("DropOverlay");
     }
 
+    private void ShowOverlay() { if (_dropOverlay != null) _dropOverlay.IsVisible = true; }
+    private void HideOverlay() { if (_dropOverlay != null) _dropOverlay.IsVisible = false; }
+
     private void OnDragEnter(object? sender, DragEventArgs e)
     {
-        if (DataContext is ImportViewModel vm && vm.IsLoading)
+        if (DataContext is ImportViewModel { IsLoading: true })
             return;
         if (e.DataTransfer.Contains(DataFormat.File))
         {
             e.DragEffects = DragDropEffects.Copy;
-            if (_dropOverlay != null)
-                _dropOverlay.IsVisible = true;
+            ShowOverlay();
         }
         else
         {
@@ -42,16 +45,22 @@ public partial class ImportPage : UserControl
         }
     }
 
+    private void OnDragOver(object? sender, DragEventArgs e)
+    {
+        if (e.DataTransfer.Contains(DataFormat.File))
+            e.DragEffects = DragDropEffects.Copy;
+        else
+            e.DragEffects = DragDropEffects.None;
+    }
+
     private void OnDragLeave(object? sender, DragEventArgs e)
     {
-        if (_dropOverlay != null)
-            _dropOverlay.IsVisible = false;
+        HideOverlay();
     }
 
     private void OnDrop(object? sender, DragEventArgs e)
     {
-        if (_dropOverlay != null)
-            _dropOverlay.IsVisible = false;
+        HideOverlay();
 
         if (DataContext is not ImportViewModel vm || vm.IsLoading)
             return;
