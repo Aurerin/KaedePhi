@@ -100,18 +100,33 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
 
     /// <summary>
-    /// 判断两个事件列表是否存在时间重叠。
+    /// 判断两个已排序事件列表是否存在时间重叠。
+    /// 使用双指针法，O(n+m) 复杂度。
     /// </summary>
-    /// <param name="toEvents">目标事件列表。</param>
-    /// <param name="fromEvents">来源事件列表。</param>
+    /// <param name="toEvents">目标事件列表（需按 StartBeat 排序）。</param>
+    /// <param name="fromEvents">来源事件列表（需按 StartBeat 排序）。</param>
     /// <returns>存在任意重叠区间时返回 <see langword="true"/>。</returns>
     protected static bool HasOverlap(
         List<KpcEvents.Event<TPayload>> toEvents,
         List<KpcEvents.Event<TPayload>> fromEvents
-    ) =>
-        fromEvents.Any(fe =>
-            toEvents.Any(te => fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat)
-        );
+    )
+    {
+        var ti = 0;
+        var fi = 0;
+        while (ti < toEvents.Count && fi < fromEvents.Count)
+        {
+            var te = toEvents[ti];
+            var fe = fromEvents[fi];
+            if (te.StartBeat < fe.EndBeat && fe.StartBeat < te.EndBeat)
+                return true;
+            if (te.EndBeat <= fe.StartBeat)
+                ti++;
+            else
+                fi++;
+        }
+
+        return false;
+    }
 
     #endregion
 
@@ -174,6 +189,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
 
     /// <summary>
     /// 构建两组事件的重叠区间，并将可连接区间归并。
+    /// 使用 HashSet 去重，避免 O(n) 线性查找。
     /// </summary>
     /// <param name="toEvents">目标事件列表。</param>
     /// <param name="fromEvents">来源事件列表。</param>
@@ -184,13 +200,15 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     )
     {
         var overlapIntervals = new List<(Beat Start, Beat End)>();
+        var seen = new HashSet<(double Start, double End)>();
         foreach (var fe in fromEvents)
         {
             foreach (var te in toEvents)
             {
                 if (!TryGetOverlapBounds(fe, te, out var start, out var end))
                     continue;
-                if (overlapIntervals.Any(iv => iv.Start == start && iv.End == end))
+                var key = ((double)start, (double)end);
+                if (!seen.Add(key))
                     continue;
                 AddOrMergeOverlapInterval(overlapIntervals, start, end);
             }
