@@ -213,7 +213,6 @@ public static class FatherUnbindHelpers
         return layers
             .Select(selector)
             .Where(ch => ch is { Count: > 0 })
-            .Select(ch => ch)
             .Aggregate(
                 result,
                 (current, ch) =>
