@@ -1,3 +1,4 @@
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.JudgeLines.KaedePhi;
@@ -35,7 +36,7 @@ public class PhiEditJudgeLineBuilder
         };
 
         if (
-            !string.Equals(trueSrc.Texture, "line.png", StringComparison.Ordinal)
+            !string.Equals(trueSrc.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal)
             || _options.LineFilter.RemoveTextureLine
             || trueSrc.AttachUi.HasValue
             || _options.LineFilter.RemoveAttachUiLine
@@ -83,7 +84,7 @@ public class PhiEditJudgeLineBuilder
             ? "，判定线将被自动移除。"
             : "。";
 
-        if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
+        if (!string.Equals(src.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal))
             Warn($"PE 不支持 JudgeLine.Texture（值='{src.Texture}'），{textureRemoveHint}");
         if (!IsDefaultAnchor(src.Anchor))
             Warn($"PE 不支持 JudgeLine.Anchor（值='[{string.Join(", ", src.Anchor)}]'）");
