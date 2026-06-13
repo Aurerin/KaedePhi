@@ -64,22 +64,5 @@ public class PhiChainConverter : LoggableBase,
     /// 检查 KPC Meta 字段是否会被 PhiChain 丢弃，发出警告。
     /// </summary>
     /// <param name="src">KPC 元数据</param>
-    private void WarnIfUnsupportedMeta(Kpc.Meta src)
-    {
-        var defaults = new Kpc.Meta();
-        if (src.Background != defaults.Background)
-            LogWarning($"PhiChain 不支持 Meta.Background（值='{src.Background}'）");
-        if (src.Author != defaults.Author)
-            LogWarning($"PhiChain 不支持 Meta.Author（值='{src.Author}'）");
-        if (src.Composer != defaults.Composer)
-            LogWarning($"PhiChain 不支持 Meta.Composer（值='{src.Composer}'）");
-        if (src.Artist != defaults.Artist)
-            LogWarning($"PhiChain 不支持 Meta.Artist（值='{src.Artist}'）");
-        if (src.Level != defaults.Level)
-            LogWarning($"PhiChain 不支持 Meta.Level（值='{src.Level}'）");
-        if (src.Name != defaults.Name)
-            LogWarning($"PhiChain 不支持 Meta.Name（值='{src.Name}'）");
-        if (src.Song != defaults.Song)
-            LogWarning($"PhiChain 不支持 Meta.Song（值='{src.Song}'）");
-    }
+    private void WarnIfUnsupportedMeta(Kpc.Meta src) => WarnIfUnsupportedMeta("PhiChain", src);
 }
