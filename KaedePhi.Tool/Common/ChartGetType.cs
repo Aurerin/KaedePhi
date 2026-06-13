@@ -54,10 +54,7 @@ public static class ChartGetType
 
             // 如果存在format字段（整数值为6）且存在bpm_list字段，则这是PhiChain v6谱面
             if (
-                jsonObj["format"] is JValue
-                {
-                    Type: JTokenType.Integer
-                } formatValue
+                jsonObj["format"] is JValue { Type: JTokenType.Integer } formatValue
                 && (ulong)formatValue == 6
                 && jsonObj["bpm_list"] is JArray
             )

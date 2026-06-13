@@ -27,8 +27,17 @@ public partial class ImportPage : UserControl
         _dropOverlay = this.FindControl<Border>("DropOverlay");
     }
 
-    private void ShowOverlay() { if (_dropOverlay != null) _dropOverlay.IsVisible = true; }
-    private void HideOverlay() { if (_dropOverlay != null) _dropOverlay.IsVisible = false; }
+    private void ShowOverlay()
+    {
+        if (_dropOverlay != null)
+            _dropOverlay.IsVisible = true;
+    }
+
+    private void HideOverlay()
+    {
+        if (_dropOverlay != null)
+            _dropOverlay.IsVisible = false;
+    }
 
     private void OnDragEnter(object? sender, DragEventArgs e)
     {

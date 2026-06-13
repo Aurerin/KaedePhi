@@ -132,22 +132,31 @@ namespace KaedePhi.Core.RePhiEdit.Events
             if (typeof(T) == typeof(float))
                 return Cast<float, T>(
                     Easing.Interpolate(
-                        EasingLeft, EasingRight,
-                        GetStartValueAsSingle(), GetEndValueAsSingle(), t
+                        EasingLeft,
+                        EasingRight,
+                        GetStartValueAsSingle(),
+                        GetEndValueAsSingle(),
+                        t
                     )
                 );
             if (typeof(T) == typeof(double))
                 return Cast<double, T>(
                     Easing.Interpolate(
-                        EasingLeft, EasingRight,
-                        GetStartValueAsDouble(), GetEndValueAsDouble(), t
+                        EasingLeft,
+                        EasingRight,
+                        GetStartValueAsDouble(),
+                        GetEndValueAsDouble(),
+                        t
                     )
                 );
             if (typeof(T) == typeof(int))
                 return Cast<int, T>(
                     Easing.Interpolate(
-                        EasingLeft, EasingRight,
-                        GetStartValueAsInt32(), GetEndValueAsInt32(), t
+                        EasingLeft,
+                        EasingRight,
+                        GetStartValueAsInt32(),
+                        GetEndValueAsInt32(),
+                        t
                     )
                 );
             if (typeof(T) == typeof(byte[]))
@@ -168,17 +177,14 @@ namespace KaedePhi.Core.RePhiEdit.Events
                     "StartValue 或 EndValue 不是 byte[] 或为 null。"
                 );
             if (startBytes.Length != endBytes.Length)
-                throw new System.InvalidOperationException(
-                    "插值要求两个 byte[] 长度一致。"
-                );
+                throw new System.InvalidOperationException("插值要求两个 byte[] 长度一致。");
 
             var result = new byte[startBytes.Length];
             for (var i = 0; i < startBytes.Length; i++)
                 result[i] = useBezier
                     ? Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i])
-                    : (byte)Easing.Interpolate(
-                        EasingLeft, EasingRight, startBytes[i], endBytes[i], t
-                    );
+                    : (byte)
+                        Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
             return Cast<byte[], T>(result);
         }
 
@@ -187,10 +193,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// </summary>
         public Event<T> Clone()
         {
-            var clone = new Event<T>
-            {
-                Easing = Easing,
-            };
+            var clone = new Event<T> { Easing = Easing };
             CopyBaseTo(clone);
             return clone;
         }

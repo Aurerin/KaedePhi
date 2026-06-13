@@ -140,9 +140,7 @@ public class FatherUnbindProcessor : FatherUnbindProcessorBase
         }
         catch (Exception ex)
         {
-            LogError?.Invoke(
-                $"FatherUnbind[{targetJudgeLineIndex}]: 解绑失败: " + ex.Message
-            );
+            LogError?.Invoke($"FatherUnbind[{targetJudgeLineIndex}]: 解绑失败: " + ex.Message);
             throw;
         }
     }

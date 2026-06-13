@@ -26,7 +26,8 @@ public static class JudgeLineBuilder
         List<Kpc.JudgeLine> result,
         ref int currentIndex,
         PhiChainToKpcConvertOptions options,
-        Action<string>? warn = null)
+        Action<string>? warn = null
+    )
     {
         var kpcLine = ConvertLine(line, fatherIndex, currentIndex, options, warn);
         result.Add(kpcLine);
@@ -50,8 +51,13 @@ public static class JudgeLineBuilder
     /// <param name="options">转换选项</param>
     /// <param name="warn">警告回调</param>
     /// <returns>KPC 判定线</returns>
-    public static Kpc.JudgeLine ConvertLine(SerializedLine src, int fatherIndex, int lineIndex,
-        PhiChainToKpcConvertOptions options, Action<string>? warn = null)
+    public static Kpc.JudgeLine ConvertLine(
+        SerializedLine src,
+        int fatherIndex,
+        int lineIndex,
+        PhiChainToKpcConvertOptions options,
+        Action<string>? warn = null
+    )
     {
         var kpcLine = new Kpc.JudgeLine
         {
@@ -66,8 +72,12 @@ public static class JudgeLineBuilder
         {
             if (EasingConverter.NeedsLinearSlicing(evt.Value.Easing))
             {
-                warn?.Invoke($"PhiChain 的 {evt.Value.Easing.EasingType} 缓动在 KPC 中不支持，已切段为线性近似");
-                allEvents.AddRange(EventBuilder.SliceUnsupportedEasing(evt, options.UnsupportedEasingPrecision));
+                warn?.Invoke(
+                    $"PhiChain 的 {evt.Value.Easing.EasingType} 缓动在 KPC 中不支持，已切段为线性近似"
+                );
+                allEvents.AddRange(
+                    EventBuilder.SliceUnsupportedEasing(evt, options.UnsupportedEasingPrecision)
+                );
             }
             else
             {
@@ -106,8 +116,12 @@ public static class JudgeLineBuilder
         foreach (var track in src.CurveNoteTracks)
         {
             // 验证索引范围
-            if (track.From < 0 || track.From >= src.Notes.Count ||
-                track.To < 0 || track.To >= src.Notes.Count)
+            if (
+                track.From < 0
+                || track.From >= src.Notes.Count
+                || track.To < 0
+                || track.To >= src.Notes.Count
+            )
             {
                 continue;
             }
@@ -131,7 +145,8 @@ public static class JudgeLineBuilder
     public static List<SerializedLine> BuildLineTree(
         List<Kpc.JudgeLine> kpcLines,
         KpcToPhiChainConvertOptions options,
-        Action<string>? warn = null)
+        Action<string>? warn = null
+    )
     {
         // 预处理：解绑 rotateWithFather 为 false 的子线
         var processedLines = PreprocessLines(kpcLines, options);
@@ -168,7 +183,8 @@ public static class JudgeLineBuilder
     /// </summary>
     private static List<Kpc.JudgeLine> PreprocessLines(
         List<Kpc.JudgeLine> kpcLines,
-        KpcToPhiChainConvertOptions options)
+        KpcToPhiChainConvertOptions options
+    )
     {
         if (!options.UnbindNonRotatingChildren)
             return kpcLines;
@@ -191,12 +207,20 @@ public static class JudgeLineBuilder
         {
             if (options.UnbindClassicMode)
             {
-                result[lineIndex] = unbinder.FatherUnbind(lineIndex, result, options.UnbindPrecision);
+                result[lineIndex] = unbinder.FatherUnbind(
+                    lineIndex,
+                    result,
+                    options.UnbindPrecision
+                );
             }
             else
             {
-                result[lineIndex] =
-                    unbinder.FatherUnbind(lineIndex, result, options.UnbindPrecision, options.UnbindTolerance);
+                result[lineIndex] = unbinder.FatherUnbind(
+                    lineIndex,
+                    result,
+                    options.UnbindPrecision,
+                    options.UnbindTolerance
+                );
             }
         }
 
@@ -211,7 +235,8 @@ public static class JudgeLineBuilder
         int lineIndex,
         Dictionary<int, List<int>> childMap,
         KpcToPhiChainConvertOptions options,
-        Action<string>? warn = null)
+        Action<string>? warn = null
+    )
     {
         var kpcLine = kpcLines[lineIndex];
         var serializedLine = ConvertLineToPhichain(kpcLine, options, warn);
@@ -237,8 +262,11 @@ public static class JudgeLineBuilder
     /// <param name="options">转换选项</param>
     /// <param name="warn">警告回调</param>
     /// <returns>PhiChain 序列化线</returns>
-    private static SerializedLine ConvertLineToPhichain(Kpc.JudgeLine src, KpcToPhiChainConvertOptions options,
-        Action<string>? warn = null)
+    private static SerializedLine ConvertLineToPhichain(
+        Kpc.JudgeLine src,
+        KpcToPhiChainConvertOptions options,
+        Action<string>? warn = null
+    )
     {
         WarnIfUnsupportedLineFields(src, warn);
 
@@ -252,19 +280,27 @@ public static class JudgeLineBuilder
         if (src.EventLayers.Count > 0)
         {
             if (src.EventLayers.Count > 1)
-                warn?.Invoke($"PhiChain 不支持多事件层，判定线 '{src.Name}' 的 {src.EventLayers.Count} 个事件层将被合并");
+                warn?.Invoke(
+                    $"PhiChain 不支持多事件层，判定线 '{src.Name}' 的 {src.EventLayers.Count} 个事件层将被合并"
+                );
 
             var processor = new LayerProcessor();
             KpcEvents.EventLayer mergedLayer;
 
             if (options.MultiLayerMergeClassicMode)
             {
-                mergedLayer = processor.LayerMerge(src.EventLayers, options.MultiLayerMergePrecision);
+                mergedLayer = processor.LayerMerge(
+                    src.EventLayers,
+                    options.MultiLayerMergePrecision
+                );
             }
             else
             {
-                mergedLayer = processor.LayerMergePlus(src.EventLayers, options.MultiLayerMergePrecision,
-                    options.MultiLayerMergeTolerance);
+                mergedLayer = processor.LayerMergePlus(
+                    src.EventLayers,
+                    options.MultiLayerMergePrecision,
+                    options.MultiLayerMergeTolerance
+                );
             }
 
             // 转换合并后的事件层为 PhiChain 事件列表
@@ -291,7 +327,8 @@ public static class JudgeLineBuilder
     /// <param name="warn">警告回调</param>
     private static void WarnIfUnsupportedLineFields(Kpc.JudgeLine src, Action<string>? warn)
     {
-        if (warn == null) return;
+        if (warn == null)
+            return;
 
         var defaults = new Kpc.JudgeLine();
         if (src.Texture != defaults.Texture)

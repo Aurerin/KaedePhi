@@ -68,7 +68,8 @@ public static class NoteBuilder
     /// <param name="warn">警告回调</param>
     public static void WarnIfUnsupportedNoteFields(Kpc.Note src, Action<string>? warn)
     {
-        if (warn == null) return;
+        if (warn == null)
+            return;
 
         var defaults = new Kpc.Note();
         if (src.Alpha != defaults.Alpha)
@@ -83,7 +84,11 @@ public static class NoteBuilder
             warn($"PhiChain 不支持 Note.VisibleTime（值={src.VisibleTime}）");
         if (Math.Abs(src.YOffset - defaults.YOffset) > 0.0001)
             warn($"PhiChain 不支持 Note.YOffset（值={src.YOffset}）");
-        if (src.Tint[0] != defaults.Tint[0] || src.Tint[1] != defaults.Tint[1] || src.Tint[2] != defaults.Tint[2])
+        if (
+            src.Tint[0] != defaults.Tint[0]
+            || src.Tint[1] != defaults.Tint[1]
+            || src.Tint[2] != defaults.Tint[2]
+        )
             warn($"PhiChain 不支持 Note.Tint（值=[{src.Tint[0]}, {src.Tint[1]}, {src.Tint[2]}]）");
         if (src.HitFxColor != null)
             warn($"PhiChain 不支持 Note.HitFxColor");
@@ -98,11 +103,16 @@ public static class NoteBuilder
     /// <param name="fromNote">起始音符</param>
     /// <param name="toNote">结束音符</param>
     /// <returns>展开后的音符列表</returns>
-    public static List<Kpc.Note> ExpandCurveNoteTrack(CurveNoteTrack track, Note fromNote, Note toNote)
+    public static List<Kpc.Note> ExpandCurveNoteTrack(
+        CurveNoteTrack track,
+        Note fromNote,
+        Note toNote
+    )
     {
         var notes = new List<Kpc.Note>();
         var density = track.Density;
-        if (density == 0) density = 16;
+        if (density == 0)
+            density = 16;
 
         var startBeat = new Beat((int[])fromNote.Beat);
         var endBeat = new Beat((int[])toNote.Beat);
@@ -160,9 +170,7 @@ public static class NoteBuilder
             // 线性直接返回
             EasingKind.Linear => t,
             // Steps 缓动：阶梯式量化
-            EasingKind.Steps => curve.Count > 0
-                ? Math.Round(t * curve.Count) / curve.Count
-                : t,
+            EasingKind.Steps => curve.Count > 0 ? Math.Round(t * curve.Count) / curve.Count : t,
             // Elastic 缓动：弹性振荡
             EasingKind.Elastic => ApplyElastic(t, curve.Omega),
             // 自定义贝塞尔曲线
@@ -182,11 +190,12 @@ public static class NoteBuilder
     /// </summary>
     private static double ApplyElastic(double t, float omega)
     {
-        if (omega == 0) return t;
+        if (omega == 0)
+            return t;
         var omegad = (double)omega;
-        return 1.0 - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omegad * t) / omegad + Math.Cos(omegad * t));
+        return 1.0
+            - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omegad * t) / omegad + Math.Cos(omegad * t));
     }
-
 
     /// <summary>
     /// 应用标准缓动函数。

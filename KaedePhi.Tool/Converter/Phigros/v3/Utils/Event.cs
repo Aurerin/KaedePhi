@@ -72,7 +72,10 @@ public static class EventBuilder
 
             var startValue = valueTransformer(startSelector(ev));
             var endValue = valueTransformer(endSelector(ev));
-            if (Math.Abs(startValue - endValue) < Constants.FloatEpsilon && endBeat - startBeat > 1d)
+            if (
+                Math.Abs(startValue - endValue) < Constants.FloatEpsilon
+                && endBeat - startBeat > 1d
+            )
                 endBeat = startBeat + 1d;
             result.Add(CreateLinearEvent(startBeat, endBeat, startValue, endValue));
         }
