@@ -1,4 +1,4 @@
-namespace KaedePhi.Tool.Common;
+﻿namespace KaedePhi.Tool.Common;
 
 /// <summary>
 /// 工具层共享常量。

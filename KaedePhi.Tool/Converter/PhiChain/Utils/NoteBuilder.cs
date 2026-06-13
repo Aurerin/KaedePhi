@@ -190,7 +190,7 @@ public static class NoteBuilder
     /// </summary>
     private static double ApplyElastic(double t, float omega)
     {
-        if (omega == 0)
+        if (Math.Abs(omega) <= Common.Constants.FloatEpsilon)
             return t;
         var omegad = (double)omega;
         return 1.0
