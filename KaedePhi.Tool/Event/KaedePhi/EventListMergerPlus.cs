@@ -302,10 +302,38 @@ public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
         return beats.Distinct().OrderBy(b => b).ToList();
     }
 
+    /// <summary>
+    /// 二分查找在指定拍处活跃的事件（最后一个 StartBeat &lt;= beat 且 EndBeat &gt;= beat 的事件）。
+    /// 要求 events 已按 StartBeat 排序。O(log n) 复杂度。
+    /// </summary>
     private static KpcEvents.Event<TPayload>? GetActiveEventAtBeat(
         List<KpcEvents.Event<TPayload>> events,
         Beat beat
-    ) => events.LastOrDefault(e => e.StartBeat <= beat && e.EndBeat >= beat);
+    )
+    {
+        var lo = 0;
+        var hi = events.Count - 1;
+        KpcEvents.Event<TPayload>? result = null;
+
+        while (lo <= hi)
+        {
+            var mid = lo + ((hi - lo) >> 1);
+            var evt = events[mid];
+
+            if (evt.StartBeat <= beat)
+            {
+                if (evt.EndBeat >= beat)
+                    result = evt;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid - 1;
+            }
+        }
+
+        return result;
+    }
 
     private static TPayload? GetPreviousEndValue(List<KpcEvents.Event<TPayload>> events, Beat beat)
     {
