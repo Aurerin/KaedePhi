@@ -56,24 +56,7 @@ public class PhiEditConverter
         };
     }
 
-    private void WarnIfUnsupportedMeta(Meta src)
-    {
-        var defaults = new Meta();
-        if (src.Background != defaults.Background)
-            Warn($"PE 不支持 Meta.Background（值='{src.Background}'）");
-        if (src.Author != defaults.Author)
-            Warn($"PE 不支持 Meta.Author（值='{src.Author}'）");
-        if (src.Composer != defaults.Composer)
-            Warn($"PE 不支持 Meta.Composer（值='{src.Composer}'）");
-        if (src.Artist != defaults.Artist)
-            Warn($"PE 不支持 Meta.Artist（值='{src.Artist}'）");
-        if (src.Level != defaults.Level)
-            Warn($"PE 不支持 Meta.Level（值='{src.Level}'）");
-        if (src.Name != defaults.Name)
-            Warn($"PE 不支持 Meta.Name（值='{src.Name}'）");
-        if (src.Song != defaults.Song)
-            Warn($"PE 不支持 Meta.Song（值='{src.Song}'）");
-    }
+    private void WarnIfUnsupportedMeta(Meta src) => WarnIfUnsupportedMeta("PE", src);
 
     private void Warn(string message) => LogWarning(message);
 }
