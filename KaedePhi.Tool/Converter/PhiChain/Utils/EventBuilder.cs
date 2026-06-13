@@ -555,7 +555,7 @@ public static class EventBuilder
 
     private static double ApplyElasticCurve(double t, float omega)
     {
-        if (omega == 0)
+        if (Math.Abs(omega) <= Common.Constants.FloatEpsilon)
             return t;
         return 1.0
             - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omega * t) / omega + Math.Cos(omega * t));
