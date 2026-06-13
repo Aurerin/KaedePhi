@@ -12,7 +12,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
         if (tolerance is > 100 or < 0)
             throw new ArgumentOutOfRangeException(
                 nameof(tolerance),
-                "Tolerance must be between 0 and 100."
+                "容差必须在 0 到 100 之间。"
             );
         if (
             typeof(TPayload) != typeof(int)
@@ -20,7 +20,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
             && typeof(TPayload) != typeof(double)
         )
             throw new NotSupportedException(
-                "EventListCompress only supports int, float, and double types."
+                "EventListCompress 仅支持 int、float 和 double 类型。"
             );
     }
 

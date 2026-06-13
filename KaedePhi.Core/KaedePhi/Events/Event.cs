@@ -116,16 +116,16 @@ namespace KaedePhi.Core.KaedePhi.Events
             var startBytes =
                 StartValue as byte[]
                 ?? throw new System.InvalidOperationException(
-                    "Start or End is not a byte array, or is null."
+                    "StartValue 或 EndValue 不是 byte[] 或为 null。"
                 );
             var endBytes =
                 EndValue as byte[]
                 ?? throw new System.InvalidOperationException(
-                    "Start or End is not a byte array, or is null."
+                    "StartValue 或 EndValue 不是 byte[] 或为 null。"
                 );
             if (startBytes.Length != endBytes.Length)
                 throw new System.InvalidOperationException(
-                    "Byte arrays must be of the same length for interpolation."
+                    "插值要求两个 byte[] 长度一致。"
                 );
 
             var result = new byte[startBytes.Length];
