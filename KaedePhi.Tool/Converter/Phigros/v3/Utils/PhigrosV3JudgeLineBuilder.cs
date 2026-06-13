@@ -41,7 +41,11 @@ public class PhigrosV3JudgeLineBuilder
         var preprocessedSrc = src;
 
         if (
-            !string.Equals(preprocessedSrc.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal)
+            !string.Equals(
+                preprocessedSrc.Texture,
+                CoreConstants.DefaultTexture,
+                StringComparison.Ordinal
+            )
             || _options.LineFilter.RemoveTextureLine
             || preprocessedSrc.AttachUi.HasValue
             || _options.LineFilter.RemoveAttachUiLine

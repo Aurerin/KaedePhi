@@ -9,8 +9,9 @@ namespace KaedePhi.Tool.Converter.PhiChain;
 /// <summary>
 /// PhiChain 格式转换器。
 /// </summary>
-public class PhiChainConverter : LoggableBase,
-    IChartConverter<PhiChainChart, PhiChainToKpcConvertOptions, KpcToPhiChainConvertOptions>
+public class PhiChainConverter
+    : LoggableBase,
+        IChartConverter<PhiChainChart, PhiChainToKpcConvertOptions, KpcToPhiChainConvertOptions>
 {
     /// <summary>
     /// 将 PhiChain 格式转换为 KPC 内部格式。
@@ -26,14 +27,21 @@ public class PhiChainConverter : LoggableBase,
             Meta = new Kpc.Meta
             {
                 Offset = (int)source.Offset, // PhiChain 和 KPC 的 offset 单位均为毫秒
-            }
+            },
         };
 
         // 展开树形线结构为扁平列表
         var lineIndex = 0;
         foreach (var line in source.Lines)
         {
-            JudgeLineBuilder.FlattenLine(line, -1, kpcChart.JudgeLineList, ref lineIndex, options, OnWarning);
+            JudgeLineBuilder.FlattenLine(
+                line,
+                -1,
+                kpcChart.JudgeLineList,
+                ref lineIndex,
+                options,
+                OnWarning
+            );
         }
 
         return kpcChart;
@@ -54,7 +62,7 @@ public class PhiChainConverter : LoggableBase,
             Offset = input.Meta.Offset, // PhiChain 和 KPC 的 offset 单位均为毫秒
             BpmList = new BpmList(input.BpmList.ConvertAll(BpmBuilder.ConvertBpmItem)),
             // 构建父子关系树
-            Lines = JudgeLineBuilder.BuildLineTree(input.JudgeLineList, options, OnWarning)
+            Lines = JudgeLineBuilder.BuildLineTree(input.JudgeLineList, options, OnWarning),
         };
 
         return chart;

@@ -166,7 +166,12 @@ public sealed class ChartService
     )
     {
         if (options.DryRun)
-            return target is ChartType.RePhiEdit or ChartType.PhiEdit or ChartType.PhigrosV3 or ChartType.PhiChain
+            return
+                target
+                    is ChartType.RePhiEdit
+                        or ChartType.PhiEdit
+                        or ChartType.PhigrosV3
+                        or ChartType.PhiChain
                 ? outputPath
                 : null;
         switch (target)
@@ -233,7 +238,10 @@ public sealed class ChartService
             }
             case ChartType.PhiChain:
             {
-                var phiChainChart = new PhiChainConverter().FromKpc(chart, new KpcToPhiChainConvertOptions());
+                var phiChainChart = new PhiChainConverter().FromKpc(
+                    chart,
+                    new KpcToPhiChainConvertOptions()
+                );
                 if (options.Stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);

@@ -52,8 +52,8 @@ public partial class MessageDialog : Window
                     DialogType.Warning => new SolidColorBrush(Color.Parse("#FF9800")),
                     DialogType.Error => new SolidColorBrush(Color.Parse("#F44336")),
                     _ => new SolidColorBrush(Color.Parse("#2196F3")),
-                }
-            }
+                },
+            },
         };
 
         dialog.ShowDialog(owner);

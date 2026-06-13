@@ -218,14 +218,10 @@ namespace KaedePhi.Core.Common
             {
                 target.StartValue = StartValue is not null
                     ? Cast<byte[], T>(Cast<T, byte[]>(StartValue).ToArray())
-                    : throw new InvalidOperationException(
-                        "byte[] 克隆时 StartValue 不能为 null。"
-                    );
+                    : throw new InvalidOperationException("byte[] 克隆时 StartValue 不能为 null。");
                 target.EndValue = EndValue is not null
                     ? Cast<byte[], T>(Cast<T, byte[]>(EndValue).ToArray())
-                    : throw new InvalidOperationException(
-                        "byte[] 克隆时 EndValue 不能为 null。"
-                    );
+                    : throw new InvalidOperationException("byte[] 克隆时 EndValue 不能为 null。");
             }
             else
             {

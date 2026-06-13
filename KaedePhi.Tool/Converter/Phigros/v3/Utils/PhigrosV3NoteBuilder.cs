@@ -12,7 +12,6 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 /// </summary>
 public static class PhigrosV3NoteBuilder
 {
-
     public static (List<PhigrosNote> above, List<PhigrosNote> below) ConvertNotes(
         List<KpcNote>? notes,
         List<KpcSpeedEvent>? speedEvents,
@@ -84,7 +83,9 @@ public static class PhigrosV3NoteBuilder
             var ev in from ev in speedEvents
             let startBeat = (double)ev.StartBeat
             let endBeat = (double)ev.EndBeat
-            where beat >= startBeat - Constants.FloatEpsilon && beat < endBeat - Constants.FloatEpsilon
+            where
+                beat >= startBeat - Constants.FloatEpsilon
+                && beat < endBeat - Constants.FloatEpsilon
             select ev
         )
         {

@@ -86,24 +86,35 @@ namespace KaedePhi.Core.KaedePhi.Events
         {
             if (typeof(T) == typeof(float))
                 return Cast<float, T>(
-                    (float)Easing.Interpolate(
-                        EasingLeft, EasingRight,
-                        GetStartValueAsSingle(), GetEndValueAsSingle(), t
-                    )
+                    (float)
+                        Easing.Interpolate(
+                            EasingLeft,
+                            EasingRight,
+                            GetStartValueAsSingle(),
+                            GetEndValueAsSingle(),
+                            t
+                        )
                 );
             if (typeof(T) == typeof(double))
                 return Cast<double, T>(
                     Easing.Interpolate(
-                        EasingLeft, EasingRight,
-                        GetStartValueAsDouble(), GetEndValueAsDouble(), t
+                        EasingLeft,
+                        EasingRight,
+                        GetStartValueAsDouble(),
+                        GetEndValueAsDouble(),
+                        t
                     )
                 );
             if (typeof(T) == typeof(int))
                 return Cast<int, T>(
-                    (int)Easing.Interpolate(
-                        EasingLeft, EasingRight,
-                        GetStartValueAsInt32(), GetEndValueAsInt32(), t
-                    )
+                    (int)
+                        Easing.Interpolate(
+                            EasingLeft,
+                            EasingRight,
+                            GetStartValueAsInt32(),
+                            GetEndValueAsInt32(),
+                            t
+                        )
                 );
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
@@ -124,21 +135,22 @@ namespace KaedePhi.Core.KaedePhi.Events
                     "StartValue 或 EndValue 不是 byte[] 或为 null。"
                 );
             if (startBytes.Length != endBytes.Length)
-                throw new System.InvalidOperationException(
-                    "插值要求两个 byte[] 长度一致。"
-                );
+                throw new System.InvalidOperationException("插值要求两个 byte[] 长度一致。");
 
             var result = new byte[startBytes.Length];
             for (var i = 0; i < startBytes.Length; i++)
                 if (useBezier)
                     result[i] = Bezier.Do(
-                        BezierPoints, ft, startBytes[i], endBytes[i],
-                        EasingLeft, EasingRight
+                        BezierPoints,
+                        ft,
+                        startBytes[i],
+                        endBytes[i],
+                        EasingLeft,
+                        EasingRight
                     );
                 else
-                    result[i] = (byte)Easing.Interpolate(
-                        EasingLeft, EasingRight, startBytes[i], endBytes[i], t
-                    );
+                    result[i] = (byte)
+                        Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
             return Cast<byte[], T>(result);
         }
 

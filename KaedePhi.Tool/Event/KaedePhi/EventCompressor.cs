@@ -10,18 +10,13 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
     private static void ValidateParams(double tolerance)
     {
         if (tolerance is > 100 or < 0)
-            throw new ArgumentOutOfRangeException(
-                nameof(tolerance),
-                "容差必须在 0 到 100 之间。"
-            );
+            throw new ArgumentOutOfRangeException(nameof(tolerance), "容差必须在 0 到 100 之间。");
         if (
             typeof(TPayload) != typeof(int)
             && typeof(TPayload) != typeof(float)
             && typeof(TPayload) != typeof(double)
         )
-            throw new NotSupportedException(
-                "EventListCompress 仅支持 int、float 和 double 类型。"
-            );
+            throw new NotSupportedException("EventListCompress 仅支持 int、float 和 double 类型。");
     }
 
     /// <summary>

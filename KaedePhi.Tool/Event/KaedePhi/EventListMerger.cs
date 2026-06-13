@@ -301,7 +301,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     /// </summary>
     /// <param name="overlapIntervals">待排序区间集合。</param>
     private static void SortIntervals(List<(Beat Start, Beat End)> overlapIntervals) =>
-        overlapIntervals.Sort((a, b) => a.Start != b.Start ? a.Start.CompareTo(b.Start) : a.End.CompareTo(b.End)
+        overlapIntervals.Sort(
+            (a, b) => a.Start != b.Start ? a.Start.CompareTo(b.Start) : a.End.CompareTo(b.End)
         );
 
     #endregion
@@ -516,12 +517,12 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     private static (
         List<KpcEvents.Event<TPayload>> CutTo,
         List<KpcEvents.Event<TPayload>> CutFrom
-        ) CutAndRemoveOverlapEvents(
-            List<KpcEvents.Event<TPayload>> toEventsCopy,
-            List<KpcEvents.Event<TPayload>> fromEventsCopy,
-            List<(Beat Start, Beat End)> overlapIntervals,
-            Beat cutLength
-        )
+    ) CutAndRemoveOverlapEvents(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
+        List<(Beat Start, Beat End)> overlapIntervals,
+        Beat cutLength
+    )
     {
         var cutTo = new List<KpcEvents.Event<TPayload>>();
         var cutFrom = new List<KpcEvents.Event<TPayload>>();
