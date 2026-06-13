@@ -1,3 +1,4 @@
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -71,17 +72,16 @@ public partial class ImportPage : UserControl
         if (DataContext is not ImportViewModel vm || vm.IsLoading)
             return;
 
-        foreach (var item in e.DataTransfer.Items)
+        var path = e.DataTransfer.Items
+            .Select(item => item.TryGetRaw(DataFormat.File) is IStorageItem storageItem
+                ? storageItem.TryGetLocalPath()
+                : null)
+            .FirstOrDefault(p => !string.IsNullOrEmpty(p));
+
+        if (!string.IsNullOrEmpty(path))
         {
-            if (item.TryGetRaw(DataFormat.File) is IStorageItem storageItem)
-            {
-                var path = storageItem.TryGetLocalPath();
-                if (!string.IsNullOrEmpty(path))
-                {
-                    vm.OnFileSelected(path);
-                    return;
-                }
-            }
+            vm.OnFileSelected(path);
+            return;
         }
     }
 
