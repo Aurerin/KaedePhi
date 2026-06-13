@@ -1,14 +1,14 @@
-ï»¿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace KaedePhi.Core.KaedePhi.Controls
 {
     /// <summary>
-    /// å€¾æ–œæ§åˆ¶ç‚¹ã€‚
+    /// ÇãĞ±¿ØÖÆµã¡£
     /// </summary>
     public class SkewControl : ControlBase
     {
         /// <summary>
-        /// å€¾æ–œå€¼ã€‚
+        /// ÇãĞ±Öµ¡£
         /// </summary>
         public float Skew { get; set; } = 1.0f;
 
@@ -16,28 +16,28 @@ namespace KaedePhi.Core.KaedePhi.Controls
         {
             new SkewControl
             {
-                Easing = new Easing(1),
+                Easing = Easing.Linear,
                 Skew = 0.0f,
                 X = 0.0f,
             },
             new SkewControl
             {
-                Easing = new Easing(1),
+                Easing = Easing.Linear,
                 Skew = 0.0f,
                 X = 9999999.0f,
             },
         };
 
         /// <summary>
-        /// è·å–é»˜è®¤æ§åˆ¶ç‚¹åˆ—è¡¨ã€‚
+        /// »ñÈ¡Ä¬ÈÏ¿ØÖÆµãÁĞ±í¡£
         /// </summary>
         public static List<SkewControl> Default =>
             DefaultInstance.ConvertAll(input => (SkewControl)input.Clone());
 
         /// <summary>
-        /// æ·±æ‹·è´æ§åˆ¶ç‚¹ã€‚
+        /// Éî¿½±´¿ØÖÆµã¡£
         /// </summary>
-        /// <returns>æ§åˆ¶ç‚¹å‰¯æœ¬</returns>
+        /// <returns>¿ØÖÆµã¸±±¾</returns>
         public override ControlBase Clone()
         {
             return new SkewControl

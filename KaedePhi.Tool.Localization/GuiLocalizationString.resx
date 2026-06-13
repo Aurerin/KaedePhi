@@ -451,6 +451,12 @@
   <data name="import_loading" xml:space="preserve">
     <value>正在加载谱面...</value>
   </data>
+  <data name="import_drop_hint" xml:space="preserve">
+    <value>或将文件拖放到此处</value>
+  </data>
+  <data name="import_drop_active" xml:space="preserve">
+    <value>释放以加载谱面</value>
+  </data>
   <data name="tool_success_title" xml:space="preserve">
     <value>工具运行成功</value>
   </data>

@@ -329,10 +329,7 @@ public static class FatherUnbindHelpers
 
         if (line.RotateWithFather)
         {
-            var merged = merge(
-                line.EventLayers[0].RotateEvents ?? [],
-                fatherRotateEvents
-            );
+            var merged = merge(line.EventLayers[0].RotateEvents ?? [], fatherRotateEvents);
             line.EventLayers[0].RotateEvents = merged;
         }
 

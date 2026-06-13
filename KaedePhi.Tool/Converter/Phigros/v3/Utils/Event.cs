@@ -1,4 +1,5 @@
 ﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Common;
 using PhigrosEvent = KaedePhi.Core.Phigros.v3.Event;
 using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
 using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;
@@ -12,8 +13,6 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 public static class EventBuilder
 {
     private const double TrailingBeatPadding = 1d / 64d;
-    private const double SpeedValueRatio = 4.5d;
-    private const double FloatTolerance = 1e-6;
 
     public static List<KpcEvents.Event<T>>? ConvertEvents<T>(
         List<PhigrosEvent>? events,
@@ -73,7 +72,10 @@ public static class EventBuilder
 
             var startValue = valueTransformer(startSelector(ev));
             var endValue = valueTransformer(endSelector(ev));
-            if (Math.Abs(startValue - endValue) < FloatTolerance && endBeat - startBeat > 1d)
+            if (
+                Math.Abs(startValue - endValue) < Constants.FloatEpsilon
+                && endBeat - startBeat > 1d
+            )
                 endBeat = startBeat + 1d;
             result.Add(CreateLinearEvent(startBeat, endBeat, startValue, endValue));
         }
@@ -99,7 +101,7 @@ public static class EventBuilder
         {
             var startBeat = Math.Max(0d, ev.StartTime / 32.0);
             var endBeat = ev.EndTime / 32.0;
-            var speedValue = (float)(ev.Value * SpeedValueRatio);
+            var speedValue = (float)(ev.Value * Constants.SpeedValueRatio);
             if (endBeat <= startBeat)
                 continue;
 
@@ -145,7 +147,7 @@ public static class EventBuilder
             maxBeat,
             GetMaxBeat(
                 src.JudgeLineMoveEvents.Select(e =>
-                    Math.Abs(e.Start - e.End) < FloatTolerance
+                    Math.Abs(e.Start - e.End) < Constants.FloatEpsilon
                         ? Math.Min(
                             (double)e.EndTime / 32,
                             Math.Max(0d, (double)e.StartTime / 32) + 1
@@ -158,7 +160,7 @@ public static class EventBuilder
             maxBeat,
             GetMaxBeat(
                 src.JudgeLineRotateEvents.Select(e =>
-                    Math.Abs(e.Start - e.End) < FloatTolerance
+                    Math.Abs(e.Start - e.End) < Constants.FloatEpsilon
                         ? Math.Min(
                             (double)e.EndTime / 32,
                             Math.Max(0d, (double)e.StartTime / 32) + 1
@@ -171,7 +173,7 @@ public static class EventBuilder
             maxBeat,
             GetMaxBeat(
                 src.JudgeLineDisappearEvents.Select(e =>
-                    Math.Abs(e.Start - e.End) < FloatTolerance
+                    Math.Abs(e.Start - e.End) < Constants.FloatEpsilon
                         ? Math.Min(
                             (double)e.EndTime / 32,
                             Math.Max(0d, (double)e.StartTime / 32) + 1

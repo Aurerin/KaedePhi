@@ -1,4 +1,5 @@
 ﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Layer.KaedePhi;
@@ -13,8 +14,6 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 /// </summary>
 public class PhigrosV3EventBuilder
 {
-    private const float FloatEpsilon = 1e-6f;
-    private const double SpeedValueRatio = 4.5d;
     private const double AlphaMax = 255d;
     private const float BeatToPhigrosTime = 32f;
     private const float TailEventEndTime = 1_000_000_000f;
@@ -149,7 +148,7 @@ public class PhigrosV3EventBuilder
         {
             var start = boundaryList[i];
             var end = boundaryList[i + 1];
-            if (end - start <= FloatEpsilon)
+            if (end - start <= Constants.FloatEpsilon)
                 continue;
 
             // 二分查找：找到 StartBeat <= start 的最靠右事件，再验证是否覆盖该区间
@@ -190,7 +189,7 @@ public class PhigrosV3EventBuilder
         while (lo <= hi)
         {
             var mid = (lo + hi) >> 1;
-            if ((float)(double)sortedEvents[mid].StartBeat <= start + FloatEpsilon)
+            if ((float)(double)sortedEvents[mid].StartBeat <= start + Constants.FloatEpsilon)
             {
                 candidate = mid;
                 lo = mid + 1;
@@ -203,7 +202,7 @@ public class PhigrosV3EventBuilder
         if (candidate == -1)
             return null;
         var ev = sortedEvents[candidate];
-        return (float)(double)ev.EndBeat >= end - FloatEpsilon ? ev : null;
+        return (float)(double)ev.EndBeat >= end - Constants.FloatEpsilon ? ev : null;
     }
 
     #endregion
@@ -335,7 +334,7 @@ public class PhigrosV3EventBuilder
                 {
                     StartTime = startBeat * BeatToPhigrosTime,
                     EndTime = endBeat * BeatToPhigrosTime,
-                    Value = ev.StartValue / (float)SpeedValueRatio,
+                    Value = ev.StartValue / (float)Constants.SpeedValueRatio,
                 }
             );
         }
@@ -379,7 +378,7 @@ public class PhigrosV3EventBuilder
             var startBeat = (float)(double)ev.StartBeat;
             var endBeat = (float)(double)ev.EndBeat;
 
-            if (startBeat > lastEndBeat + FloatEpsilon && result.Count > 0)
+            if (startBeat > lastEndBeat + Constants.FloatEpsilon && result.Count > 0)
             {
                 result.Add(
                     new KpcEvents.Event<T>
@@ -408,7 +407,7 @@ public class PhigrosV3EventBuilder
     {
         for (var i = 1; i < events.Count; i++)
         {
-            if (events[i].StartBeat < (double)events[i - 1].StartBeat - FloatEpsilon)
+            if (events[i].StartBeat < (double)events[i - 1].StartBeat - Constants.FloatEpsilon)
                 return false;
         }
         return true;

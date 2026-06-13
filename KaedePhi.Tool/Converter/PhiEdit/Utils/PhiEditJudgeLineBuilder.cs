@@ -1,3 +1,4 @@
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.JudgeLines.KaedePhi;
@@ -11,7 +12,6 @@ namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 /// </summary>
 public class PhiEditJudgeLineBuilder
 {
-    private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhiEditConvertOptions _options;
     private readonly LineEventBuilder _eventBuilder;
     private readonly Action<string>? _warnLogger;
@@ -36,7 +36,7 @@ public class PhiEditJudgeLineBuilder
         };
 
         if (
-            !string.Equals(trueSrc.Texture, "line.png", StringComparison.Ordinal)
+            !string.Equals(trueSrc.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal)
             || _options.LineFilter.RemoveTextureLine
             || trueSrc.AttachUi.HasValue
             || _options.LineFilter.RemoveAttachUiLine
@@ -84,7 +84,7 @@ public class PhiEditJudgeLineBuilder
             ? "，判定线将被自动移除。"
             : "。";
 
-        if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
+        if (!string.Equals(src.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal))
             Warn($"PE 不支持 JudgeLine.Texture（值='{src.Texture}'），{textureRemoveHint}");
         if (!IsDefaultAnchor(src.Anchor))
             Warn($"PE 不支持 JudgeLine.Anchor（值='[{string.Join(", ", src.Anchor)}]'）");
@@ -100,7 +100,7 @@ public class PhiEditJudgeLineBuilder
             );
         if (src.IsGif)
             Warn($"PE 不支持 JudgeLine.IsGif（值={src.IsGif}）");
-        if (Math.Abs(src.BpmFactor - 1f) > FloatEpsilon)
+        if (Math.Abs(src.BpmFactor - 1f) > Constants.FloatEpsilon)
             Warn($"PE 不支持 JudgeLine.BpmFactor（值={src.BpmFactor}）");
 
         WarnIfUnsupportedControlFields(src);
@@ -138,8 +138,8 @@ public class PhiEditJudgeLineBuilder
 
     private static bool IsDefaultAnchor(float[]? anchor) =>
         anchor is { Length: 2 }
-        && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
-        && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
+        && Math.Abs(anchor[0] - 0.5f) <= Constants.FloatEpsilon
+        && Math.Abs(anchor[1] - 0.5f) <= Constants.FloatEpsilon;
 
     private void Warn(string message) => _warnLogger?.Invoke(message);
 }

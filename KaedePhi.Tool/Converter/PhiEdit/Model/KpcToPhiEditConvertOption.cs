@@ -1,9 +1,11 @@
-﻿namespace KaedePhi.Tool.Converter.PhiEdit.Model;
+﻿using KaedePhi.Tool.Common;
+
+namespace KaedePhi.Tool.Converter.PhiEdit.Model;
 
 public class KpcToPhiEditConvertOptions
 {
-    public const double DefaultPrecision = 64d;
-    public const double DefaultTolerancePercent = 0.1d;
+    public const double DefaultPrecision = Constants.DefaultPrecision;
+    public const double DefaultTolerancePercent = Constants.DefaultTolerancePercent;
 
     /// <summary>
     /// 事件切割相关配置

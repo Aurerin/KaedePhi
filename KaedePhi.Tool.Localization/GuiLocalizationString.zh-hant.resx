@@ -451,6 +451,12 @@
   <data name="import_loading" xml:space="preserve">
     <value>正在載入譜面...</value>
   </data>
+  <data name="import_drop_hint" xml:space="preserve">
+    <value>或將檔案拖放到此處</value>
+  </data>
+  <data name="import_drop_active" xml:space="preserve">
+    <value>釋放以載入譜面</value>
+  </data>
   <data name="tool_success_title" xml:space="preserve">
     <value>工具執行成功</value>
   </data>

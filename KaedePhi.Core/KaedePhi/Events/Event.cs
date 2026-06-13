@@ -1,53 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
 
 namespace KaedePhi.Core.KaedePhi.Events
 {
-    public class Event<T>
+    public class Event<T> : EventBase<T>
     {
-        /// <summary>
-        /// 是否为贝塞尔曲线
-        /// </summary>
-        public bool IsBezier { get; set; } // 是否为贝塞尔曲线
-
-        /// <summary>
-        /// 贝塞尔曲线控制点（x1 y1 x2 y2）
-        /// </summary>
-        public float[] BezierPoints { get; set; } = new float[4]; // 贝塞尔曲线点
-
-        /// <summary>
-        /// 缓动截取左界限
-        /// </summary>
-        public float EasingLeft { get; set; } // 缓动开始
-
-        /// <summary>
-        /// 缓动截取右界限
-        /// </summary>
-        public float EasingRight { get; set; } = 1.0f; // 缓动结束
-
         /// <summary>
         /// 缓动类型
         /// </summary>
-        public Easing Easing { get; set; } = new(1); // 缓动类型
-
-        /// <summary>
-        /// 事件开始数值
-        /// </summary>
-#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 'required' 修饰符或声明为可以为 null。
-        public T StartValue { get; set; } // 开始值
-
-        /// <summary>
-        /// 事件结束数值
-        /// </summary>
-        public T EndValue { get; set; } // 结束值
-#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 'required' 修饰符或声明为可以为 null。
-        /// <summary>
-        /// 事件开始拍
-        /// </summary>
-        public Beat StartBeat { get; set; } = new(new[] { 0, 0, 1 });
+        public Easing Easing { get; set; } = new(1);
 
         /// <summary>
         /// 模拟器保留字段
@@ -55,22 +17,9 @@ namespace KaedePhi.Core.KaedePhi.Events
         public float StartTime { get; set; }
 
         /// <summary>
-        /// 事件结束拍
-        /// </summary>
-        public Beat EndBeat { get; set; } = new(new[] { 1, 0, 1 });
-
-        /// <summary>
         /// 模拟器保留字段
         /// </summary>
         public float EndTime { get; set; }
-
-        /// <summary>
-        /// 当此事件为文字事件时，此值为字体文件相对路径，默认cmdysj.ttf
-        /// </summary>
-        public string? Font { get; set; }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static TTo Cast<TFrom, TTo>(TFrom value) => Unsafe.As<TFrom, TTo>(ref value);
 
         /// <summary>
         /// 保留字段
@@ -80,8 +29,6 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// <summary>
         /// 获取指定拍在此事件中的插值（返回 double）。
         /// </summary>
-        /// <param name="beat">指定拍</param>
-        /// <returns>插值结果</returns>
         public double GetValueAtBeatAsDouble(Beat beat)
         {
             var t = (beat - StartBeat) / (EndBeat - StartBeat);
@@ -90,7 +37,6 @@ namespace KaedePhi.Core.KaedePhi.Events
             if (t >= 1)
                 return GetEndValueAsDouble();
 
-            // 直接使用double类型的Interpolate，避免类型检查
             return Easing.Interpolate(
                 EasingLeft,
                 EasingRight,
@@ -101,114 +47,8 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 获取 StartValue 的 double 表示。
-        /// </summary>
-        /// <returns>double 类型的起始值</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetStartValueAsDouble()
-        {
-            if (typeof(T) == typeof(double))
-                return Cast<T, double>(StartValue);
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(StartValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(StartValue);
-            return Convert.ToDouble(StartValue);
-        }
-
-        /// <summary>
-        /// 获取 EndValue 的 double 表示。
-        /// </summary>
-        /// <returns>double 类型的结束值</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetEndValueAsDouble()
-        {
-            if (typeof(T) == typeof(double))
-                return Cast<T, double>(EndValue);
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(EndValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(EndValue);
-            return Convert.ToDouble(EndValue);
-        }
-
-        /// <summary>
-        /// 获取 StartValue 的 float 表示。
-        /// </summary>
-        /// <returns>float 类型的起始值</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float GetStartValueAsSingle()
-        {
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(StartValue);
-            if (typeof(T) == typeof(double))
-                return (float)Cast<T, double>(StartValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(StartValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(StartValue);
-            return Convert.ToSingle(StartValue);
-        }
-
-        /// <summary>
-        /// 获取 EndValue 的 float 表示。
-        /// </summary>
-        /// <returns>float 类型的结束值</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float GetEndValueAsSingle()
-        {
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(EndValue);
-            if (typeof(T) == typeof(double))
-                return (float)Cast<T, double>(EndValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(EndValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(EndValue);
-            return Convert.ToSingle(EndValue);
-        }
-
-        /// <summary>
-        /// 获取 StartValue 的 int 表示。
-        /// </summary>
-        /// <returns>int 类型的起始值</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetStartValueAsInt32()
-        {
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(StartValue);
-            if (typeof(T) == typeof(float))
-                return (int)Cast<T, float>(StartValue);
-            if (typeof(T) == typeof(double))
-                return (int)Cast<T, double>(StartValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(StartValue);
-            return Convert.ToInt32(StartValue);
-        }
-
-        /// <summary>
-        /// 获取 EndValue 的 int 表示。
-        /// </summary>
-        /// <returns>int 类型的结束值</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetEndValueAsInt32()
-        {
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(EndValue);
-            if (typeof(T) == typeof(float))
-                return (int)Cast<T, float>(EndValue);
-            if (typeof(T) == typeof(double))
-                return (int)Cast<T, double>(EndValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(EndValue);
-            return Convert.ToInt32(EndValue);
-        }
-
-        /// <summary>
         /// 获取某个拍在这个事件中的值
         /// </summary>
-        /// <param name="beat">指定拍</param>
-        /// <returns>指定拍时，此事件的数值</returns>
         public T GetValueAtBeat(Beat beat)
         {
             var t = (beat - StartBeat) / (EndBeat - StartBeat);
@@ -220,12 +60,7 @@ namespace KaedePhi.Core.KaedePhi.Events
             };
         }
 
-        /// <summary>
-        /// 使用贝塞尔曲线对已知类型进行插值。
-        /// </summary>
-        /// <param name="t">归一化时间 (0, 1)。</param>
-        /// <returns>插值结果。</returns>
-        /// <exception cref="NotSupportedException">不支持的类型 <typeparamref name="T"/>。</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private T InterpolateBezier(double t)
         {
             var ft = (float)t;
@@ -243,15 +78,10 @@ namespace KaedePhi.Core.KaedePhi.Events
                 );
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: true);
-            throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
+            throw new System.NotSupportedException($"类型 {typeof(T)} 不受支持。");
         }
 
-        /// <summary>
-        /// 使用缓动函数对已知类型进行插值。
-        /// </summary>
-        /// <param name="t">归一化时间 (0, 1)。</param>
-        /// <returns>插值结果。</returns>
-        /// <exception cref="NotSupportedException">不支持的类型 <typeparamref name="T"/>。</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private T InterpolateEasing(double t)
         {
             if (typeof(T) == typeof(float))
@@ -288,36 +118,24 @@ namespace KaedePhi.Core.KaedePhi.Events
                 );
             if (typeof(T) == typeof(byte[]))
                 return InterpolateByteArray(t, useBezier: false);
-            throw new NotSupportedException($"类型 {typeof(T)} 不受支持。");
+            throw new System.NotSupportedException($"类型 {typeof(T)} 不受支持。");
         }
 
-        /// <summary>
-        /// 对 <c>byte[]</c> 类型按分量进行插值（贝塞尔或缓动）。
-        /// </summary>
-        /// <param name="t">归一化时间 (0, 1)。</param>
-        /// <param name="useBezier">为 <see langword="true"/> 时使用贝塞尔曲线，否则使用缓动函数。</param>
-        /// <returns>逐分量插值后的 <c>byte[]</c> 结果，包装为 <typeparamref name="T"/>。</returns>
-        /// <exception cref="InvalidOperationException">
-        /// <see cref="Event{T}.StartValue"/> 或 <see cref="Event{T}.EndValue"/> 不是有效的字节数组，
-        /// 或两者长度不一致时抛出。
-        /// </exception>
         private T InterpolateByteArray(double t, bool useBezier)
         {
             var ft = (float)t;
             var startBytes =
                 StartValue as byte[]
-                ?? throw new InvalidOperationException(
-                    "Start or End is not a byte array, or is null."
+                ?? throw new System.InvalidOperationException(
+                    "StartValue 或 EndValue 不是 byte[] 或为 null。"
                 );
             var endBytes =
                 EndValue as byte[]
-                ?? throw new InvalidOperationException(
-                    "Start or End is not a byte array, or is null."
+                ?? throw new System.InvalidOperationException(
+                    "StartValue 或 EndValue 不是 byte[] 或为 null。"
                 );
             if (startBytes.Length != endBytes.Length)
-                throw new InvalidOperationException(
-                    "Byte arrays must be of the same length for interpolation."
-                );
+                throw new System.InvalidOperationException("插值要求两个 byte[] 长度一致。");
 
             var result = new byte[startBytes.Length];
             for (var i = 0; i < startBytes.Length; i++)
@@ -337,98 +155,18 @@ namespace KaedePhi.Core.KaedePhi.Events
         }
 
         /// <summary>
-        /// 针对已知T类型（int/byte/byte[]/string/float/double）的DeepClone实现
-        /// 完全避免反射，直接处理已知类型
-        /// </summary>
-        private static TValue DeepClone<TValue>(TValue value)
-        {
-            if (value is null)
-                throw new InvalidOperationException("Value cannot be null for cloning.");
-
-            var type = typeof(TValue);
-
-            // 值类型：int, float, double, byte
-            if (
-                type == typeof(int)
-                || type == typeof(float)
-                || type == typeof(double)
-                || type == typeof(byte)
-            )
-                return value;
-
-            // 不可变引用类型：string
-            if (type == typeof(string))
-                return value;
-
-            // byte[]：需要深拷贝
-            if (type == typeof(byte[]))
-            {
-                var arr = Cast<TValue, byte[]>(value);
-                return Cast<byte[], TValue>(arr.ToArray());
-            }
-
-            // 不应到达此处，但提供兜底
-            return value;
-        }
-
-        /// <summary>
         /// 深拷贝事件。
         /// </summary>
-        /// <returns>事件副本</returns>
         public Event<T> Clone()
         {
             var clone = new Event<T>
             {
-                IsBezier = IsBezier,
-                EasingLeft = EasingLeft,
-                EasingRight = EasingRight,
                 Easing = Easing,
-                Font = Font,
+                StartTime = StartTime,
+                EndTime = EndTime,
+                FloorPosition = FloorPosition,
             };
-
-            // BezierPoints: 直接Array.Copy，避免LINQ的ToArray()分配
-            var bp = new float[BezierPoints.Length];
-            Array.Copy(BezierPoints, bp, BezierPoints.Length);
-            clone.BezierPoints = bp;
-
-            // 针对已知T类型优化：int/float/double/byte直接赋值，byte[]/string特殊处理
-            if (
-                typeof(T) == typeof(int)
-                || typeof(T) == typeof(float)
-                || typeof(T) == typeof(double)
-                || typeof(T) == typeof(byte)
-                || typeof(T) == typeof(string)
-            )
-            {
-                // 值类型直接赋值，无开销
-                clone.StartValue = StartValue;
-                clone.EndValue = EndValue;
-            }
-            else if (typeof(T) == typeof(byte[]))
-            {
-                // byte[]需要深拷贝
-                clone.StartValue = StartValue is not null
-                    ? Cast<byte[], T>(Cast<T, byte[]>(StartValue).ToArray())
-                    : throw new InvalidOperationException(
-                        "StartValue cannot be null for byte[] cloning."
-                    );
-                clone.EndValue = EndValue is not null
-                    ? Cast<byte[], T>(Cast<T, byte[]>(EndValue).ToArray())
-                    : throw new InvalidOperationException(
-                        "EndValue cannot be null for byte[] cloning."
-                    );
-            }
-            else
-            {
-                // 兜底：使用DeepClone（不应到达此处）
-                clone.StartValue = DeepClone(StartValue);
-                clone.EndValue = DeepClone(EndValue);
-            }
-
-            // Beat拷贝
-            clone.StartBeat = new Beat((int[])StartBeat);
-            clone.EndBeat = new Beat((int[])EndBeat);
-
+            CopyBaseTo(clone);
             return clone;
         }
     }

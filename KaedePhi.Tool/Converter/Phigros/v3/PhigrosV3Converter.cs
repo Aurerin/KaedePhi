@@ -114,24 +114,7 @@ public class PhigrosV3Converter
 
     private static float GetPhigrosV3Offset(KpcMeta meta) => meta.Offset / 1000f;
 
-    private void WarnIfUnsupportedMeta(KpcMeta src)
-    {
-        var defaults = new KpcMeta();
-        if (src.Background != defaults.Background)
-            Warn($"PhigrosV3 不支持 Meta.Background（值='{src.Background}'）");
-        if (src.Author != defaults.Author)
-            Warn($"PhigrosV3 不支持 Meta.Author（值='{src.Author}'）");
-        if (src.Composer != defaults.Composer)
-            Warn($"PhigrosV3 不支持 Meta.Composer（值='{src.Composer}'）");
-        if (src.Artist != defaults.Artist)
-            Warn($"PhigrosV3 不支持 Meta.Artist（值='{src.Artist}'）");
-        if (src.Level != defaults.Level)
-            Warn($"PhigrosV3 不支持 Meta.Level（值='{src.Level}'）");
-        if (src.Name != defaults.Name)
-            Warn($"PhigrosV3 不支持 Meta.Name（值='{src.Name}'）");
-        if (src.Song != defaults.Song)
-            Warn($"PhigrosV3 不支持 Meta.Song（值='{src.Song}'）");
-    }
+    private void WarnIfUnsupportedMeta(KpcMeta src) => WarnIfUnsupportedMeta("PhigrosV3", src);
 
     private void Warn(string message) => LogWarning(message);
 }

@@ -6,6 +6,11 @@ namespace KaedePhi.Core.RePhiEdit
     [JsonConverter(typeof(EasingJsonConverter))]
     public class Easing
     {
+        /// <summary>
+        /// 线性缓动（编号1）。
+        /// </summary>
+        public static Easing Linear { get; } = new(1);
+
         public Easing(int easingNumber)
         {
             _easingNumber = easingNumber;

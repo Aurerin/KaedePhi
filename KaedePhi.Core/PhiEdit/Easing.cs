@@ -4,6 +4,11 @@ namespace KaedePhi.Core.PhiEdit
 {
     public class Easing
     {
+        /// <summary>
+        /// 线性缓动（编号1）。
+        /// </summary>
+        public static Easing Linear { get; } = Get(1);
+
         private readonly int _easingNumber;
         private readonly Utils.Easings.EasingFunction _function;
 
