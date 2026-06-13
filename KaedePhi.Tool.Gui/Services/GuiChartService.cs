@@ -134,10 +134,7 @@ public sealed class GuiChartService
         {
             case ChartType.RePhiEdit:
             {
-                var rpeChart = Core
-                    .RePhiEdit.Chart.LoadFromJsonAsync(text)
-                    .GetAwaiter()
-                    .GetResult();
+                var rpeChart = Core.RePhiEdit.Chart.LoadFromJson(text);
                 var rpeConverter = new RePhiEditConverter();
                 rpeConverter.SubscribeLog(
                     info: msg => _log.Information(msg),
@@ -156,7 +153,7 @@ public sealed class GuiChartService
             }
             case ChartType.PhiEdit:
             {
-                var peChart = Core.PhiEdit.Chart.LoadAsync(text).GetAwaiter().GetResult();
+                var peChart = Core.PhiEdit.Chart.Load(text);
                 var peConverter = new PhiEditConverter();
                 peConverter.SubscribeLog(
                     info: msg => _log.Information(msg),
@@ -177,10 +174,7 @@ public sealed class GuiChartService
             }
             case ChartType.PhigrosV3:
             {
-                var v3Chart = Core
-                    .Phigros.v3.Chart.LoadFromJsonAsync(text)
-                    .GetAwaiter()
-                    .GetResult();
+                var v3Chart = Core.Phigros.v3.Chart.LoadFromJson(text);
                 var v3Converter = new PhigrosV3Converter();
                 v3Converter.SubscribeLog(
                     info: msg => _log.Information(msg),
