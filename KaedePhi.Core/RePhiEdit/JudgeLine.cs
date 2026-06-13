@@ -18,7 +18,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 判定线纹理相对路径，默认值为line.png
         /// </summary>
         [JsonProperty("Texture")]
-        public string Texture { get; set; } = "line.png"; // 判定线纹理路径
+        public string Texture { get; set; } = CoreConstants.DefaultTexture;
 
         /// <summary>
         /// 判定线纹理锚点(0~1之间)，默认值为中心点(0.5, 0.5)

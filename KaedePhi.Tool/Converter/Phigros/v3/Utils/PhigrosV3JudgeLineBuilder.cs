@@ -41,7 +41,7 @@ public class PhigrosV3JudgeLineBuilder
         var preprocessedSrc = src;
 
         if (
-            !string.Equals(preprocessedSrc.Texture, "line.png", StringComparison.Ordinal)
+            !string.Equals(preprocessedSrc.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal)
             || _options.LineFilter.RemoveTextureLine
             || preprocessedSrc.AttachUi.HasValue
             || _options.LineFilter.RemoveAttachUiLine
@@ -611,7 +611,7 @@ public class PhigrosV3JudgeLineBuilder
 
         if (!string.Equals(src.Name, "Untitled", StringComparison.Ordinal))
             Warn($"PhigrosV3 不支持 JudgeLine.Name（值='{src.Name}'）");
-        if (!string.Equals(src.Texture, "line.png", StringComparison.Ordinal))
+        if (!string.Equals(src.Texture, CoreConstants.DefaultTexture, StringComparison.Ordinal))
             Warn($"PhigrosV3 不支持 JudgeLine.Texture（值='{src.Texture}'），{textureRemoveHint}");
         if (!IsDefaultAnchor(src.Anchor))
             Warn($"PhigrosV3 不支持 JudgeLine.Anchor（值='[{string.Join(", ", src.Anchor)}]'）");
