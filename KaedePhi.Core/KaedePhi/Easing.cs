@@ -6,6 +6,11 @@
     public class Easing
     {
         /// <summary>
+        /// 线性缓动（编号1）。
+        /// </summary>
+        public static Easing Linear { get; } = new(1);
+
+        /// <summary>
         /// 创建指定编号的缓动类型。
         /// </summary>
         /// <param name="easingNumber">缓动编号</param>

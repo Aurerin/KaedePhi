@@ -1,14 +1,14 @@
-ï»¿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace KaedePhi.Core.KaedePhi.Controls
 {
     /// <summary>
-    /// ä¸é€æ˜åº¦æ§åˆ¶ç‚¹ã€‚
+    /// ²»Í¸Ã÷¶È¿ØÖÆµã¡£
     /// </summary>
     public class AlphaControl : ControlBase
     {
         /// <summary>
-        /// ä¸é€æ˜åº¦å€¼ã€‚
+        /// ²»Í¸Ã÷¶ÈÖµ¡£
         /// </summary>
         public float Alpha { get; set; } = 1.0f;
 
@@ -16,28 +16,28 @@ namespace KaedePhi.Core.KaedePhi.Controls
         {
             new AlphaControl
             {
-                Easing = new Easing(1),
+                Easing = Easing.Linear,
                 Alpha = 1.0f,
                 X = 0.0f,
             },
             new AlphaControl
             {
-                Easing = new Easing(1),
+                Easing = Easing.Linear,
                 Alpha = 1.0f,
                 X = 9999999.0f,
             },
         };
 
         /// <summary>
-        /// è·å–é»˜è®¤æ§åˆ¶ç‚¹åˆ—è¡¨ã€‚
+        /// »ñÈ¡Ä¬ÈÏ¿ØÖÆµãÁĞ±í¡£
         /// </summary>
         public static List<AlphaControl> Default =>
             DefaultInstance.ConvertAll(input => (AlphaControl)input.Clone());
 
         /// <summary>
-        /// æ·±æ‹·è´æ§åˆ¶ç‚¹ã€‚
+        /// Éî¿½±´¿ØÖÆµã¡£
         /// </summary>
-        /// <returns>æ§åˆ¶ç‚¹å‰¯æœ¬</returns>
+        /// <returns>¿ØÖÆµã¸±±¾</returns>
         public override ControlBase Clone()
         {
             return new AlphaControl

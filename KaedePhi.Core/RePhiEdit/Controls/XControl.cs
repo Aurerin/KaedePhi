@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.RePhiEdit.Controls
@@ -12,13 +12,13 @@ namespace KaedePhi.Core.RePhiEdit.Controls
         {
             new XControl
             {
-                Easing = new Easing(1),
+                Easing = Easing.Linear,
                 Pos = 1.0f,
                 X = 0.0f,
             },
             new XControl
             {
-                Easing = new Easing(1),
+                Easing = Easing.Linear,
                 Pos = 1.0f,
                 X = 9999999.0f,
             },
