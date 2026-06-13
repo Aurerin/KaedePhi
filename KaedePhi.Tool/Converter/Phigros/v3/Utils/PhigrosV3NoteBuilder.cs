@@ -1,4 +1,5 @@
 ﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Common;
 using KpcNote = KaedePhi.Core.KaedePhi.Note;
 using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;
 using PhigrosNote = KaedePhi.Core.Phigros.v3.Note;
@@ -11,9 +12,6 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 /// </summary>
 public static class PhigrosV3NoteBuilder
 {
-    private const float NotePositionXRatio = 0.1125f;
-    private const float FloatEpsilon = 1e-6f;
-    private const double SpeedValueRatio = 4.5d;
 
     public static (List<PhigrosNote> above, List<PhigrosNote> below) ConvertNotes(
         List<KpcNote>? notes,
@@ -70,7 +68,7 @@ public static class PhigrosV3NoteBuilder
         {
             Type = phigrosType,
             Time = time,
-            PositionX = (float)(src.PositionX / NotePositionXRatio),
+            PositionX = (float)(src.PositionX / Constants.NotePositionXRatio),
             HoldTime = holdTime,
             Speed = speed,
         };
@@ -86,14 +84,14 @@ public static class PhigrosV3NoteBuilder
             var ev in from ev in speedEvents
             let startBeat = (double)ev.StartBeat
             let endBeat = (double)ev.EndBeat
-            where beat >= startBeat - FloatEpsilon && beat < endBeat - FloatEpsilon
+            where beat >= startBeat - Constants.FloatEpsilon && beat < endBeat - Constants.FloatEpsilon
             select ev
         )
         {
-            return (float)(ev.GetValueAtBeat(beatObj) / SpeedValueRatio);
+            return (float)(ev.GetValueAtBeat(beatObj) / Constants.SpeedValueRatio);
         }
 
-        return (float)(speedEvents[^1].EndValue / SpeedValueRatio);
+        return (float)(speedEvents[^1].EndValue / Constants.SpeedValueRatio);
     }
 
     public static PhigrosNoteType ConvertNoteType(NoteType type) =>
@@ -110,11 +108,11 @@ public static class PhigrosV3NoteBuilder
     {
         if (src.Alpha != 255)
             Warn($"PhigrosV3 不支持 Note.Alpha（值={src.Alpha}）");
-        if (Math.Abs(src.JudgeArea - 1f) > FloatEpsilon)
+        if (Math.Abs(src.JudgeArea - 1f) > Constants.FloatEpsilon)
             Warn($"PhigrosV3 不支持 Note.JudgeArea（值={src.JudgeArea}）");
-        if (Math.Abs(src.VisibleTime - 999999f) > FloatEpsilon)
+        if (Math.Abs(src.VisibleTime - 999999f) > Constants.FloatEpsilon)
             Warn($"PhigrosV3 不支持 Note.VisibleTime（值={src.VisibleTime}）");
-        if (Math.Abs(src.YOffset) > FloatEpsilon)
+        if (Math.Abs(src.YOffset) > Constants.FloatEpsilon)
             Warn($"PhigrosV3 不支持 Note.YOffset（值={src.YOffset}）");
         if (!IsDefaultTint(src.Tint))
             Warn($"PhigrosV3 不支持 Note.Tint（值='[{string.Join(", ", src.Tint)}]'）");
@@ -124,7 +122,7 @@ public static class PhigrosV3NoteBuilder
             Warn($"PhigrosV3 不支持 Note.HitSound（值='{src.HitSound}'）");
         if (src.IsFake)
             Warn($"PhigrosV3 不支持 Note.IsFake（值={src.IsFake}）");
-        if (Math.Abs(src.WidthRatio - 1f) > FloatEpsilon)
+        if (Math.Abs(src.WidthRatio - 1f) > Constants.FloatEpsilon)
             Warn($"PhigrosV3 不支持 Note.WidthRatio（值={src.WidthRatio}）");
         return;
         void Warn(string message) => warnLogger?.Invoke(message);

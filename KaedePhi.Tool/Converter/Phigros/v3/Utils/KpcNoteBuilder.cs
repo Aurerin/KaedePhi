@@ -1,4 +1,5 @@
 ﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Common;
 using PhigrosNote = KaedePhi.Core.Phigros.v3.Note;
 using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;
 
@@ -9,7 +10,6 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 /// </summary>
 public static class NoteBuilder
 {
-    private const float NotePositionXRatio = 0.1125f;
     private const float NoteSegmentation = 32f;
 
     public static List<Kpc.Note> ConvertNotes(
@@ -39,7 +39,7 @@ public static class NoteBuilder
                     ? (src.Time + src.HoldTime) / NoteSegmentation
                     : src.Time / NoteSegmentation
             ),
-            PositionX = src.PositionX * NotePositionXRatio,
+            PositionX = src.PositionX * Constants.NotePositionXRatio,
             SpeedMultiplier = src.Type != PhigrosNoteType.Hold ? src.Speed : 1f,
             Type = ConvertNoteType(src.Type),
         };

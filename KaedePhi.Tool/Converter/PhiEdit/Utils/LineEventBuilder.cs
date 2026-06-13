@@ -1,4 +1,5 @@
 ﻿using KaedePhi.Core.Common;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Event.KaedePhi;
 using KaedePhi.Tool.Layer.KaedePhi;
@@ -12,7 +13,6 @@ namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 /// </summary>
 public class LineEventBuilder
 {
-    private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhiEditConvertOptions _options;
     private readonly Action<string>? _warnLogger;
     private readonly EventCutter<int> _eventCutterInt;
@@ -122,10 +122,10 @@ public class LineEventBuilder
             var startValue = ToSingle(ev.StartValue);
             var endValue = ToSingle(ev.EndValue);
 
-            var disconnected = Math.Abs(previousEndBeat - startBeat) > FloatEpsilon;
+            var disconnected = Math.Abs(previousEndBeat - startBeat) > Constants.FloatEpsilon;
             var changed =
                 float.IsNaN(previousEndValue)
-                || Math.Abs(previousEndValue - startValue) > FloatEpsilon;
+                || Math.Abs(previousEndValue - startValue) > Constants.FloatEpsilon;
             if (disconnected || changed)
             {
                 target.AlphaFrames.Add(new Pe.Frame { Beat = startBeat, Value = startValue });
@@ -202,7 +202,7 @@ public class LineEventBuilder
         {
             var start = boundaries[i];
             var end = boundaries[i + 1];
-            if (end - start <= FloatEpsilon)
+            if (end - start <= Constants.FloatEpsilon)
                 continue;
             ProcessMoveInterval(target, xEvents, yEvents, start, end, ref lastX, ref lastY);
         }
@@ -346,8 +346,8 @@ public class LineEventBuilder
 
     private static bool IsExactlyCovering(KpcEvents.Event<double>? ev, float start, float end) =>
         ev != null
-        && Math.Abs((double)ev.StartBeat - start) <= FloatEpsilon
-        && Math.Abs((double)ev.EndBeat - end) <= FloatEpsilon;
+        && Math.Abs((double)ev.StartBeat - start) <= Constants.FloatEpsilon
+        && Math.Abs((double)ev.EndBeat - end) <= Constants.FloatEpsilon;
 
     private void EmitCutMoveSegments(
         Pe.JudgeLine target,
@@ -375,7 +375,7 @@ public class LineEventBuilder
         {
             var segStart = subBoundaries[i];
             var segEnd = subBoundaries[i + 1];
-            if (segEnd - segStart <= FloatEpsilon)
+            if (segEnd - segStart <= Constants.FloatEpsilon)
                 continue;
 
             // CutEventsInRange 对每个原始事件独立按 cutLength 切割，cutX 与 cutY 的段边界不一定对齐。
@@ -448,17 +448,17 @@ public class LineEventBuilder
             var startValue = valueTransform(ToSingle(ev.StartValue));
             var endValue = valueTransform(ToSingle(ev.EndValue));
 
-            var disconnected = Math.Abs(previousEndBeat - startBeat) > FloatEpsilon;
+            var disconnected = Math.Abs(previousEndBeat - startBeat) > Constants.FloatEpsilon;
             var changed =
                 float.IsNaN(previousEndValue)
-                || Math.Abs(previousEndValue - startValue) > FloatEpsilon;
+                || Math.Abs(previousEndValue - startValue) > Constants.FloatEpsilon;
             if (disconnected || changed)
             {
                 targetFrames.Add(new Pe.Frame { Beat = startBeat, Value = startValue });
             }
 
             // 头尾值相同时，只需一个起始 Frame 即可表示，无需生成 Event
-            if (Math.Abs(startValue - endValue) <= FloatEpsilon)
+            if (Math.Abs(startValue - endValue) <= Constants.FloatEpsilon)
             {
                 // 已在上方添加过起始 Frame，此处无需额外操作
             }
@@ -520,8 +520,8 @@ public class LineEventBuilder
 
         // PE 不支持 EasingLeft/EasingRight 截取，需要切割成线性事件
         if (
-            Math.Abs(src.EasingLeft) > FloatEpsilon
-            || Math.Abs(src.EasingRight - 1f) > FloatEpsilon
+            Math.Abs(src.EasingLeft) > Constants.FloatEpsilon
+            || Math.Abs(src.EasingRight - 1f) > Constants.FloatEpsilon
         )
         {
             Warn(
@@ -571,14 +571,14 @@ public class LineEventBuilder
     )
     {
         var beatValue = (double)beat;
-        // 二分查找：找到最后一个 StartBeat <= beatValue + FloatEpsilon 的事件
+        // 二分查找：找到最后一个 StartBeat <= beatValue + Constants.FloatEpsilon 的事件
         var lo = 0;
         var hi = events.Count - 1;
         var candidate = -1;
         while (lo <= hi)
         {
             var mid = (lo + hi) >>> 1;
-            if (events[mid].StartBeat <= beatValue + FloatEpsilon)
+            if (events[mid].StartBeat <= beatValue + Constants.FloatEpsilon)
             {
                 candidate = mid;
                 lo = mid + 1;
@@ -591,7 +591,7 @@ public class LineEventBuilder
         if (candidate < 0)
             return null;
         var ev = events[candidate];
-        return beatValue < (double)ev.EndBeat - FloatEpsilon ? ev : null;
+        return beatValue < (double)ev.EndBeat - Constants.FloatEpsilon ? ev : null;
     }
 
     private int SafeConvertEasingToInt(KpcEasing easing, string context)
@@ -635,8 +635,8 @@ public class LineEventBuilder
             if (e.IsBezier)
                 Warn($"{channel}：Bezier 事件不受 PE 原生事件模型支持，事件将被自动转换为线性事件");
             if (
-                Math.Abs(e.EasingLeft) > FloatEpsilon
-                || Math.Abs(e.EasingRight - 1f) > FloatEpsilon
+                Math.Abs(e.EasingLeft) > Constants.FloatEpsilon
+                || Math.Abs(e.EasingRight - 1f) > Constants.FloatEpsilon
             )
                 Warn(
                     $"{channel}：PE 不支持 EasingLeft/EasingRight 裁剪，事件将被自动转换为线性事件"
