@@ -3,9 +3,11 @@
              xmlns:vm="using:KaedePhi.Tool.Gui.ViewModels"
              xmlns:loc="using:KaedePhi.Tool.Localization"
              x:Class="KaedePhi.Tool.Gui.Views.ImportPage"
-             x:DataType="vm:ImportViewModel">
+             x:DataType="vm:ImportViewModel"
+             DragDrop.AllowDrop="True"
+             Background="Transparent">
 
-    <Grid DragDrop.AllowDrop="True">
+    <Grid>
         <!-- 主内容（拖拽时模糊） -->
         <Grid Name="ContentGrid">
             <!-- Center import button -->
