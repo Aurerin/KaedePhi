@@ -4,22 +4,22 @@ namespace KaedePhi.Core.Utils
 {
     public static class Easings
     {
-        // Delegate for easing functions
+        // 缓动函数委托
         public delegate double EasingFunction(double t);
 
         private const double FloatEpsilon = 1e-7;
 
-        // Linear
+        // 线性
         public static double Linear(double t) => t;
 
-        // Quadratic
+        // 二次
         public static double EaseInQuad(double t) => t * t;
 
         public static double EaseOutQuad(double t) => t * (2 - t);
 
         public static double EaseInOutQuad(double t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
-        // Cubic
+        // 三次
         public static double EaseInCubic(double t) => t * t * t;
 
         public static double EaseOutCubic(double t)
@@ -31,7 +31,7 @@ namespace KaedePhi.Core.Utils
         public static double EaseInOutCubic(double t) =>
             t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
-        // Quartic
+        // 四次
         public static double EaseInQuart(double t) => t * t * t * t;
 
         public static double EaseOutQuart(double t)
@@ -43,7 +43,7 @@ namespace KaedePhi.Core.Utils
         public static double EaseInOutQuart(double t) =>
             t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
 
-        // Quintic
+        // 五次
         public static double EaseInQuint(double t) => t * t * t * t * t;
 
         public static double EaseOutQuint(double t)
@@ -55,14 +55,14 @@ namespace KaedePhi.Core.Utils
         public static double EaseInOutQuint(double t) =>
             t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
 
-        // Sine
+        // 正弦
         public static double EaseInSine(double t) => 1 - Math.Cos(t * Math.PI / 2);
 
         public static double EaseOutSine(double t) => Math.Sin(t * Math.PI / 2);
 
         public static double EaseInOutSine(double t) => -0.5f * (Math.Cos(Math.PI * t) - 1);
 
-        // Exponential
+        // 指数
         public static double EaseInExpo(double t) =>
             Math.Abs(t) < FloatEpsilon ? 0 : Math.Pow(2, 10 * (t - 1));
 
@@ -78,7 +78,7 @@ namespace KaedePhi.Core.Utils
                 : 1 - 0.5f * Math.Pow(2, -20 * t + 10);
         }
 
-        // Circular
+        // 圆形
         public static double EaseInCirc(double t) => 1 - Math.Sqrt(1 - t * t);
 
         public static double EaseOutCirc(double t) => Math.Sqrt(1 - (--t) * t);
@@ -88,7 +88,7 @@ namespace KaedePhi.Core.Utils
                 ? 0.5f * (1 - Math.Sqrt(1 - 4 * t * t))
                 : 0.5f * (Math.Sqrt(1 - 4 * (--t) * t) + 1);
 
-        // Back
+        // 回弹
         public static double EaseInBack(double t)
         {
             const double s = 1.70158d;
@@ -112,7 +112,7 @@ namespace KaedePhi.Core.Utils
             return 0.5f * (t * t * ((s + 1) * t + s) + 2);
         }
 
-        // Elastic
+        // 弹性
         public static double EaseInElastic(double t)
         {
             if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
@@ -138,7 +138,7 @@ namespace KaedePhi.Core.Utils
             return Math.Pow(2, -10 * t) * Math.Sin((t - 0.1f) * 5 * Math.PI) * 0.5f + 1;
         }
 
-        // Bounce
+        // 弹跳
         public static double EaseInBounce(double t) => 1 - EaseOutBounce(1 - t);
 
         public static double EaseOutBounce(double t)

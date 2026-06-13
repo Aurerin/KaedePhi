@@ -12,7 +12,9 @@ public static class EasingConverter
     /// KPC 缓动在 PhiChain 中无对应项时抛出，用于触发切段拟合。
     /// </summary>
     public sealed class EasingNotSupportedException(PhiChainEasingKind easingKind)
-        : Exception($"PhiChain easing {easingKind} is unsupported in KPC and requires linear slicing")
+        : Exception(
+            $"PhiChain easing {easingKind} is unsupported in KPC and requires linear slicing"
+        )
     {
         public PhiChainEasingKind EasingKind { get; } = easingKind;
     }
@@ -58,8 +60,12 @@ public static class EasingConverter
             PhiChainEasingKind.EaseOutBounce => 30,
             PhiChainEasingKind.EaseInOutBounce => 31,
             // Steps 和自定义 Elastic 不支持，需要切段处理
-            PhiChainEasingKind.Steps => throw new EasingNotSupportedException(PhiChainEasingKind.Steps),
-            PhiChainEasingKind.Elastic => throw new EasingNotSupportedException(PhiChainEasingKind.Elastic),
+            PhiChainEasingKind.Steps => throw new EasingNotSupportedException(
+                PhiChainEasingKind.Steps
+            ),
+            PhiChainEasingKind.Elastic => throw new EasingNotSupportedException(
+                PhiChainEasingKind.Elastic
+            ),
             // Custom 贝塞尔曲线由调用方处理
             PhiChainEasingKind.Custom => 1,
             _ => 1,

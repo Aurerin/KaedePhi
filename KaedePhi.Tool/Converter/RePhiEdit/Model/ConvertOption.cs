@@ -1,11 +1,13 @@
-﻿namespace KaedePhi.Tool.Converter.RePhiEdit.Model;
+﻿using KaedePhi.Tool.Common;
+
+namespace KaedePhi.Tool.Converter.RePhiEdit.Model;
 
 public class ConvertOption
 {
     /// <summary>
     /// 默认缓动切割精度
     /// </summary>
-    public const int DefaultPrecision = 64;
+    public const int DefaultPrecision = Constants.DefaultPrecision;
     public CuttingOptions Cutting { get; set; } = new();
 
     public class CuttingOptions

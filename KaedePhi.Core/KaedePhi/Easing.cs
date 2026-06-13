@@ -6,6 +6,11 @@
     public class Easing
     {
         /// <summary>
+        /// 线性缓动（编号1）。
+        /// </summary>
+        public static Easing Linear { get; } = new(1);
+
+        /// <summary>
         /// 创建指定编号的缓动类型。
         /// </summary>
         /// <param name="easingNumber">缓动编号</param>
@@ -71,47 +76,47 @@
             return _easingNumber switch
             {
                 1 => "Linear",
-                // Sine
+                // 正弦
                 2 => "EaseInSine",
                 3 => "EaseOutSine",
                 4 => "EaseInOutSine",
-                // Quad
+                // 二次
                 5 => "EaseInQuad",
                 6 => "EaseOutQuad",
                 7 => "EaseInOutQuad",
-                // Cubic
+                // 三次
                 8 => "EaseInCubic",
                 9 => "EaseOutCubic",
                 10 => "EaseInOutCubic",
-                // Quart
+                // 四次
                 11 => "EaseInQuart",
                 12 => "EaseOutQuart",
                 13 => "EaseInOutQuart",
-                // Quint
+                // 五次
                 14 => "EaseInQuint",
                 15 => "EaseOutQuint",
                 16 => "EaseInOutQuint",
-                // Expo
+                // 指数
                 17 => "EaseInExpo",
                 18 => "EaseOutExpo",
                 19 => "EaseInOutExpo",
-                // Circ
+                // 圆形
                 20 => "EaseInCirc",
                 21 => "EaseOutCirc",
                 22 => "EaseInOutCirc",
-                // Back
+                // 回弹
                 23 => "EaseInBack",
                 24 => "EaseOutBack",
                 25 => "EaseInOutBack",
-                // Elastic
+                // 弹性
                 26 => "EaseInElastic",
                 27 => "EaseOutElastic",
                 28 => "EaseInOutElastic",
-                // Bounce
+                // 弹跳
                 29 => "EaseInBounce",
                 30 => "EaseOutBounce",
                 31 => "EaseInOutBounce",
-                // Fallback
+                // 兜底
                 _ => $"Unknown({_easingNumber})",
             };
         }

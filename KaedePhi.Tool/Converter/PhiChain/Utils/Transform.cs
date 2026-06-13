@@ -22,20 +22,24 @@ public static class Transform
     /// <summary>
     /// 将 PhiChain 角度转换为 KPC 角度。
     /// </summary>
-    public static double TransformToKpcAngle(float angle) => CoordinateGeometry.ToKpcAngle(angle, PhiChainProfile);
+    public static double TransformToKpcAngle(float angle) =>
+        CoordinateGeometry.ToKpcAngle(angle, PhiChainProfile);
 
     /// <summary>
     /// 将 KPC X 坐标转换为 PhiChain X 坐标。
     /// </summary>
-    public static float TransformToPhiChainX(double x) => CoordinateGeometry.ToTargetXf(x, PhiChainProfile);
+    public static float TransformToPhiChainX(double x) =>
+        CoordinateGeometry.ToTargetXf(x, PhiChainProfile);
 
     /// <summary>
     /// 将 KPC Y 坐标转换为 PhiChain Y 坐标。
     /// </summary>
-    public static float TransformToPhiChainY(double y) => CoordinateGeometry.ToTargetYf(y, PhiChainProfile);
+    public static float TransformToPhiChainY(double y) =>
+        CoordinateGeometry.ToTargetYf(y, PhiChainProfile);
 
     /// <summary>
     /// 将 KPC 角度转换为 PhiChain 角度。
     /// </summary>
-    public static double TransformToPhiChainAngle(double angle) => CoordinateGeometry.ToTargetAngle(angle, PhiChainProfile);
+    public static double TransformToPhiChainAngle(double angle) =>
+        CoordinateGeometry.ToTargetAngle(angle, PhiChainProfile);
 }

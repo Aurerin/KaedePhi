@@ -100,18 +100,33 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
 
     /// <summary>
-    /// 判断两个事件列表是否存在时间重叠。
+    /// 判断两个已排序事件列表是否存在时间重叠。
+    /// 使用双指针法，O(n+m) 复杂度。
     /// </summary>
-    /// <param name="toEvents">目标事件列表。</param>
-    /// <param name="fromEvents">来源事件列表。</param>
+    /// <param name="toEvents">目标事件列表（需按 StartBeat 排序）。</param>
+    /// <param name="fromEvents">来源事件列表（需按 StartBeat 排序）。</param>
     /// <returns>存在任意重叠区间时返回 <see langword="true"/>。</returns>
     protected static bool HasOverlap(
         List<KpcEvents.Event<TPayload>> toEvents,
         List<KpcEvents.Event<TPayload>> fromEvents
-    ) =>
-        fromEvents.Any(fe =>
-            toEvents.Any(te => fe.StartBeat < te.EndBeat && fe.EndBeat > te.StartBeat)
-        );
+    )
+    {
+        var ti = 0;
+        var fi = 0;
+        while (ti < toEvents.Count && fi < fromEvents.Count)
+        {
+            var te = toEvents[ti];
+            var fe = fromEvents[fi];
+            if (te.StartBeat < fe.EndBeat && fe.StartBeat < te.EndBeat)
+                return true;
+            if (te.EndBeat <= fe.StartBeat)
+                ti++;
+            else
+                fi++;
+        }
+
+        return false;
+    }
 
     #endregion
 
@@ -174,6 +189,7 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
 
     /// <summary>
     /// 构建两组事件的重叠区间，并将可连接区间归并。
+    /// 使用 HashSet 去重，避免 O(n) 线性查找。
     /// </summary>
     /// <param name="toEvents">目标事件列表。</param>
     /// <param name="fromEvents">来源事件列表。</param>
@@ -184,13 +200,15 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     )
     {
         var overlapIntervals = new List<(Beat Start, Beat End)>();
+        var seen = new HashSet<(double Start, double End)>();
         foreach (var fe in fromEvents)
         {
             foreach (var te in toEvents)
             {
                 if (!TryGetOverlapBounds(fe, te, out var start, out var end))
                     continue;
-                if (overlapIntervals.Any(iv => iv.Start == start && iv.End == end))
+                var key = ((double)start, (double)end);
+                if (!seen.Add(key))
                     continue;
                 AddOrMergeOverlapInterval(overlapIntervals, start, end);
             }
@@ -283,7 +301,8 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     /// </summary>
     /// <param name="overlapIntervals">待排序区间集合。</param>
     private static void SortIntervals(List<(Beat Start, Beat End)> overlapIntervals) =>
-        overlapIntervals.Sort((a, b) => a.Start != b.Start ? a.Start.CompareTo(b.Start) : a.End.CompareTo(b.End)
+        overlapIntervals.Sort(
+            (a, b) => a.Start != b.Start ? a.Start.CompareTo(b.Start) : a.End.CompareTo(b.End)
         );
 
     #endregion
@@ -498,12 +517,12 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     private static (
         List<KpcEvents.Event<TPayload>> CutTo,
         List<KpcEvents.Event<TPayload>> CutFrom
-        ) CutAndRemoveOverlapEvents(
-            List<KpcEvents.Event<TPayload>> toEventsCopy,
-            List<KpcEvents.Event<TPayload>> fromEventsCopy,
-            List<(Beat Start, Beat End)> overlapIntervals,
-            Beat cutLength
-        )
+    ) CutAndRemoveOverlapEvents(
+        List<KpcEvents.Event<TPayload>> toEventsCopy,
+        List<KpcEvents.Event<TPayload>> fromEventsCopy,
+        List<(Beat Start, Beat End)> overlapIntervals,
+        Beat cutLength
+    )
     {
         var cutTo = new List<KpcEvents.Event<TPayload>>();
         var cutFrom = new List<KpcEvents.Event<TPayload>>();
@@ -581,6 +600,14 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         TPayload? formLastEndValue
     )
     {
+        // 预索引：O(n) 构建，后续 O(1) 查找
+        var toIndex = new Dictionary<(double, double), KpcEvents.Event<TPayload>>();
+        foreach (var e in cutTo)
+            toIndex.TryAdd(((double)e.StartBeat, (double)e.EndBeat), e);
+        var fromIndex = new Dictionary<(double, double), KpcEvents.Event<TPayload>>();
+        foreach (var e in cutFrom)
+            fromIndex.TryAdd(((double)e.StartBeat, (double)e.EndBeat), e);
+
         var merged = new List<KpcEvents.Event<TPayload>>();
         var currentBeat = start;
         while (currentBeat < end)
@@ -588,12 +615,9 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
             var nextBeat = currentBeat + cutLength;
             if (nextBeat > end)
                 nextBeat = end;
-            var toEvent = cutTo.FirstOrDefault(e =>
-                e.StartBeat == currentBeat && e.EndBeat == nextBeat
-            );
-            var formEvent = cutFrom.FirstOrDefault(e =>
-                e.StartBeat == currentBeat && e.EndBeat == nextBeat
-            );
+            var key = ((double)currentBeat, (double)nextBeat);
+            toIndex.TryGetValue(key, out var toEvent);
+            fromIndex.TryGetValue(key, out var formEvent);
 
             var toStart = toEvent is not null ? toEvent.StartValue : toLastEndValue;
             var formStart = formEvent is not null ? formEvent.StartValue : formLastEndValue;

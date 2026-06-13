@@ -7,7 +7,7 @@ namespace KaedePhi.Tool.Common;
 /// </summary>
 public static class ControlDefaultChecker
 {
-    private const float FloatEpsilon = 1e-6f;
+    // 使用 Constants.FloatEpsilon
 
     /// <summary>
     /// 检查 Control 列表是否与默认值完全一致。
@@ -70,7 +70,7 @@ public static class ControlDefaultChecker
         // 比较基类属性
         if ((int)a.Easing != (int)b.Easing)
             return false;
-        if (Math.Abs(a.X - b.X) > FloatEpsilon)
+        if (Math.Abs(a.X - b.X) > Constants.FloatEpsilon)
             return false;
 
         // 比较派生类特定属性
@@ -94,35 +94,35 @@ public static class ControlDefaultChecker
         {
             var xa = (KpcControls.XControl)(object)a;
             var xb = (KpcControls.XControl)(object)b;
-            return Math.Abs(xa.Pos - xb.Pos) <= FloatEpsilon;
+            return Math.Abs(xa.Pos - xb.Pos) <= Constants.FloatEpsilon;
         }
 
         if (type == typeof(KpcControls.AlphaControl))
         {
             var aa = (KpcControls.AlphaControl)(object)a;
             var ab = (KpcControls.AlphaControl)(object)b;
-            return Math.Abs(aa.Alpha - ab.Alpha) <= FloatEpsilon;
+            return Math.Abs(aa.Alpha - ab.Alpha) <= Constants.FloatEpsilon;
         }
 
         if (type == typeof(KpcControls.SizeControl))
         {
             var sa = (KpcControls.SizeControl)(object)a;
             var sb = (KpcControls.SizeControl)(object)b;
-            return Math.Abs(sa.Size - sb.Size) <= FloatEpsilon;
+            return Math.Abs(sa.Size - sb.Size) <= Constants.FloatEpsilon;
         }
 
         if (type == typeof(KpcControls.SkewControl))
         {
             var ska = (KpcControls.SkewControl)(object)a;
             var skb = (KpcControls.SkewControl)(object)b;
-            return Math.Abs(ska.Skew - skb.Skew) <= FloatEpsilon;
+            return Math.Abs(ska.Skew - skb.Skew) <= Constants.FloatEpsilon;
         }
 
         if (type == typeof(KpcControls.YControl))
         {
             var ya = (KpcControls.YControl)(object)a;
             var yb = (KpcControls.YControl)(object)b;
-            return Math.Abs(ya.Y - yb.Y) <= FloatEpsilon;
+            return Math.Abs(ya.Y - yb.Y) <= Constants.FloatEpsilon;
         }
 
         // 对于未知类型，使用反射比较所有属性
@@ -153,14 +153,14 @@ public static class ControlDefaultChecker
             {
                 var floatA = (float)(valueA ?? 0f);
                 var floatB = (float)(valueB ?? 0f);
-                if (Math.Abs(floatA - floatB) > FloatEpsilon)
+                if (Math.Abs(floatA - floatB) > Constants.FloatEpsilon)
                     return false;
             }
             else if (prop.PropertyType == typeof(double))
             {
                 var doubleA = (double)(valueA ?? 0d);
                 var doubleB = (double)(valueB ?? 0d);
-                if (Math.Abs(doubleA - doubleB) > FloatEpsilon)
+                if (Math.Abs(doubleA - doubleB) > Constants.FloatEpsilon)
                     return false;
             }
             else if (prop.PropertyType == typeof(int))
@@ -184,7 +184,10 @@ public static class ControlDefaultChecker
                 if (strA != strB)
                     return false;
             }
-            else if ((prop.PropertyType.IsEnum || prop.PropertyType.IsClass) && !Equals(valueA, valueB)) return false;
+            else if (
+                (prop.PropertyType.IsEnum || prop.PropertyType.IsClass) && !Equals(valueA, valueB)
+            )
+                return false;
         }
 
         return true;

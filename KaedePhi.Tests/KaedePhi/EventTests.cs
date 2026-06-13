@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.KaedePhi;
 using KpcEvents = KaedePhi.Core.KaedePhi.Events;
 
@@ -17,7 +17,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1), // Linear
+            Easing = Easing.Linear, // Linear
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 0, 0, 1 }));
@@ -34,7 +34,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1), // Linear
+            Easing = Easing.Linear, // Linear
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 1, 0, 1 }));
@@ -51,7 +51,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0.0,
             EndValue = 100.0,
-            Easing = new Easing(1), // Linear
+            Easing = Easing.Linear, // Linear
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 1, 0, 1 }));
@@ -68,7 +68,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1),
+            Easing = Easing.Linear,
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 0, 0, 1 }));
@@ -85,7 +85,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1),
+            Easing = Easing.Linear,
         };
 
         var result = evt.GetValueAtBeat(new Beat(new[] { 2, 0, 1 }));
@@ -105,7 +105,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = startVal,
             EndValue = 200.0f,
-            Easing = new Easing(1),
+            Easing = Easing.Linear,
         };
 
         // At StartBeat (t=0), returns StartValue
@@ -123,7 +123,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0,
             EndValue = 100,
-            Easing = new Easing(1),
+            Easing = Easing.Linear,
         };
 
         // At beat 1 (middle of [0,2]), should return 50
@@ -145,7 +145,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0.0f,
             EndValue = 100.0f,
-            Easing = new Easing(1),
+            Easing = Easing.Linear,
         };
 
         // At beat 1 (middle of [0,2]), should return 50
@@ -223,7 +223,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 1, 0, 1 }),
             StartValue = 10.0,
             EndValue = 20.0,
-            Easing = new Easing(1),
+            Easing = Easing.Linear,
             EasingLeft = 0.1f,
             EasingRight = 0.9f,
             IsBezier = false,
@@ -358,7 +358,7 @@ public class EventTests
             EndBeat = new Beat(new[] { 2, 0, 1 }),
             StartValue = 0.0,
             EndValue = 100.0,
-            Easing = new Easing(1), // Linear
+            Easing = Easing.Linear, // Linear
             EasingLeft = 0.2f,
             EasingRight = 0.8f,
         };

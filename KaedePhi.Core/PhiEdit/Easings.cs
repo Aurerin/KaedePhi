@@ -43,14 +43,14 @@ namespace KaedePhi.Core.PhiEdit
                 _ => Linear,
             };
 
-        // Method to evaluate easing between any start and end point
+        // 在任意起点和终点之间评估缓动
         [PublicAPI]
         public static double Evaluate(EasingFunction function, double t)
         {
             return function(t);
         }
 
-        // Overload, using int to specify the corresponding EasingFunction
+        // 使用 int 指定对应的缓动函数
         public static double Evaluate(int easingType, double t)
         {
             return Evaluate(GetFunction(easingType), t);

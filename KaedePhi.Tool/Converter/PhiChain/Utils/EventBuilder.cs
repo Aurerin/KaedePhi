@@ -15,6 +15,7 @@ public static class EventBuilder
     private static readonly EventCutter<double> DoubleCutter = new();
     private static readonly EventCutter<int> IntCutter = new();
     private static readonly EventCutter<float> FloatCutter = new();
+
     /// <summary>
     /// 将 PhiChain 事件列表转换为 KPC 事件层。
     /// </summary>
@@ -30,15 +31,21 @@ public static class EventBuilder
             {
                 case PhichainEventType.X:
                     layer.MoveXEvents ??= new List<KpcEvents.Event<double>>();
-                    layer.MoveXEvents.Add(ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcX));
+                    layer.MoveXEvents.Add(
+                        ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcX)
+                    );
                     break;
                 case PhichainEventType.Y:
                     layer.MoveYEvents ??= new List<KpcEvents.Event<double>>();
-                    layer.MoveYEvents.Add(ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcY));
+                    layer.MoveYEvents.Add(
+                        ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcY)
+                    );
                     break;
                 case PhichainEventType.Rotation:
                     layer.RotateEvents ??= new List<KpcEvents.Event<double>>();
-                    layer.RotateEvents.Add(ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcAngle));
+                    layer.RotateEvents.Add(
+                        ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcAngle)
+                    );
                     break;
                 case PhichainEventType.Opacity:
                     layer.AlphaEvents ??= new List<KpcEvents.Event<int>>();
@@ -70,26 +77,54 @@ public static class EventBuilder
     /// <param name="layer">KPC 事件层</param>
     /// <param name="options">转换选项</param>
     /// <returns>PhiChain 事件列表</returns>
-    public static List<LineEvent> ConvertEventLayer(KpcEvents.EventLayer layer, KpcToPhiChainConvertOptions options)
+    public static List<LineEvent> ConvertEventLayer(
+        KpcEvents.EventLayer layer,
+        KpcToPhiChainConvertOptions options
+    )
     {
         if (options.EasingCutPrecision <= 0)
             throw new ArgumentOutOfRangeException(nameof(options), "EasingCutPrecision必须大于0。");
 
         var events = new List<LineEvent>();
         if (layer.MoveXEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.MoveXEvents, PhichainEventType.X, Transform.TransformToPhiChainX, options));
+            events.AddRange(
+                ConvertEventsWithTransform(
+                    layer.MoveXEvents,
+                    PhichainEventType.X,
+                    Transform.TransformToPhiChainX,
+                    options
+                )
+            );
 
         if (layer.MoveYEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.MoveYEvents, PhichainEventType.Y, Transform.TransformToPhiChainY, options));
+            events.AddRange(
+                ConvertEventsWithTransform(
+                    layer.MoveYEvents,
+                    PhichainEventType.Y,
+                    Transform.TransformToPhiChainY,
+                    options
+                )
+            );
 
         if (layer.RotateEvents != null)
-            events.AddRange(ConvertEventsWithTransform(layer.RotateEvents, PhichainEventType.Rotation, v => (float)Transform.TransformToPhiChainAngle(v), options));
+            events.AddRange(
+                ConvertEventsWithTransform(
+                    layer.RotateEvents,
+                    PhichainEventType.Rotation,
+                    v => (float)Transform.TransformToPhiChainAngle(v),
+                    options
+                )
+            );
 
         if (layer.AlphaEvents != null)
-            events.AddRange(ConvertIntEventsWithCutting(layer.AlphaEvents, PhichainEventType.Opacity, options));
+            events.AddRange(
+                ConvertIntEventsWithCutting(layer.AlphaEvents, PhichainEventType.Opacity, options)
+            );
 
         if (layer.SpeedEvents != null)
-            events.AddRange(ConvertFloatEventsWithCutting(layer.SpeedEvents, PhichainEventType.Speed, options));
+            events.AddRange(
+                ConvertFloatEventsWithCutting(layer.SpeedEvents, PhichainEventType.Speed, options)
+            );
 
         return events;
     }
@@ -97,15 +132,25 @@ public static class EventBuilder
     /// <summary>
     /// 转换 double 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertEventsWithTransform(List<KpcEvents.Event<double>> events, PhichainEventType eventType, Func<double, float> transform, KpcToPhiChainConvertOptions options)
+    private static List<LineEvent> ConvertEventsWithTransform(
+        List<KpcEvents.Event<double>> events,
+        PhichainEventType eventType,
+        Func<double, float> transform,
+        KpcToPhiChainConvertOptions options
+    )
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
         {
             if (NeedsCutting(evt))
             {
-                var cutEvents = DoubleCutter.CutEventToLinear(evt, 1.0 / options.EasingCutPrecision);
-                result.AddRange(cutEvents.Select(e => ConvertEventWithTransform(e, eventType, transform)));
+                var cutEvents = DoubleCutter.CutEventToLinear(
+                    evt,
+                    1.0 / options.EasingCutPrecision
+                );
+                result.AddRange(
+                    cutEvents.Select(e => ConvertEventWithTransform(e, eventType, transform))
+                );
             }
             else
             {
@@ -118,7 +163,11 @@ public static class EventBuilder
     /// <summary>
     /// 转换 int 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertIntEventsWithCutting(List<KpcEvents.Event<int>> events, PhichainEventType eventType, KpcToPhiChainConvertOptions options)
+    private static List<LineEvent> ConvertIntEventsWithCutting(
+        List<KpcEvents.Event<int>> events,
+        PhichainEventType eventType,
+        KpcToPhiChainConvertOptions options
+    )
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
@@ -139,7 +188,11 @@ public static class EventBuilder
     /// <summary>
     /// 转换 float 事件列表，对使用缓动截取的事件进行切割。
     /// </summary>
-    private static List<LineEvent> ConvertFloatEventsWithCutting(List<KpcEvents.Event<float>> events, PhichainEventType eventType, KpcToPhiChainConvertOptions options)
+    private static List<LineEvent> ConvertFloatEventsWithCutting(
+        List<KpcEvents.Event<float>> events,
+        PhichainEventType eventType,
+        KpcToPhiChainConvertOptions options
+    )
     {
         var result = new List<LineEvent>();
         foreach (var evt in events)
@@ -168,7 +221,10 @@ public static class EventBuilder
     /// <summary>
     /// 将 PhiChain 事件转换为 KPC double 事件，带坐标变换。
     /// </summary>
-    private static KpcEvents.Event<double> ConvertEventToDoubleWithTransform(LineEvent src, Func<float, double> transform)
+    private static KpcEvents.Event<double> ConvertEventToDoubleWithTransform(
+        LineEvent src,
+        Func<float, double> transform
+    )
     {
         var kpcEvent = new KpcEvents.Event<double>
         {
@@ -189,7 +245,7 @@ public static class EventBuilder
                     src.Value.Easing.X1,
                     src.Value.Easing.Y1,
                     src.Value.Easing.X2,
-                    src.Value.Easing.Y2
+                    src.Value.Easing.Y2,
                 ];
             }
             else
@@ -231,7 +287,7 @@ public static class EventBuilder
                     src.Value.Easing.X1,
                     src.Value.Easing.Y1,
                     src.Value.Easing.X2,
-                    src.Value.Easing.Y2
+                    src.Value.Easing.Y2,
                 ];
             }
             else
@@ -272,7 +328,7 @@ public static class EventBuilder
                     src.Value.Easing.X1,
                     src.Value.Easing.Y1,
                     src.Value.Easing.X2,
-                    src.Value.Easing.Y2
+                    src.Value.Easing.Y2,
                 ];
             }
             else
@@ -292,7 +348,11 @@ public static class EventBuilder
     /// <summary>
     /// 将 KPC double 事件转换为 PhiChain 事件，带坐标变换。
     /// </summary>
-    private static LineEvent ConvertEventWithTransform(KpcEvents.Event<double> src, PhichainEventType eventType, Func<double, float> transform)
+    private static LineEvent ConvertEventWithTransform(
+        KpcEvents.Event<double> src,
+        PhichainEventType eventType,
+        Func<double, float> transform
+    )
     {
         var lineEvent = new LineEvent
         {
@@ -464,13 +524,15 @@ public static class EventBuilder
             var segStartBeat = new Beat(startBeatVal + t1 * totalBeats);
             var segEndBeat = new Beat(startBeatVal + t2 * totalBeats);
 
-            events.Add(new LineEvent
-            {
-                Type = src.Type,
-                StartBeat = segStartBeat,
-                EndBeat = segEndBeat,
-                Value = LineEventValue.Transition(value1, value2, Easing.Linear),
-            });
+            events.Add(
+                new LineEvent
+                {
+                    Type = src.Type,
+                    StartBeat = segStartBeat,
+                    EndBeat = segEndBeat,
+                    Value = LineEventValue.Transition(value1, value2, Easing.Linear),
+                }
+            );
         }
 
         return events;
@@ -484,9 +546,7 @@ public static class EventBuilder
         return easing.EasingType switch
         {
             EasingKind.Linear => t,
-            EasingKind.Steps => easing.Count > 0
-                ? Math.Round(t * easing.Count) / easing.Count
-                : t,
+            EasingKind.Steps => easing.Count > 0 ? Math.Round(t * easing.Count) / easing.Count : t,
             EasingKind.Elastic => ApplyElasticCurve(t, easing.Omega),
             EasingKind.Custom => ApplyBezierCurve(t, easing.X1, easing.Y1, easing.X2, easing.Y2),
             _ => ApplyStandardEasingCurve(t, easing),
@@ -495,8 +555,10 @@ public static class EventBuilder
 
     private static double ApplyElasticCurve(double t, float omega)
     {
-        if (omega == 0) return t;
-        return 1.0 - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omega * t) / omega + Math.Cos(omega * t));
+        if (Math.Abs(omega) <= Common.Constants.FloatEpsilon)
+            return t;
+        return 1.0
+            - Math.Pow(1.0 - t, 2) * (2.0 * Math.Sin(omega * t) / omega + Math.Cos(omega * t));
     }
 
     private static double ApplyBezierCurve(double t, float x1, float y1, float x2, float y2)
@@ -513,7 +575,8 @@ public static class EventBuilder
         {
             var currentX = ((ax * guess + bx) * guess + cx) * guess;
             var currentSlope = (3.0 * ax * guess + 2.0 * bx) * guess + cx;
-            if (Math.Abs(currentSlope) < 1e-7) break;
+            if (Math.Abs(currentSlope) < 1e-7)
+                break;
             guess -= (currentX - t) / currentSlope;
         }
 
