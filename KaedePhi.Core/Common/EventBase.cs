@@ -165,7 +165,7 @@ namespace KaedePhi.Core.Common
         protected static TValue DeepClone<TValue>(TValue value)
         {
             if (value is null)
-                throw new InvalidOperationException("Value cannot be null for cloning.");
+                throw new InvalidOperationException("克隆时值不能为 null。");
 
             var type = typeof(TValue);
 
@@ -219,12 +219,12 @@ namespace KaedePhi.Core.Common
                 target.StartValue = StartValue is not null
                     ? Cast<byte[], T>(Cast<T, byte[]>(StartValue).ToArray())
                     : throw new InvalidOperationException(
-                        "StartValue cannot be null for byte[] cloning."
+                        "byte[] 克隆时 StartValue 不能为 null。"
                     );
                 target.EndValue = EndValue is not null
                     ? Cast<byte[], T>(Cast<T, byte[]>(EndValue).ToArray())
                     : throw new InvalidOperationException(
-                        "EndValue cannot be null for byte[] cloning."
+                        "byte[] 克隆时 EndValue 不能为 null。"
                     );
             }
             else
