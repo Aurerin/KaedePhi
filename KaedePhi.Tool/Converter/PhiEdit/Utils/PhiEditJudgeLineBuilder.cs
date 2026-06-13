@@ -11,7 +11,6 @@ namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 /// </summary>
 public class PhiEditJudgeLineBuilder
 {
-    private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhiEditConvertOptions _options;
     private readonly LineEventBuilder _eventBuilder;
     private readonly Action<string>? _warnLogger;
@@ -100,7 +99,7 @@ public class PhiEditJudgeLineBuilder
             );
         if (src.IsGif)
             Warn($"PE 不支持 JudgeLine.IsGif（值={src.IsGif}）");
-        if (Math.Abs(src.BpmFactor - 1f) > FloatEpsilon)
+        if (Math.Abs(src.BpmFactor - 1f) > Constants.FloatEpsilon)
             Warn($"PE 不支持 JudgeLine.BpmFactor（值={src.BpmFactor}）");
 
         WarnIfUnsupportedControlFields(src);
@@ -138,8 +137,8 @@ public class PhiEditJudgeLineBuilder
 
     private static bool IsDefaultAnchor(float[]? anchor) =>
         anchor is { Length: 2 }
-        && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
-        && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
+        && Math.Abs(anchor[0] - 0.5f) <= Constants.FloatEpsilon
+        && Math.Abs(anchor[1] - 0.5f) <= Constants.FloatEpsilon;
 
     private void Warn(string message) => _warnLogger?.Invoke(message);
 }

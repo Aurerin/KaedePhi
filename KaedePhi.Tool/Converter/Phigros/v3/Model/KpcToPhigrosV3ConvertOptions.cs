@@ -4,8 +4,8 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Model;
 
 public class KpcToPhigrosV3ConvertOptions
 {
-    public const double DefaultPrecision = 64d;
-    public const double DefaultTolerancePercent = 0.1d;
+    public const double DefaultPrecision = Constants.DefaultPrecision;
+    public const double DefaultTolerancePercent = Constants.DefaultTolerancePercent;
     public const float DefaultGlobalBpm = 120f;
 
     /// <summary>

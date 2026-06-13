@@ -15,7 +15,6 @@ namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 /// </summary>
 public class PhigrosV3JudgeLineBuilder
 {
-    private const float FloatEpsilon = 1e-6f;
     private readonly KpcToPhigrosV3ConvertOptions _options;
     private readonly PhigrosV3EventBuilder _phigrosV3EventBuilder;
     private readonly float _globalBpm;
@@ -318,7 +317,7 @@ public class PhigrosV3JudgeLineBuilder
     private double ComputeElevationKpcY(double angleDegrees)
     {
         var step = _options.NegativeAlpha.ElevationStep;
-        if (Math.Abs(angleDegrees) < FloatEpsilon)
+        if (Math.Abs(angleDegrees) < Constants.FloatEpsilon)
             return step;
 
         // 有旋转时，抬高方向在判定线局部坐标系的 +Y 方向；
@@ -666,8 +665,8 @@ public class PhigrosV3JudgeLineBuilder
 
     private static bool IsDefaultAnchor(float[]? anchor) =>
         anchor is { Length: 2 }
-        && Math.Abs(anchor[0] - 0.5f) <= FloatEpsilon
-        && Math.Abs(anchor[1] - 0.5f) <= FloatEpsilon;
+        && Math.Abs(anchor[0] - 0.5f) <= Constants.FloatEpsilon
+        && Math.Abs(anchor[1] - 0.5f) <= Constants.FloatEpsilon;
 
     private void Warn(string message) => _warnLogger?.Invoke(message);
 }
