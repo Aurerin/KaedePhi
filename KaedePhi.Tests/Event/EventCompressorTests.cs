@@ -164,14 +164,11 @@ public class EventCompressorTests
         };
 
         var progressReports = new List<ToolProgress>();
-        var progressMock = new Mock<IProgress<ToolProgress>>();
-        progressMock
-            .Setup(p => p.Report(It.IsAny<ToolProgress>()))
-            .Callback<ToolProgress>(progressReports.Add);
+        IProgress<ToolProgress> progress = new ProgressRecorder(progressReports);
 
-        _doubleCompressor.EventListCompressSqrt(events, 10, progressMock.Object);
+        _doubleCompressor.EventListCompressSqrt(events, 10, progress);
 
-        progressMock.Verify(p => p.Report(It.IsAny<ToolProgress>()), Times.AtLeastOnce);
+        progressReports.Should().NotBeEmpty();
     }
 
     #endregion
@@ -333,4 +330,13 @@ public class EventCompressorTests
     }
 
     #endregion
+}
+
+internal class ProgressRecorder : IProgress<ToolProgress>
+{
+    private readonly List<ToolProgress> _reports;
+
+    public ProgressRecorder(List<ToolProgress> reports) => _reports = reports;
+
+    public void Report(ToolProgress value) => _reports.Add(value);
 }
