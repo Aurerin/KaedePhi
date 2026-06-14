@@ -1,4 +1,5 @@
-﻿using KaedePhi.Tool.Common;
+﻿using System.Threading;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using Meta = KaedePhi.Core.KaedePhi.Meta;
 
@@ -11,6 +12,13 @@ public class PhiEditConverter
     : LoggableBase,
         IChartConverter<Pe.Chart, PhiEditToKpcConvertOptions, KpcToPhiEditConvertOptions>
 {
+    private CancellationToken _ct;
+
+    /// <summary>
+    /// 设置取消令牌。
+    /// </summary>
+    public void SetCancellationToken(CancellationToken ct) => _ct = ct;
+
     /// <summary>
     /// 将 PhiEdit 格式转换为 KPC 内部格式。
     /// </summary>
@@ -22,11 +30,13 @@ public class PhiEditConverter
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(option);
 
+        _ct.ThrowIfCancellationRequested();
+
         return new Kpc.Chart
         {
             BpmList = source.BpmList.ConvertAll(Utils.BpmItemBuilder.ConvertBpmItem),
             Meta = Utils.MetaBuilder.ConvertMeta(source),
-            JudgeLineList = new Utils.KaedePhiJudgeLineBuilder(option).ConvertJudgeLines(
+            JudgeLineList = new Utils.KaedePhiJudgeLineBuilder(option, _ct).ConvertJudgeLines(
                 source.JudgeLineList
             ),
         };

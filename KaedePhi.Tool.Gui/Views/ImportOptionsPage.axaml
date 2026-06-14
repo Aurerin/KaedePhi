@@ -103,7 +103,8 @@
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
                 <Button Padding="20,8" Click="OnCancelClick"
-                        IsEnabled="{Binding !IsLoading}">
+                        IsEnabled="{Binding !IsLoading}"
+                        IsVisible="{Binding !IsLoading}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="&#xf060;" Classes="fa-icon"
                                    FontSize="13" VerticalAlignment="Center"/>
@@ -113,7 +114,12 @@
                 <Button Classes="accent" Padding="24,8" FontSize="14"
                         Content="{x:Static loc:GuiLocalizationString.import_options_confirm}"
                         Click="OnConfirmClick"
-                        IsEnabled="{Binding !IsLoading}"/>
+                        IsEnabled="{Binding !IsLoading}"
+                        IsVisible="{Binding !IsLoading}"/>
+                <Button Padding="24,8" FontSize="14"
+                        Content="{x:Static loc:GuiLocalizationString.btn_cancel}"
+                        Click="OnCancelImportClick"
+                        IsVisible="{Binding IsLoading}"/>
             </StackPanel>
         </Border>
     </Grid>

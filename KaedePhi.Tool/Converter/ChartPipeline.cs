@@ -1,4 +1,6 @@
-﻿namespace KaedePhi.Tool.Converter;
+﻿using System.Threading;
+
+namespace KaedePhi.Tool.Converter;
 
 /// <summary>
 /// 管线式图表转换入口
@@ -11,11 +13,13 @@ public static class ChartPipeline
     public static ChartPipelineSource From<TIn, TInOptions, TOutOptions>(
         TIn input,
         IChartConverter<TIn, TInOptions, TOutOptions> converter,
-        TInOptions inOptions
+        TInOptions inOptions,
+        CancellationToken ct = default
     )
     {
+        ct.ThrowIfCancellationRequested();
         var kpc = converter.ToKpc(input, inOptions);
-        return new ChartPipelineSource(kpc);
+        return new ChartPipelineSource(kpc, ct);
     }
 }
 
@@ -25,8 +29,13 @@ public static class ChartPipeline
 public sealed class ChartPipelineSource
 {
     private readonly Kpc.Chart _kpc;
+    private readonly CancellationToken _ct;
 
-    internal ChartPipelineSource(Kpc.Chart kpc) => _kpc = kpc;
+    internal ChartPipelineSource(Kpc.Chart kpc, CancellationToken ct)
+    {
+        _kpc = kpc;
+        _ct = ct;
+    }
 
     /// <summary>
     /// 指定目标转换器及其 option，完成管线并立即执行
@@ -34,5 +43,9 @@ public sealed class ChartPipelineSource
     public TOut To<TOut, TInOptions, TOutOptions>(
         IChartConverter<TOut, TInOptions, TOutOptions> toConverter,
         TOutOptions outOptions
-    ) => toConverter.FromKpc(_kpc, outOptions);
+    )
+    {
+        _ct.ThrowIfCancellationRequested();
+        return toConverter.FromKpc(_kpc, outOptions);
+    }
 }

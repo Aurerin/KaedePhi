@@ -130,9 +130,11 @@ public sealed class ImportOptionsViewModel : INotifyPropertyChanged
 
     public event Action? RequestConfirm;
     public event Action? RequestCancel;
+    public event Action? RequestCancelImport;
 
     public void OnConfirmClicked() => RequestConfirm?.Invoke();
     public void OnCancelClicked() => RequestCancel?.Invoke();
+    public void OnCancelImportClicked() => RequestCancelImport?.Invoke();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
