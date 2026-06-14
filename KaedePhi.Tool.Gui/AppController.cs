@@ -207,7 +207,13 @@ internal sealed class AppController
         {
             var detectedType = _importOptionsVm.DetectedFormat;
             var importOptions = BuildImportOptions(detectedType);
-            await LoadChartWithOptions(_pendingFilePath, _pendingUseStream, detectedType, importOptions, _cts.Token);
+            await LoadChartWithOptions(
+                _pendingFilePath,
+                _pendingUseStream,
+                detectedType,
+                importOptions,
+                _cts.Token
+            );
         }
         catch (OperationCanceledException)
         {
@@ -238,14 +244,15 @@ internal sealed class AppController
         }
     }
 
-    private async Task LoadChartWithOptions(string filePath, bool useStream, ChartType detectedType, object? importOptions, CancellationToken ct = default)
+    private async Task LoadChartWithOptions(
+        string filePath,
+        bool useStream,
+        ChartType detectedType,
+        object? importOptions,
+        CancellationToken ct = default
+    )
     {
-        var (_, _) = await _chart.LoadChartAsync(
-            filePath,
-            useStream,
-            ct,
-            importOptions
-        );
+        var (_, _) = await _chart.LoadChartAsync(filePath, useStream, ct, importOptions);
 
         _toolVm.CurrentFileName = Path.GetFileName(filePath);
         _toolVm.DetectedFormat = detectedType.ToString();

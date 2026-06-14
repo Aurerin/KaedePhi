@@ -1,10 +1,12 @@
 ﻿using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;
 
 namespace KaedePhi.Core.KaedePhi.Events
 {
     public class Event<T> : EventBase<T>
+        where T : notnull
     {
         /// <summary>
         /// 缓动类型
@@ -14,16 +16,19 @@ namespace KaedePhi.Core.KaedePhi.Events
         /// <summary>
         /// 模拟器保留字段
         /// </summary>
+        [PublicAPI]
         public float StartTime { get; set; }
 
         /// <summary>
         /// 模拟器保留字段
         /// </summary>
+        [PublicAPI]
         public float EndTime { get; set; }
 
         /// <summary>
         /// 保留字段
         /// </summary>
+        [PublicAPI]
         public float FloorPosition { get; set; }
 
         /// <summary>
@@ -32,18 +37,18 @@ namespace KaedePhi.Core.KaedePhi.Events
         public double GetValueAtBeatAsDouble(Beat beat)
         {
             var t = (beat - StartBeat) / (EndBeat - StartBeat);
-            if (t <= 0)
-                return GetStartValueAsDouble();
-            if (t >= 1)
-                return GetEndValueAsDouble();
-
-            return Easing.Interpolate(
-                EasingLeft,
-                EasingRight,
-                GetStartValueAsDouble(),
-                GetEndValueAsDouble(),
-                t
-            );
+            return t switch
+            {
+                <= 0 => GetStartValueAsDouble(),
+                >= 1 => GetEndValueAsDouble(),
+                _ => Easing.Interpolate(
+                    EasingLeft,
+                    EasingRight,
+                    GetStartValueAsDouble(),
+                    GetEndValueAsDouble(),
+                    t
+                ),
+            };
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -10,6 +11,7 @@ namespace KaedePhi.Core.Common
     /// </summary>
     /// <typeparam name="T">事件值类型（int/float/double/byte/byte[]）</typeparam>
     public abstract class EventBase<T>
+        where T : notnull
     {
         /// <summary>
         /// 是否为贝塞尔曲线
@@ -34,14 +36,18 @@ namespace KaedePhi.Core.Common
         /// <summary>
         /// 事件开始数值
         /// </summary>
-#pragma warning disable CS8618
-        public T StartValue { get; set; }
+        [DisallowNull]
+        [NotNull]
+        // ReSharper disable once NullableWarningSuppressionIsUsed
+        public T StartValue { get; set; } = default!;
 
         /// <summary>
         /// 事件结束数值
         /// </summary>
-        public T EndValue { get; set; }
-#pragma warning restore CS8618
+        [DisallowNull]
+        [NotNull]
+        // ReSharper disable once NullableWarningSuppressionIsUsed
+        public T EndValue { get; set; } = default!;
 
         /// <summary>
         /// 事件开始拍

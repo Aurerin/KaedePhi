@@ -67,7 +67,11 @@ public sealed class ExportViewModel : INotifyPropertyChanged
     /// 是否需要显示转换选项面板（目标格式存在可用选项时显示）
     /// </summary>
     public bool ShowConversionOptions =>
-        _selectedFormat is ChartType.PhiEdit or ChartType.PhigrosV3 or ChartType.RePhiEdit or ChartType.PhiChain;
+        _selectedFormat
+            is ChartType.PhiEdit
+                or ChartType.PhigrosV3
+                or ChartType.RePhiEdit
+                or ChartType.PhiChain;
 
     /// <summary>
     /// 是否显示 PhiEdit 专属转换选项（目标为 PhiEdit）

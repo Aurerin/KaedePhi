@@ -38,15 +38,16 @@ public class PhigrosV3Converter
 
         _ct.ThrowIfCancellationRequested();
 
-        var defaultBpm = input.JudgeLineList.Count > 0
-            ? input.JudgeLineList[0].Bpm
-            : DefaultPhigrosBpm;
+        var defaultBpm =
+            input.JudgeLineList.Count > 0 ? input.JudgeLineList[0].Bpm : DefaultPhigrosBpm;
 
         var judgeLines = new List<Kpc.JudgeLine>(input.JudgeLineList.Count);
         for (var i = 0; i < input.JudgeLineList.Count; i++)
         {
             _ct.ThrowIfCancellationRequested();
-            judgeLines.Add(KpcJudgeLineBuilder.ConvertJudgeLine(input.JudgeLineList[i], i, defaultBpm));
+            judgeLines.Add(
+                KpcJudgeLineBuilder.ConvertJudgeLine(input.JudgeLineList[i], i, defaultBpm)
+            );
         }
 
         return new Kpc.Chart
