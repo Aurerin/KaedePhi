@@ -4,6 +4,8 @@ namespace KaedePhi.Core.PhiEdit
 {
     public class Easing
     {
+        private static readonly Easing?[] Cache = new Easing[30];
+
         /// <summary>
         /// 线性缓动（编号1）。
         /// </summary>
@@ -11,8 +13,6 @@ namespace KaedePhi.Core.PhiEdit
 
         private readonly int _easingNumber;
         private readonly Utils.Easings.EasingFunction _function;
-
-        private static readonly Easing?[] Cache = new Easing[30];
 
         /// <summary>获取缓存的 Easing 实例，避免重复创建。</summary>
         public static Easing Get(int easingNumber)

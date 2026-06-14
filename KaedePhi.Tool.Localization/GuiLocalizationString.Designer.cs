@@ -1300,5 +1300,140 @@ namespace KaedePhi.Tool.Localization {
                 return ResourceManager.GetString("tool_unbind_name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 导入选项.
+        /// </summary>
+        public static string import_convert_options {
+            get {
+                return ResourceManager.GetString("import_convert_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 帧转事件持续拍长度.
+        /// </summary>
+        public static string convert_frame_duration_beat {
+            get {
+                return ResourceManager.GetString("convert_frame_duration_beat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 尾部拍填充量.
+        /// </summary>
+        public static string convert_trailing_beat_padding {
+            get {
+                return ResourceManager.GetString("convert_trailing_beat_padding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 转换到 RePhiEdit 格式选项.
+        /// </summary>
+        public static string convert_rephiedit_options {
+            get {
+                return ResourceManager.GetString("convert_rephiedit_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 转换到 PhiChain 格式选项.
+        /// </summary>
+        public static string convert_phichain_options {
+            get {
+                return ResourceManager.GetString("convert_phichain_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 解绑非旋转子线.
+        /// </summary>
+        public static string convert_unbind_non_rotating {
+            get {
+                return ResourceManager.GetString("convert_unbind_non_rotating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 缓动截取切割.
+        /// </summary>
+        public static string convert_easing_cut_section {
+            get {
+                return ResourceManager.GetString("convert_easing_cut_section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 缓动截取切割精度.
+        /// </summary>
+        public static string convert_easing_cut_precision {
+            get {
+                return ResourceManager.GetString("convert_easing_cut_precision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 缓动截取切割后压缩.
+        /// </summary>
+        public static string convert_easing_cut_compress {
+            get {
+                return ResourceManager.GetString("convert_easing_cut_compress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 缓动截取切割容差百分比.
+        /// </summary>
+        public static string convert_easing_cut_tolerance {
+            get {
+                return ResourceManager.GetString("convert_easing_cut_tolerance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 导入选项.
+        /// </summary>
+        public static string import_options_title {
+            get {
+                return ResourceManager.GetString("import_options_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 文件:.
+        /// </summary>
+        public static string import_options_file {
+            get {
+                return ResourceManager.GetString("import_options_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 检测到格式:.
+        /// </summary>
+        public static string import_options_format {
+            get {
+                return ResourceManager.GetString("import_options_format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 确认并加载.
+        /// </summary>
+        public static string import_options_confirm {
+            get {
+                return ResourceManager.GetString("import_options_confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 取消.
+        /// </summary>
+        public static string btn_cancel {
+            get {
+                return ResourceManager.GetString("btn_cancel", resourceCulture);
+            }
+        }
     }
 }

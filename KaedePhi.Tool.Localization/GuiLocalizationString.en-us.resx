@@ -472,4 +472,49 @@
   <data name="load_error_title" xml:space="preserve">
     <value>Load Failed</value>
   </data>
+  <data name="import_convert_options" xml:space="preserve">
+    <value>Import Options</value>
+  </data>
+  <data name="convert_frame_duration_beat" xml:space="preserve">
+    <value>Frame Duration Beat</value>
+  </data>
+  <data name="convert_trailing_beat_padding" xml:space="preserve">
+    <value>Trailing Beat Padding</value>
+  </data>
+  <data name="convert_rephiedit_options" xml:space="preserve">
+    <value>RePhiEdit Conversion Options</value>
+  </data>
+  <data name="convert_phichain_options" xml:space="preserve">
+    <value>PhiChain Conversion Options</value>
+  </data>
+  <data name="convert_unbind_non_rotating" xml:space="preserve">
+    <value>Unbind Non-Rotating Children</value>
+  </data>
+  <data name="convert_easing_cut_section" xml:space="preserve">
+    <value>Easing Cut</value>
+  </data>
+  <data name="convert_easing_cut_precision" xml:space="preserve">
+    <value>Easing Cut Precision</value>
+  </data>
+  <data name="convert_easing_cut_compress" xml:space="preserve">
+    <value>Compress After Easing Cut</value>
+  </data>
+  <data name="convert_easing_cut_tolerance" xml:space="preserve">
+    <value>Easing Cut Tolerance %</value>
+  </data>
+  <data name="import_options_title" xml:space="preserve">
+    <value>Import Options</value>
+  </data>
+  <data name="import_options_file" xml:space="preserve">
+    <value>File:</value>
+  </data>
+  <data name="import_options_format" xml:space="preserve">
+    <value>Detected Format:</value>
+  </data>
+  <data name="import_options_confirm" xml:space="preserve">
+    <value>Confirm and Load</value>
+  </data>
+  <data name="btn_cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root>

@@ -472,4 +472,49 @@
   <data name="load_error_title" xml:space="preserve">
     <value>加载失败</value>
   </data>
+  <data name="import_convert_options" xml:space="preserve">
+    <value>导入选项</value>
+  </data>
+  <data name="convert_frame_duration_beat" xml:space="preserve">
+    <value>帧转事件持续拍长度</value>
+  </data>
+  <data name="convert_trailing_beat_padding" xml:space="preserve">
+    <value>尾部拍填充量</value>
+  </data>
+  <data name="convert_rephiedit_options" xml:space="preserve">
+    <value>转换到 RePhiEdit 格式选项</value>
+  </data>
+  <data name="convert_phichain_options" xml:space="preserve">
+    <value>转换到 PhiChain 格式选项</value>
+  </data>
+  <data name="convert_unbind_non_rotating" xml:space="preserve">
+    <value>解绑非旋转子线</value>
+  </data>
+  <data name="convert_easing_cut_section" xml:space="preserve">
+    <value>缓动截取切割</value>
+  </data>
+  <data name="convert_easing_cut_precision" xml:space="preserve">
+    <value>缓动截取切割精度</value>
+  </data>
+  <data name="convert_easing_cut_compress" xml:space="preserve">
+    <value>缓动截取切割后压缩</value>
+  </data>
+  <data name="convert_easing_cut_tolerance" xml:space="preserve">
+    <value>缓动截取切割容差百分比</value>
+  </data>
+  <data name="import_options_title" xml:space="preserve">
+    <value>导入选项</value>
+  </data>
+  <data name="import_options_file" xml:space="preserve">
+    <value>文件:</value>
+  </data>
+  <data name="import_options_format" xml:space="preserve">
+    <value>检测到格式:</value>
+  </data>
+  <data name="import_options_confirm" xml:space="preserve">
+    <value>确认并加载</value>
+  </data>
+  <data name="btn_cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
 </root>

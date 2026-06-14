@@ -22,4 +22,10 @@ public partial class ExportPage : UserControl
         if (DataContext is ExportViewModel vm)
             vm.OnReturnClicked();
     }
+
+    private void OnCancelExportClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ExportViewModel vm)
+            vm.OnCancelExportClicked();
+    }
 }
