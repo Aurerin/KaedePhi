@@ -25,8 +25,12 @@ permissions:
   packages: write
 
 jobs:
-  release-gui:
+  build-gui:
     runs-on: ubuntu-latest
+    outputs:
+      build_type: ${{ steps.version.outputs.build_type }}
+      version: ${{ steps.version.outputs.version }}
+      change_level: ${{ steps.version.outputs.change_level }}
 
     steps:
       - name: Checkout code
@@ -151,6 +155,85 @@ jobs:
             cd -
           done
 
+      - name: Upload build artifacts
+        if: steps.version.outputs.build_type != 'skip'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-build-${{ github.sha }}
+          path: ./artifacts/gui/*.zip
+          if-no-files-found: warn
+          retention-days: 1
+
+  build-installer:
+    needs: build-gui
+    if: needs.build-gui.outputs.build_type != 'skip'
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: gui-build-${{ github.sha }}
+          path: ./artifacts/gui
+
+      - name: Extract Windows build
+        shell: pwsh
+        run: |
+          $version = "${{ needs.build-gui.outputs.version }}"
+          $zipFile = "./artifacts/gui/KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip"
+          $publishDir = "./publish"
+          
+          Expand-Archive -Path $zipFile -DestinationPath $publishDir
+          
+          # 设置环境变量供 Inno Setup 使用
+          echo "KAEPHI_VERSION=$version" >> $env:GITHUB_ENV
+          echo "KAEPHI_PROJECT_DIR=$env:GITHUB_WORKSPACE" >> $env:GITHUB_ENV
+          echo "KAEPHI_PUBLISH_DIR=$env:GITHUB_WORKSPACE\$publishDir" >> $env:GITHUB_ENV
+
+      - name: Build installer with Inno Setup
+        uses: Minionguyjpro/inno-setup-action@v1.0.0
+        with:
+          path: SetupGenScript.iss
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-installer-${{ github.sha }}
+          path: ./setup/*.exe
+          if-no-files-found: warn
+          retention-days: 1
+
+  create-release:
+    needs: [build-gui, build-installer]
+    if: needs.build-gui.outputs.build_type != 'skip'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_TYPE: ${{ needs.build-gui.outputs.build_type }}
+          VERSION: ${{ needs.build-gui.outputs.version }}
+          CHANGE_LEVEL: ${{ needs.build-gui.outputs.change_level }}
+        run: |
           TAG="Gui-v${VERSION}"
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "::warning::Tag $TAG already exists, skipping release creation."
@@ -192,14 +275,28 @@ jobs:
             echo "" >> "$NOTES_FILE"
             git log HEAD --pretty=format:"- %s (%h)" --no-merges >> "$NOTES_FILE"
           fi
+          
+          echo "" >> "$NOTES_FILE"
+          echo "## 下载说明" >> "$NOTES_FILE"
+          echo "" >> "$NOTES_FILE"
+          echo "- **便携版**：下载 `KaedePhi.Tool.Gui-net10.0-*-fdd.zip`，解压后直接运行" >> "$NOTES_FILE"
+          echo "- **安装版**：下载 `KaedePhi-{VERSION}.exe` 安装程序" >> "$NOTES_FILE"
           # ──────────────────────────────────────────────────────────────────
 
           git tag "$TAG"
           git push origin "$TAG"
 
+          # 收集所有产物
+          RELEASE_FILES=()
+          for dir in ./artifacts/gui-*/; do
+            for file in "$dir"*; do
+              [ -f "$file" ] && RELEASE_FILES+=("$file")
+            done
+          done
+
           RELEASE_FLAGS=("$TAG" --title "Gui v${VERSION}" --notes-file "$NOTES_FILE")
           [ "$BUILD_TYPE" = "prerelease" ] && RELEASE_FLAGS+=(--prerelease) || RELEASE_FLAGS+=(--latest)
-          RELEASE_FLAGS+=(./artifacts/gui/*.zip)
+          RELEASE_FLAGS+=("${RELEASE_FILES[@]}")
 
           gh release create "${RELEASE_FLAGS[@]}"
           echo "✅ Created $BUILD_TYPE release: Gui v${VERSION}"
