@@ -55,12 +55,34 @@ public sealed class GuiChartService
     public bool IsLoaded => CurrentChart != null;
 
     /// <summary>
+    /// 检测文件的图表格式类型
+    /// </summary>
+    public ChartType DetectChartType(string filePath, bool stream)
+    {
+        string text;
+        if (stream)
+        {
+            using var reader = new StreamReader(filePath);
+            text = reader.ReadToEnd();
+        }
+        else
+        {
+            text = File.ReadAllText(filePath);
+        }
+
+        var detectedType = ChartGetType.GetType(text);
+        _log.Information(log_step_detected, detectedType);
+        return detectedType;
+    }
+
+    /// <summary>
     /// 从文件加载图表并转换为 KPC 格式存储在内存中
     /// </summary>
     public async Task<(Chart Chart, ChartType DetectedType)> LoadChartAsync(
         string filePath,
         bool stream,
-        CancellationToken ct
+        CancellationToken ct,
+        object? importOptions = null
     )
     {
         _log.Information(log_file_selected, filePath, stream);
@@ -80,7 +102,7 @@ public sealed class GuiChartService
         _log.Information(log_step_detected, detectedType);
 
         // 在后台线程执行耗时的格式转换
-        var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType), ct);
+        var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType, importOptions), ct);
 
         CurrentChart = kpcChart;
         SourceFormat = detectedType;
@@ -97,7 +119,7 @@ public sealed class GuiChartService
         string outputPath,
         bool stream,
         bool indented,
-        KpcToPhigrosV3ConvertOptions? phigrosOptions = null,
+        object? exportOptions = null,
         CancellationToken ct = default
     )
     {
@@ -111,7 +133,7 @@ public sealed class GuiChartService
             outputPath,
             stream,
             indented,
-            phigrosOptions,
+            exportOptions,
             ct
         );
         _log.Information(log_export_done);
@@ -127,7 +149,7 @@ public sealed class GuiChartService
         SourceFilePath = null;
     }
 
-    private Chart ConvertToKpc(string text, ChartType sourceType)
+    private Chart ConvertToKpc(string text, ChartType sourceType, object? importOptions = null)
     {
         _log.Information(log_step_converting);
         switch (sourceType)
@@ -168,8 +190,9 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
+                var options = importOptions as PhiEditToKpcConvertOptions ?? new PhiEditToKpcConvertOptions();
                 return ChartPipeline
-                    .From(peChart, peConverter, new PhiEditToKpcConvertOptions())
+                    .From(peChart, peConverter, options)
                     .To(kpcConverter, null);
             }
             case ChartType.PhigrosV3:
@@ -208,8 +231,9 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
+                var options = importOptions as PhiChainToKpcConvertOptions ?? new PhiChainToKpcConvertOptions();
                 return ChartPipeline
-                    .From(pcChart, pcConverter, new PhiChainToKpcConvertOptions())
+                    .From(pcChart, pcConverter, options)
                     .To(kpcConverter, null);
             }
             default:
@@ -223,7 +247,7 @@ public sealed class GuiChartService
         string outputPath,
         bool stream,
         bool indented,
-        KpcToPhigrosV3ConvertOptions? phigrosOptions,
+        object? exportOptions,
         CancellationToken ct
     )
     {
@@ -239,7 +263,8 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var rpeChart = rpeConverter.FromKpc(chart, new ConvertOption());
+                var options = exportOptions as ConvertOption ?? new ConvertOption();
+                var rpeChart = rpeConverter.FromKpc(chart, options);
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
@@ -285,10 +310,8 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var phigrosChart = v3Converter.FromKpc(
-                    chart,
-                    phigrosOptions ?? new KpcToPhigrosV3ConvertOptions()
-                );
+                var options = exportOptions as KpcToPhigrosV3ConvertOptions ?? new KpcToPhigrosV3ConvertOptions();
+                var phigrosChart = v3Converter.FromKpc(chart, options);
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);
@@ -313,7 +336,8 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var pcChart = pcConverter.FromKpc(chart, new KpcToPhiChainConvertOptions());
+                var options = exportOptions as KpcToPhiChainConvertOptions ?? new KpcToPhiChainConvertOptions();
+                var pcChart = pcConverter.FromKpc(chart, options);
                 if (stream)
                 {
                     await using var s = new FileStream(outputPath, FileMode.Create);

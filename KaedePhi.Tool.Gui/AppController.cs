@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Converter.PhiChain.Model;
+using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
+using KaedePhi.Tool.Converter.RePhiEdit.Model;
 using KaedePhi.Tool.Gui.Services;
 using KaedePhi.Tool.Gui.ViewModels;
 using KaedePhi.Tool.Gui.Views;
@@ -25,6 +28,7 @@ internal sealed class AppController
     private readonly Window _window;
 
     private readonly ImportViewModel _importVm;
+    private readonly ImportOptionsViewModel _importOptionsVm;
     private readonly ToolViewModel _toolVm;
     private readonly ExportViewModel _exportVm;
     private readonly ProcessingViewModel _processingVm;
@@ -32,6 +36,8 @@ internal sealed class AppController
 
     private CancellationTokenSource? _cts;
     private bool _isFileProcessing;
+    private string? _pendingFilePath;
+    private bool _pendingUseStream;
 
     public AppController(
         MainViewModel main,
@@ -49,6 +55,7 @@ internal sealed class AppController
         _window = window;
 
         _importVm = new ImportViewModel();
+        _importOptionsVm = new ImportOptionsViewModel();
         _toolVm = new ToolViewModel();
         _exportVm = new ExportViewModel();
         _processingVm = new ProcessingViewModel();
@@ -65,6 +72,8 @@ internal sealed class AppController
     private void WireEvents()
     {
         _importVm.FileSelected += OnFileSelected;
+        _importOptionsVm.RequestConfirm += OnImportOptionsConfirm;
+        _importOptionsVm.RequestCancel += OnReturnToImport;
         _toolVm.RequestRun += OnToolRun;
         _toolVm.RequestExport += OnToolExport;
         _toolVm.RequestSettings += NavigateToSettings;
@@ -72,6 +81,7 @@ internal sealed class AppController
         _toolVm.PropertyChanged += OnToolVmPropertyChanged;
         _exportVm.RequestExport += OnExportExecute;
         _exportVm.RequestReturnToImport += OnReturnToImport;
+        _exportVm.RequestCancelExport += OnCancelExport;
         _processingVm.RequestReturnToTools += NavigateToTool;
         _processingVm.RequestReturnToImport += OnReturnToImport;
         _processingVm.RequestGoToExport += NavigateToExport;
@@ -137,6 +147,7 @@ internal sealed class AppController
 
     private void OnReturnToImport()
     {
+        _pendingFilePath = null;
         NavigateToImport();
     }
 
@@ -149,19 +160,26 @@ internal sealed class AppController
 
         try
         {
-            var (_, detectedType) = await _chart.LoadChartAsync(
-                filePath,
-                useStream,
-                CancellationToken.None
-            );
+            // 先检测格式
+            var detectedType = _chart.DetectChartType(filePath, useStream);
 
-            _toolVm.CurrentFileName = Path.GetFileName(filePath);
-            _toolVm.DetectedFormat = detectedType.ToString();
-            _toolVm.SourceChartType = detectedType;
-            _toolVm.SelectedTool = null;
-            _toolVm.StatusText = string.Empty;
+            // 检查是否需要显示导入选项
+            if (detectedType is ChartType.PhiEdit or ChartType.PhiChain)
+            {
+                // 保存待处理的文件信息
+                _pendingFilePath = filePath;
+                _pendingUseStream = useStream;
 
-            NavigateToTool();
+                // 导航到导入选项页面
+                _importOptionsVm.DetectedFormat = detectedType;
+                _importOptionsVm.FileName = Path.GetFileName(filePath);
+                _main.CurrentPage = _importOptionsVm;
+            }
+            else
+            {
+                // 不需要选项，直接加载
+                await LoadChartWithOptions(filePath, useStream, detectedType, null);
+            }
         }
         catch (Exception ex)
         {
@@ -173,6 +191,72 @@ internal sealed class AppController
             _isFileProcessing = false;
             _importVm.IsLoading = false;
         }
+    }
+
+    private async void OnImportOptionsConfirm()
+    {
+        if (_pendingFilePath == null || _isFileProcessing)
+            return;
+
+        _isFileProcessing = true;
+        _importOptionsVm.IsLoading = true;
+
+        try
+        {
+            var detectedType = _importOptionsVm.DetectedFormat;
+            var importOptions = BuildImportOptions(detectedType);
+            await LoadChartWithOptions(_pendingFilePath, _pendingUseStream, detectedType, importOptions);
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, log_load_failed);
+            MessageDialog.ShowError(_window, load_error_title, ex.Message);
+        }
+        finally
+        {
+            _isFileProcessing = false;
+            _importOptionsVm.IsLoading = false;
+            _pendingFilePath = null;
+        }
+    }
+
+    private async Task LoadChartWithOptions(string filePath, bool useStream, ChartType detectedType, object? importOptions)
+    {
+        var (_, _) = await _chart.LoadChartAsync(
+            filePath,
+            useStream,
+            CancellationToken.None,
+            importOptions
+        );
+
+        _toolVm.CurrentFileName = Path.GetFileName(filePath);
+        _toolVm.DetectedFormat = detectedType.ToString();
+        _toolVm.SourceChartType = detectedType;
+        _toolVm.SelectedTool = null;
+        _toolVm.StatusText = string.Empty;
+
+        NavigateToTool();
+    }
+
+    /// <summary>
+    /// 根据检测到的格式构建导入选项
+    /// </summary>
+    private object? BuildImportOptions(ChartType detectedType)
+    {
+        return detectedType switch
+        {
+            ChartType.PhiEdit => new PhiEditToKpcConvertOptions
+            {
+                FrameDurationBeat = _importOptionsVm.PeFrameDurationBeat,
+                SpeedConversionRatio = _importOptionsVm.PeSpeedConversionRatio,
+                TrailingBeatPadding = _importOptionsVm.PeTrailingBeatPadding,
+            },
+            ChartType.PhiChain => new PhiChainToKpcConvertOptions
+            {
+                UnsupportedEasingPrecision = _importOptionsVm.PhiChainUnsupportedEasingPrecision,
+            },
+            _ => null,
+        };
     }
 
     private async void OnToolRun()
@@ -342,8 +426,7 @@ internal sealed class AppController
                         outputPath = outputPath + expectedExt;
 
                     // 在后台线程执行耗时的导出操作，避免阻塞 UI
-                    var phigrosOptions =
-                        targetFormat == ChartType.PhigrosV3 ? BuildPhigrosOptions(_exportVm) : null;
+                    var exportOptions = BuildExportOptions(targetFormat);
                     var useStream = _exportVm.UseStream;
                     var indented = _exportVm.IndentedOutput;
 
@@ -355,7 +438,7 @@ internal sealed class AppController
                                 outputPath,
                                 useStream,
                                 indented,
-                                phigrosOptions,
+                                exportOptions,
                                 _cts.Token
                             );
                         },
@@ -400,6 +483,16 @@ internal sealed class AppController
         }
     }
 
+    private void OnCancelExport()
+    {
+        if (_cts is { IsCancellationRequested: false })
+        {
+            _cts.Cancel();
+            _exportVm.StatusText = status_export_cancelled;
+            _log.Information(log_export_cancelled);
+        }
+    }
+
     private static KpcToPhigrosV3ConvertOptions BuildPhigrosOptions(ExportViewModel vm)
     {
         return new KpcToPhigrosV3ConvertOptions
@@ -413,6 +506,48 @@ internal sealed class AppController
                 Enabled = vm.NegativeAlphaElevation,
                 ElevationStep = vm.NegativeAlphaStep,
             },
+        };
+    }
+
+    private static KpcToPhiChainConvertOptions BuildPhiChainOptions(ExportViewModel vm)
+    {
+        return new KpcToPhiChainConvertOptions
+        {
+            UnbindNonRotatingChildren = vm.PhiChainUnbindNonRotatingChildren,
+            UnbindPrecision = vm.PhiChainUnbindPrecision,
+            UnbindTolerance = vm.PhiChainUnbindTolerance,
+            UnbindClassicMode = vm.PhiChainUnbindClassicMode,
+            MultiLayerMergePrecision = vm.PhiChainMultiLayerMergePrecision,
+            MultiLayerMergeTolerance = vm.PhiChainMultiLayerMergeTolerance,
+            MultiLayerMergeClassicMode = vm.PhiChainMultiLayerMergeClassicMode,
+            EasingCutPrecision = vm.PhiChainEasingCutPrecision,
+            EasingCutCompress = vm.PhiChainEasingCutCompress,
+            EasingCutTolerance = vm.PhiChainEasingCutTolerance,
+        };
+    }
+
+    private static ConvertOption BuildRePhiEditOptions(ExportViewModel vm)
+    {
+        return new ConvertOption
+        {
+            Cutting = new ConvertOption.CuttingOptions
+            {
+                UnsupportedEasingPrecision = vm.RePhiEditUnsupportedEasingPrecision,
+            },
+        };
+    }
+
+    /// <summary>
+    /// 根据目标格式构建导出选项
+    /// </summary>
+    private object? BuildExportOptions(ChartType targetFormat)
+    {
+        return targetFormat switch
+        {
+            ChartType.PhigrosV3 => BuildPhigrosOptions(_exportVm),
+            ChartType.PhiChain => BuildPhiChainOptions(_exportVm),
+            ChartType.RePhiEdit => BuildRePhiEditOptions(_exportVm),
+            _ => null,
         };
     }
 }

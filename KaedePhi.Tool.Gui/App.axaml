@@ -22,6 +22,9 @@
         <DataTemplate DataType="vm:ImportViewModel">
             <views:ImportPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:ImportOptionsViewModel">
+            <views:ImportOptionsPage/>
+        </DataTemplate>
         <DataTemplate DataType="vm:ToolViewModel">
             <views:ToolPage/>
         </DataTemplate>
