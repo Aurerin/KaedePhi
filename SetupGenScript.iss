@@ -2,11 +2,34 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 ; Non-commercial use only
 
+; 环境变量配置说明：
+;   KAEPHI_VERSION     - 应用版本号（必需），例如 "0.5.0" 或 "0.5.0+abc123def456..."
+;                        建议使用完整 commit hash 以保持与软件内部展示一致
+;   KAEPHI_PROJECT_DIR - 项目根目录（可选），用于定位 LICENSE、README 等文件，默认为脚本所在目录
+;   KAEPHI_PUBLISH_DIR - 发布输出目录（必需），包含编译产物的目录
+
 #define MyAppName "KaedePhi"
-#define MyAppVersion "0.4.2+a1e65214ff6d343f8c1e701389d8e0d86827fa28"
 #define MyAppPublisher "NuanR_Star Ciallo Team"
 #define MyAppURL "https://www.nuanr-mxi.com"
 #define MyAppExeName "KaedePhi.Tool.Gui.exe"
+
+; 从环境变量获取版本号，如果未设置则报错
+#define MyAppVersion GetEnv("KAEPHI_VERSION")
+#if MyAppVersion == ""
+  #error "环境变量 KAEPHI_VERSION 未设置，请设置版本号，例如 set KAEPHI_VERSION=0.5.0"
+#endif
+
+; 从环境变量获取项目根目录，默认为脚本所在目录
+#define ProjectDir GetEnv("KAEPHI_PROJECT_DIR")
+#if ProjectDir == ""
+  #define ProjectDir "."
+#endif
+
+; 从环境变量获取发布目录
+#define PublishDir GetEnv("KAEPHI_PUBLISH_DIR")
+#if PublishDir == ""
+  #error "环境变量 KAEPHI_PUBLISH_DIR 未设置，请设置发布输出目录"
+#endif
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -31,14 +54,14 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=C:\Users\23084\RiderProjects\KaedePhi\LICENSE
-InfoBeforeFile=C:\Users\23084\RiderProjects\KaedePhi\README.md
+LicenseFile={#ProjectDir}\LICENSE
+InfoBeforeFile={#ProjectDir}\README.md
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\Users\23084\RiderProjects\KaedePhi\KaedePhi.Tool.Gui\bin\PreRelease\setup
-OutputBaseFilename=KaedePhi
-SetupIconFile=C:\Users\23084\RiderProjects\KaedePhi\KaedePhiIcon.ico
+OutputDir={#ProjectDir}\setup
+OutputBaseFilename=KaedePhi-{#MyAppVersion}
+SetupIconFile={#ProjectDir}\KaedePhiIcon.ico
 SolidCompression=yes
 WizardStyle=modern dynamic
 
@@ -49,8 +72,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\23084\RiderProjects\KaedePhi\KaedePhi.Tool.Gui\bin\PreRelease\publish\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\23084\RiderProjects\KaedePhi\KaedePhi.Tool.Gui\bin\PreRelease\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#PublishDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
