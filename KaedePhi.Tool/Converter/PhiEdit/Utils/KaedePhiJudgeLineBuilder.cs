@@ -1,3 +1,4 @@
+using System.Threading;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
@@ -9,11 +10,13 @@ public class KaedePhiJudgeLineBuilder
 {
     private readonly PhiEditFrameEventBuilder _phiEditFrameEvent;
     private readonly EventLayerBuilder _eventLayerConverter;
+    private readonly CancellationToken _ct;
 
-    public KaedePhiJudgeLineBuilder(PhiEditToKpcConvertOptions options)
+    public KaedePhiJudgeLineBuilder(PhiEditToKpcConvertOptions options, CancellationToken ct = default)
     {
         _eventLayerConverter = new EventLayerBuilder(options);
         _phiEditFrameEvent = new PhiEditFrameEventBuilder(options);
+        _ct = ct;
     }
 
     /// <summary>
@@ -25,7 +28,11 @@ public class KaedePhiJudgeLineBuilder
             return [];
 
         var result = new List<Kpc.JudgeLine>(judgeLines.Count);
-        result.AddRange(judgeLines.Select(ConvertJudgeLine));
+        for (var i = 0; i < judgeLines.Count; i++)
+        {
+            _ct.ThrowIfCancellationRequested();
+            result.Add(ConvertJudgeLine(judgeLines[i], i));
+        }
         return result;
     }
 

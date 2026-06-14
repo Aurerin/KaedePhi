@@ -102,7 +102,7 @@ public sealed class GuiChartService
         _log.Information(log_step_detected, detectedType);
 
         // 在后台线程执行耗时的格式转换
-        var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType, importOptions), ct);
+        var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType, importOptions, ct), ct);
 
         CurrentChart = kpcChart;
         SourceFormat = detectedType;
@@ -149,8 +149,9 @@ public sealed class GuiChartService
         SourceFilePath = null;
     }
 
-    private Chart ConvertToKpc(string text, ChartType sourceType, object? importOptions = null)
+    private Chart ConvertToKpc(string text, ChartType sourceType, object? importOptions = null, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
         _log.Information(log_step_converting);
         switch (sourceType)
         {
@@ -158,6 +159,7 @@ public sealed class GuiChartService
             {
                 var rpeChart = Core.RePhiEdit.Chart.LoadFromJson(text);
                 var rpeConverter = new RePhiEditConverter();
+                rpeConverter.SetCancellationToken(ct);
                 rpeConverter.SubscribeLog(
                     info: msg => _log.Information(msg),
                     warning: msg => _log.Warning(msg),
@@ -171,12 +173,13 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                return ChartPipeline.From(rpeChart, rpeConverter, null).To(kpcConverter, null);
+                return ChartPipeline.From(rpeChart, rpeConverter, null, ct).To(kpcConverter, null);
             }
             case ChartType.PhiEdit:
             {
                 var peChart = Core.PhiEdit.Chart.Load(text);
                 var peConverter = new PhiEditConverter();
+                peConverter.SetCancellationToken(ct);
                 peConverter.SubscribeLog(
                     info: msg => _log.Information(msg),
                     warning: msg => _log.Warning(msg),
@@ -192,13 +195,14 @@ public sealed class GuiChartService
                 );
                 var options = importOptions as PhiEditToKpcConvertOptions ?? new PhiEditToKpcConvertOptions();
                 return ChartPipeline
-                    .From(peChart, peConverter, options)
+                    .From(peChart, peConverter, options, ct)
                     .To(kpcConverter, null);
             }
             case ChartType.PhigrosV3:
             {
                 var v3Chart = Core.Phigros.v3.Chart.LoadFromJson(text);
                 var v3Converter = new PhigrosV3Converter();
+                v3Converter.SetCancellationToken(ct);
                 v3Converter.SubscribeLog(
                     info: msg => _log.Information(msg),
                     warning: msg => _log.Warning(msg),
@@ -212,12 +216,13 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                return ChartPipeline.From(v3Chart, v3Converter, null).To(kpcConverter, null);
+                return ChartPipeline.From(v3Chart, v3Converter, null, ct).To(kpcConverter, null);
             }
             case ChartType.PhiChain:
             {
                 var pcChart = Core.PhiChain.v6.Chart.LoadFromJson(text);
                 var pcConverter = new PhiChainConverter();
+                pcConverter.SetCancellationToken(ct);
                 pcConverter.SubscribeLog(
                     info: msg => _log.Information(msg),
                     warning: msg => _log.Warning(msg),
@@ -233,7 +238,7 @@ public sealed class GuiChartService
                 );
                 var options = importOptions as PhiChainToKpcConvertOptions ?? new PhiChainToKpcConvertOptions();
                 return ChartPipeline
-                    .From(pcChart, pcConverter, options)
+                    .From(pcChart, pcConverter, options, ct)
                     .To(kpcConverter, null);
             }
             default:

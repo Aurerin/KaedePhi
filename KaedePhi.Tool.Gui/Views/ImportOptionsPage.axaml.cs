@@ -22,4 +22,10 @@ public partial class ImportOptionsPage : UserControl
         if (DataContext is ImportOptionsViewModel vm)
             vm.OnCancelClicked();
     }
+
+    private void OnCancelImportClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ImportOptionsViewModel vm)
+            vm.OnCancelImportClicked();
+    }
 }

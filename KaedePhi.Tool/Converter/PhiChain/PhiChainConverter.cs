@@ -1,4 +1,5 @@
-﻿using KaedePhi.Core.PhiChain.v6;
+﻿using System.Threading;
+using KaedePhi.Core.PhiChain.v6;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.Converter.PhiChain.Utils;
@@ -13,6 +14,13 @@ public class PhiChainConverter
     : LoggableBase,
         IChartConverter<PhiChainChart, PhiChainToKpcConvertOptions, KpcToPhiChainConvertOptions>
 {
+    private CancellationToken _ct;
+
+    /// <summary>
+    /// 设置取消令牌。
+    /// </summary>
+    public void SetCancellationToken(CancellationToken ct) => _ct = ct;
+
     /// <summary>
     /// 将 PhiChain 格式转换为 KPC 内部格式。
     /// </summary>
@@ -21,6 +29,8 @@ public class PhiChainConverter
     /// <returns>KPC 谱面</returns>
     public Kpc.Chart ToKpc(PhiChainChart source, PhiChainToKpcConvertOptions options)
     {
+        _ct.ThrowIfCancellationRequested();
+
         var kpcChart = new Kpc.Chart
         {
             BpmList = source.BpmList.ConvertAll(BpmBuilder.ConvertBpmPoint),
@@ -34,6 +44,7 @@ public class PhiChainConverter
         var lineIndex = 0;
         foreach (var line in source.Lines)
         {
+            _ct.ThrowIfCancellationRequested();
             JudgeLineBuilder.FlattenLine(
                 line,
                 -1,

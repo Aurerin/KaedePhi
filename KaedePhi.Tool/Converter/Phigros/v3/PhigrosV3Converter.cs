@@ -1,4 +1,5 @@
-﻿using KaedePhi.Tool.Common;
+﻿using System.Threading;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Converter.Phigros.v3.Utils;
 using KpcMeta = KaedePhi.Core.KaedePhi.Meta;
@@ -18,6 +19,13 @@ public class PhigrosV3Converter
     /// </summary>
     private const float DefaultPhigrosBpm = 120f;
 
+    private CancellationToken _ct;
+
+    /// <summary>
+    /// 设置取消令牌。
+    /// </summary>
+    public void SetCancellationToken(CancellationToken ct) => _ct = ct;
+
     /// <summary>
     /// 将 Phigros V3 格式转换为 KPC 内部格式。
     /// </summary>
@@ -28,22 +36,24 @@ public class PhigrosV3Converter
     {
         ArgumentNullException.ThrowIfNull(input);
 
+        _ct.ThrowIfCancellationRequested();
+
+        var defaultBpm = input.JudgeLineList.Count > 0
+            ? input.JudgeLineList[0].Bpm
+            : DefaultPhigrosBpm;
+
+        var judgeLines = new List<Kpc.JudgeLine>(input.JudgeLineList.Count);
+        for (var i = 0; i < input.JudgeLineList.Count; i++)
+        {
+            _ct.ThrowIfCancellationRequested();
+            judgeLines.Add(KpcJudgeLineBuilder.ConvertJudgeLine(input.JudgeLineList[i], i, defaultBpm));
+        }
+
         return new Kpc.Chart
         {
             BpmList = BpmItemBuilder.ConvertBpmList(input.JudgeLineList),
             Meta = MetaBuilder.ConvertMeta(input),
-            JudgeLineList = input
-                .JudgeLineList.Select(
-                    (j, i) =>
-                        KpcJudgeLineBuilder.ConvertJudgeLine(
-                            j,
-                            i,
-                            input.JudgeLineList.Count > 0
-                                ? input.JudgeLineList[0].Bpm
-                                : DefaultPhigrosBpm
-                        )
-                )
-                .ToList(),
+            JudgeLineList = judgeLines,
         };
     }
 

@@ -74,6 +74,7 @@ internal sealed class AppController
         _importVm.FileSelected += OnFileSelected;
         _importOptionsVm.RequestConfirm += OnImportOptionsConfirm;
         _importOptionsVm.RequestCancel += OnReturnToImport;
+        _importOptionsVm.RequestCancelImport += OnCancelImport;
         _toolVm.RequestRun += OnToolRun;
         _toolVm.RequestExport += OnToolExport;
         _toolVm.RequestSettings += NavigateToSettings;
@@ -200,32 +201,49 @@ internal sealed class AppController
 
         _isFileProcessing = true;
         _importOptionsVm.IsLoading = true;
+        _cts = new CancellationTokenSource();
 
         try
         {
             var detectedType = _importOptionsVm.DetectedFormat;
             var importOptions = BuildImportOptions(detectedType);
-            await LoadChartWithOptions(_pendingFilePath, _pendingUseStream, detectedType, importOptions);
+            await LoadChartWithOptions(_pendingFilePath, _pendingUseStream, detectedType, importOptions, _cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            _log.Information("Import cancelled by user");
+            NavigateToImport();
         }
         catch (Exception ex)
         {
             _log.Error(ex, log_load_failed);
             MessageDialog.ShowError(_window, load_error_title, ex.Message);
+            NavigateToImport();
         }
         finally
         {
             _isFileProcessing = false;
             _importOptionsVm.IsLoading = false;
             _pendingFilePath = null;
+            _cts?.Dispose();
+            _cts = null;
         }
     }
 
-    private async Task LoadChartWithOptions(string filePath, bool useStream, ChartType detectedType, object? importOptions)
+    private void OnCancelImport()
+    {
+        if (_cts is { IsCancellationRequested: false })
+        {
+            _cts.Cancel();
+        }
+    }
+
+    private async Task LoadChartWithOptions(string filePath, bool useStream, ChartType detectedType, object? importOptions, CancellationToken ct = default)
     {
         var (_, _) = await _chart.LoadChartAsync(
             filePath,
             useStream,
-            CancellationToken.None,
+            ct,
             importOptions
         );
 
