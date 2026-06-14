@@ -57,7 +57,9 @@ public partial class ImportPage : UserControl
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = e.DataTransfer.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = e.DataTransfer.Contains(DataFormat.File)
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
     }
 
     private void OnDragLeave(object? sender, DragEventArgs e)
@@ -72,10 +74,12 @@ public partial class ImportPage : UserControl
         if (DataContext is not ImportViewModel vm || vm.IsLoading)
             return;
 
-        var path = e.DataTransfer.Items
-            .Select(item => item.TryGetRaw(DataFormat.File) is IStorageItem storageItem
-                ? storageItem.TryGetLocalPath()
-                : null)
+        var path = e
+            .DataTransfer.Items.Select(item =>
+                item.TryGetRaw(DataFormat.File) is IStorageItem storageItem
+                    ? storageItem.TryGetLocalPath()
+                    : null
+            )
             .FirstOrDefault(p => !string.IsNullOrEmpty(p));
 
         if (!string.IsNullOrEmpty(path))

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.RePhiEdit.JsonConverter;
@@ -7,6 +8,7 @@ using Newtonsoft.Json;
 namespace KaedePhi.Core.RePhiEdit.Events
 {
     public class Event<T> : EventBase<T>
+        where T : notnull
     {
         /// <summary>
         /// 缓动类型
@@ -14,7 +16,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
         [JsonProperty("easingType")]
         public Easing Easing { get; set; } = new(1);
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.IsBezier" />
         [JsonProperty("bezier")]
         [JsonConverter(typeof(BoolConverter))]
         public new bool IsBezier
@@ -23,7 +25,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             set => base.IsBezier = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.BezierPoints" />
         [JsonProperty("bezierPoints")]
         public new float[] BezierPoints
         {
@@ -31,7 +33,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             set => base.BezierPoints = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.EasingLeft" />
         [JsonProperty("easingLeft")]
         public new float EasingLeft
         {
@@ -39,7 +41,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             set => base.EasingLeft = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.EasingRight" />
         [JsonProperty("easingRight")]
         public new float EasingRight
         {
@@ -47,25 +49,27 @@ namespace KaedePhi.Core.RePhiEdit.Events
             set => base.EasingRight = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.StartValue" />
         [JsonProperty("start")]
-#pragma warning disable CS8618
+        [DisallowNull]
+        [NotNull]
         public new T StartValue
         {
             get => base.StartValue;
             set => base.StartValue = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.EndValue" />
         [JsonProperty("end")]
+        [DisallowNull]
+        [NotNull]
         public new T EndValue
         {
             get => base.EndValue;
             set => base.EndValue = value;
         }
-#pragma warning restore CS8618
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.StartBeat" />
         [JsonProperty("startTime")]
         public new Beat StartBeat
         {
@@ -73,7 +77,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             set => base.StartBeat = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.EndBeat" />
         [JsonProperty("endTime")]
         public new Beat EndBeat
         {
@@ -81,7 +85,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             set => base.EndBeat = value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="EventBase{T}.Font" />
         [JsonProperty(
             "font",
             DefaultValueHandling = DefaultValueHandling.Ignore,
@@ -183,8 +187,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
             for (var i = 0; i < startBytes.Length; i++)
                 result[i] = useBezier
                     ? Bezier.Do(BezierPoints, t, startBytes[i], endBytes[i])
-                    : (byte)
-                        Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
+                    : Easing.Interpolate(EasingLeft, EasingRight, startBytes[i], endBytes[i], t);
             return Cast<byte[], T>(result);
         }
 

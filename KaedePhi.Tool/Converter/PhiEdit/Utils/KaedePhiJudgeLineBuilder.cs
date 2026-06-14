@@ -12,7 +12,10 @@ public class KaedePhiJudgeLineBuilder
     private readonly EventLayerBuilder _eventLayerConverter;
     private readonly CancellationToken _ct;
 
-    public KaedePhiJudgeLineBuilder(PhiEditToKpcConvertOptions options, CancellationToken ct = default)
+    public KaedePhiJudgeLineBuilder(
+        PhiEditToKpcConvertOptions options,
+        CancellationToken ct = default
+    )
     {
         _eventLayerConverter = new EventLayerBuilder(options);
         _phiEditFrameEvent = new PhiEditFrameEventBuilder(options);

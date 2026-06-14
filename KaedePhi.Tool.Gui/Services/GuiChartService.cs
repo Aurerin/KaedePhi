@@ -102,7 +102,10 @@ public sealed class GuiChartService
         _log.Information(log_step_detected, detectedType);
 
         // 在后台线程执行耗时的格式转换
-        var kpcChart = await Task.Run(() => ConvertToKpc(text, detectedType, importOptions, ct), ct);
+        var kpcChart = await Task.Run(
+            () => ConvertToKpc(text, detectedType, importOptions, ct),
+            ct
+        );
 
         CurrentChart = kpcChart;
         SourceFormat = detectedType;
@@ -149,7 +152,12 @@ public sealed class GuiChartService
         SourceFilePath = null;
     }
 
-    private Chart ConvertToKpc(string text, ChartType sourceType, object? importOptions = null, CancellationToken ct = default)
+    private Chart ConvertToKpc(
+        string text,
+        ChartType sourceType,
+        object? importOptions = null,
+        CancellationToken ct = default
+    )
     {
         ct.ThrowIfCancellationRequested();
         _log.Information(log_step_converting);
@@ -193,10 +201,9 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var options = importOptions as PhiEditToKpcConvertOptions ?? new PhiEditToKpcConvertOptions();
-                return ChartPipeline
-                    .From(peChart, peConverter, options, ct)
-                    .To(kpcConverter, null);
+                var options =
+                    importOptions as PhiEditToKpcConvertOptions ?? new PhiEditToKpcConvertOptions();
+                return ChartPipeline.From(peChart, peConverter, options, ct).To(kpcConverter, null);
             }
             case ChartType.PhigrosV3:
             {
@@ -236,10 +243,10 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var options = importOptions as PhiChainToKpcConvertOptions ?? new PhiChainToKpcConvertOptions();
-                return ChartPipeline
-                    .From(pcChart, pcConverter, options, ct)
-                    .To(kpcConverter, null);
+                var options =
+                    importOptions as PhiChainToKpcConvertOptions
+                    ?? new PhiChainToKpcConvertOptions();
+                return ChartPipeline.From(pcChart, pcConverter, options, ct).To(kpcConverter, null);
             }
             default:
                 throw new NotSupportedException($"Unsupported chart format: {sourceType}");
@@ -315,7 +322,9 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var options = exportOptions as KpcToPhigrosV3ConvertOptions ?? new KpcToPhigrosV3ConvertOptions();
+                var options =
+                    exportOptions as KpcToPhigrosV3ConvertOptions
+                    ?? new KpcToPhigrosV3ConvertOptions();
                 var phigrosChart = v3Converter.FromKpc(chart, options);
                 if (stream)
                 {
@@ -341,7 +350,9 @@ public sealed class GuiChartService
                     error: msg => _log.Error(msg),
                     debug: msg => _log.Debug(msg)
                 );
-                var options = exportOptions as KpcToPhiChainConvertOptions ?? new KpcToPhiChainConvertOptions();
+                var options =
+                    exportOptions as KpcToPhiChainConvertOptions
+                    ?? new KpcToPhiChainConvertOptions();
                 var pcChart = pcConverter.FromKpc(chart, options);
                 if (stream)
                 {
