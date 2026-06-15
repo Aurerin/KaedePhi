@@ -1,0 +1,106 @@
+﻿stages:
+  - build
+  - installer
+  - upload
+
+build-gui:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+  before_script:
+    - apt-get update && apt-get install -y zip
+  script:
+    - |
+      PROPS="Directory.Build.props"
+      VERSION=$(grep -oP '<Version>\K[^<]+' "$PROPS" 2>/dev/null || echo "0.0.0")
+      HASH=$(git rev-parse --short HEAD)
+      FULL_VERSION="${VERSION}+nightly.${HASH}"
+      echo "$FULL_VERSION" > version.txt
+
+      CSPROJ="KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
+      output_dir="./artifacts/gui"
+      runtimes=("win-x64" "linux-x64")
+
+      mkdir -p "$output_dir"
+
+      for runtime in "${runtimes[@]}"; do
+        echo "Building net10.0 / $runtime (Debug)..."
+        dotnet publish "$CSPROJ" \
+          -c Debug \
+          -f net10.0 \
+          -r "$runtime" \
+          --self-contained false \
+          -o "$output_dir/net10.0-$runtime"
+
+        cd "$output_dir/net10.0-$runtime"
+        zip -r "../KaedePhi.Tool.Gui-nightly-net10.0-$runtime.zip" .
+        cd -
+      done
+  artifacts:
+    paths:
+      - ./artifacts/gui/*.zip
+      - ./version.txt
+    expire_in: 1 day
+
+build-installer:
+  stage: installer
+  tags: [windows]
+  dependencies:
+    - build-gui
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+  script:
+    - |
+      $ErrorActionPreference = "Stop"
+
+      # 安装 Chocolatey
+      Set-ExecutionPolicy Bypass -Scope Process -Force
+      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      # 安装 .NET SDK 10.0 和 Inno Setup
+      choco install dotnet-10.0-sdk -y
+      choco install innosetup --version=6.2.2 -y
+      refreshenv
+      $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+
+      $version = Get-Content -Path "version.txt"
+      $zipFile = "./artifacts/gui/KaedePhi.Tool.Gui-nightly-net10.0-win-x64.zip"
+      $publishDir = "./publish"
+
+      Expand-Archive -Path $zipFile -DestinationPath $publishDir
+
+      # 设置环境变量供 Inno Setup 使用
+      $env:KAEPHI_VERSION = $version
+      $env:KAEPHI_PROJECT_DIR = $env:CI_PROJECT_DIR
+      $env:KAEPHI_PUBLISH_DIR = "$env:CI_PROJECT_DIR\$publishDir"
+
+      # 运行 Inno Setup 编译器
+      iscc SetupGenScript.iss
+  artifacts:
+    paths:
+      - ./setup/*.exe
+    expire_in: 7 days
+
+upload-nightly:
+  stage: upload
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  dependencies:
+    - build-gui
+    - build-installer
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+  script:
+    - echo "Collecting artifacts..."
+  artifacts:
+    paths:
+      - ./artifacts/gui/*.zip
+      - ./setup/*.exe
+    expire_in: 7 days
