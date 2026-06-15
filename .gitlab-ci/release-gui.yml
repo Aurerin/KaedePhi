@@ -1,9 +1,3 @@
-stages:
-  - detect
-  - build
-  - installer
-  - release
-
 variables:
   CI_RELEASE_TYPE: "auto"
 
