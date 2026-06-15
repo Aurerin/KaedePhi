@@ -1,9 +1,4 @@
-﻿stages:
-  - build
-  - installer
-  - upload
-
-build-gui:
+﻿build-gui:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:10.0
   rules:

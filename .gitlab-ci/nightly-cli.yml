@@ -1,6 +1,3 @@
-stages:
-  - build
-
 nightly-cli:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:10.0

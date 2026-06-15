@@ -1,3 +1,10 @@
+stages:
+  - build
+  - detect
+  - installer
+  - upload
+  - release
+
 include:
   - local: '.gitlab-ci/nightly-cli.yml'
   - local: '.gitlab-ci/nightly-gui.yml'
