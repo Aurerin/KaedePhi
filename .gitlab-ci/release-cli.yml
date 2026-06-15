@@ -94,9 +94,6 @@ detect-version:
 build-cli:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:10.0
-  needs:
-    - job: detect-version
-      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
@@ -147,11 +144,6 @@ build-cli:
 create-release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  needs:
-    - job: detect-version
-      artifacts: true
-    - job: build-cli
-      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
