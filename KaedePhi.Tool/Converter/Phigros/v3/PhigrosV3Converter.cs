@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using KaedePhi.Tool.Common;
+﻿using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Converter.Phigros.v3.Utils;
 using KpcMeta = KaedePhi.Core.KaedePhi.Meta;
@@ -117,6 +116,7 @@ public class PhigrosV3Converter
     }
 
     private static double GetMaxEventEndBeat<T>(List<KpcEvents.Event<T>>? events)
+        where T : notnull
     {
         if (events is not { Count: > 0 })
             return 0;

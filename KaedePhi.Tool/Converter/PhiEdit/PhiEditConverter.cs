@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using KaedePhi.Tool.Common;
+﻿using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using Meta = KaedePhi.Core.KaedePhi.Meta;
 

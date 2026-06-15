@@ -181,6 +181,7 @@ public class PhigrosV3EventBuilder
         float start,
         float end
     )
+        where T : notnull
     {
         // 找到 StartBeat <= start + epsilon 的最靠右的候选项
         int lo = 0,
@@ -228,7 +229,7 @@ public class PhigrosV3EventBuilder
             from ev in filled
             let startBeat = (float)(double)ev.StartBeat
             let endBeat = (float)(double)ev.EndBeat
-            where !(endBeat <= startBeat)
+            where endBeat > startBeat
             select new PhigrosEvent
             {
                 StartTime = startBeat * BeatToPhigrosTime,
@@ -360,6 +361,7 @@ public class PhigrosV3EventBuilder
         List<KpcEvents.Event<T>> events,
         T defaultValue
     )
+        where T : notnull
     {
         if (events.Count == 0)
             return events;
@@ -404,6 +406,7 @@ public class PhigrosV3EventBuilder
     /// <c>true</c>，避免在常规路径下执行 O(n log n) 的 <c>OrderBy</c>。
     /// </summary>
     private static bool IsSortedByStartBeat<T>(List<KpcEvents.Event<T>> events)
+        where T : notnull
     {
         for (var i = 1; i < events.Count; i++)
         {

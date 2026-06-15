@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using KaedePhi.Core.Common;
+﻿using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.RePhiEdit.Model;
 using KaedePhi.Tool.Converter.RePhiEdit.Utils;

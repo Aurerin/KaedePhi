@@ -4,6 +4,7 @@ using KaedePhi.Tool.Common;
 namespace KaedePhi.Tool.Event.KaedePhi;
 
 public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvents.Event<TPayload>>
+    where TPayload : notnull
 {
     protected static readonly EventCutter<TPayload> Cutter = new();
 
@@ -603,10 +604,10 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
         // 预索引：O(n) 构建，后续 O(1) 查找
         var toIndex = new Dictionary<(double, double), KpcEvents.Event<TPayload>>();
         foreach (var e in cutTo)
-            toIndex.TryAdd(((double)e.StartBeat, (double)e.EndBeat), e);
+            toIndex.TryAdd((e.StartBeat, e.EndBeat), e);
         var fromIndex = new Dictionary<(double, double), KpcEvents.Event<TPayload>>();
         foreach (var e in cutFrom)
-            fromIndex.TryAdd(((double)e.StartBeat, (double)e.EndBeat), e);
+            fromIndex.TryAdd((e.StartBeat, e.EndBeat), e);
 
         var merged = new List<KpcEvents.Event<TPayload>>();
         var currentBeat = start;

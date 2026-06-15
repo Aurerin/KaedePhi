@@ -7,6 +7,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// 将连续的线性事件序列拟合为带缓动函数的单一事件。
 /// </summary>
 public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPayload>>
+    where TPayload : notnull
 {
     private static readonly int[] AllEasingIds = Enumerable.Range(1, 31).ToArray();
 

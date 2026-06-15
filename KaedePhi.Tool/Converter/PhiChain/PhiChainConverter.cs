@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using KaedePhi.Core.PhiChain.v6;
+﻿using KaedePhi.Core.PhiChain.v6;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiChain.Model;
 using KaedePhi.Tool.Converter.PhiChain.Utils;

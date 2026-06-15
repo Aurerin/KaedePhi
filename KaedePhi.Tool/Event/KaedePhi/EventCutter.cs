@@ -7,6 +7,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// KPC 事件切割器：将事件列表按指定拍长切割为等长段。
 /// </summary>
 public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<TPayload>, Beat>
+    where TPayload : notnull
 {
     /// <inheritdoc/>
     public List<KpcEvents.Event<TPayload>> CutEventsInRange(

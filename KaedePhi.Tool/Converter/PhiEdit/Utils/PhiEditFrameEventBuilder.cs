@@ -165,6 +165,7 @@ public class PhiEditFrameEventBuilder
         double horizonBeat,
         Func<float, T> valueTransformer
     )
+        where T : notnull
     {
         var orderedFrames = frames?.OrderBy(frame => frame.Beat).ToList() ?? [];
         var orderedEvents = events?.OrderBy(ev => ev.StartBeat).ToList() ?? [];
@@ -393,7 +394,8 @@ public class PhiEditFrameEventBuilder
         double startBeat,
         double endBeat,
         T value
-    ) =>
+    )
+        where T : notnull =>
         new()
         {
             StartBeat = new Beat(startBeat),

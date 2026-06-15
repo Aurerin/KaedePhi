@@ -15,6 +15,7 @@ public static class EventBuilder
         Func<T, T>? valueCopier = null,
         Func<T, T>? valueTransformer = null
     )
+        where T : notnull
     {
         valueCopier ??= v => v;
         valueTransformer ??= v => v;
@@ -38,6 +39,7 @@ public static class EventBuilder
         Func<T, T>? valueCopier = null,
         Func<T, T>? valueTransformer = null
     )
+        where T : notnull
     {
         valueCopier ??= v => v;
         valueTransformer ??= v => v;

@@ -1,4 +1,3 @@
-using System.Threading;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
@@ -51,7 +50,7 @@ public class KaedePhiJudgeLineBuilder
         return new Kpc.JudgeLine
         {
             Name = $"PeJudgeLine_{index}",
-            Notes = src.NoteList.ConvertAll(NoteBuilder.ConvertNote) ?? [],
+            Notes = src.NoteList.ConvertAll(NoteBuilder.ConvertNote),
             EventLayers = [eventLayer],
         };
     }
