@@ -1,0 +1,7 @@
+include:
+  - local: '.gitlab-ci/nightly-cli.yml'
+  - local: '.gitlab-ci/nightly-gui.yml'
+  - local: '.gitlab-ci/release-cli.yml'
+  - local: '.gitlab-ci/release-core.yml'
+  - local: '.gitlab-ci/release-gui.yml'
+  - local: '.gitlab-ci/release-tool.yml'
