@@ -258,7 +258,7 @@ public class LineEventBuilder
 
         if (canDirectMap)
         {
-            EmitAlignedMoveSegment(target, start, end, activeX!, activeY!, ref lastX, ref lastY);
+            EmitAlignedMoveSegment(target, start, end, activeX, activeY, ref lastX, ref lastY);
         }
         else
         {
@@ -272,16 +272,16 @@ public class LineEventBuilder
         Pe.JudgeLine target,
         float start,
         float end,
-        KpcEvents.Event<double> activeX,
-        KpcEvents.Event<double> activeY,
+        KpcEvents.Event<double>? activeX,
+        KpcEvents.Event<double>? activeY,
         ref double lastX,
         ref double lastY
     )
     {
         // 两轴都精确覆盖且缓动相同，直接取 StartValue/EndValue
-        var startXv = activeX.StartValue;
+        var startXv = activeX?.StartValue ?? throw new InvalidOperationException("activeX 不应为 null");
         var endXv = activeX.EndValue;
-        var startYv = activeY.StartValue;
+        var startYv = activeY?.StartValue ?? throw new InvalidOperationException("activeY 不应为 null");
         var endYv = activeY.EndValue;
         var easing = SafeConvertEasingToInt(activeX.Easing, $"移动@{start:F3}");
 
