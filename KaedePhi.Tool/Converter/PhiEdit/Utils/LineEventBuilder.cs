@@ -426,6 +426,7 @@ public class LineEventBuilder
         Func<float, float> valueTransform,
         string channelName
     )
+        where T : notnull
     {
         if (sourceEvents == null || sourceEvents.Count == 0)
             return;
@@ -502,6 +503,7 @@ public class LineEventBuilder
         KpcEvents.Event<T> src,
         string context
     )
+        where T : notnull
     {
         try
         {
@@ -535,6 +537,7 @@ public class LineEventBuilder
     }
 
     private EventCutter<T> GetOrCreateCutter<T>()
+        where T : notnull
     {
         var type = typeof(T);
         if (!_eventCutters.TryGetValue(type, out var cutter))
@@ -629,6 +632,7 @@ public class LineEventBuilder
         IEnumerable<KpcEvents.Event<T>> events,
         string channel
     )
+        where T : notnull
     {
         foreach (var e in events)
         {

@@ -18,6 +18,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// </summary>
 /// <typeparam name="TPayload">事件值类型（<see langword="int"/>、<see langword="float"/> 或 <see langword="double"/>）。</typeparam>
 public class EventListMergerPlus<TPayload> : EventListMerger<TPayload>
+    where TPayload : notnull
 {
     #region 入口
 

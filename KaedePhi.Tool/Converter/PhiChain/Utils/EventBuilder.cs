@@ -214,6 +214,7 @@ public static class EventBuilder
     /// 检查事件是否需要切割（使用了非默认的缓动截取）。
     /// </summary>
     private static bool NeedsCutting<T>(KpcEvents.Event<T> evt)
+        where T : notnull
     {
         return Math.Abs(evt.EasingLeft) > 0.0001f || Math.Abs(evt.EasingRight - 1.0f) > 0.0001f;
     }

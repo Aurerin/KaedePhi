@@ -6,6 +6,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 /// KPC 事件压缩器：合并变化率相近的相邻线性事件，以及移除无意义的默认值事件。
 /// </summary>
 public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvents.Event<TPayload>>
+    where TPayload : notnull
 {
     private static void ValidateParams(double tolerance)
     {

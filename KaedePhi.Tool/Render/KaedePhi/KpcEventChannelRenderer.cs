@@ -135,6 +135,7 @@ public static class KpcEventChannelRenderer
         Func<KpcEvents.Event<T>, Beat, double> getValue,
         KpcRenderOptions opts
     )
+        where T : notnull
     {
         var (minVal, maxVal) = SampleEventRange(events, getValue, opts);
         var list = new List<(double, double, Func<double, double>)>();
@@ -162,6 +163,7 @@ public static class KpcEventChannelRenderer
         Func<KpcEvents.Event<T>, Beat, double> getValue,
         KpcRenderOptions opts
     )
+        where T : notnull
     {
         if (events == null || events.Count == 0)
             return (-1.0, 1.0);
@@ -212,6 +214,7 @@ public static class KpcEventChannelRenderer
         return max;
 
         void Scan<T>(List<KpcEvents.Event<T>>? list)
+            where T : notnull
         {
             if (list == null)
                 return;

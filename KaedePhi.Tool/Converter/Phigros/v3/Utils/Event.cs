@@ -19,6 +19,7 @@ public static class EventBuilder
         double horizonBeat,
         Func<float, T> valueTransformer
     )
+        where T : notnull
     {
         if (events is not { Count: > 0 })
             return null;
@@ -190,7 +191,8 @@ public static class EventBuilder
         double endBeat,
         T startValue,
         T endValue
-    ) =>
+    )
+        where T : notnull =>
         new()
         {
             StartBeat = new Beat(startBeat),
@@ -200,6 +202,7 @@ public static class EventBuilder
         };
 
     private static void AddTrailingEvent<T>(List<KpcEvents.Event<T>> events, double horizonBeat)
+        where T : notnull
     {
         var lastEnd = (double)events[^1].EndBeat;
         var trailingEnd = Math.Max(horizonBeat, lastEnd + TrailingBeatPadding);
