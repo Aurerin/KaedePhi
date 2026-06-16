@@ -53,8 +53,9 @@ public static class FatherUnbindHelpers
         double angleDegrees,
         double lineX,
         double lineY
-    ) =>
-        CoordinateGeometry.GetKpcAbsolutePos(
+    )
+    {
+        return CoordinateGeometry.GetKpcAbsolutePos(
             fatherLineX,
             fatherLineY,
             angleDegrees,
@@ -62,6 +63,7 @@ public static class FatherUnbindHelpers
             lineY,
             CurrentRenderProfile
         );
+    }
 
     /// <summary>
     /// 判断线段是否需要进一步切割以满足精度要求。
@@ -361,14 +363,16 @@ public static class FatherUnbindHelpers
             List<KpcEvents.Event<double>>,
             List<KpcEvents.Event<double>>
         > merge
-    ) =>
-        new(
+    )
+    {
+        return new EventChannels(
             Fx: MergeLayerChannel(fatherLayers, l => l.MoveXEvents, merge),
             Fy: MergeLayerChannel(fatherLayers, l => l.MoveYEvents, merge),
             Fr: MergeLayerChannel(fatherLayers, l => l.RotateEvents, merge),
             Tx: MergeLayerChannel(targetLayers, l => l.MoveXEvents, merge),
             Ty: MergeLayerChannel(targetLayers, l => l.MoveYEvents, merge)
         );
+    }
 
     #endregion
 
@@ -536,25 +540,6 @@ public static class FatherUnbindHelpers
             segmentsY[i] = [];
         }
 
-        // 捕获 EventChannels 到局部函数，避免闭包捕获可变变量
-        (double X, double Y) AbsPosIn(Beat b) =>
-            GetLinePos(
-                GetValIn(ch.Fx, b),
-                GetValIn(ch.Fy, b),
-                GetValIn(ch.Fr, b),
-                GetValIn(ch.Tx, b),
-                GetValIn(ch.Ty, b)
-            );
-
-        (double X, double Y) AbsPosOut(Beat b) =>
-            GetLinePos(
-                GetValOut(ch.Fx, b),
-                GetValOut(ch.Fy, b),
-                GetValOut(ch.Fr, b),
-                GetValOut(ch.Tx, b),
-                GetValOut(ch.Ty, b)
-            );
-
         Parallel.For(
             0,
             segmentCount,
@@ -582,6 +567,24 @@ public static class FatherUnbindHelpers
         foreach (var seg in segmentsY)
             resY.AddRange(seg);
         return (resX, resY);
+
+        (double X, double Y) AbsPosIn(Beat b) =>
+            GetLinePos(
+                GetValIn(ch.Fx, b),
+                GetValIn(ch.Fy, b),
+                GetValIn(ch.Fr, b),
+                GetValIn(ch.Tx, b),
+                GetValIn(ch.Ty, b)
+            );
+
+        (double X, double Y) AbsPosOut(Beat b) =>
+            GetLinePos(
+                GetValOut(ch.Fx, b),
+                GetValOut(ch.Fy, b),
+                GetValOut(ch.Fr, b),
+                GetValOut(ch.Tx, b),
+                GetValOut(ch.Ty, b)
+            );
     }
 
     /// <summary>

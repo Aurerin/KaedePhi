@@ -36,7 +36,7 @@ public static class KpcEventChannelRenderer
             double Start,
             double End,
             Func<double, double> GetValue
-        )> Events { get; init; } = Array.Empty<(double, double, Func<double, double>)>();
+        )> Events { get; init; } = [];
     }
 
     /// <summary>渲染单个 EventLayer 的所有通道，返回 SKBitmap。</summary>

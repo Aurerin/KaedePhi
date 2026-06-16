@@ -1,3 +1,4 @@
+using System.Linq;
 using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
@@ -534,7 +535,7 @@ public class PhigrosV3JudgeLineBuilder
             );
         }
 
-        result.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
+        result = result.OrderBy(e => e.StartBeat).ToList();
         layer.MoveYEvents = result;
     }
 
@@ -601,7 +602,9 @@ public class PhigrosV3JudgeLineBuilder
             );
         }
 
-        events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
+        var sorted = events.OrderBy(e => e.StartBeat).ToList();
+        events.Clear();
+        events.AddRange(sorted);
     }
 
     #endregion

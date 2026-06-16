@@ -30,29 +30,29 @@ public static class EventBuilder
             switch (evt.Type)
             {
                 case PhichainEventType.X:
-                    layer.MoveXEvents ??= new List<KpcEvents.Event<double>>();
+                    layer.MoveXEvents ??= [];
                     layer.MoveXEvents.Add(
                         ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcX)
                     );
                     break;
                 case PhichainEventType.Y:
-                    layer.MoveYEvents ??= new List<KpcEvents.Event<double>>();
+                    layer.MoveYEvents ??= [];
                     layer.MoveYEvents.Add(
                         ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcY)
                     );
                     break;
                 case PhichainEventType.Rotation:
-                    layer.RotateEvents ??= new List<KpcEvents.Event<double>>();
+                    layer.RotateEvents ??= [];
                     layer.RotateEvents.Add(
                         ConvertEventToDoubleWithTransform(evt, Transform.TransformToKpcAngle)
                     );
                     break;
                 case PhichainEventType.Opacity:
-                    layer.AlphaEvents ??= new List<KpcEvents.Event<int>>();
+                    layer.AlphaEvents ??= [];
                     layer.AlphaEvents.Add(ConvertEventToInt(evt));
                     break;
                 case PhichainEventType.Speed:
-                    layer.SpeedEvents ??= new List<KpcEvents.Event<float>>();
+                    layer.SpeedEvents ??= [];
                     layer.SpeedEvents.Add(ConvertEventToFloat(evt));
                     break;
             }
@@ -498,7 +498,7 @@ public static class EventBuilder
         var endBeatVal = (double)endBeat;
         var totalBeats = endBeatVal - startBeatVal;
         if (totalBeats <= 0)
-            return new List<LineEvent> { src };
+            return [src];
 
         // 根据精度计算切段数量：事件长度（拍） * 每拍细分数量
         var segments = (int)(totalBeats * precision);

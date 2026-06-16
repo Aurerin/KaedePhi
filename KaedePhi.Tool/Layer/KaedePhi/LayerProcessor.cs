@@ -274,18 +274,10 @@ public class LayerProcessor : LoggableBase, ILayerProcessor<EventLayer>
         var layersCopy = layers.Select(l => l.Clone()).ToList();
         foreach (var layer in layersCopy)
         {
-            layer.AlphaEvents =
-                _intCompressor.RemoveUselessEvent(layer.AlphaEvents)
-                ?? throw new InvalidOperationException();
-            layer.MoveXEvents =
-                _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents)
-                ?? throw new InvalidOperationException();
-            layer.MoveYEvents =
-                _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents)
-                ?? throw new InvalidOperationException();
-            layer.RotateEvents =
-                _doubleCompressor.RemoveUselessEvent(layer.RotateEvents)
-                ?? throw new InvalidOperationException();
+            layer.AlphaEvents = _intCompressor.RemoveUselessEvent(layer.AlphaEvents);
+            layer.MoveXEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveXEvents);
+            layer.MoveYEvents = _doubleCompressor.RemoveUselessEvent(layer.MoveYEvents);
+            layer.RotateEvents = _doubleCompressor.RemoveUselessEvent(layer.RotateEvents);
         }
 
         return layersCopy;

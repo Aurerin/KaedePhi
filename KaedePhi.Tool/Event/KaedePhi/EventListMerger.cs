@@ -1,3 +1,4 @@
+using System.Linq;
 using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 
@@ -97,8 +98,12 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     /// 按开始拍排序事件列表。
     /// </summary>
     /// <param name="events">待排序的事件列表。</param>
-    protected static void SortByStartBeat(List<KpcEvents.Event<TPayload>> events) =>
-        events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
+    protected static void SortByStartBeat(List<KpcEvents.Event<TPayload>> events)
+    {
+        var sorted = events.OrderBy(e => e.StartBeat).ToList();
+        events.Clear();
+        events.AddRange(sorted);
+    }
 
     /// <summary>
     /// 判断两个已排序事件列表是否存在时间重叠。
@@ -301,10 +306,12 @@ public class EventListMerger<TPayload> : LoggableBase, IEventListMerger<KpcEvent
     /// 按起止拍对区间进行稳定排序。
     /// </summary>
     /// <param name="overlapIntervals">待排序区间集合。</param>
-    private static void SortIntervals(List<(Beat Start, Beat End)> overlapIntervals) =>
-        overlapIntervals.Sort(
-            (a, b) => a.Start != b.Start ? a.Start.CompareTo(b.Start) : a.End.CompareTo(b.End)
-        );
+    private static void SortIntervals(List<(Beat Start, Beat End)> overlapIntervals)
+    {
+        var sorted = overlapIntervals.OrderBy(x => x.Start).ThenBy(x => x.End).ToList();
+        overlapIntervals.Clear();
+        overlapIntervals.AddRange(sorted);
+    }
 
     #endregion
 

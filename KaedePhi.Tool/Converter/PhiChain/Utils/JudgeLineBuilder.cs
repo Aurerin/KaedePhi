@@ -161,7 +161,7 @@ public static class JudgeLineBuilder
             if (father >= 0)
             {
                 if (!childMap.ContainsKey(father))
-                    childMap[father] = new List<int>();
+                    childMap[father] = [];
                 childMap[father].Add(i);
             }
         }
@@ -308,7 +308,7 @@ public static class JudgeLineBuilder
         }
         else
         {
-            line.Events = new List<LineEvent>();
+            line.Events = [];
         }
 
         // 警告音符字段丢失
