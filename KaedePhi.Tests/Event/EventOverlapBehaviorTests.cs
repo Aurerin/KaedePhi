@@ -1,3 +1,4 @@
+using System.Linq;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.KaedePhi;
 using KpcEvents = KaedePhi.Core.KaedePhi.Events;
@@ -403,7 +404,9 @@ public class EventOverlapBehaviorTests
 
     private static void EventSort(List<KpcEvents.Event<double>> events)
     {
-        events.Sort((a, b) => a.StartBeat.CompareTo(b.StartBeat));
+        var sorted = events.OrderBy(e => e.StartBeat).ToList();
+        events.Clear();
+        events.AddRange(sorted);
     }
 
     #endregion

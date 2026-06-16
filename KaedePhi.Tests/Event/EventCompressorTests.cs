@@ -219,11 +219,11 @@ public class EventCompressorTests
     #region RemoveUselessEvent Tests
 
     [Fact]
-    public void RemoveUselessEvent_NullInput_ReturnsNull()
+    public void RemoveUselessEvent_NullInput_ReturnsEmpty()
     {
         var result = _doubleCompressor.RemoveUselessEvent(null);
 
-        result.Should().BeNull();
+        result.Should().BeEmpty();
     }
 
     [Fact]

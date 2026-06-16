@@ -279,9 +279,11 @@ public class LineEventBuilder
     )
     {
         // 两轴都精确覆盖且缓动相同，直接取 StartValue/EndValue
-        var startXv = activeX?.StartValue ?? throw new InvalidOperationException("activeX 不应为 null");
+        var startXv =
+            activeX?.StartValue ?? throw new InvalidOperationException("activeX 不应为 null");
         var endXv = activeX.EndValue;
-        var startYv = activeY?.StartValue ?? throw new InvalidOperationException("activeY 不应为 null");
+        var startYv =
+            activeY?.StartValue ?? throw new InvalidOperationException("activeY 不应为 null");
         var endYv = activeY.EndValue;
         var easing = SafeConvertEasingToInt(activeX.Easing, $"移动@{start:F3}");
 

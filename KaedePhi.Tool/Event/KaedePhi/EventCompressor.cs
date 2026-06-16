@@ -36,15 +36,6 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
         var midValueEnd = NumericHelper.ToDouble(last.EndValue);
         var midValueStart = NumericHelper.ToDouble(cur.StartValue);
         var endValue = NumericHelper.ToDouble(cur.EndValue);
-
-        // 以两个子段各自运动范围的最大值为归一化尺度：
-        //   rangeFirst = |B-A|（第一段），rangeSecond = |C-B|（第二段）
-        //   scale = max(rangeFirst, rangeSecond, 1e-3)
-        //
-        // 不使用总净变化量 |C-A|（rangeTotal）的原因：
-        //   对于跨越零点的信号（如 A=-0.4, B=0, C=+0.4），|C-A|=0.8 远大于旧代码
-        //   max(|A|,|C|)=0.4，使得容差被虚增一倍，导致本不应合并的非线性段被合并。
-        //   用子段范围可以保持与旧代码同等严格，同时对大直流偏置小幅运动更敏感。
         var rangeFirst = Math.Abs(midValueEnd - startValue);
         var rangeSecond = Math.Abs(endValue - midValueStart);
         var scale = Math.Max(Math.Max(rangeFirst, rangeSecond), 1e-3);
@@ -188,7 +179,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
     /// <summary>
     /// 移除无用事件（起始值和结束值都为默认值的事件）。
     /// </summary>
-    public List<KpcEvents.Event<TPayload>>? RemoveUselessEvent(
+    public List<KpcEvents.Event<TPayload>> RemoveUselessEvent(
         List<KpcEvents.Event<TPayload>>? events
     )
     {
@@ -202,7 +193,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
             && EqualityComparer<TPayload>.Default.Equals(events[0].EndValue, default)
         )
         {
-            return new List<KpcEvents.Event<TPayload>>();
+            return [];
         }
 
         // 其他情况直接返回原列表，无需克隆

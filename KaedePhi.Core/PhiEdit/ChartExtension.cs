@@ -10,6 +10,8 @@ namespace KaedePhi.Core.PhiEdit
 {
     public partial class Chart
     {
+        private static readonly string[] Separator = { "\r\n", "\n" };
+
         /// <summary>
         /// 将 PhiEditChart 格式的文本字符串反序列化为 <see cref="Chart"/> 对象。
         /// <para>
@@ -24,7 +26,7 @@ namespace KaedePhi.Core.PhiEdit
         [PublicAPI]
         public static Chart Load(string pec)
         {
-            var lines = pec.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            var lines = pec.Split(Separator, StringSplitOptions.None);
 
             if (!int.TryParse(lines[0], out var offset))
                 throw new FormatException(
@@ -86,8 +88,7 @@ namespace KaedePhi.Core.PhiEdit
             using var reader = CreateStreamReader(stream);
             var (chart, judgeDict) = InitializeChart(reader.ReadLine);
 
-            string? line;
-            while ((line = reader.ReadLine()) is not null)
+            while (reader.ReadLine() is { } line)
             {
                 if (!string.IsNullOrWhiteSpace(line))
                     ParseChartLineCore(line, reader.ReadLine, chart, judgeDict);
@@ -115,8 +116,7 @@ namespace KaedePhi.Core.PhiEdit
             var firstLine = await reader.ReadLineAsync();
             var (chart, judgeDict) = InitializeChart(() => firstLine);
 
-            string? line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            while (await reader.ReadLineAsync() is { } line)
             {
                 if (!string.IsNullOrWhiteSpace(line))
                     await ParseChartLineAsync(line, reader, chart, judgeDict);
