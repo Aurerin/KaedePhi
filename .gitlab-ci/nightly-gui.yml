@@ -1,4 +1,8 @@
-﻿build-gui:
+# nightly-gui 分为两个独立 job：
+#   1. nightly-gui-build      - linux docker，构建 GUI zip 产物
+#   2. nightly-gui-installer  - windows runner，构建安装包
+
+nightly-gui-build:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:10.0
   rules:
@@ -6,18 +10,18 @@
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
   before_script:
-    - apt-get update && apt-get install -y zip
+    - apt-get update -qq && apt-get install -y -qq zip
   script:
     - |
       PROPS="Directory.Build.props"
-      VERSION=$(grep -oP '<Version>\K[^<]+' "$PROPS" 2>/dev/null || echo "0.0.0")
-      HASH=$(git rev-parse --short HEAD)
-      FULL_VERSION="${VERSION}+nightly.${HASH}"
-      echo "$FULL_VERSION" > version.txt
-
       CSPROJ="KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
       output_dir="./artifacts/gui"
       runtimes=("win-x64" "linux-x64")
+
+      VERSION=$(grep -oP '<Version>\K[^<]+' "$PROPS" 2>/dev/null || echo "0.0.0")
+      HASH=$(git rev-parse --short HEAD)
+      FULL_VERSION="${VERSION}+nightly.${HASH}"
+      echo "$FULL_VERSION" > nightly-version.txt
 
       mkdir -p "$output_dir"
 
@@ -36,15 +40,16 @@
       done
   artifacts:
     paths:
-      - ./artifacts/gui/*.zip
-      - ./version.txt
-    expire_in: 1 day
+      - artifacts/gui/*.zip
+      - nightly-version.txt
+    expire_in: 7 days
 
-build-installer:
+nightly-gui-installer:
   stage: installer
   tags: [windows]
-  dependencies:
-    - build-gui
+  needs:
+    - job: nightly-gui-build
+      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
     - if: $CI_PIPELINE_SOURCE == "web"
@@ -53,49 +58,28 @@ build-installer:
     - |
       $ErrorActionPreference = "Stop"
 
-      # 安装 Chocolatey
-      Set-ExecutionPolicy Bypass -Scope Process -Force
-      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-      # 安装 .NET SDK 10.0 和 Inno Setup
-      choco install dotnet-10.0-sdk -y
-      choco install innosetup --version=6.2.2 -y
-      refreshenv
-      $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
-
-      $version = Get-Content -Path "version.txt"
+      $version = (Get-Content -Path "nightly-version.txt" -Raw).Trim()
       $zipFile = "./artifacts/gui/KaedePhi.Tool.Gui-nightly-net10.0-win-x64.zip"
-      $publishDir = "./publish"
+      $publishDir = (Resolve-Path ".").Path + "\publish"
 
-      Expand-Archive -Path $zipFile -DestinationPath $publishDir
+      Expand-Archive -Path $zipFile -DestinationPath $publishDir -Force
 
-      # 设置环境变量供 Inno Setup 使用
       $env:KAEPHI_VERSION = $version
-      $env:KAEPHI_PROJECT_DIR = $env:CI_PROJECT_DIR
-      $env:KAEPHI_PUBLISH_DIR = "$env:CI_PROJECT_DIR\$publishDir"
+      $env:KAEPHI_PROJECT_DIR = (Resolve-Path ".").Path
+      $env:KAEPHI_PUBLISH_DIR = $publishDir
 
-      # 运行 Inno Setup 编译器
-      iscc SetupGenScript.iss
+      # 下载并静默安装 Inno Setup（与 GitHub inno-setup-action 行为一致）
+      $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+      if (-not (Test-Path $isccPath)) {
+        Write-Host "Installing Inno Setup..."
+        $installer = "$env:TEMP\innosetup.exe"
+        Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile $installer
+        Start-Process -FilePath $installer -ArgumentList "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES" -Wait
+        Remove-Item $installer
+      }
+      & $isccPath SetupGenScript.iss
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
   artifacts:
     paths:
-      - ./setup/*.exe
-    expire_in: 7 days
-
-upload-nightly:
-  stage: upload
-  image: mcr.microsoft.com/dotnet/sdk:10.0
-  dependencies:
-    - build-gui
-    - build-installer
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: manual
-  script:
-    - echo "Collecting artifacts..."
-  artifacts:
-    paths:
-      - ./artifacts/gui/*.zip
-      - ./setup/*.exe
+      - setup/*.exe
     expire_in: 7 days

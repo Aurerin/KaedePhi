@@ -1,3 +1,7 @@
+# release-core 只需要一个 job，无需多阶段
+# 触发条件：main 分支 push 且改动了 Core csproj 或 Directory.Build.props，
+#           或通过 Web UI 手动触发（可通过变量 CI_TEST_BUILD=true 只构建不发版）
+
 release-core:
   stage: release
   image: mcr.microsoft.com/dotnet/sdk:10.0
@@ -7,15 +11,11 @@ release-core:
         - KaedePhi.Core/KaedePhi.Core.csproj
         - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
   variables:
     CI_TEST_BUILD: "false"
-    CI_CREATE_RELEASE: "true"
   before_script:
-    - apt-get update && apt-get install -y curl
-    - curl -L https://gitlab.com/gitlab-org/release-cli/-/releases/permalink/latest/downloads/release-cli-linux-amd64 -o /usr/local/bin/release-cli
-    - chmod +x /usr/local/bin/release-cli
-    - git config --global user.name "GitLab CI"
-    - git config --global user.email "gitlab-ci@example.com"
+    - apt-get update -qq && apt-get install -y -qq curl
   script:
     - |
       CSPROJ="KaedePhi.Core/KaedePhi.Core.csproj"
@@ -38,10 +38,21 @@ release-core:
       if [ -z "$VERSION" ]; then echo "Could not extract version from $CSPROJ or $PROPS, skipping."; exit 0; fi
 
       TAG="Core-v${VERSION}"
+
+      # 安装 net8.0 + net9.0 SDK（sdk:10.0 镜像只含 10.0）
+      for ch in "8.0" "9.0"; do
+        major="${ch%%.*}"
+        if ! dotnet --list-sdks 2>/dev/null | grep -q "^${major}\."; then
+          echo "Installing .NET SDK $ch..."
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- \
+            --channel "$ch" --install-dir /usr/share/dotnet
+        fi
+      done
+
       mkdir -p ./artifacts
 
       IS_TEST_BUILD=${CI_TEST_BUILD:-false}
-      SHOULD_RELEASE=${CI_CREATE_RELEASE:-true}
+      SHOULD_RELEASE="true"
 
       if [ "$IS_TEST_BUILD" = "true" ]; then
         echo "Test build mode - skipping release for Core"
@@ -64,16 +75,36 @@ release-core:
       fi
 
       PRERELEASE=$(is_prerelease "$VERSION")
+      git config user.name "GitLab CI"
+      git config user.email "gitlab-ci@noreply"
       git tag "$TAG"
-      git push origin "$TAG" --force
+      git push "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$TAG" --force
 
-      RELEASE_ARGS=("$TAG" --name "Core v${VERSION}" --description "自动发布 Core 版本 $VERSION")
-      [ "$PRERELEASE" = "true" ] && RELEASE_ARGS+=(--pre-release)
-      RELEASE_ARGS+=(--assets-link "{\"name\":\"nupkg\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/*.nupkg\"}")
+      ASSETS=""
+      for nupkg in ./artifacts/*.nupkg; do
+        FNAME=$(basename "$nupkg")
+        ASSETS="${ASSETS}{\"name\":\"${FNAME}\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/${FNAME}\",\"link_type\":\"other\"},"
+      done
+      ASSETS="[${ASSETS%,}]"
 
-      release-cli create "${RELEASE_ARGS[@]}"
+      BODY=$(cat <<EOF
+      {
+        "name": "Core v${VERSION}",
+        "tag_name": "${TAG}",
+        "description": "自动发布 Core 版本 ${VERSION}",
+        "assets": { "links": ${ASSETS} }
+      }
+      EOF
+      )
+
+      curl -sf -X POST \
+        -H "PRIVATE-TOKEN: ${GITLAB_RELEASE_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d "$BODY" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+
       echo "Created release: Core v${VERSION} (prerelease: $PRERELEASE)"
   artifacts:
     paths:
-      - ./artifacts/*.nupkg
+      - artifacts/*.nupkg
     expire_in: 7 days
