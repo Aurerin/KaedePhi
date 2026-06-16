@@ -1,4 +1,4 @@
-﻿// 向前兼容层 — KaedePhi 格式
+// 向前兼容层 — KaedePhi 格式
 //
 // 这些类型已迁移至子命名空间以改善目录结构的可维护性：
 //   事件系统  → KaedePhi.Core.KaedePhi.Events

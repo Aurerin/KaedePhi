@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 
 namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 

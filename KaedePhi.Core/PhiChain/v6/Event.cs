@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6.JsonConverter;
 using Newtonsoft.Json;

@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Common;
 using SkiaSharp;
 using Chart = KaedePhi.Core.KaedePhi.Chart;
 

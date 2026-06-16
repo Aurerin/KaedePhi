@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.KaedePhi;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Event.KaedePhi;

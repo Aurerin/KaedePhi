@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.JudgeLines.KaedePhi.Utils;
 using JudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 

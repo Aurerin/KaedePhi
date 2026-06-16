@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Core.PhiZonePlayerExtended.JudgeLines
+namespace KaedePhi.Core.PhiZonePlayerExtended.JudgeLines
 {
     /// <summary>
     /// 决定当UI组件或任何视频附加到该线上时，该线将如何显示。

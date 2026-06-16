@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Cli.Infrastructure;
+using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Settings;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;

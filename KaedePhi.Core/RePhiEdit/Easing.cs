@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.RePhiEdit.JsonConverter;
+using KaedePhi.Core.RePhiEdit.JsonConverter;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.RePhiEdit

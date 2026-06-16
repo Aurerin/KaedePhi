@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6;
 using KaedePhi.Core.Utils;
 using KpcNoteType = KaedePhi.Core.Common.NoteType;

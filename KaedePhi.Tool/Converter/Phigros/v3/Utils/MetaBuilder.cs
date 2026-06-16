@@ -1,4 +1,4 @@
-﻿using PhigrosChart = KaedePhi.Core.Phigros.v3.Chart;
+using PhigrosChart = KaedePhi.Core.Phigros.v3.Chart;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 

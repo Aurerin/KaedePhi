@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Common;
+namespace KaedePhi.Tool.Common;
 
 /// <summary>
 /// 坐标几何工具类，提供 Kpc 坐标系与其他坐标系之间的互转、角度映射、旋转变换及屏幕空间距离计算等功能。

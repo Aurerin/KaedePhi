@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Cli.Model;
+namespace KaedePhi.Tool.Cli.Model;
 
 /// <summary>
 /// 事件拟合命令默认配置

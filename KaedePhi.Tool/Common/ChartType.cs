@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Common;
+namespace KaedePhi.Tool.Common;
 
 public enum ChartType
 {

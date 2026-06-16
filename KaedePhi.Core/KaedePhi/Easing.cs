@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Core.KaedePhi
+namespace KaedePhi.Core.KaedePhi
 {
     /// <summary>
     /// 缓动类型封装。

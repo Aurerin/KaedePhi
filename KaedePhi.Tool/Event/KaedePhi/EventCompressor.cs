@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Event.KaedePhi;
 
@@ -193,7 +193,7 @@ public class EventCompressor<TPayload> : LoggableBase, IEventCompressor<KpcEvent
     )
     {
         if (events == null || events.Count == 0)
-            return events;
+            return events ?? [];
 
         // 只有当列表只有一个事件且该事件为默认值时才需要修改
         if (

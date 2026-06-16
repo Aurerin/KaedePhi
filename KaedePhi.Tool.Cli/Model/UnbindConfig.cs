@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Cli.Model;
+namespace KaedePhi.Tool.Cli.Model;
 
 /// <summary>
 /// 父线解绑命令默认配置

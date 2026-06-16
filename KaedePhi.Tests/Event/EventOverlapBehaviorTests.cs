@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.KaedePhi;
 using KpcEvents = KaedePhi.Core.KaedePhi.Events;
 

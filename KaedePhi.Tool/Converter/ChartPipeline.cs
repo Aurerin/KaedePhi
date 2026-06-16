@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter;
+namespace KaedePhi.Tool.Converter;
 
 /// <summary>
 /// 管线式图表转换入口

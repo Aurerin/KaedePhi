@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using KaedePhi.Tool.Cli.Commands;
 using KaedePhi.Tool.Cli.Commands.Test;
 using KaedePhi.Tool.Cli.Commands.WorkSpace;

@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Cli.Model;
+namespace KaedePhi.Tool.Cli.Model;
 
 /// <summary>
 /// 层级合并命令默认配置

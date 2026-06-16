@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Cli.Infrastructure;
+using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Model;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.Phigros.v3.JsonConverter

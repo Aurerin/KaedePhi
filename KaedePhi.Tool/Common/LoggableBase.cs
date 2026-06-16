@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Common;
+namespace KaedePhi.Tool.Common;
 
 /// <summary>
 /// 提供日志回调订阅功能的抽象基类，供工具实现类继承以避免重复代码。

@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter.PhiChain.Model;
+namespace KaedePhi.Tool.Converter.PhiChain.Model;
 
 /// <summary>
 /// Phichain 转 KPC 的转换选项。

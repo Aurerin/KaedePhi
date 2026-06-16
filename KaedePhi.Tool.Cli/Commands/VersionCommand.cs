@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands;

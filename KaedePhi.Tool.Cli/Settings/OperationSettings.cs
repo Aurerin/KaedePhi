@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Cli.Infrastructure;
+using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Cli.Model;
 using Spectre.Console;
 using YamlDotNet.Serialization;

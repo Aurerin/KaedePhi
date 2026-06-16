@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
+namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
 /// <summary>
 /// RPE 与 KPC 缓动类型之间的映射与转换工具。
