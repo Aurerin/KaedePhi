@@ -1,16 +1,21 @@
-variables:
-  CI_RELEASE_TYPE: "auto"
+# release-gui 分为四个独立 job：
+#   1. detect-gui-version  - 检测版本变更（linux docker）
+#   2. build-gui-release   - 构建 GUI zip 产物（linux docker）
+#   3. build-gui-installer - 构建安装包（windows runner，自行安装 Inno Setup）
+#   4. release-gui         - 创建 GitLab Release（linux docker）
 
-detect-version:
+detect-gui-version:
   stage: detect
   image: mcr.microsoft.com/dotnet/sdk:10.0
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
+  variables:
+    CI_RELEASE_TYPE: "auto"
   script:
     - |
       CSPROJ="KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
@@ -31,26 +36,21 @@ detect-version:
         exit 0
       fi
 
-      # Handle forced release types
       if [ "$FORCE" = "release" ]; then
-        echo "Forced release type: release"
         echo "release" > build_type.txt
         echo "$CURRENT" > version.txt
         echo "minor" > change_level.txt
         exit 0
       elif [ "$FORCE" = "prerelease" ]; then
-        echo "Forced release type: prerelease"
         echo "prerelease" > build_type.txt
         echo "$CURRENT" > version.txt
         echo "patch" > change_level.txt
         exit 0
       elif [ "$FORCE" = "skip" ]; then
-        echo "Forced skip"
         echo "skip" > build_type.txt
         exit 0
       fi
 
-      # Auto detection: compare version with previous commit
       PREVIOUS=$(git show HEAD~1:"$CSPROJ" 2>/dev/null | grep -oP '<Version>\K[^<]+' || echo "")
       if [ -z "$PREVIOUS" ]; then
         PREVIOUS=$(git show HEAD~1:"$PROPS" 2>/dev/null | grep -oP '<Version>\K[^<]+' || echo "")
@@ -59,27 +59,23 @@ detect-version:
       echo "Previous version: $PREVIOUS"
 
       if [ "$CURRENT" = "$PREVIOUS" ]; then
-        echo ".csproj changed but version is unchanged ($CURRENT), skipping release build."
+        echo "Version unchanged ($CURRENT), skipping."
         echo "skip" > build_type.txt
         exit 0
       fi
 
-      # Parse version components (x.y.z)
       CUR_MAJOR=$(echo "$CURRENT"  | cut -d'.' -f1)
       CUR_MINOR=$(echo "$CURRENT"  | cut -d'.' -f2)
       PREV_MAJOR=$(echo "$PREVIOUS" | cut -d'.' -f1)
       PREV_MINOR=$(echo "$PREVIOUS" | cut -d'.' -f2)
 
       if [ -z "$PREVIOUS" ] || [ "$CUR_MAJOR" != "$PREV_MAJOR" ]; then
-        echo "Major version changed ($PREVIOUS → $CURRENT) → Release"
         echo "release" > build_type.txt
         echo "major" > change_level.txt
       elif [ "$CUR_MINOR" != "$PREV_MINOR" ]; then
-        echo "Minor version changed ($PREVIOUS → $CURRENT) → Release"
         echo "release" > build_type.txt
         echo "minor" > change_level.txt
       else
-        echo "Patch version changed ($PREVIOUS → $CURRENT) → PreRelease"
         echo "prerelease" > build_type.txt
         echo "patch" > change_level.txt
       fi
@@ -91,18 +87,21 @@ detect-version:
       - change_level.txt
     expire_in: 1 hour
 
-build-gui:
+build-gui-release:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:10.0
+  needs:
+    - job: detect-gui-version
+      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
   before_script:
-    - apt-get update && apt-get install -y zip
+    - apt-get update -qq && apt-get install -y -qq zip
   script:
     - |
       BUILD_TYPE=$(cat build_type.txt)
@@ -135,66 +134,78 @@ build-gui:
       done
   artifacts:
     paths:
-      - ./artifacts/gui/*.zip
+      - artifacts/gui/*.zip
     expire_in: 1 hour
 
-build-installer:
+build-gui-installer:
   stage: installer
   tags: [windows]
+  needs:
+    - job: detect-gui-version
+      artifacts: true
+    - job: build-gui-release
+      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
   script:
     - |
       $ErrorActionPreference = "Stop"
-
-      $buildType = Get-Content -Path "build_type.txt"
+      $buildType = (Get-Content build_type.txt -Raw).Trim()
       if ($buildType -eq "skip") {
         Write-Host "Skipping installer build."
         exit 0
       }
 
-      # 安装 Chocolatey
-      Set-ExecutionPolicy Bypass -Scope Process -Force
-      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-      # 安装 .NET SDK 10.0 和 Inno Setup
-      choco install dotnet-10.0-sdk -y
-      choco install innosetup --version=6.2.2 -y
-      refreshenv
-      $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
-
-      $version = Get-Content -Path "version.txt"
+      $version = (Get-Content version.txt -Raw).Trim()
       $zipFile = "./artifacts/gui/KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip"
-      $publishDir = "./publish"
+      $publishDir = (Resolve-Path ".").Path + "\publish"
 
-      Expand-Archive -Path $zipFile -DestinationPath $publishDir
+      Expand-Archive -Path $zipFile -DestinationPath $publishDir -Force
 
       $env:KAEPHI_VERSION = $version
-      $env:KAEPHI_PROJECT_DIR = $env:CI_PROJECT_DIR
-      $env:KAEPHI_PUBLISH_DIR = "$env:CI_PROJECT_DIR\$publishDir"
+      $env:KAEPHI_PROJECT_DIR = (Resolve-Path ".").Path
+      $env:KAEPHI_PUBLISH_DIR = $publishDir
 
-      iscc SetupGenScript.iss
+      # 下载并静默安装 Inno Setup（与 GitHub inno-setup-action 行为一致）
+      $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+      if (-not (Test-Path $isccPath)) {
+        Write-Host "Installing Inno Setup..."
+        $installer = "$env:TEMP\innosetup.exe"
+        Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile $installer
+        Start-Process -FilePath $installer -ArgumentList "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES" -Wait
+        Remove-Item $installer
+      }
+      & $isccPath SetupGenScript.iss
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
   artifacts:
     paths:
-      - ./setup/*.exe
+      - setup/*.exe
     expire_in: 1 hour
 
-create-release:
+release-gui:
   stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  needs:
+    - job: detect-gui-version
+      artifacts: true
+    - job: build-gui-release
+      artifacts: true
+    - job: build-gui-installer
+      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Gui/KaedePhi.Tool.Gui.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl
   script:
     - |
       BUILD_TYPE=$(cat build_type.txt)
@@ -207,19 +218,12 @@ create-release:
       fi
 
       TAG="Gui-v${VERSION}"
-      echo "Creating release: $TAG"
 
-      # Check if tag already exists
       if git rev-parse "$TAG" >/dev/null 2>&1; then
-        echo "Warning: Tag $TAG already exists, skipping release creation."
+        echo "Warning: Tag $TAG already exists, skipping."
         exit 0
       fi
 
-      # Create tag
-      git tag "$TAG"
-      git push origin "$TAG"
-
-      # Generate changelog
       CUR_MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
       CUR_MINOR=$(echo "$VERSION" | cut -d'.' -f2)
 
@@ -254,31 +258,39 @@ create-release:
         echo "" >> "$NOTES_FILE"
         git log HEAD --pretty=format:"- %s (%h)" --no-merges >> "$NOTES_FILE"
       fi
-
       echo "" >> "$NOTES_FILE"
       echo "## 下载说明" >> "$NOTES_FILE"
       echo "" >> "$NOTES_FILE"
       echo "- **便携版**：下载 \`KaedePhi.Tool.Gui-net10.0-*-fdd.zip\`，解压后直接运行" >> "$NOTES_FILE"
       echo "- **安装版**：下载 \`KaedePhi-${VERSION}.exe\` 安装程序" >> "$NOTES_FILE"
 
-      # Create release using release-cli
-      if [ "$BUILD_TYPE" = "prerelease" ]; then
-        release-cli create \
-          --name "Gui v${VERSION}" \
-          --tag-name "$TAG" \
-          --description "$(cat $NOTES_FILE)" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/gui/KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Gui-net10.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/gui/KaedePhi.Tool.Gui-net10.0-linux-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi-${VERSION}.exe\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/setup/KaedePhi-${VERSION}.exe\"}" \
-          --prerelease
-      else
-        release-cli create \
-          --name "Gui v${VERSION}" \
-          --tag-name "$TAG" \
-          --description "$(cat $NOTES_FILE)" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/gui/KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Gui-net10.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/gui/KaedePhi.Tool.Gui-net10.0-linux-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi-${VERSION}.exe\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/setup/KaedePhi-${VERSION}.exe\"}"
-      fi
+      git config user.name "GitLab CI"
+      git config user.email "gitlab-ci@noreply"
+      git tag "$TAG"
+      git push "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$TAG"
+
+      NOTES=$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' "$NOTES_FILE")
+
+      EXE_NAME=$(ls ./setup/*.exe 2>/dev/null | head -1 | xargs -r basename)
+      [ -z "$EXE_NAME" ] && EXE_NAME="KaedePhi-${VERSION}.exe"
+
+      ASSETS=""
+      ASSETS="${ASSETS}{\"name\":\"KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/gui/KaedePhi.Tool.Gui-net10.0-win-x64-fdd.zip\",\"link_type\":\"other\"},"
+      ASSETS="${ASSETS}{\"name\":\"KaedePhi.Tool.Gui-net10.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/gui/KaedePhi.Tool.Gui-net10.0-linux-x64-fdd.zip\",\"link_type\":\"other\"},"
+      ASSETS="${ASSETS}{\"name\":\"${EXE_NAME}\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/setup/${EXE_NAME}\",\"link_type\":\"other\"}"
+      ASSETS="[${ASSETS}]"
+
+      BODY="{\"name\":\"Gui v${VERSION}\",\"tag_name\":\"${TAG}\",\"description\":\"${NOTES}\",\"assets\":{\"links\":${ASSETS}}}"
+
+      curl -sf -X POST \
+        -H "PRIVATE-TOKEN: ${GITLAB_RELEASE_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d "$BODY" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
 
       echo "Created $BUILD_TYPE release: Gui v${VERSION}"
+  artifacts:
+    paths:
+      - artifacts/gui/*.zip
+      - setup/*.exe
+    expire_in: 7 days

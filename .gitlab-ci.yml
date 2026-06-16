@@ -1,8 +1,7 @@
 stages:
-  - build
   - detect
+  - build
   - installer
-  - upload
   - release
 
 include:

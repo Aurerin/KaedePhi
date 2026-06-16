@@ -1,16 +1,23 @@
-variables:
-  CI_RELEASE_TYPE: "auto"
+# release-cli 分为三个独立 job：
+#   1. detect-cli-version  - 检测版本变更（linux docker）
+#   2. build-cli           - 构建 CLI 产物（linux docker）
+#   3. release-cli         - 创建 GitLab Release（linux docker）
+#
+# 触发条件：main 分支 push 且改动了 CLI csproj 或 Directory.Build.props，
+#           或通过 Web UI 手动触发（可通过变量 CI_RELEASE_TYPE 控制：auto/release/prerelease/skip）
 
-detect-version:
+detect-cli-version:
   stage: detect
   image: mcr.microsoft.com/dotnet/sdk:10.0
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
+  variables:
+    CI_RELEASE_TYPE: "auto"
   script:
     - |
       CSPROJ="KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
@@ -31,7 +38,6 @@ detect-version:
         exit 0
       fi
 
-      # Handle forced release types
       if [ "$FORCE" = "release" ]; then
         echo "Forced release type: release"
         echo "release" > build_type.txt
@@ -50,7 +56,6 @@ detect-version:
         exit 0
       fi
 
-      # Auto detection: compare version with previous commit
       PREVIOUS=$(git show HEAD~1:"$CSPROJ" 2>/dev/null | grep -oP '<Version>\K[^<]+' || echo "")
       if [ -z "$PREVIOUS" ]; then
         PREVIOUS=$(git show HEAD~1:"$PROPS" 2>/dev/null | grep -oP '<Version>\K[^<]+' || echo "")
@@ -64,7 +69,6 @@ detect-version:
         exit 0
       fi
 
-      # Parse version components (x.y.z)
       CUR_MAJOR=$(echo "$CURRENT"  | cut -d'.' -f1)
       CUR_MINOR=$(echo "$CURRENT"  | cut -d'.' -f2)
       PREV_MAJOR=$(echo "$PREVIOUS" | cut -d'.' -f1)
@@ -94,21 +98,31 @@ detect-version:
 build-cli:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:10.0
+  needs:
+    - job: detect-cli-version
+      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
   before_script:
-    - apt-get update && apt-get install -y zip
+    - apt-get update -qq && apt-get install -y -qq zip
   script:
     - |
       BUILD_TYPE=$(cat build_type.txt)
       if [ "$BUILD_TYPE" = "skip" ]; then
         echo "Skipping build."
         exit 0
+      fi
+
+      # 安装 net8.0 SDK（sdk:10.0 镜像只含 10.0）
+      if ! dotnet --list-sdks 2>/dev/null | grep -q "^8\."; then
+        echo "Installing .NET SDK 8.0..."
+        curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- \
+          --channel "8.0" --install-dir /usr/share/dotnet
       fi
 
       CSPROJ="KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
@@ -138,19 +152,26 @@ build-cli:
       done
   artifacts:
     paths:
-      - ./artifacts/cli/*.zip
+      - artifacts/cli/*.zip
     expire_in: 1 hour
 
-create-release:
+release-cli:
   stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  needs:
+    - job: detect-cli-version
+      artifacts: true
+    - job: build-cli
+      artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
       changes:
-        - "KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
-        - "Directory.Build.props"
+        - KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj
+        - Directory.Build.props
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl
   script:
     - |
       BUILD_TYPE=$(cat build_type.txt)
@@ -163,19 +184,12 @@ create-release:
       fi
 
       TAG="Cli-v${VERSION}"
-      echo "Creating release: $TAG"
 
-      # Check if tag already exists
       if git rev-parse "$TAG" >/dev/null 2>&1; then
-        echo "Warning: Tag $TAG already exists, skipping release creation."
+        echo "Warning: Tag $TAG already exists, skipping."
         exit 0
       fi
 
-      # Create tag
-      git tag "$TAG"
-      git push origin "$TAG"
-
-      # Generate changelog
       CUR_MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
       CUR_MINOR=$(echo "$VERSION" | cut -d'.' -f2)
 
@@ -186,16 +200,13 @@ create-release:
         tmin=$(echo "$tver" | cut -d'.' -f2)
         case "$CHANGE_LEVEL" in
           patch)
-            # Last tag in the same major.minor series
             [ "$tmaj" = "$CUR_MAJOR" ] && [ "$tmin" = "$CUR_MINOR" ] && { BASE_TAG="$tag"; break; }
             ;;
           minor)
-            # Last tag with same major but a different (older) minor
             { [ "$tmaj" = "$CUR_MAJOR" ] && [ "$tmin" != "$CUR_MINOR" ]; } \
               || [ "$tmaj" != "$CUR_MAJOR" ] && { BASE_TAG="$tag"; break; }
             ;;
           major)
-            # Last tag with a different (older) major
             [ "$tmaj" != "$CUR_MAJOR" ] && { BASE_TAG="$tag"; break; }
             ;;
         esac
@@ -214,26 +225,29 @@ create-release:
         git log HEAD --pretty=format:"- %s (%h)" --no-merges >> "$NOTES_FILE"
       fi
 
-      # Create release using release-cli
-      if [ "$BUILD_TYPE" = "prerelease" ]; then
-        release-cli create \
-          --name "Cli v${VERSION}" \
-          --tag-name "$TAG" \
-          --description "$(cat $NOTES_FILE)" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net8.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net8.0-win-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net8.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net8.0-linux-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net10.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net10.0-win-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net10.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net10.0-linux-x64-fdd.zip\"}" \
-          --prerelease
-      else
-        release-cli create \
-          --name "Cli v${VERSION}" \
-          --tag-name "$TAG" \
-          --description "$(cat $NOTES_FILE)" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net8.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net8.0-win-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net8.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net8.0-linux-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net10.0-win-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net10.0-win-x64-fdd.zip\"}" \
-          --assets-link "{\"name\":\"KaedePhi.Tool.Cli-net10.0-linux-x64-fdd.zip\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/KaedePhi.Tool.Cli-net10.0-linux-x64-fdd.zip\"}"
-      fi
+      git config user.name "GitLab CI"
+      git config user.email "gitlab-ci@noreply"
+      git tag "$TAG"
+      git push "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$TAG"
 
-      echo "✅ Created $BUILD_TYPE release: Cli v${VERSION}"
+      NOTES=$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' "$NOTES_FILE")
+      ASSETS=""
+      for zip_file in ./artifacts/cli/*.zip; do
+        ZIP_NAME=$(basename "$zip_file")
+        ASSETS="${ASSETS}{\"name\":\"${ZIP_NAME}\",\"url\":\"${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/raw/artifacts/cli/${ZIP_NAME}\",\"link_type\":\"other\"},"
+      done
+      ASSETS="[${ASSETS%,}]"
+
+      BODY="{\"name\":\"Cli v${VERSION}\",\"tag_name\":\"${TAG}\",\"description\":\"${NOTES}\",\"assets\":{\"links\":${ASSETS}}}"
+
+      curl -sf -X POST \
+        -H "PRIVATE-TOKEN: ${GITLAB_RELEASE_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d "$BODY" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+
+      echo "Created $BUILD_TYPE release: Cli v${VERSION}"
+  artifacts:
+    paths:
+      - artifacts/cli/*.zip
+    expire_in: 7 days

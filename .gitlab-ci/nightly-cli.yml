@@ -6,13 +6,25 @@ nightly-cli:
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
   before_script:
-    - apt-get update && apt-get install -y zip
+    - apt-get update -qq && apt-get install -y -qq zip
   script:
     - |
       CSPROJ="KaedePhi.Tool.Cli/KaedePhi.Tool.Cli.csproj"
       output_dir="./artifacts/cli"
       frameworks=("net8.0" "net10.0")
       runtimes=("win-x64" "linux-x64")
+
+      # net8.0 需要额外安装 SDK，dotnet/sdk:10.0 镜像只含 10.0
+      dotnet_install_sdk() {
+        local channel="$1"
+        if ! dotnet --list-sdks 2>/dev/null | grep -q "^${channel%%.*}\."; then
+          echo "Installing .NET SDK $channel..."
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- \
+            --channel "$channel" --install-dir /usr/share/dotnet
+        fi
+      }
+
+      dotnet_install_sdk "8.0"
 
       mkdir -p "$output_dir"
 
@@ -33,5 +45,5 @@ nightly-cli:
       done
   artifacts:
     paths:
-      - ./artifacts/cli/*.zip
+      - artifacts/cli/*.zip
     expire_in: 7 days
