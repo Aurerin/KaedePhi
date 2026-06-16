@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
+namespace KaedePhi.Tool.Converter.RePhiEdit.Utils;
 
 /// <summary>
 /// RPE 与 KPC 元数据之间的双向转换工具。

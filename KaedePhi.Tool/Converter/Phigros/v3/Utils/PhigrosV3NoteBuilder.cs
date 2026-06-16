@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KpcNote = KaedePhi.Core.KaedePhi.Note;
 using KpcSpeedEvent = KaedePhi.Core.KaedePhi.Events.Event<float>;

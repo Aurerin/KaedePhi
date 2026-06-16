@@ -1,4 +1,4 @@
-﻿using static KaedePhi.Core.Utils.Easings;
+using static KaedePhi.Core.Utils.Easings;
 
 namespace KaedePhi.Core.KaedePhi
 {

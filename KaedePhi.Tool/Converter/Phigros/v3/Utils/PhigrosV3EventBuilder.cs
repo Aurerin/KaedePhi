@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Event.KaedePhi;

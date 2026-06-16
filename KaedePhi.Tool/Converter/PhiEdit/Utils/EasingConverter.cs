@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
+namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
 /// <summary>
 /// PE 与 KPC 缓动类型之间的映射与转换工具。

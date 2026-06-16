@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter.PhiEdit.Model;
+namespace KaedePhi.Tool.Converter.PhiEdit.Model;
 
 public class PhiEditToKpcConvertOptions
 {

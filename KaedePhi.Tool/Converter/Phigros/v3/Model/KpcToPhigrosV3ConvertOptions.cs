@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Model;
 

@@ -1,4 +1,4 @@
-﻿using PhiChainEasing = KaedePhi.Core.PhiChain.v6.Easing;
+using PhiChainEasing = KaedePhi.Core.PhiChain.v6.Easing;
 using PhiChainEasingKind = KaedePhi.Core.PhiChain.v6.EasingKind;
 
 namespace KaedePhi.Tool.Converter.PhiChain.Utils;

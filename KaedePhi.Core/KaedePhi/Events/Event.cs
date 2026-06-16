@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using KaedePhi.Core.Common;
 using KaedePhi.Core.Utils;

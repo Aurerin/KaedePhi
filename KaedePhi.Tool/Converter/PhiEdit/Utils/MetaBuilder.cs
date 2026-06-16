@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
+namespace KaedePhi.Tool.Converter.PhiEdit.Utils;
 
 /// <summary>
 /// PE 与 KPC 元数据之间的转换工具。

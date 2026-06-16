@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Core.PhiEdit
+namespace KaedePhi.Core.PhiEdit
 {
     public class MoveEvent
     {

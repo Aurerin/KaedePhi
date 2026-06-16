@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.PhiChain.v6.JsonConverter;
+using KaedePhi.Core.PhiChain.v6.JsonConverter;
 using Newtonsoft.Json;
 
 namespace KaedePhi.Core.PhiChain.v6

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using KaedePhi.Core.Phigros.v3.JsonConverter;
 using Newtonsoft.Json;
 

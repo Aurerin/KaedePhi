@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Core.PhiChain.v6
+namespace KaedePhi.Core.PhiChain.v6
 {
     public static class Constants
     {

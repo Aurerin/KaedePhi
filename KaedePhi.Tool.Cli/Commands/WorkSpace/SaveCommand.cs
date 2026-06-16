@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Cli.Infrastructure;
+using KaedePhi.Tool.Cli.Infrastructure;
 using Spectre.Console;
 
 namespace KaedePhi.Tool.Cli.Commands.WorkSpace;

@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Cli.Infrastructure;
+namespace KaedePhi.Tool.Cli.Infrastructure;
 
 /// <summary>
 /// 工作区服务，仅负责文件的复制与路径管理，不进行任何谱面序列化/反序列化。

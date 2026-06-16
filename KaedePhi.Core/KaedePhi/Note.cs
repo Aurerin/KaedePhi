@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using KaedePhi.Core.Common;
 
 namespace KaedePhi.Core.KaedePhi

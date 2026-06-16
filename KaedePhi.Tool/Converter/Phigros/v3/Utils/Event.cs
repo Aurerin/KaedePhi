@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using PhigrosEvent = KaedePhi.Core.Phigros.v3.Event;
 using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;

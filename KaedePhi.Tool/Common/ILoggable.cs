@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Common;
+namespace KaedePhi.Tool.Common;
 
 /// <summary>
 /// 可订阅日志的工具接口。

@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using SkiaSharp;
 using EventLayer = KaedePhi.Core.KaedePhi.Events.EventLayer;
 

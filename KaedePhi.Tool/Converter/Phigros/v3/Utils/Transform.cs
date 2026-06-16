@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Common;
 using PhigrosV3 = KaedePhi.Core.Phigros.v3.Chart;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;

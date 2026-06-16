@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Common;
 

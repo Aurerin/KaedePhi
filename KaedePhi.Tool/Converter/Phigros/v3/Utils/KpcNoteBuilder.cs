@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Tool.Common;
 using PhigrosNote = KaedePhi.Core.Phigros.v3.Note;
 using PhigrosNoteType = KaedePhi.Core.Phigros.v3.NoteType;

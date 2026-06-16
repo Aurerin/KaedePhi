@@ -1,4 +1,4 @@
-﻿using KaedePhi.Core.Common;
+using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiChain.v6;
 
 namespace KaedePhi.Tool.Converter.PhiChain.Utils;

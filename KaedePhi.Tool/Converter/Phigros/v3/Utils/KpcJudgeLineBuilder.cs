@@ -1,4 +1,4 @@
-﻿using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
+using PhigrosJudgeLine = KaedePhi.Core.Phigros.v3.JudgeLine;
 
 namespace KaedePhi.Tool.Converter.Phigros.v3.Utils;
 

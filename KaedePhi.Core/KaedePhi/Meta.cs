@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Core.KaedePhi
+namespace KaedePhi.Core.KaedePhi
 {
     /// <summary>
     /// 谱面元数据

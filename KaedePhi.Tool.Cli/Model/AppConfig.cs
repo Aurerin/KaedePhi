@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Cli.Model;
+namespace KaedePhi.Tool.Cli.Model;
 
 /// <summary>
 /// 适用于YamlDotNet的默认配置文件

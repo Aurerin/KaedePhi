@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using KaedePhi.Core.PhiEdit;
 using KaedePhi.Tool.Cli.Infrastructure;
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using JudgeLine = KaedePhi.Core.KaedePhi.JudgeLine;
 
 namespace KaedePhi.Tool.JudgeLines.KaedePhi.Utils;

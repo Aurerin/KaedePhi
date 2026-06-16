@@ -1,4 +1,4 @@
-﻿using KaedePhi.Tool.Common;
+using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter;
 using KaedePhi.Tool.Converter.KaedePhi;
 using KaedePhi.Tool.Converter.PhiChain;

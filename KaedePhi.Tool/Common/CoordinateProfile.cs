@@ -1,4 +1,4 @@
-﻿using Chart = KaedePhi.Core.KaedePhi.Chart;
+using Chart = KaedePhi.Core.KaedePhi.Chart;
 using PhichainChart = KaedePhi.Core.PhiChain.v6.Chart;
 
 namespace KaedePhi.Tool.Common;

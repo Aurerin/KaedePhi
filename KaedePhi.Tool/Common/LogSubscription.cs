@@ -1,4 +1,4 @@
-﻿namespace KaedePhi.Tool.Common;
+namespace KaedePhi.Tool.Common;
 
 /// <summary>
 /// 日志订阅句柄，释放时自动取消订阅。
