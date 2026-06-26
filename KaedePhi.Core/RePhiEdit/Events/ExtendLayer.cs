@@ -118,6 +118,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// </summary>
         public void Anticipation()
         {
+            Sort();
             if (ColorEvents is { Count: 0 })
                 ColorEvents = null;
             if (ScaleXEvents is { Count: 0 })

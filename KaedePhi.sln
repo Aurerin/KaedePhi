@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Core", "KaedePhi.Core\KaedePhi.Core.csproj", "{832E0B60-8DCC-4E10-A090-32B7258829C4}"
 EndProject
@@ -11,6 +11,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tool.Gui", "KaedePhi.Tool.Gui\KaedePhi.Tool.Gui.csproj", "{13894E81-CE42-46E3-905B-25C651960D2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Tests", "KaedePhi.Tests\KaedePhi.Tests.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaedePhi.Core.Extensions", "KaedePhi.Core.Extensions\KaedePhi.Core.Extensions.csproj", "{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,5 +57,11 @@ Global
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|x64.Build.0 = Release|x64
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.PreRelease|x64.ActiveCfg = Debug|x64
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.PreRelease|x64.Build.0 = Debug|x64
+		{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}.Debug|x64.Build.0 = Debug|Any CPU
+		{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}.Release|x64.ActiveCfg = Release|Any CPU
+		{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}.Release|x64.Build.0 = Release|Any CPU
+		{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}.PreRelease|x64.ActiveCfg = Debug|Any CPU
+		{FC3F1BB0-3AD3-47C1-8ACA-D44DC0338A93}.PreRelease|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal
