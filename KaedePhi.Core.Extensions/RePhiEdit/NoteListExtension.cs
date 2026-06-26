@@ -1,0 +1,27 @@
+﻿using KaedePhi.Core.RePhiEdit;
+
+namespace KaedePhi.Core.Extensions.RePhiEdit;
+
+public static class NoteListExtension
+{
+    extension(List<Note> noteList)
+    {
+        /// <summary>
+        /// 将音符加入音符列表
+        /// 使用前必须确保列表已经按照StartBeat升序排序
+        /// </summary>
+        /// <param name="note">音符</param>
+        /// <exception cref="ArgumentNullException">音符或音符列表为 <see langword="null"/></exception>
+        public void AppendNote(Note note)
+        {
+            ArgumentNullException.ThrowIfNull(noteList);
+            ArgumentNullException.ThrowIfNull(note);
+            // 对比列表中note的StartBeat，然后插入到中间，保持列表升序
+            var index = noteList.FindIndex(n => n.StartBeat > note.StartBeat);
+            if (index == -1)
+                noteList.Add(note);
+            else
+                noteList.Insert(index, note);
+        }
+    }
+}
