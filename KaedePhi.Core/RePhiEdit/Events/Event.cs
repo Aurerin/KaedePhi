@@ -103,11 +103,12 @@ namespace KaedePhi.Core.RePhiEdit.Events
         public T GetValueAtBeat(Beat beat)
         {
             var t = (beat - StartBeat) / (EndBeat - StartBeat);
-            if (t <= 0)
-                return StartValue;
-            if (t >= 1)
-                return EndValue;
-            return IsBezier ? InterpolateBezier(t) : InterpolateEasing(t);
+            return t switch
+            {
+                <= 0 => StartValue,
+                >= 1 => EndValue,
+                _ => IsBezier ? InterpolateBezier(t) : InterpolateEasing(t),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
