@@ -10,6 +10,7 @@ namespace KaedePhi.Core.Extensions.Phigros.v3
         /// 将事件插入到列表
         /// 使用前必须确保列表已经按照StartTime升序排序
         /// </summary>
+        /// <param name="eventList">事件列表</param>
         /// <param name="event">事件</param>
         /// <exception cref="ArgumentNullException">事件列表或事件为 <see langword="null"/></exception>
         public static void AppendEvent<T>(this List<T> eventList, T @event)
@@ -30,6 +31,7 @@ namespace KaedePhi.Core.Extensions.Phigros.v3
         /// 将速度事件插入到列表
         /// 使用前必须确保列表已经按照StartTime升序排序
         /// </summary>
+        /// <param name="eventList">事件列表</param>
         /// <param name="event">速度事件</param>
         /// <exception cref="ArgumentNullException">事件列表或事件为 <see langword="null"/></exception>
         public static void AppendSpeedEvent<T>(this List<T> eventList, T @event)
