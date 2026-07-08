@@ -79,57 +79,57 @@
         <value>将谱面各通道事件渲染为 PNG 图片</value>
     </data>
     <!-- ── option descriptions ───────────────────────────────────────────────── -->
-    <data name="opt_input_phiedit_desc" xml:space="preserve">
+    <data name="cli_opt_input_phiedit_desc" xml:space="preserve">
         <value>输入的 RPE/PhiEdit 谱面文件路径</value>
         <comment>LoadCommand --input 选项</comment>
     </data>
-    <data name="opt_workspace_default_desc" xml:space="preserve">
+    <data name="cli_opt_workspace_default_desc" xml:space="preserve">
         <value>工作区 ID（默认：default）</value>
         <comment>LoadCommand / SaveCommand --workspace 选项</comment>
     </data>
-    <data name="opt_output_path_desc" xml:space="preserve">
+    <data name="cli_opt_output_path_desc" xml:space="preserve">
         <value>输出文件路径</value>
         <comment>SaveCommand --output 选项</comment>
     </data>
-    <data name="opt_workspace_clear_id_desc" xml:space="preserve">
+    <data name="cli_opt_workspace_clear_id_desc" xml:space="preserve">
         <value>只清理指定工作区（不填则清理全部）</value>
         <comment>WorkspaceClearCommand --id 选项</comment>
     </data>
-    <data name="opt_input_rpe_desc" xml:space="preserve">
+    <data name="cli_opt_input_rpe_desc" xml:space="preserve">
         <value>输入的 RPE 谱面文件路径（与 --workspace 二选一）</value>
         <comment>RpeOperationSettings --input 选项</comment>
     </data>
-    <data name="opt_output_auto_desc" xml:space="preserve">
+    <data name="cli_opt_output_auto_desc" xml:space="preserve">
         <value>输出文件路径（不填则自动生成 _PFC.json 后缀）</value>
         <comment>RpeOperationSettings --output 选项</comment>
     </data>
-    <data name="opt_workspace_rpe_desc" xml:space="preserve">
+    <data name="cli_opt_workspace_rpe_desc" xml:space="preserve">
         <value>工作区 ID（与 --input 二选一）</value>
         <comment>RpeOperationSettings --workspace 选项</comment>
     </data>
-    <data name="opt_precision_desc" xml:space="preserve">
+    <data name="cli_opt_precision_desc" xml:space="preserve">
         <value>采样精度（每拍细分数，默认：64，即每次采样步进六十四分之一拍）</value>
         <comment>RpeOperationSettings --precision 选项</comment>
     </data>
-    <data name="opt_tolerance_desc" xml:space="preserve">
+    <data name="cli_opt_tolerance_desc" xml:space="preserve">
         <value>拟合容差百分比（默认：5）</value>
         <comment>RpeOperationSettings --tolerance 选项</comment>
     </data>
-    <data name="opt_dry_run_desc" xml:space="preserve">
+    <data name="cli_opt_dry_run_desc" xml:space="preserve">
         <value>试运行模式，不写入文件</value>
         <comment>RpeOperationSettings --dry-run 选项</comment>
     </data>
-    <data name="opt_stream_output_desc" xml:space="preserve">
+    <data name="cli_opt_stream_output_desc" xml:space="preserve">
         <value>流式输出模式（若发生内存不足错误，请考虑使用此选项）</value>
         <comment>RpeOperationSettings --stream 选项</comment>
     </data>
-    <data name="opt_classic_mode_desc" xml:space="preserve">
+    <data name="cli_opt_classic_mode_desc" xml:space="preserve">
         <value>旧版行为模式，这个模式通常会消耗更多性能，但是输出通常更加稳定</value>
     </data>
-    <data name="opt_format_desc" xml:space="preserve">
+    <data name="cli_opt_format_desc" xml:space="preserve">
         <value>使输出的文件格式化</value>
     </data>
-    <data name="opt_compress_desc" xml:space="preserve">
+    <data name="cli_opt_compress_desc" xml:space="preserve">
         <value>禁用压缩</value>
     </data>
     <data name="render_opt_pixels_per_beat" xml:space="preserve">
@@ -152,6 +152,21 @@
     </data>
     <data name="render_opt_output" xml:space="preserve">
         <value>图片输出文件夹路径。</value>
+    </data>
+    <data name="render_opt_range_padding_ratio" xml:space="preserve">
+        <value>通道值域填充比例（默认：0.1）</value>
+    </data>
+    <data name="render_opt_range_samples" xml:space="preserve">
+        <value>通道值域计算采样点数（默认：256）</value>
+    </data>
+    <data name="render_opt_segment_tolerance" xml:space="preserve">
+        <value>事件段压缩容差（默认：0.05）</value>
+    </data>
+    <data name="render_opt_min_range_half" xml:space="preserve">
+        <value>通道值域最小半宽（绝对，默认：0.1）</value>
+    </data>
+    <data name="render_opt_min_range_half_ratio" xml:space="preserve">
+        <value>通道值域最小半宽比例（默认：0.05）</value>
     </data>
     <!-- ── messages ─────────────────────────────────────────────────────────── -->
     <data name="msg_loaded" xml:space="preserve">
@@ -249,6 +264,84 @@
     </data>
     <data name="convert_opt_negative_alpha_step" xml:space="preserve">
         <value>负透明度段每次抬高的 KPC Y 偏移量（默认：4.0）</value>
+    </data>
+    <!-- ── convert option descriptions（PE 转换） ────────────────────────────── -->
+    <data name="convert_opt_pe_speed_ratio" xml:space="preserve">
+        <value>PE 输出时的速度转换倍率（默认：约1.56）</value>
+    </data>
+    <data name="convert_opt_pe_trailing_padding" xml:space="preserve">
+        <value>PE 输出时帧结束后的尾部填充拍数（默认：1/64拍）</value>
+    </data>
+    <data name="convert_opt_pe_easing_precision" xml:space="preserve">
+        <value>PE 不支持缓动类型的近似采样精度（每拍细分数）</value>
+    </data>
+    <data name="convert_opt_pe_xy_precision" xml:space="preserve">
+        <value>PE 输出时未对齐的 X/Y 事件修正精度</value>
+    </data>
+    <data name="convert_opt_pe_alpha_precision" xml:space="preserve">
+        <value>PE 输出时不透明度通道的切割精度</value>
+    </data>
+    <data name="convert_opt_pe_alpha_tolerance" xml:space="preserve">
+        <value>PE 输出时不透明度通道的压缩容差百分比</value>
+    </data>
+    <data name="convert_opt_pe_speed_precision" xml:space="preserve">
+        <value>PE 输出时速度通道的切割精度</value>
+    </data>
+    <data name="convert_opt_pe_speed_tolerance" xml:space="preserve">
+        <value>PE 输出时速度通道的压缩容差百分比</value>
+    </data>
+    <!-- ── convert option descriptions（Phigros 转换） ────────────────────────── -->
+    <data name="convert_opt_phigros_bpm" xml:space="preserve">
+        <value>Phigros 输出时的默认 BPM（用于时间→节拍转换）</value>
+    </data>
+    <data name="convert_opt_phigros_easing_precision" xml:space="preserve">
+        <value>Phigros 不支持缓动类型的近似采样精度</value>
+    </data>
+    <data name="convert_opt_phigros_xy_precision" xml:space="preserve">
+        <value>Phigros 输出时未对齐的 X/Y 事件修正精度</value>
+    </data>
+    <data name="convert_opt_phigros_alpha_precision" xml:space="preserve">
+        <value>Phigros 输出时不透明度通道的切割精度</value>
+    </data>
+    <data name="convert_opt_phigros_alpha_tolerance" xml:space="preserve">
+        <value>Phigros 输出时不透明度通道的压缩容差百分比</value>
+    </data>
+    <data name="convert_opt_phigros_speed_precision" xml:space="preserve">
+        <value>Phigros 输出时速度通道的切割精度</value>
+    </data>
+    <!-- ── convert option descriptions（解绑） ────────────────────────────────── -->
+    <data name="convert_opt_unbind_precision" xml:space="preserve">
+        <value>父级解绑时的采样精度（每拍细分数）</value>
+    </data>
+    <data name="convert_opt_unbind_tolerance" xml:space="preserve">
+        <value>父级解绑时的容差百分比</value>
+    </data>
+    <data name="convert_opt_unbind_classic" xml:space="preserve">
+        <value>启用经典解绑模式（等间距采样）</value>
+    </data>
+    <!-- ── convert option descriptions（多层级合并） ──────────────────────────── -->
+    <data name="convert_opt_merge_precision" xml:space="preserve">
+        <value>多层级事件合并的精度</value>
+    </data>
+    <data name="convert_opt_merge_tolerance" xml:space="preserve">
+        <value>多层级事件合并的容差百分比</value>
+    </data>
+    <data name="convert_opt_merge_classic" xml:space="preserve">
+        <value>启用经典合并模式（固定采样）</value>
+    </data>
+    <!-- ── convert option descriptions（压缩控制） ────────────────────────────── -->
+    <data name="convert_opt_no_unbind_compress" xml:space="preserve">
+        <value>禁用解绑后的自动压缩</value>
+    </data>
+    <data name="convert_opt_no_merge_compress" xml:space="preserve">
+        <value>禁用合并后的自动压缩</value>
+    </data>
+    <!-- ── convert option descriptions（判定线过滤） ──────────────────────────── -->
+    <data name="convert_opt_remove_attach_ui" xml:space="preserve">
+        <value>移除带有 AttachUi 的判定线</value>
+    </data>
+    <data name="convert_opt_remove_texture" xml:space="preserve">
+        <value>移除非默认纹理的判定线</value>
     </data>
     <!-- ── misc ──────────────────────────────────────────────────────────────── -->
     <data name="project_link" xml:space="preserve">
