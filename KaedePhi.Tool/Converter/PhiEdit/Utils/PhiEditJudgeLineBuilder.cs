@@ -51,14 +51,14 @@ public class PhiEditJudgeLineBuilder
             if (_options.FatherLineUnbind.ClassicMode)
             {
                 trueSrc = unbinder.FatherUnbind(
-                    allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
+                    allLine.FindIndex(l => ReferenceEquals(l, src)),
                     allLine,
                     _options.FatherLineUnbind.Precision
                 );
             }
             else
                 trueSrc = unbinder.FatherUnbind(
-                    allLine.FindIndex(l => l.GetHashCode() == src.GetHashCode()),
+                    allLine.FindIndex(l => ReferenceEquals(l, src)),
                     allLine,
                     _options.FatherLineUnbind.Precision,
                     _options.FatherLineUnbind.Tolerance
