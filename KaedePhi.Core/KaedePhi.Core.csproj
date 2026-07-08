@@ -12,7 +12,7 @@
     <PackageIcon>KaedePhiIcon.png</PackageIcon>
     <RepositoryUrl>https://github.com/NuanRMxi-Lazy-Team/KaedePhi</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Copyright>NuanR_Star Ciallo Copyright © 2025</Copyright>
+    <Copyright>NuanR_Star Ciallo Copyright © 2026</Copyright>
     <TargetFrameworks>net10.0;net8.0;netstandard2.1</TargetFrameworks>
     <Configurations>Debug;Release;PreRelease</Configurations>
     <Platforms>x64</Platforms>
