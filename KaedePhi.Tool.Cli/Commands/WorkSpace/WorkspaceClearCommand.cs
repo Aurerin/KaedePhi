@@ -13,14 +13,13 @@ public static class WorkspaceClearCommand
     private static readonly Option<string?> IdOpt = new("--id")
     {
         Description = L("cli_opt_workspace_clear_id_desc"),
-        Arity = ArgumentArity.ZeroOrOne
+        Arity = ArgumentArity.ZeroOrOne,
     };
 
     public static Command Create()
     {
-        var cmd = new Command("clear", L("cmd_workspace_clear_desc"));
-        cmd.Add(IdOpt);
-        cmd.SetAction((result) =>
+        var cmd = new Command("clear", L("cmd_workspace_clear_desc")) { IdOpt };
+        cmd.SetAction(result =>
         {
             var ws = new WorkspaceService();
             ws.Clear(result.GetValue(IdOpt));

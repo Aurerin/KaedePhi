@@ -15,7 +15,7 @@ public static class OnlyStreamLoadCommand
     private static readonly Option<string?> InputOpt = new("--input", "-i")
     {
         Description = "需要推算的文件",
-        Arity = ArgumentArity.ZeroOrOne
+        Arity = ArgumentArity.ZeroOrOne,
     };
 
     public static Command Create()
@@ -24,25 +24,27 @@ public static class OnlyStreamLoadCommand
         cmd.Hidden = true;
         cmd.Add(InputOpt);
 
-        cmd.SetAction(async (result, ct) =>
-        {
-#if Debug
-            var input = result.GetValue(InputOpt);
-            if (string.IsNullOrWhiteSpace(input))
+        cmd.SetAction(
+            async (result, ct) =>
             {
-                ConsoleWriter.Error("Input file path cannot be null or whitespace.");
-                return 1;
-            }
+#if Debug
+                var input = result.GetValue(InputOpt);
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    ConsoleWriter.Error("Input file path cannot be null or whitespace.");
+                    return 1;
+                }
 
-            using var stream = File.OpenRead(input);
-            var chart = await Chart.LoadStreamAsync(stream);
-            ConsoleWriter.Info(chart.Offset.ToString());
+                using var stream = File.OpenRead(input);
+                var chart = await Chart.LoadStreamAsync(stream);
+                ConsoleWriter.Info(chart.Offset.ToString());
 #else
-            ConsoleWriter.Warn("This command can only be executed on Debug builds.");
-            await Task.CompletedTask;
+                ConsoleWriter.Warn("This command can only be executed on Debug builds.");
+                await Task.CompletedTask;
 #endif
-            return 0;
-        });
+                return 0;
+            }
+        );
 
         return cmd;
     }

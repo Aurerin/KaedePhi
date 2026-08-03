@@ -15,7 +15,7 @@ public static class GetTypeTestCommand
     private static readonly Option<string?> InputOpt = new("--input", "-i")
     {
         Description = "需要推算的文件",
-        Arity = ArgumentArity.ZeroOrOne
+        Arity = ArgumentArity.ZeroOrOne,
     };
 
     public static Command Create()
@@ -24,19 +24,21 @@ public static class GetTypeTestCommand
         cmd.Hidden = true;
         cmd.Add(InputOpt);
 
-        cmd.SetAction(async (result, ct) =>
-        {
+        cmd.SetAction(
+            async (result, ct) =>
+            {
 #if Debug
-            var input = result.GetValue(InputOpt);
-            var inputText = input is null ? "" : await File.ReadAllTextAsync(input, ct);
-            var type = ChartGetType.GetType(inputText);
-            ConsoleWriter.Info($"Type: {type}");
+                var input = result.GetValue(InputOpt);
+                var inputText = input is null ? "" : await File.ReadAllTextAsync(input, ct);
+                var type = ChartGetType.GetType(inputText);
+                ConsoleWriter.Info($"Type: {type}");
 #else
-            ConsoleWriter.Warn("This command can only be executed on Debug builds.");
-            await Task.CompletedTask;
+                ConsoleWriter.Warn("This command can only be executed on Debug builds.");
+                await Task.CompletedTask;
 #endif
-            return 0;
-        });
+                return 0;
+            }
+        );
 
         return cmd;
     }

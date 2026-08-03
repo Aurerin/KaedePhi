@@ -14,11 +14,13 @@ ConsoleWriter.Warn(
 var root = new RootCommand(CliLocalizationString.app_title);
 
 var ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-root.SetAction((_) =>
-{
-    ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
-    return 0;
-});
+root.SetAction(
+    (_) =>
+    {
+        ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
+        return 0;
+    }
+);
 
 root.Add(VersionCommand.Create());
 

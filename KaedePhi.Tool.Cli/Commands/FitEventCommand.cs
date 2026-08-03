@@ -1,4 +1,5 @@
 using System.Globalization;
+using KaedePhi.Core.KaedePhi.Events;
 using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Event.KaedePhi;
 
@@ -27,69 +28,94 @@ public static class FitEventCommand
         cmd.Add(ToleranceOpt);
         cmd.Add(DryRunOpt);
 
-        cmd.SetAction(async (result, ct) =>
-        {
-            var input = result.GetValue(InputOpt);
-            var workspace = result.GetValue(WorkspaceOpt);
-            if (string.IsNullOrWhiteSpace(input) && string.IsNullOrWhiteSpace(workspace))
+        cmd.SetAction(
+            async (result, ct) =>
             {
-                ConsoleWriter.Error(CliLocalizationString.err_input_required);
-                return 1;
-            }
-
-            var config = AppConfigHelper.Load();
-            var c = config.FitConfig;
-            var tolerance = SharedOptions.GetIfSpecified(result, ToleranceOpt) ?? c.Tolerance;
-            var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
-
-            var svc = new ChartService();
-            var nrc = await svc.LoadKpcAsync(input, workspace, ct);
-            if (nrc == null)
-            {
-                ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
-                return 1;
-            }
-
-            var nrcCopy = nrc.Clone();
-
-            var mxFitter = new EventFit<double>();
-            var myFitter = new EventFit<double>();
-            var alFitter = new EventFit<int>();
-            var roFitter = new EventFit<double>();
-            var spFitter = new EventFit<float>();
-            mxFitter.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error, ConsoleWriter.Debug);
-            myFitter.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error, ConsoleWriter.Debug);
-            alFitter.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error, ConsoleWriter.Debug);
-            roFitter.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error, ConsoleWriter.Debug);
-            spFitter.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error, ConsoleWriter.Debug);
-
-            foreach (var line in nrc.JudgeLineList)
-            {
-                foreach (var el in line.EventLayers)
+                var input = result.GetValue(InputOpt);
+                var workspace = result.GetValue(WorkspaceOpt);
+                if (string.IsNullOrWhiteSpace(input) && string.IsNullOrWhiteSpace(workspace))
                 {
-                    if (el is null)
-                        continue;
-                    ct.ThrowIfCancellationRequested();
-
-                    el.MoveXEvents = mxFitter.FitEvents(el.MoveXEvents, tolerance);
-                    el.MoveYEvents = myFitter.FitEvents(el.MoveYEvents, tolerance);
-                    el.AlphaEvents = alFitter.FitEvents(el.AlphaEvents, tolerance);
-                    el.RotateEvents = roFitter.FitEvents(el.RotateEvents, tolerance);
-                    el.SpeedEvents = spFitter.FitEvents(el.SpeedEvents, tolerance);
+                    ConsoleWriter.Error(CliLocalizationString.err_input_required);
+                    return 1;
                 }
 
-                nrcCopy.JudgeLineList[nrc.JudgeLineList.IndexOf(line)] = line;
-            }
+                var config = AppConfigHelper.Load();
+                var c = config.FitConfig;
+                var tolerance = SharedOptions.GetIfSpecified(result, ToleranceOpt) ?? c.Tolerance;
+                var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
 
-            var output = await ChartService.SaveAsRpeAsync(
-                nrcCopy,
-                svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
-                dryRun,
-                ct
-            );
-            ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
-            return 0;
-        });
+                var svc = new ChartService();
+                var nrc = await svc.LoadKpcAsync(input, workspace, ct);
+                if (nrc == null)
+                {
+                    ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
+                    return 1;
+                }
+
+                var nrcCopy = nrc.Clone();
+
+                var mxFitter = new EventFit<double>();
+                var myFitter = new EventFit<double>();
+                var alFitter = new EventFit<int>();
+                var roFitter = new EventFit<double>();
+                var spFitter = new EventFit<float>();
+                mxFitter.SubscribeLog(
+                    ConsoleWriter.Info,
+                    ConsoleWriter.Warn,
+                    ConsoleWriter.Error,
+                    ConsoleWriter.Debug
+                );
+                myFitter.SubscribeLog(
+                    ConsoleWriter.Info,
+                    ConsoleWriter.Warn,
+                    ConsoleWriter.Error,
+                    ConsoleWriter.Debug
+                );
+                alFitter.SubscribeLog(
+                    ConsoleWriter.Info,
+                    ConsoleWriter.Warn,
+                    ConsoleWriter.Error,
+                    ConsoleWriter.Debug
+                );
+                roFitter.SubscribeLog(
+                    ConsoleWriter.Info,
+                    ConsoleWriter.Warn,
+                    ConsoleWriter.Error,
+                    ConsoleWriter.Debug
+                );
+                spFitter.SubscribeLog(
+                    ConsoleWriter.Info,
+                    ConsoleWriter.Warn,
+                    ConsoleWriter.Error,
+                    ConsoleWriter.Debug
+                );
+
+                foreach (var line in nrc.JudgeLineList)
+                {
+                    foreach (var el in line.EventLayers.OfType<EventLayer>())
+                    {
+                        ct.ThrowIfCancellationRequested();
+
+                        el.MoveXEvents = mxFitter.FitEvents(el.MoveXEvents, tolerance);
+                        el.MoveYEvents = myFitter.FitEvents(el.MoveYEvents, tolerance);
+                        el.AlphaEvents = alFitter.FitEvents(el.AlphaEvents, tolerance);
+                        el.RotateEvents = roFitter.FitEvents(el.RotateEvents, tolerance);
+                        el.SpeedEvents = spFitter.FitEvents(el.SpeedEvents, tolerance);
+                    }
+
+                    nrcCopy.JudgeLineList[nrc.JudgeLineList.IndexOf(line)] = line;
+                }
+
+                var output = await ChartService.SaveAsRpeAsync(
+                    nrcCopy,
+                    svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
+                    dryRun,
+                    ct
+                );
+                ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
+                return 0;
+            }
+        );
 
         return cmd;
     }

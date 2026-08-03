@@ -20,13 +20,15 @@ public static class ConfigResetCommand
     public static Command Create()
     {
         var cmd = new Command("reset", L("cmd_config_reset_desc"));
-        cmd.SetAction((_) =>
+        cmd.SetAction(_ =>
         {
             var configPath = "config.yaml";
             var defaults = new AppConfig();
             var yaml = YamlSerializer.Serialize(defaults);
             File.WriteAllText(configPath, yaml);
-            ConsoleWriter.Info(string.Format(CliLocalizationString.msg_config_reset_done, configPath));
+            ConsoleWriter.Info(
+                string.Format(CliLocalizationString.msg_config_reset_done, configPath)
+            );
             return 0;
         });
         return cmd;

@@ -31,52 +31,59 @@ public static class UnbindFatherCommand
         cmd.Add(ClassicOpt);
         cmd.Add(DryRunOpt);
 
-        cmd.SetAction(async (result, ct) =>
-        {
-            var input = result.GetValue(InputOpt);
-            var workspace = result.GetValue(WorkspaceOpt);
-            if (string.IsNullOrWhiteSpace(input) && string.IsNullOrWhiteSpace(workspace))
+        cmd.SetAction(
+            async (result, ct) =>
             {
-                ConsoleWriter.Error(CliLocalizationString.err_input_required);
-                return 1;
+                var input = result.GetValue(InputOpt);
+                var workspace = result.GetValue(WorkspaceOpt);
+                if (string.IsNullOrWhiteSpace(input) && string.IsNullOrWhiteSpace(workspace))
+                {
+                    ConsoleWriter.Error(CliLocalizationString.err_input_required);
+                    return 1;
+                }
+
+                var config = AppConfigHelper.Load();
+                var c = config.UnbindConfig;
+                var precision = SharedOptions.GetIfSpecified(result, PrecisionOpt) ?? c.Precision;
+                var tolerance = SharedOptions.GetIfSpecified(result, ToleranceOpt) ?? c.Tolerance;
+                var classic = SharedOptions.GetIfSpecified(result, ClassicOpt) ?? c.ClassicMode;
+                var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
+
+                var svc = new ChartService();
+                var nrc = await svc.LoadKpcAsync(input, workspace, ct);
+                if (nrc == null)
+                {
+                    ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
+                    return 1;
+                }
+
+                var nrcCopy = nrc.Clone();
+                var unbinder = new JudgeLineUnbinder();
+                unbinder.SubscribeLog(
+                    ConsoleWriter.Info,
+                    ConsoleWriter.Warn,
+                    ConsoleWriter.Error,
+                    ConsoleWriter.Debug
+                );
+
+                for (var i = 0; i < nrc.JudgeLineList.Count; i++)
+                {
+                    if (nrc.JudgeLineList[i].Father != -1)
+                        nrcCopy.JudgeLineList[i] = classic
+                            ? unbinder.FatherUnbind(i, nrc.JudgeLineList, precision)
+                            : unbinder.FatherUnbind(i, nrc.JudgeLineList, precision, tolerance);
+                }
+
+                var output = await ChartService.SaveAsRpeAsync(
+                    nrcCopy,
+                    svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
+                    dryRun,
+                    ct
+                );
+                ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
+                return 0;
             }
-
-            var config = AppConfigHelper.Load();
-            var c = config.UnbindConfig;
-            var precision = SharedOptions.GetIfSpecified(result, PrecisionOpt) ?? c.Precision;
-            var tolerance = SharedOptions.GetIfSpecified(result, ToleranceOpt) ?? c.Tolerance;
-            var classic = SharedOptions.GetIfSpecified(result, ClassicOpt) ?? c.ClassicMode;
-            var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
-
-            var svc = new ChartService();
-            var nrc = await svc.LoadKpcAsync(input, workspace, ct);
-            if (nrc == null)
-            {
-                ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
-                return 1;
-            }
-
-            var nrcCopy = nrc.Clone();
-            var unbinder = new JudgeLineUnbinder();
-            unbinder.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error, ConsoleWriter.Debug);
-
-            for (var i = 0; i < nrc.JudgeLineList.Count; i++)
-            {
-                if (nrc.JudgeLineList[i].Father != -1)
-                    nrcCopy.JudgeLineList[i] = classic == true
-                        ? unbinder.FatherUnbind(i, nrc.JudgeLineList, precision)
-                        : unbinder.FatherUnbind(i, nrc.JudgeLineList, precision, tolerance);
-            }
-
-            var output = await ChartService.SaveAsRpeAsync(
-                nrcCopy,
-                svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
-                dryRun,
-                ct
-            );
-            ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, output));
-            return 0;
-        });
+        );
 
         return cmd;
     }

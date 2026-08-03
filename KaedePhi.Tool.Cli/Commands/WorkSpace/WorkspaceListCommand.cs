@@ -13,7 +13,7 @@ public static class WorkspaceListCommand
     public static Command Create()
     {
         var cmd = new Command("list", L("cmd_workspace_list_desc"));
-        cmd.SetAction((_) =>
+        cmd.SetAction(_ =>
         {
             var ws = new WorkspaceService();
             foreach (var id in ws.List())

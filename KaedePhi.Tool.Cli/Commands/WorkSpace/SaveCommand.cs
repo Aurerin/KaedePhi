@@ -14,7 +14,7 @@ public static class SaveCommand
     private static readonly Option<string> WorkspaceOpt = new("--workspace", "-w")
     {
         Description = L("cli_opt_workspace_default_desc"),
-        Arity = ArgumentArity.ExactlyOne
+        Arity = ArgumentArity.ExactlyOne,
     };
 
     public static Command Create()
@@ -23,24 +23,28 @@ public static class SaveCommand
         cmd.Add(OutputOpt);
         cmd.Add(WorkspaceOpt);
 
-        cmd.SetAction(async (result, ct) =>
-        {
-            var output = result.GetValue(OutputOpt);
-            if (string.IsNullOrWhiteSpace(output))
+        cmd.SetAction(
+            async (result, ct) =>
             {
-                ConsoleWriter.Error(CliLocalizationString.err_output_required);
-                return 1;
+                var output = result.GetValue(OutputOpt);
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    ConsoleWriter.Error(CliLocalizationString.err_output_required);
+                    return 1;
+                }
+
+                var workspaceId = result.GetValue(WorkspaceOpt);
+                if (string.IsNullOrWhiteSpace(workspaceId))
+                    workspaceId = "default";
+
+                var ws = new WorkspaceService();
+                await ws.SaveAsync(workspaceId, output);
+                ConsoleWriter.Info(
+                    string.Format(CliLocalizationString.msg_saved, workspaceId, output)
+                );
+                return 0;
             }
-
-            var workspaceId = result.GetValue(WorkspaceOpt);
-            if (string.IsNullOrWhiteSpace(workspaceId))
-                workspaceId = "default";
-
-            var ws = new WorkspaceService();
-            await ws.SaveAsync(workspaceId, output);
-            ConsoleWriter.Info(string.Format(CliLocalizationString.msg_saved, workspaceId, output));
-            return 0;
-        });
+        );
 
         return cmd;
     }

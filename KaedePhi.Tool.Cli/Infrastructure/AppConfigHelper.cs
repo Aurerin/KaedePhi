@@ -15,14 +15,16 @@ public static class AppConfigHelper
         .Build();
 
     private static AppConfig? _cached;
-    private static readonly object _lock = new();
+
+    // ReSharper disable once ChangeFieldTypeToSystemThreadingLock 不适用于.NET 8.0
+    private static readonly object Lock = new();
 
     public static AppConfig Load()
     {
         if (_cached is not null)
             return _cached;
 
-        lock (_lock)
+        lock (Lock)
         {
             if (_cached is not null)
                 return _cached;

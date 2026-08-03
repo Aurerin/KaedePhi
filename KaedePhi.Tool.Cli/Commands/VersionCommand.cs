@@ -15,7 +15,7 @@ public static class VersionCommand
     {
         var cmd = new Command("version", L("cmd_version_desc"));
         cmd.Aliases.Add("ver");
-        cmd.SetAction((_) =>
+        cmd.SetAction(_ =>
         {
 #if PreRelease || Release
             var ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
