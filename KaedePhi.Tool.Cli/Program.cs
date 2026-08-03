@@ -41,15 +41,16 @@ root.Add(LayerMergeCommand.Create());
 root.Add(UnbindFatherCommand.Create());
 root.Add(RenderCommand.Create());
 
-var configBranch = new Command("config", L("branch_config_desc"));
-configBranch.Add(ConfigResetCommand.Create());
+var configBranch = new Command("config", L("branch_config_desc")) { ConfigResetCommand.Create() };
 root.Add(configBranch);
 
-var workspaceBranch = new Command("workspace", L("branch_workspace_desc"));
-workspaceBranch.Add(WorkspaceListCommand.Create());
-workspaceBranch.Add(WorkspaceClearCommand.Create());
-workspaceBranch.Add(LoadCommand.Create());
-workspaceBranch.Add(SaveCommand.Create());
+var workspaceBranch = new Command("workspace", L("branch_workspace_desc"))
+{
+    WorkspaceListCommand.Create(),
+    WorkspaceClearCommand.Create(),
+    LoadCommand.Create(),
+    SaveCommand.Create(),
+};
 root.Add(workspaceBranch);
 
 try
