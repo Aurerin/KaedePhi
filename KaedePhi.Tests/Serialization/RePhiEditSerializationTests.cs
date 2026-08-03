@@ -1,5 +1,6 @@
 using KaedePhi.Core.Common;
 using KaedePhi.Core.RePhiEdit;
+using KaedePhi.Core.RePhiEdit.Events;
 
 namespace KaedePhi.Tests.Serialization;
 

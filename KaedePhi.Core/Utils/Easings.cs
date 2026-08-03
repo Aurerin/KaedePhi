@@ -69,7 +69,10 @@ namespace KaedePhi.Core.Utils
 
         public static double EaseInOutExpo(double t)
         {
-            if (Math.Abs(t) < CoreConstants.FloatEpsilon || Math.Abs(t - 1) < CoreConstants.FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             return t < 0.5f
                 ? 0.5f * Math.Pow(2, 20 * t - 10)
@@ -113,21 +116,30 @@ namespace KaedePhi.Core.Utils
         // 弹性
         public static double EaseInElastic(double t)
         {
-            if (Math.Abs(t) < CoreConstants.FloatEpsilon || Math.Abs(t - 1) < CoreConstants.FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             return -Math.Pow(2, 10 * (t - 1)) * Math.Sin((t - 1.1f) * 5 * Math.PI);
         }
 
         public static double EaseOutElastic(double t)
         {
-            if (Math.Abs(t) < CoreConstants.FloatEpsilon || Math.Abs(t - 1) < CoreConstants.FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             return Math.Pow(2, -10 * t) * Math.Sin((t - 0.1f) * 5 * Math.PI) + 1;
         }
 
         public static double EaseInOutElastic(double t)
         {
-            if (Math.Abs(t) < CoreConstants.FloatEpsilon || Math.Abs(t - 1) < CoreConstants.FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             t *= 2;
             if (t < 1)
