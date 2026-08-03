@@ -1,20 +1,25 @@
+using System.Globalization;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands.WorkSpace;
 
-public sealed class WorkspaceListCommand : Command<WorkspaceListCommand.Settings>
+public static class WorkspaceListCommand
 {
-    public sealed class Settings : CommandSettings { }
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
 
-    protected override int Execute(
-        CommandContext context,
-        Settings settings,
-        CancellationToken cancellationToken
-    )
+    public static Command Create()
     {
-        var ws = new WorkspaceService();
-        foreach (var id in ws.List())
-            Console.WriteLine(id);
-        return 0;
+        var cmd = new Command("list", L("cmd_workspace_list_desc"));
+        cmd.SetAction((_) =>
+        {
+            var ws = new WorkspaceService();
+            foreach (var id in ws.List())
+                Console.WriteLine(id);
+            return 0;
+        });
+        return cmd;
     }
 }

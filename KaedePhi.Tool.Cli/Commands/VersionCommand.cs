@@ -1,28 +1,33 @@
+using System.Globalization;
 using System.Reflection;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands;
 
-// Description set via WithDescription(CliLocalizationString.cmd_version_desc) in Program.cs
-public sealed class VersionCommand : AsyncCommand<VersionCommand.Settings>
+public static class VersionCommand
 {
-    public sealed class Settings : CommandSettings { }
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
 
-    protected override Task<int> ExecuteAsync(
-        CommandContext context,
-        Settings settings,
-        CancellationToken cancellationToken
-    )
+    public static Command Create()
     {
+        var cmd = new Command("version", L("cmd_version_desc"));
+        cmd.Aliases.Add("ver");
+        cmd.SetAction((_) =>
+        {
 #if PreRelease || Release
-        var ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
+            var ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
 #else
-        var ver = Assembly
-            .GetExecutingAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion;
+            var ver = Assembly
+                .GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
 #endif
-        ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
-        return Task.FromResult(0);
+            ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
+            return 0;
+        });
+        return cmd;
     }
 }

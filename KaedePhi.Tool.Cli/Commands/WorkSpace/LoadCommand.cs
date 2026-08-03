@@ -1,40 +1,47 @@
+using System.Globalization;
 using KaedePhi.Tool.Cli.Infrastructure;
-using Spectre.Console;
 
 namespace KaedePhi.Tool.Cli.Commands.WorkSpace;
 
-// Description set via WithDescription(CliLocalizationString.cmd_load_desc) in Program.cs
-public sealed class LoadCommand : AsyncCommand<LoadCommand.Settings>
+public static class LoadCommand
 {
-    public sealed class Settings : CommandSettings
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
+
+    private static readonly Option<string?> InputOpt = SharedOptions.CreateInputPhieditOption();
+    private static readonly Option<string> WorkspaceOpt = new("--workspace", "-w")
     {
-        [CommandOption("-i|--input <PATH>")]
-        [LocalizedDescription("cli_opt_input_phiedit_desc")]
-        public string? Input { get; set; }
+        Description = L("cli_opt_workspace_default_desc"),
+        Arity = ArgumentArity.ExactlyOne
+    };
 
-        [CommandOption("-w|--workspace <ID>")]
-        [LocalizedDescription("cli_opt_workspace_default_desc")]
-        public string Workspace { get; set; } = "default";
+    public static Command Create()
+    {
+        var cmd = new Command("load", L("cmd_load_desc"));
+        cmd.Add(InputOpt);
+        cmd.Add(WorkspaceOpt);
 
-        public override ValidationResult Validate()
+        cmd.SetAction(async (result, ct) =>
         {
-            if (string.IsNullOrWhiteSpace(Input))
-                return ValidationResult.Error(CliLocalizationString.err_input_required);
-            return base.Validate();
-        }
-    }
+            var input = result.GetValue(InputOpt);
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                ConsoleWriter.Error(CliLocalizationString.err_input_required);
+                return 1;
+            }
 
-    protected override async Task<int> ExecuteAsync(
-        CommandContext context,
-        Settings settings,
-        CancellationToken cancellationToken
-    )
-    {
-        var ws = new WorkspaceService();
-        if (settings.Input is not { } input)
-            return 1;
-        await ws.LoadAsync(settings.Workspace, input);
-        ConsoleWriter.Info(string.Format(CliLocalizationString.msg_loaded, settings.Workspace));
-        return 0;
+            var workspaceId = result.GetValue(WorkspaceOpt);
+            if (string.IsNullOrWhiteSpace(workspaceId))
+                workspaceId = "default";
+
+            var ws = new WorkspaceService();
+            await ws.LoadAsync(workspaceId, input);
+            ConsoleWriter.Info(string.Format(CliLocalizationString.msg_loaded, workspaceId));
+            return 0;
+        });
+
+        return cmd;
     }
 }

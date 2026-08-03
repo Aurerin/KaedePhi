@@ -1,34 +1,43 @@
 using System.ComponentModel;
+using System.Globalization;
 using KaedePhi.Tool.Cli.Infrastructure;
 using KaedePhi.Tool.Common;
 
 namespace KaedePhi.Tool.Cli.Commands.Test;
 
-public class GetTypeTestCommand : AsyncCommand<GetTypeTestCommand.Settings>
+public static class GetTypeTestCommand
 {
-    public class Settings : CommandSettings
-    {
-        [CommandOption("-i|--input <PATH>")]
-        [Description("需要推算的文件")]
-        public string? Input { get; set; }
-    }
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
 
-    protected override async Task<int> ExecuteAsync(
-        CommandContext context,
-        Settings settings,
-        CancellationToken cancellationToken
-    )
+    private static readonly Option<string?> InputOpt = new("--input", "-i")
     {
+        Description = "需要推算的文件",
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    public static Command Create()
+    {
+        var cmd = new Command("test", "Test command");
+        cmd.Hidden = true;
+        cmd.Add(InputOpt);
+
+        cmd.SetAction(async (result, ct) =>
+        {
 #if Debug
-        var input = settings.Input;
-        var inputText = input is null ? "" : await File.ReadAllTextAsync(input, cancellationToken);
-        var type = ChartGetType.GetType(inputText);
-        ConsoleWriter.Info($"Type: {type}");
+            var input = result.GetValue(InputOpt);
+            var inputText = input is null ? "" : await File.ReadAllTextAsync(input, ct);
+            var type = ChartGetType.GetType(inputText);
+            ConsoleWriter.Info($"Type: {type}");
 #else
-        ConsoleWriter.Warn("This command can only be executed on Debug builds.");
-        await Task.CompletedTask;
+            ConsoleWriter.Warn("This command can only be executed on Debug builds.");
+            await Task.CompletedTask;
 #endif
+            return 0;
+        });
 
-        return 0;
+        return cmd;
     }
 }

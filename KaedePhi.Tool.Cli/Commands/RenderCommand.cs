@@ -1,126 +1,172 @@
+using System.Globalization;
 using KaedePhi.Tool.Cli.Infrastructure;
-using KaedePhi.Tool.Cli.Settings;
 using KaedePhi.Tool.Render.KaedePhi;
 
 namespace KaedePhi.Tool.Cli.Commands;
 
-public sealed class RenderCommand : AsyncCommand<RenderCommand.Settings>
+public static class RenderCommand
 {
-    public sealed class Settings : OperationSettings
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
+
+    private static readonly Option<string?> InputOpt = SharedOptions.CreateInputRpeOption();
+    private static readonly Option<string?> OutputOpt = SharedOptions.CreateOutputAutoOption();
+    private static readonly Option<string?> WorkspaceOpt = SharedOptions.CreateWorkspaceRpeOption();
+
+    private static readonly Option<float> PixelsPerBeatOpt = new("--pixels-per-beat", "-r")
     {
-        [CommandOption("-r|--pixels-per-beat <N>")]
-        [LocalizedDescription("render_opt_pixels_per_beat")]
-        public float? PixelsPerBeat { get; set; }
+        Description = L("render_opt_pixels_per_beat"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
 
-        [CommandOption("--channel-width <N>")]
-        [LocalizedDescription("render_opt_channel_width")]
-        public int? ChannelWidth { get; set; }
-
-        [CommandOption("--samples <N>")]
-        [LocalizedDescription("render_opt_samples")]
-        public int? SamplesPerEvent { get; set; }
-
-        [CommandOption("-b|--beat-subdivisions <N>")]
-        [LocalizedDescription("render_opt_beat_subdivisions")]
-        public int? BeatSubdivisions { get; set; }
-
-        [CommandOption("--line <INDEX>")]
-        [LocalizedDescription("render_opt_line")]
-        public int? LineIndex { get; set; }
-
-        [CommandOption("--layer <INDEX>")]
-        [LocalizedDescription("render_opt_layer")]
-        public int? LayerIndex { get; set; }
-
-        [CommandOption("--range-padding-ratio <N>")]
-        [LocalizedDescription("render_opt_range_padding_ratio")]
-        public double? RangePaddingRatio { get; set; }
-
-        [CommandOption("--range-samples <N>")]
-        [LocalizedDescription("render_opt_range_samples")]
-        public int? RangeSamplesPerEvent { get; set; }
-
-        [CommandOption("--segment-tolerance <N>")]
-        [LocalizedDescription("render_opt_segment_tolerance")]
-        public double? SegmentGroupTolerance { get; set; }
-
-        [CommandOption("--min-range-half <N>")]
-        [LocalizedDescription("render_opt_min_range_half")]
-        public double? MinValueRangeHalf { get; set; }
-
-        [CommandOption("--min-range-half-ratio <N>")]
-        [LocalizedDescription("render_opt_min_range_half_ratio")]
-        public double? MinValueRangeHalfRatio { get; set; }
-    }
-
-    protected override async Task<int> ExecuteAsync(
-        CommandContext context,
-        Settings s,
-        CancellationToken cancellationToken
-    )
+    private static readonly Option<int> ChannelWidthOpt = new("--channel-width")
     {
-        var c = s.AppConfig.RenderConfig;
-        s.PixelsPerBeat ??= c.PixelsPerBeat;
-        s.ChannelWidth ??= c.ChannelWidth;
-        s.SamplesPerEvent ??= c.SamplesPerEvent;
-        s.BeatSubdivisions ??= c.BeatSubdivisions;
+        Description = L("render_opt_channel_width"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
 
-        var svc = new ChartService();
-        var nrc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (nrc == null)
+    private static readonly Option<int> SamplesPerEventOpt = new("--samples")
+    {
+        Description = L("render_opt_samples"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<int> BeatSubdivisionsOpt = new("--beat-subdivisions", "-b")
+    {
+        Description = L("render_opt_beat_subdivisions"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<int> LineIndexOpt = new("--line")
+    {
+        Description = L("render_opt_line"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<int> LayerIndexOpt = new("--layer")
+    {
+        Description = L("render_opt_layer"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> RangePaddingRatioOpt = new("--range-padding-ratio")
+    {
+        Description = L("render_opt_range_padding_ratio"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<int> RangeSamplesOpt = new("--range-samples")
+    {
+        Description = L("render_opt_range_samples"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> SegmentToleranceOpt = new("--segment-tolerance")
+    {
+        Description = L("render_opt_segment_tolerance"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> MinRangeHalfOpt = new("--min-range-half")
+    {
+        Description = L("render_opt_min_range_half"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> MinRangeHalfRatioOpt = new("--min-range-half-ratio")
+    {
+        Description = L("render_opt_min_range_half_ratio"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    public static Command Create()
+    {
+        var cmd = new Command("render-event", L("render_command_desc"));
+        cmd.Aliases.Add("render");
+        cmd.Add(InputOpt);
+        cmd.Add(OutputOpt);
+        cmd.Add(WorkspaceOpt);
+        cmd.Add(PixelsPerBeatOpt);
+        cmd.Add(ChannelWidthOpt);
+        cmd.Add(SamplesPerEventOpt);
+        cmd.Add(BeatSubdivisionsOpt);
+        cmd.Add(LineIndexOpt);
+        cmd.Add(LayerIndexOpt);
+        cmd.Add(RangePaddingRatioOpt);
+        cmd.Add(RangeSamplesOpt);
+        cmd.Add(SegmentToleranceOpt);
+        cmd.Add(MinRangeHalfOpt);
+        cmd.Add(MinRangeHalfRatioOpt);
+
+        cmd.SetAction(async (result, ct) =>
         {
-            ConsoleWriter.Error(CliLocalizationString.render_err_load_failed);
-            return 1;
-        }
+            var input = result.GetValue(InputOpt);
+            var workspace = result.GetValue(WorkspaceOpt);
+            if (string.IsNullOrWhiteSpace(input) && string.IsNullOrWhiteSpace(workspace))
+            {
+                ConsoleWriter.Error(CliLocalizationString.err_input_required);
+                return 1;
+            }
 
-        string? outputDir;
-        if (!string.IsNullOrWhiteSpace(s.Output))
-            outputDir = s.Output;
-        else
-            outputDir = !string.IsNullOrWhiteSpace(s.Input)
-                ? Path.Combine(Path.GetDirectoryName(s.Input) ?? ".", "render_output")
-                : Path.Combine(Directory.GetCurrentDirectory(), "render_output");
+            var config = AppConfigHelper.Load();
+            var c = config.RenderConfig;
 
-        ConsoleWriter.Info(string.Format(CliLocalizationString.render_msg_start, outputDir));
+            var svc = new ChartService();
+            var nrc = await svc.LoadKpcAsync(input, workspace, ct);
+            if (nrc == null)
+            {
+                ConsoleWriter.Error(CliLocalizationString.render_err_load_failed);
+                return 1;
+            }
 
-        var opts = new KpcRenderOptions
-        {
-            PixelsPerBeat = s.PixelsPerBeat ?? 100f,
-            ChannelWidth = s.ChannelWidth ?? 150,
-            SamplesPerEvent = s.SamplesPerEvent ?? 64,
-            BeatSubdivisions = s.BeatSubdivisions ?? 2,
-            RangePaddingRatio = s.RangePaddingRatio ?? c.RangePaddingRatio,
-            RangeSamplesPerEvent = s.RangeSamplesPerEvent ?? c.RangeSamplesPerEvent,
-            SegmentGroupTolerance = s.SegmentGroupTolerance ?? c.SegmentGroupTolerance,
-            MinValueRangeHalf = s.MinValueRangeHalf ?? c.MinValueRangeHalf,
-            MinValueRangeHalfRatio = s.MinValueRangeHalfRatio ?? c.MinValueRangeHalfRatio,
-        };
-
-        var exporter = new KpcChartRenderExporter();
-        exporter.SubscribeLog(
-            info: ConsoleWriter.Info,
-            warning: ConsoleWriter.Warn,
-            error: ConsoleWriter.Error
-        );
-
-        try
-        {
-            var files = exporter.ExportChart(nrc, outputDir, opts, s.LineIndex, s.LayerIndex);
-            if (files.Count == 0)
-                ConsoleWriter.Warn(CliLocalizationString.render_warn_nothing);
+            string? outputDir;
+            var outputValue = result.GetValue(OutputOpt);
+            if (!string.IsNullOrWhiteSpace(outputValue))
+                outputDir = outputValue;
             else
-                ConsoleWriter.Info(
-                    string.Format(CliLocalizationString.render_msg_done, files.Count, outputDir)
-                );
-        }
-        catch (Exception ex)
-        {
-            ConsoleWriter.Error(
-                string.Format(CliLocalizationString.render_err_render_failed, ex.Message)
-            );
-            return 2;
-        }
+                outputDir = !string.IsNullOrWhiteSpace(input)
+                    ? Path.Combine(Path.GetDirectoryName(input) ?? ".", "render_output")
+                    : Path.Combine(Directory.GetCurrentDirectory(), "render_output");
 
-        return 0;
+            ConsoleWriter.Info(string.Format(CliLocalizationString.render_msg_start, outputDir));
+
+            var opts = new KpcRenderOptions
+            {
+                PixelsPerBeat = SharedOptions.GetIfSpecified(result, PixelsPerBeatOpt) ?? c.PixelsPerBeat,
+                ChannelWidth = SharedOptions.GetIfSpecified(result, ChannelWidthOpt) ?? c.ChannelWidth,
+                SamplesPerEvent = SharedOptions.GetIfSpecified(result, SamplesPerEventOpt) ?? c.SamplesPerEvent,
+                BeatSubdivisions = SharedOptions.GetIfSpecified(result, BeatSubdivisionsOpt) ?? c.BeatSubdivisions,
+                RangePaddingRatio = SharedOptions.GetIfSpecified(result, RangePaddingRatioOpt) ?? c.RangePaddingRatio,
+                RangeSamplesPerEvent = SharedOptions.GetIfSpecified(result, RangeSamplesOpt) ?? c.RangeSamplesPerEvent,
+                SegmentGroupTolerance = SharedOptions.GetIfSpecified(result, SegmentToleranceOpt) ?? c.SegmentGroupTolerance,
+                MinValueRangeHalf = SharedOptions.GetIfSpecified(result, MinRangeHalfOpt) ?? c.MinValueRangeHalf,
+                MinValueRangeHalfRatio = SharedOptions.GetIfSpecified(result, MinRangeHalfRatioOpt) ?? c.MinValueRangeHalfRatio,
+            };
+
+            var exporter = new KpcChartRenderExporter();
+            exporter.SubscribeLog(ConsoleWriter.Info, ConsoleWriter.Warn, ConsoleWriter.Error);
+
+            try
+            {
+                var lineIndex = SharedOptions.GetIfSpecified(result, LineIndexOpt);
+                var layerIndex = SharedOptions.GetIfSpecified(result, LayerIndexOpt);
+                var files = exporter.ExportChart(nrc, outputDir, opts, lineIndex, layerIndex);
+                if (files.Count == 0)
+                    ConsoleWriter.Warn(CliLocalizationString.render_warn_nothing);
+                else
+                    ConsoleWriter.Info(string.Format(CliLocalizationString.render_msg_done, files.Count, outputDir));
+            }
+            catch (Exception ex)
+            {
+                ConsoleWriter.Error(string.Format(CliLocalizationString.render_err_render_failed, ex.Message));
+                return 2;
+            }
+
+            return 0;
+        });
+
+        return cmd;
     }
 }

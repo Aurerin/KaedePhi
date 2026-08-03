@@ -1,5 +1,3 @@
-using Spectre.Console;
-
 namespace KaedePhi.Tool.Cli.Infrastructure;
 
 /// <summary>
@@ -22,7 +20,7 @@ public static class ConsoleWriter
     {
         if (!ShouldLog(1))
             return;
-        AnsiConsole.MarkupLine($"[grey]{Escape(message)}[/]");
+        WriteColoredLine(message, ConsoleColor.Gray);
     }
 
     /// <summary>
@@ -32,7 +30,7 @@ public static class ConsoleWriter
     {
         if (!ShouldLog(2))
             return;
-        AnsiConsole.MarkupLine($"[green]{Escape(message)}[/]");
+        WriteColoredLine(message, ConsoleColor.Green);
     }
 
     /// <summary>
@@ -42,7 +40,7 @@ public static class ConsoleWriter
     {
         if (!ShouldLog(3))
             return;
-        AnsiConsole.MarkupLine($"[yellow]{Escape(message)}[/]");
+        WriteColoredLine(message, ConsoleColor.Yellow);
     }
 
     /// <summary>
@@ -52,7 +50,7 @@ public static class ConsoleWriter
     {
         if (!ShouldLog(4))
             return;
-        AnsiConsole.MarkupLine($"[red]{Escape(message)}[/]");
+        WriteColoredLine(message, ConsoleColor.Red);
     }
 
     /// <summary>
@@ -60,5 +58,11 @@ public static class ConsoleWriter
     /// </summary>
     private static bool ShouldLog(uint level) => LogLevel != 0 && level >= LogLevel;
 
-    private static string Escape(string text) => text.Replace("[", "[[").Replace("]", "]]");
+    private static void WriteColoredLine(string message, ConsoleColor color)
+    {
+        var prev = Console.ForegroundColor;
+        Console.ForegroundColor = color;
+        Console.WriteLine(message);
+        Console.ForegroundColor = prev;
+    }
 }

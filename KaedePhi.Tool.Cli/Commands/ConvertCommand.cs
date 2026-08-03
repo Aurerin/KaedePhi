@@ -1,300 +1,382 @@
+using System.Globalization;
 using KaedePhi.Tool.Cli.Infrastructure;
-using KaedePhi.Tool.Cli.Settings;
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
 
 namespace KaedePhi.Tool.Cli.Commands;
 
-public sealed class ConvertCommand : AsyncCommand<ConvertCommand.Settings>
+public static class ConvertCommand
 {
-    public sealed class Settings : OperationSettings
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
+
+    #region 共享选项
+
+    private static readonly Option<string?> InputOpt = SharedOptions.CreateInputRpeOption();
+    private static readonly Option<string?> OutputOpt = SharedOptions.CreateOutputAutoOption();
+    private static readonly Option<string?> WorkspaceOpt = SharedOptions.CreateWorkspaceRpeOption();
+    private static readonly Option<double> PrecisionOpt = SharedOptions.PrecisionOption;
+    private static readonly Option<double> ToleranceOpt = SharedOptions.ToleranceOption;
+    private static readonly Option<bool> ClassicOpt = SharedOptions.ClassicOption;
+    private static readonly Option<bool> NoCompressOpt = SharedOptions.NoCompressOption;
+    private static readonly Option<bool> DryRunOpt = SharedOptions.DryRunOption;
+    private static readonly Option<bool> StreamOpt = SharedOptions.StreamOutputOption;
+    private static readonly Option<bool> FormatOpt = SharedOptions.FormatOutputOption;
+
+    #endregion
+
+    #region 专属选项
+
+    private static readonly Option<ChartType?> TargetTypeOpt = new("--target")
     {
-        [CommandOption("--target <TYPE>")]
-        [LocalizedDescription("convert_command_opt_target")]
-        public ChartType? TargetType { get; set; }
+        Description = L("convert_command_opt_target"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
 
-        #region PhiEdit 转换选项
-
-        [CommandOption("--pe-speed-ratio <N>")]
-        [LocalizedDescription("convert_opt_pe_speed_ratio")]
-        public double? PeSpeedConversionRatio { get; set; }
-
-        [CommandOption("--pe-trailing-padding <N>")]
-        [LocalizedDescription("convert_opt_pe_trailing_padding")]
-        public double? PeTrailingBeatPadding { get; set; }
-
-        [CommandOption("--pe-easing-precision <N>")]
-        [LocalizedDescription("convert_opt_pe_easing_precision")]
-        public double? PeUnsupportedEasingPrecision { get; set; }
-
-        [CommandOption("--pe-xy-precision <N>")]
-        [LocalizedDescription("convert_opt_pe_xy_precision")]
-        public double? PeMisalignedXyEventPrecision { get; set; }
-
-        [CommandOption("--pe-alpha-precision <N>")]
-        [LocalizedDescription("convert_opt_pe_alpha_precision")]
-        public double? PeAlphaCutPrecision { get; set; }
-
-        [CommandOption("--pe-alpha-tolerance <N>")]
-        [LocalizedDescription("convert_opt_pe_alpha_tolerance")]
-        public double? PeAlphaCutTolerance { get; set; }
-
-        [CommandOption("--pe-speed-precision <N>")]
-        [LocalizedDescription("convert_opt_pe_speed_precision")]
-        public double? PeSpeedCutPrecision { get; set; }
-
-        [CommandOption("--pe-speed-tolerance <N>")]
-        [LocalizedDescription("convert_opt_pe_speed_tolerance")]
-        public double? PeSpeedCutTolerance { get; set; }
-
-        #endregion
-
-        #region PhigrosV3 转换选项
-
-        [CommandOption("--phigros-bpm <N>")]
-        [LocalizedDescription("convert_opt_phigros_bpm")]
-        public float? PhigrosDefaultBpm { get; set; }
-
-        [CommandOption("--phigros-easing-precision <N>")]
-        [LocalizedDescription("convert_opt_phigros_easing_precision")]
-        public double? PhigrosEasingPrecision { get; set; }
-
-        [CommandOption("--phigros-xy-precision <N>")]
-        [LocalizedDescription("convert_opt_phigros_xy_precision")]
-        public double? PhigrosMisalignedXyEventPrecision { get; set; }
-
-        [CommandOption("--phigros-alpha-precision <N>")]
-        [LocalizedDescription("convert_opt_phigros_alpha_precision")]
-        public double? PhigrosAlphaCutPrecision { get; set; }
-
-        [CommandOption("--phigros-alpha-tolerance <N>")]
-        [LocalizedDescription("convert_opt_phigros_alpha_tolerance")]
-        public double? PhigrosAlphaCutTolerance { get; set; }
-
-        [CommandOption("--phigros-speed-precision <N>")]
-        [LocalizedDescription("convert_opt_phigros_speed_precision")]
-        public double? PhigrosSpeedCutPrecision { get; set; }
-
-        #endregion
-
-        #region 解绑选项
-
-        [CommandOption("--unbind-precision <N>")]
-        [LocalizedDescription("convert_opt_unbind_precision")]
-        public double? UnbindPrecision { get; set; }
-
-        [CommandOption("--unbind-tolerance <N>")]
-        [LocalizedDescription("convert_opt_unbind_tolerance")]
-        public double? UnbindTolerance { get; set; }
-
-        [CommandOption("--unbind-classic")]
-        [LocalizedDescription("convert_opt_unbind_classic")]
-        public bool? UnbindClassicMode { get; set; }
-
-        #endregion
-
-        #region 多层级合并选项
-
-        [CommandOption("--merge-precision <N>")]
-        [LocalizedDescription("convert_opt_merge_precision")]
-        public double? MultiLayerMergePrecision { get; set; }
-
-        [CommandOption("--merge-tolerance <N>")]
-        [LocalizedDescription("convert_opt_merge_tolerance")]
-        public double? MultiLayerMergeTolerance { get; set; }
-
-        [CommandOption("--merge-classic")]
-        [LocalizedDescription("convert_opt_merge_classic")]
-        public bool? MultiLayerMergeClassicMode { get; set; }
-
-        #endregion
-
-        #region 压缩控制选项
-
-        [CommandOption("--no-unbind-compress")]
-        [LocalizedDescription("convert_opt_no_unbind_compress")]
-        public bool? DisableUnbindCompress { get; set; }
-
-        [CommandOption("--no-merge-compress")]
-        [LocalizedDescription("convert_opt_no_merge_compress")]
-        public bool? DisableMergeCompress { get; set; }
-
-        #endregion
-
-        #region 判定线过滤选项
-
-        [CommandOption("--remove-attach-ui")]
-        [LocalizedDescription("convert_opt_remove_attach_ui")]
-        public bool? RemoveAttachUiLine { get; set; }
-
-        [CommandOption("--remove-texture")]
-        [LocalizedDescription("convert_opt_remove_texture")]
-        public bool? RemoveTextureLine { get; set; }
-
-        #endregion
-
-        #region 音符过滤选项
-
-        [CommandOption("--filter-fake-notes")]
-        [LocalizedDescription("convert_opt_filter_fake_notes")]
-        public bool? FilterFakeNotes { get; set; }
-
-        #endregion
-
-        #region 负不透明度抬高选项
-
-        [CommandOption("--negative-alpha-elevation")]
-        [LocalizedDescription("convert_opt_negative_alpha_elevation")]
-        public bool? NegativeAlphaElevation { get; set; }
-
-        [CommandOption("--negative-alpha-step <N>")]
-        [LocalizedDescription("convert_opt_negative_alpha_step")]
-        public double? NegativeAlphaStep { get; set; }
-
-        #endregion
-    }
-
-    protected override async Task<int> ExecuteAsync(
-        CommandContext context,
-        Settings s,
-        CancellationToken cancellationToken
-    )
+    private static readonly Option<double> PeSpeedRatioOpt = new("--pe-speed-ratio")
     {
-        var c = s.AppConfig.ConvertConfig;
-        s.TargetType ??= c.TargetType;
-        s.StreamOutput ??= c.StreamOutput;
-        s.FormatOutput ??= c.FormatOutput;
-        s.DryRun ??= c.DryRun;
+        Description = L("convert_opt_pe_speed_ratio"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
 
-        var svc = new ChartService();
+    private static readonly Option<double> PeTrailingPaddingOpt = new("--pe-trailing-padding")
+    {
+        Description = L("convert_opt_pe_trailing_padding"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
 
-        var kpc = await svc.LoadKpcAsync(s.Input, s.Workspace, cancellationToken);
-        if (kpc == null)
+    private static readonly Option<double> PeEasingPrecisionOpt = new("--pe-easing-precision")
+    {
+        Description = L("convert_opt_pe_easing_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PeXyPrecisionOpt = new("--pe-xy-precision")
+    {
+        Description = L("convert_opt_pe_xy_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PeAlphaPrecisionOpt = new("--pe-alpha-precision")
+    {
+        Description = L("convert_opt_pe_alpha_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PeAlphaToleranceOpt = new("--pe-alpha-tolerance")
+    {
+        Description = L("convert_opt_pe_alpha_tolerance"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PeSpeedPrecisionOpt = new("--pe-speed-precision")
+    {
+        Description = L("convert_opt_pe_speed_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PeSpeedToleranceOpt = new("--pe-speed-tolerance")
+    {
+        Description = L("convert_opt_pe_speed_tolerance"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<float> PhigrosBpmOpt = new("--phigros-bpm")
+    {
+        Description = L("convert_opt_phigros_bpm"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PhigrosEasingPrecisionOpt = new("--phigros-easing-precision")
+    {
+        Description = L("convert_opt_phigros_easing_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PhigrosXyPrecisionOpt = new("--phigros-xy-precision")
+    {
+        Description = L("convert_opt_phigros_xy_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PhigrosAlphaPrecisionOpt = new("--phigros-alpha-precision")
+    {
+        Description = L("convert_opt_phigros_alpha_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PhigrosAlphaToleranceOpt = new("--phigros-alpha-tolerance")
+    {
+        Description = L("convert_opt_phigros_alpha_tolerance"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> PhigrosSpeedPrecisionOpt = new("--phigros-speed-precision")
+    {
+        Description = L("convert_opt_phigros_speed_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> UnbindPrecisionOpt = new("--unbind-precision")
+    {
+        Description = L("convert_opt_unbind_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> UnbindToleranceOpt = new("--unbind-tolerance")
+    {
+        Description = L("convert_opt_unbind_tolerance"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<bool> UnbindClassicOpt = new("--unbind-classic")
+    {
+        Description = L("convert_opt_unbind_classic")
+    };
+
+    private static readonly Option<double> MergePrecisionOpt = new("--merge-precision")
+    {
+        Description = L("convert_opt_merge_precision"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<double> MergeToleranceOpt = new("--merge-tolerance")
+    {
+        Description = L("convert_opt_merge_tolerance"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    private static readonly Option<bool> MergeClassicOpt = new("--merge-classic")
+    {
+        Description = L("convert_opt_merge_classic")
+    };
+
+    private static readonly Option<bool> NoUnbindCompressOpt = new("--no-unbind-compress")
+    {
+        Description = L("convert_opt_no_unbind_compress")
+    };
+
+    private static readonly Option<bool> NoMergeCompressOpt = new("--no-merge-compress")
+    {
+        Description = L("convert_opt_no_merge_compress")
+    };
+
+    private static readonly Option<bool> RemoveAttachUiOpt = new("--remove-attach-ui")
+    {
+        Description = L("convert_opt_remove_attach_ui")
+    };
+
+    private static readonly Option<bool> RemoveTextureOpt = new("--remove-texture")
+    {
+        Description = L("convert_opt_remove_texture")
+    };
+
+    private static readonly Option<bool> FilterFakeNotesOpt = new("--filter-fake-notes")
+    {
+        Description = L("convert_opt_filter_fake_notes")
+    };
+
+    private static readonly Option<bool> NegativeAlphaElevationOpt = new("--negative-alpha-elevation")
+    {
+        Description = L("convert_opt_negative_alpha_elevation")
+    };
+
+    private static readonly Option<double> NegativeAlphaStepOpt = new("--negative-alpha-step")
+    {
+        Description = L("convert_opt_negative_alpha_step"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    #endregion
+
+    public static Command Create()
+    {
+        var cmd = new Command("convert", L("convert_command_desc"));
+        cmd.Add(InputOpt);
+        cmd.Add(OutputOpt);
+        cmd.Add(WorkspaceOpt);
+        cmd.Add(PrecisionOpt);
+        cmd.Add(ToleranceOpt);
+        cmd.Add(ClassicOpt);
+        cmd.Add(NoCompressOpt);
+        cmd.Add(DryRunOpt);
+        cmd.Add(StreamOpt);
+        cmd.Add(FormatOpt);
+        cmd.Add(TargetTypeOpt);
+        cmd.Add(PeSpeedRatioOpt);
+        cmd.Add(PeTrailingPaddingOpt);
+        cmd.Add(PeEasingPrecisionOpt);
+        cmd.Add(PeXyPrecisionOpt);
+        cmd.Add(PeAlphaPrecisionOpt);
+        cmd.Add(PeAlphaToleranceOpt);
+        cmd.Add(PeSpeedPrecisionOpt);
+        cmd.Add(PeSpeedToleranceOpt);
+        cmd.Add(PhigrosBpmOpt);
+        cmd.Add(PhigrosEasingPrecisionOpt);
+        cmd.Add(PhigrosXyPrecisionOpt);
+        cmd.Add(PhigrosAlphaPrecisionOpt);
+        cmd.Add(PhigrosAlphaToleranceOpt);
+        cmd.Add(PhigrosSpeedPrecisionOpt);
+        cmd.Add(UnbindPrecisionOpt);
+        cmd.Add(UnbindToleranceOpt);
+        cmd.Add(UnbindClassicOpt);
+        cmd.Add(MergePrecisionOpt);
+        cmd.Add(MergeToleranceOpt);
+        cmd.Add(MergeClassicOpt);
+        cmd.Add(NoUnbindCompressOpt);
+        cmd.Add(NoMergeCompressOpt);
+        cmd.Add(RemoveAttachUiOpt);
+        cmd.Add(RemoveTextureOpt);
+        cmd.Add(FilterFakeNotesOpt);
+        cmd.Add(NegativeAlphaElevationOpt);
+        cmd.Add(NegativeAlphaStepOpt);
+
+        cmd.SetAction(async (result, ct) =>
         {
-            ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
-            return 1;
-        }
+            var input = result.GetValue(InputOpt);
+            var workspace = result.GetValue(WorkspaceOpt);
+            if (string.IsNullOrWhiteSpace(input) && string.IsNullOrWhiteSpace(workspace))
+            {
+                ConsoleWriter.Error(CliLocalizationString.err_input_required);
+                return 1;
+            }
 
-        var output = svc.ResolveOutputPath(s.Input, s.Output, s.Workspace);
+            var config = AppConfigHelper.Load();
+            var c = config.ConvertConfig;
 
-        var disableUnbindCompress = s.DisableUnbindCompress ?? false;
-        var disableMergeCompress = s.DisableMergeCompress ?? false;
+            var svc = new ChartService();
+            var kpc = await svc.LoadKpcAsync(input, workspace, ct);
+            if (kpc == null)
+            {
+                ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
+                return 1;
+            }
 
-        var peOptions = new KpcToPhiEditConvertOptions
-        {
-            SpeedConversionRatio = s.PeSpeedConversionRatio ?? c.PeSpeedConversionRatio,
-            TrailingBeatPadding = s.PeTrailingBeatPadding ?? c.PeTrailingBeatPadding,
-            Cutting = new KpcToPhiEditConvertOptions.CuttingOptions
-            {
-                UnsupportedEasingPrecision =
-                    s.PeUnsupportedEasingPrecision ?? c.PeUnsupportedEasingPrecision,
-                MisalignedXyEventPrecision =
-                    s.PeMisalignedXyEventPrecision ?? c.PeMisalignedXyEventPrecision,
-            },
-            Alpha = new KpcToPhiEditConvertOptions.AlphaOptions
-            {
-                CutPrecision = s.PeAlphaCutPrecision ?? c.PeAlphaCutPrecision,
-                CutCompress = c.PeAlphaCutCompress,
-                CutTolerance = s.PeAlphaCutTolerance ?? c.PeAlphaCutTolerance,
-            },
-            Speed = new KpcToPhiEditConvertOptions.SpeedOptions
-            {
-                CutPrecision = s.PeSpeedCutPrecision ?? c.PeSpeedCutPrecision,
-                CutCompress = c.PeSpeedCutCompress,
-                CutTolerance = s.PeSpeedCutTolerance ?? c.PeSpeedCutTolerance,
-            },
-            FatherLineUnbind = new KpcToPhiEditConvertOptions.FatherLineUnbindOptions
-            {
-                Precision = s.UnbindPrecision ?? s.Precision ?? c.UnbindPrecision,
-                Tolerance = s.UnbindTolerance ?? s.Tolerance ?? c.UnbindTolerance,
-                ClassicMode = s.UnbindClassicMode ?? s.Classic ?? c.UnbindClassicMode,
-                Compress = !disableUnbindCompress,
-            },
-            MultiLayerMerge = new KpcToPhiEditConvertOptions.MultiLayerMergeOptions
-            {
-                Precision = s.MultiLayerMergePrecision ?? c.MultiLayerMergePrecision,
-                Tolerance = s.MultiLayerMergeTolerance ?? c.MultiLayerMergeTolerance,
-                ClassicMode = s.MultiLayerMergeClassicMode ?? c.MultiLayerMergeClassicMode,
-                Compress = !disableMergeCompress,
-            },
-            LineFilter = new KpcToPhiEditConvertOptions.LineFilterOptions
-            {
-                RemoveAttachUiLine = s.RemoveAttachUiLine ?? false,
-                RemoveTextureLine = s.RemoveTextureLine ?? false,
-            },
-        };
+            var output = svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace);
+            var targetType = result.GetValue(TargetTypeOpt) ?? c.TargetType;
+            var streamOutput = SharedOptions.GetIfSpecified(result, StreamOpt) ?? c.StreamOutput;
+            var formatOutput = SharedOptions.GetIfSpecified(result, FormatOpt) ?? c.FormatOutput;
+            var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
+            var disableUnbindCompress = result.GetValue(NoUnbindCompressOpt);
+            var disableMergeCompress = result.GetValue(NoMergeCompressOpt);
 
-        var phigrosOptions = new KpcToPhigrosV3ConvertOptions
-        {
-            DefaultBpm = s.PhigrosDefaultBpm ?? c.PhigrosDefaultBpm,
-            Cutting = new KpcToPhigrosV3ConvertOptions.CuttingOptions
+            var peOptions = new KpcToPhiEditConvertOptions
             {
-                EasingPrecision = s.PhigrosEasingPrecision ?? c.PhigrosEasingPrecision,
-                MisalignedXyEventPrecision =
-                    s.PhigrosMisalignedXyEventPrecision ?? c.PhigrosMisalignedXyEventPrecision,
-            },
-            Alpha = new KpcToPhigrosV3ConvertOptions.AlphaOptions
-            {
-                CutPrecision = s.PhigrosAlphaCutPrecision ?? c.PhigrosAlphaCutPrecision,
-                CutCompress = c.PhigrosAlphaCutCompress,
-                CutTolerance = s.PhigrosAlphaCutTolerance ?? c.PhigrosAlphaCutTolerance,
-            },
-            Speed = new KpcToPhigrosV3ConvertOptions.SpeedOptions
-            {
-                CutPrecision = s.PhigrosSpeedCutPrecision ?? c.PhigrosSpeedCutPrecision,
-            },
-            FatherLineUnbind = new KpcToPhigrosV3ConvertOptions.FatherLineUnbindOptions
-            {
-                Precision = s.UnbindPrecision ?? s.Precision ?? c.UnbindPrecision,
-                Tolerance = s.UnbindTolerance ?? s.Tolerance ?? c.UnbindTolerance,
-                ClassicMode = s.UnbindClassicMode ?? s.Classic ?? c.UnbindClassicMode,
-                Compress = !disableUnbindCompress,
-            },
-            MultiLayerMerge = new KpcToPhigrosV3ConvertOptions.MultiLayerMergeOptions
-            {
-                Precision = s.MultiLayerMergePrecision ?? c.MultiLayerMergePrecision,
-                Tolerance = s.MultiLayerMergeTolerance ?? c.MultiLayerMergeTolerance,
-                ClassicMode = s.MultiLayerMergeClassicMode ?? c.MultiLayerMergeClassicMode,
-                Compress = !disableMergeCompress,
-            },
-            LineFilter = new KpcToPhigrosV3ConvertOptions.LineFilterOptions
-            {
-                RemoveAttachUiLine = s.RemoveAttachUiLine ?? false,
-                RemoveTextureLine = s.RemoveTextureLine ?? false,
-            },
-            NoteFilter = new KpcToPhigrosV3ConvertOptions.NoteFilterOptions
-            {
-                FilterFakeNotes = s.FilterFakeNotes ?? c.PhigrosFilterFakeNotes,
-            },
-            NegativeAlpha = new KpcToPhigrosV3ConvertOptions.NegativeAlphaOptions
-            {
-                Enabled = s.NegativeAlphaElevation ?? c.PhigrosNegativeAlphaElevation,
-                ElevationStep = s.NegativeAlphaStep ?? c.PhigrosNegativeAlphaStep,
-            },
-        };
+                SpeedConversionRatio = SharedOptions.GetIfSpecified(result, PeSpeedRatioOpt) ?? c.PeSpeedConversionRatio,
+                TrailingBeatPadding = SharedOptions.GetIfSpecified(result, PeTrailingPaddingOpt) ?? c.PeTrailingBeatPadding,
+                Cutting = new KpcToPhiEditConvertOptions.CuttingOptions
+                {
+                    UnsupportedEasingPrecision = SharedOptions.GetIfSpecified(result, PeEasingPrecisionOpt) ?? c.PeUnsupportedEasingPrecision,
+                    MisalignedXyEventPrecision = SharedOptions.GetIfSpecified(result, PeXyPrecisionOpt) ?? c.PeMisalignedXyEventPrecision,
+                },
+                Alpha = new KpcToPhiEditConvertOptions.AlphaOptions
+                {
+                    CutPrecision = SharedOptions.GetIfSpecified(result, PeAlphaPrecisionOpt) ?? c.PeAlphaCutPrecision,
+                    CutCompress = c.PeAlphaCutCompress,
+                    CutTolerance = SharedOptions.GetIfSpecified(result, PeAlphaToleranceOpt) ?? c.PeAlphaCutTolerance,
+                },
+                Speed = new KpcToPhiEditConvertOptions.SpeedOptions
+                {
+                    CutPrecision = SharedOptions.GetIfSpecified(result, PeSpeedPrecisionOpt) ?? c.PeSpeedCutPrecision,
+                    CutCompress = c.PeSpeedCutCompress,
+                    CutTolerance = SharedOptions.GetIfSpecified(result, PeSpeedToleranceOpt) ?? c.PeSpeedCutTolerance,
+                },
+                FatherLineUnbind = new KpcToPhiEditConvertOptions.FatherLineUnbindOptions
+                {
+                    Precision = SharedOptions.GetIfSpecified(result, UnbindPrecisionOpt) ?? SharedOptions.GetIfSpecified(result, PrecisionOpt) ?? c.UnbindPrecision,
+                    Tolerance = SharedOptions.GetIfSpecified(result, UnbindToleranceOpt) ?? SharedOptions.GetIfSpecified(result, ToleranceOpt) ?? c.UnbindTolerance,
+                    ClassicMode = SharedOptions.GetIfSpecified(result, UnbindClassicOpt) ?? SharedOptions.GetIfSpecified(result, ClassicOpt) ?? c.UnbindClassicMode,
+                    Compress = !disableUnbindCompress,
+                },
+                MultiLayerMerge = new KpcToPhiEditConvertOptions.MultiLayerMergeOptions
+                {
+                    Precision = SharedOptions.GetIfSpecified(result, MergePrecisionOpt) ?? c.MultiLayerMergePrecision,
+                    Tolerance = SharedOptions.GetIfSpecified(result, MergeToleranceOpt) ?? c.MultiLayerMergeTolerance,
+                    ClassicMode = SharedOptions.GetIfSpecified(result, MergeClassicOpt) ?? c.MultiLayerMergeClassicMode,
+                    Compress = !disableMergeCompress,
+                },
+                LineFilter = new KpcToPhiEditConvertOptions.LineFilterOptions
+                {
+                    RemoveAttachUiLine = result.GetValue(RemoveAttachUiOpt),
+                    RemoveTextureLine = result.GetValue(RemoveTextureOpt),
+                },
+            };
 
-        var result = await ChartService.SaveAsAsync(
-            kpc,
-            output,
-            s.TargetType ?? ChartType.RePhiEdit,
-            new SaveAsOptions
+            var phigrosOptions = new KpcToPhigrosV3ConvertOptions
             {
-                Stream = s.StreamOutput ?? false,
-                Format = s.FormatOutput ?? false,
-                DryRun = s.DryRun ?? false,
-                PhiEditOptions = peOptions,
-                PhigrosOptions = phigrosOptions,
-            },
-            cancellationToken
-        );
+                DefaultBpm = SharedOptions.GetIfSpecified(result, PhigrosBpmOpt) ?? c.PhigrosDefaultBpm,
+                Cutting = new KpcToPhigrosV3ConvertOptions.CuttingOptions
+                {
+                    EasingPrecision = SharedOptions.GetIfSpecified(result, PhigrosEasingPrecisionOpt) ?? c.PhigrosEasingPrecision,
+                    MisalignedXyEventPrecision = SharedOptions.GetIfSpecified(result, PhigrosXyPrecisionOpt) ?? c.PhigrosMisalignedXyEventPrecision,
+                },
+                Alpha = new KpcToPhigrosV3ConvertOptions.AlphaOptions
+                {
+                    CutPrecision = SharedOptions.GetIfSpecified(result, PhigrosAlphaPrecisionOpt) ?? c.PhigrosAlphaCutPrecision,
+                    CutCompress = c.PhigrosAlphaCutCompress,
+                    CutTolerance = SharedOptions.GetIfSpecified(result, PhigrosAlphaToleranceOpt) ?? c.PhigrosAlphaCutTolerance,
+                },
+                Speed = new KpcToPhigrosV3ConvertOptions.SpeedOptions
+                {
+                    CutPrecision = SharedOptions.GetIfSpecified(result, PhigrosSpeedPrecisionOpt) ?? c.PhigrosSpeedCutPrecision,
+                },
+                FatherLineUnbind = new KpcToPhigrosV3ConvertOptions.FatherLineUnbindOptions
+                {
+                    Precision = SharedOptions.GetIfSpecified(result, UnbindPrecisionOpt) ?? SharedOptions.GetIfSpecified(result, PrecisionOpt) ?? c.UnbindPrecision,
+                    Tolerance = SharedOptions.GetIfSpecified(result, UnbindToleranceOpt) ?? SharedOptions.GetIfSpecified(result, ToleranceOpt) ?? c.UnbindTolerance,
+                    ClassicMode = SharedOptions.GetIfSpecified(result, UnbindClassicOpt) ?? SharedOptions.GetIfSpecified(result, ClassicOpt) ?? c.UnbindClassicMode,
+                    Compress = !disableUnbindCompress,
+                },
+                MultiLayerMerge = new KpcToPhigrosV3ConvertOptions.MultiLayerMergeOptions
+                {
+                    Precision = SharedOptions.GetIfSpecified(result, MergePrecisionOpt) ?? c.MultiLayerMergePrecision,
+                    Tolerance = SharedOptions.GetIfSpecified(result, MergeToleranceOpt) ?? c.MultiLayerMergeTolerance,
+                    ClassicMode = SharedOptions.GetIfSpecified(result, MergeClassicOpt) ?? c.MultiLayerMergeClassicMode,
+                    Compress = !disableMergeCompress,
+                },
+                LineFilter = new KpcToPhigrosV3ConvertOptions.LineFilterOptions
+                {
+                    RemoveAttachUiLine = result.GetValue(RemoveAttachUiOpt),
+                    RemoveTextureLine = result.GetValue(RemoveTextureOpt),
+                },
+                NoteFilter = new KpcToPhigrosV3ConvertOptions.NoteFilterOptions
+                {
+                    FilterFakeNotes = SharedOptions.GetIfSpecified(result, FilterFakeNotesOpt) ?? c.PhigrosFilterFakeNotes,
+                },
+                NegativeAlpha = new KpcToPhigrosV3ConvertOptions.NegativeAlphaOptions
+                {
+                    Enabled = SharedOptions.GetIfSpecified(result, NegativeAlphaElevationOpt) ?? c.PhigrosNegativeAlphaElevation,
+                    ElevationStep = SharedOptions.GetIfSpecified(result, NegativeAlphaStepOpt) ?? c.PhigrosNegativeAlphaStep,
+                },
+            };
 
-        if (result == null)
-        {
-            ConsoleWriter.Warn(CliLocalizationString.warn_rpe_convert);
-            return 2;
-        }
-        ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, result));
-        return 0;
+            var saveResult = await ChartService.SaveAsAsync(
+                kpc,
+                output,
+                targetType,
+                new SaveAsOptions
+                {
+                    Stream = streamOutput,
+                    Format = formatOutput,
+                    DryRun = dryRun,
+                    PhiEditOptions = peOptions,
+                    PhigrosOptions = phigrosOptions,
+                },
+                ct
+            );
+
+            if (saveResult == null)
+            {
+                ConsoleWriter.Warn(CliLocalizationString.warn_rpe_convert);
+                return 2;
+            }
+            ConsoleWriter.Info(string.Format(CliLocalizationString.msg_written, saveResult));
+            return 0;
+        });
+
+        return cmd;
     }
 }

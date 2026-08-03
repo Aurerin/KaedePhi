@@ -1,43 +1,49 @@
 using System.ComponentModel;
+using System.Globalization;
 using KaedePhi.Core.PhiEdit;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands.Test;
 
-public class OnlyStreamLoadCommand : AsyncCommand<GetTypeTestCommand.Settings>
+public static class OnlyStreamLoadCommand
 {
-    public class Settings : CommandSettings
-    {
-        [CommandOption("-i|--input <PATH>")]
-        [Description("需要推算的文件")]
-        public string? Input { get; set; }
-    }
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
 
-    protected override async Task<int> ExecuteAsync(
-        CommandContext context,
-        GetTypeTestCommand.Settings settings,
-        CancellationToken cancellationToken
-    )
+    private static readonly Option<string?> InputOpt = new("--input", "-i")
     {
-#if Debug
-        var input = settings.Input;
-        if (string.IsNullOrWhiteSpace(input))
+        Description = "需要推算的文件",
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    public static Command Create()
+    {
+        var cmd = new Command("pestream", "PE stream test");
+        cmd.Hidden = true;
+        cmd.Add(InputOpt);
+
+        cmd.SetAction(async (result, ct) =>
         {
-            ConsoleWriter.Error("Input file path cannot be null or whitespace.");
-            return 1;
-        }
+#if Debug
+            var input = result.GetValue(InputOpt);
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                ConsoleWriter.Error("Input file path cannot be null or whitespace.");
+                return 1;
+            }
 
-        // 创建文件流
-        using var stream = File.OpenRead(input);
-        // 测试pec
-        var chart = await Chart.LoadStreamAsync(stream);
-        ConsoleWriter.Info(chart.Offset.ToString());
-        Console.ReadLine();
+            using var stream = File.OpenRead(input);
+            var chart = await Chart.LoadStreamAsync(stream);
+            ConsoleWriter.Info(chart.Offset.ToString());
 #else
-        ConsoleWriter.Warn("This command can only be executed on Debug builds.");
-        await Task.CompletedTask;
+            ConsoleWriter.Warn("This command can only be executed on Debug builds.");
+            await Task.CompletedTask;
 #endif
+            return 0;
+        });
 
-        return 0;
+        return cmd;
     }
 }

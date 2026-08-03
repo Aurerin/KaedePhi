@@ -1,2 +1,2 @@
 global using KaedePhi.Tool.Localization;
-global using Spectre.Console.Cli;
+global using System.CommandLine;

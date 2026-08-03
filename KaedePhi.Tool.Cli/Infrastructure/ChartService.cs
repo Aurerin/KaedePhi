@@ -135,7 +135,7 @@ public sealed class ChartService
         if (string.IsNullOrWhiteSpace(workspace))
             return Path.Combine(
                 Path.GetDirectoryName(input) ?? ".",
-                Path.GetFileNameWithoutExtension(input) + "_PFC.json"
+                Path.GetFileNameWithoutExtension(input) + "_KaedePhi.json"
             );
         return Path.Combine(_workspace.Root, workspace, "chart.json");
     }

@@ -1,25 +1,32 @@
+using System.Globalization;
 using KaedePhi.Tool.Cli.Infrastructure;
 
 namespace KaedePhi.Tool.Cli.Commands.WorkSpace;
 
-public sealed class WorkspaceClearCommand : Command<WorkspaceClearCommand.Settings>
+public static class WorkspaceClearCommand
 {
-    public sealed class Settings : CommandSettings
-    {
-        [CommandOption("--id <ID>")]
-        [LocalizedDescription("cli_opt_workspace_clear_id_desc")]
-        public string? Id { get; set; }
-    }
+    private static string L(string key) =>
+        CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentUICulture)
+        ?? CliLocalizationString.ResourceManager.GetString(key, CultureInfo.CurrentCulture)
+        ?? key;
 
-    protected override int Execute(
-        CommandContext context,
-        Settings settings,
-        CancellationToken cancellationToken
-    )
+    private static readonly Option<string?> IdOpt = new("--id")
     {
-        var ws = new WorkspaceService();
-        ws.Clear(settings.Id);
-        ConsoleWriter.Info(CliLocalizationString.msg_cleared);
-        return 0;
+        Description = L("cli_opt_workspace_clear_id_desc"),
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
+    public static Command Create()
+    {
+        var cmd = new Command("clear", L("cmd_workspace_clear_desc"));
+        cmd.Add(IdOpt);
+        cmd.SetAction((result) =>
+        {
+            var ws = new WorkspaceService();
+            ws.Clear(result.GetValue(IdOpt));
+            ConsoleWriter.Info(CliLocalizationString.msg_cleared);
+            return 0;
+        });
+        return cmd;
     }
 }
