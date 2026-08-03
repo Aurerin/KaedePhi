@@ -1,13 +1,11 @@
 using System;
+using KaedePhi.Core.Common;
 
 namespace KaedePhi.Core.Utils
 {
     public static class Easings
     {
-        // 缓动函数委托
         public delegate double EasingFunction(double t);
-
-        private const double FloatEpsilon = 1e-7;
 
         // 线性
         public static double Linear(double t) => t;
@@ -64,14 +62,17 @@ namespace KaedePhi.Core.Utils
 
         // 指数
         public static double EaseInExpo(double t) =>
-            Math.Abs(t) < FloatEpsilon ? 0 : Math.Pow(2, 10 * (t - 1));
+            Math.Abs(t) < CoreConstants.FloatEpsilon ? 0 : Math.Pow(2, 10 * (t - 1));
 
         public static double EaseOutExpo(double t) =>
-            Math.Abs(t - 1) < FloatEpsilon ? 1 : 1 - Math.Pow(2, -10 * t);
+            Math.Abs(t - 1) < CoreConstants.FloatEpsilon ? 1 : 1 - Math.Pow(2, -10 * t);
 
         public static double EaseInOutExpo(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             return t < 0.5f
                 ? 0.5f * Math.Pow(2, 20 * t - 10)
@@ -115,21 +116,30 @@ namespace KaedePhi.Core.Utils
         // 弹性
         public static double EaseInElastic(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             return -Math.Pow(2, 10 * (t - 1)) * Math.Sin((t - 1.1f) * 5 * Math.PI);
         }
 
         public static double EaseOutElastic(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             return Math.Pow(2, -10 * t) * Math.Sin((t - 0.1f) * 5 * Math.PI) + 1;
         }
 
         public static double EaseInOutElastic(double t)
         {
-            if (Math.Abs(t) < FloatEpsilon || Math.Abs(t - 1) < FloatEpsilon)
+            if (
+                Math.Abs(t) < CoreConstants.FloatEpsilon
+                || Math.Abs(t - 1) < CoreConstants.FloatEpsilon
+            )
                 return t;
             t *= 2;
             if (t < 1)

@@ -144,6 +144,7 @@ namespace KaedePhi.Core.RePhiEdit.Events
         /// </summary>
         public void Anticipation()
         {
+            Sort();
             if (MoveXEvents is { Count: 0 })
                 MoveXEvents = null;
             if (MoveYEvents is { Count: 0 })

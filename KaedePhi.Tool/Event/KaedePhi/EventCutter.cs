@@ -22,47 +22,6 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
     }
 
     /// <inheritdoc/>
-    public List<KpcEvents.Event<TPayload>> CutEventToLinear(
-        KpcEvents.Event<TPayload> evt,
-        double cutLength
-    ) => CutEventToLinear(evt, new Beat(cutLength));
-
-    /// <inheritdoc/>
-    public List<KpcEvents.Event<TPayload>> CutEventToLinear(
-        KpcEvents.Event<TPayload> evt,
-        Beat cutLength
-    )
-    {
-        if (cutLength <= 0)
-            throw new ArgumentOutOfRangeException(nameof(cutLength), "切割长度必须大于0.");
-        var cutEvents = new List<KpcEvents.Event<TPayload>>();
-        // 在evt中均匀采样，并返回
-        var nowBeat = evt.StartBeat;
-        while (nowBeat < evt.EndBeat)
-        {
-            var segmentEnd = nowBeat + cutLength;
-            if (segmentEnd > evt.EndBeat)
-            {
-                segmentEnd = evt.EndBeat;
-            }
-
-            cutEvents.Add(
-                new KpcEvents.Event<TPayload>
-                {
-                    StartBeat = nowBeat,
-                    EndBeat = segmentEnd,
-                    StartValue = evt.GetValueAtBeat(nowBeat),
-                    EndValue = evt.GetValueAtBeat(segmentEnd),
-                }
-            );
-
-            nowBeat = segmentEnd;
-        }
-
-        return cutEvents;
-    }
-
-    /// <inheritdoc/>
     public List<KpcEvents.Event<TPayload>> CutEventsInRange(
         List<KpcEvents.Event<TPayload>> events,
         Beat startBeat,
@@ -105,6 +64,47 @@ public class EventCutter<TPayload> : LoggableBase, IEventCutter<KpcEvents.Event<
                     }
                 );
             }
+        }
+
+        return cutEvents;
+    }
+
+    /// <inheritdoc/>
+    public List<KpcEvents.Event<TPayload>> CutEventToLinear(
+        KpcEvents.Event<TPayload> evt,
+        double cutLength
+    ) => CutEventToLinear(evt, new Beat(cutLength));
+
+    /// <inheritdoc/>
+    public List<KpcEvents.Event<TPayload>> CutEventToLinear(
+        KpcEvents.Event<TPayload> evt,
+        Beat cutLength
+    )
+    {
+        if (cutLength <= 0)
+            throw new ArgumentOutOfRangeException(nameof(cutLength), "切割长度必须大于0.");
+        var cutEvents = new List<KpcEvents.Event<TPayload>>();
+        // 在evt中均匀采样，并返回
+        var nowBeat = evt.StartBeat;
+        while (nowBeat < evt.EndBeat)
+        {
+            var segmentEnd = nowBeat + cutLength;
+            if (segmentEnd > evt.EndBeat)
+            {
+                segmentEnd = evt.EndBeat;
+            }
+
+            cutEvents.Add(
+                new KpcEvents.Event<TPayload>
+                {
+                    StartBeat = nowBeat,
+                    EndBeat = segmentEnd,
+                    StartValue = evt.GetValueAtBeat(nowBeat),
+                    EndValue = evt.GetValueAtBeat(segmentEnd),
+                }
+            );
+
+            nowBeat = segmentEnd;
         }
 
         return cutEvents;

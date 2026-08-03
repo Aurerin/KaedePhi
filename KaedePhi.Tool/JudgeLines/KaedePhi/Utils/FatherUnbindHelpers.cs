@@ -39,7 +39,7 @@ public static class FatherUnbindHelpers
     /// 以 allJudgeLines 实例为 key 自动隔离缓存：
     /// 同一谱面的所有解绑调用共享同一份缓存，allJudgeLines 被 GC 后自动释放。
     /// </summary>
-    public static readonly ConditionalWeakTable<
+    internal static readonly ConditionalWeakTable<
         List<JudgeLine>,
         ConcurrentDictionary<int, JudgeLine>
     > JudgeLineCacheTable = new();

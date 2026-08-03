@@ -191,6 +191,33 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 过滤假音符（直接删除 IsFake=true 的音符）.
+        /// </summary>
+        public static string convert_opt_filter_fake_notes {
+            get {
+                return ResourceManager.GetString("convert_opt_filter_fake_notes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 启用负透明度段判定线抬高至屏幕外.
+        /// </summary>
+        public static string convert_opt_negative_alpha_elevation {
+            get {
+                return ResourceManager.GetString("convert_opt_negative_alpha_elevation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 负透明度段每次抬高的 KPC Y 偏移量（默认：4.0）.
+        /// </summary>
+        public static string convert_opt_negative_alpha_step {
+            get {
+                return ResourceManager.GetString("convert_opt_negative_alpha_step", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 某些选项禁用时，必须启用旧版行为.
         /// </summary>
         public static string err_classic_disablsed {
@@ -404,7 +431,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_classic_mode_desc {
             get {
-                return ResourceManager.GetString("opt_classic_mode_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_classic_mode_desc", resourceCulture);
             }
         }
         
@@ -413,7 +440,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_compress_desc {
             get {
-                return ResourceManager.GetString("opt_compress_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_compress_desc", resourceCulture);
             }
         }
         
@@ -422,7 +449,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_dry_run_desc {
             get {
-                return ResourceManager.GetString("opt_dry_run_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_dry_run_desc", resourceCulture);
             }
         }
         
@@ -431,7 +458,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_format_desc {
             get {
-                return ResourceManager.GetString("opt_format_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_format_desc", resourceCulture);
             }
         }
         
@@ -440,7 +467,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_input_phiedit_desc {
             get {
-                return ResourceManager.GetString("opt_input_phiedit_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_input_phiedit_desc", resourceCulture);
             }
         }
         
@@ -449,7 +476,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_input_rpe_desc {
             get {
-                return ResourceManager.GetString("opt_input_rpe_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_input_rpe_desc", resourceCulture);
             }
         }
         
@@ -458,7 +485,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_output_auto_desc {
             get {
-                return ResourceManager.GetString("opt_output_auto_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_output_auto_desc", resourceCulture);
             }
         }
         
@@ -467,7 +494,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_output_path_desc {
             get {
-                return ResourceManager.GetString("opt_output_path_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_output_path_desc", resourceCulture);
             }
         }
         
@@ -476,7 +503,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_precision_desc {
             get {
-                return ResourceManager.GetString("opt_precision_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_precision_desc", resourceCulture);
             }
         }
         
@@ -485,7 +512,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_stream_output_desc {
             get {
-                return ResourceManager.GetString("opt_stream_output_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_stream_output_desc", resourceCulture);
             }
         }
         
@@ -494,7 +521,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_tolerance_desc {
             get {
-                return ResourceManager.GetString("opt_tolerance_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_tolerance_desc", resourceCulture);
             }
         }
         
@@ -503,7 +530,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_workspace_clear_id_desc {
             get {
-                return ResourceManager.GetString("opt_workspace_clear_id_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_workspace_clear_id_desc", resourceCulture);
             }
         }
         
@@ -512,7 +539,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_workspace_default_desc {
             get {
-                return ResourceManager.GetString("opt_workspace_default_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_workspace_default_desc", resourceCulture);
             }
         }
         
@@ -521,7 +548,7 @@ namespace KaedePhi.Tool.Localization {
         /// </summary>
         public static string opt_workspace_rpe_desc {
             get {
-                return ResourceManager.GetString("opt_workspace_rpe_desc", resourceCulture);
+                return ResourceManager.GetString("cli_opt_workspace_rpe_desc", resourceCulture);
             }
         }
         
