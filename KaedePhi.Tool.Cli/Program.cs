@@ -11,11 +11,10 @@ ConsoleWriter.Warn(
 );
 #endif
 
-var root = new RootCommand(CliLocalizationString.app_title);
+var root = new RootCommand(CliLocalizationString.app_description);
 
 var ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-root.SetAction(
-    (_) =>
+root.SetAction(_ =>
     {
         ConsoleWriter.Info($"{CliLocalizationString.app_title} v{ver}");
         return 0;
@@ -64,6 +63,7 @@ catch (Exception ex) when (ex is not OperationCanceledException)
         ConsoleWriter.Error(string.Format(CliLocalizationString.err_out_of_memory, ex));
         return 1;
     }
+
     ConsoleWriter.Error(string.Format(CliLocalizationString.err_ukerr, ex));
     return 1;
 }

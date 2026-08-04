@@ -350,4 +350,7 @@
     <data name="hit_help" xml:space="preserve">
         <value>咦？是输错命令了吗？可以试试--help哦~</value>
     </data>
+    <data name="app_description" xml:space="preserve">
+        <value>KaedePhi - 简单易用万能的Phigros社区谱面工具集</value>
+    </data>
 </root>

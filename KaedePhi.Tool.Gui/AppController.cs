@@ -252,7 +252,7 @@ internal sealed class AppController
         CancellationToken ct = default
     )
     {
-        var (_, _) = await _chart.LoadChartAsync(filePath, useStream, ct, importOptions);
+        await _chart.LoadChartAsync(filePath, useStream, ct, importOptions);
 
         _toolVm.CurrentFileName = Path.GetFileName(filePath);
         _toolVm.DetectedFormat = detectedType.ToString();
@@ -448,7 +448,7 @@ internal sealed class AppController
                     // 若 OS 未自动附加扩展名，则手动补全
                     var expectedExt = $".{ext}";
                     if (!outputPath.EndsWith(expectedExt, StringComparison.OrdinalIgnoreCase))
-                        outputPath = outputPath + expectedExt;
+                        outputPath += expectedExt;
 
                     // 在后台线程执行耗时的导出操作，避免阻塞 UI
                     var exportOptions = BuildExportOptions(targetFormat);
