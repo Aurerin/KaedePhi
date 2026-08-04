@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using KaedePhi.Core.Common;
 using KaedePhi.Core.PhiFans;
 
 namespace KaedePhi.Core.Extensions.PhiFans

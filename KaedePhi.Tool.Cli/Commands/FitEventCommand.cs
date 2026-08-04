@@ -45,14 +45,14 @@ public static class FitEventCommand
                 var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
 
                 var svc = new ChartService();
-                var nrc = await svc.LoadKpcAsync(input, workspace, ct);
-                if (nrc == null)
+                var kpc = await svc.LoadKpcAsync(input, workspace, ct);
+                if (kpc == null)
                 {
                     ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
                     return 1;
                 }
 
-                var nrcCopy = nrc.Clone();
+                var kpcClone = kpc.Clone();
 
                 var mxFitter = new EventFit<double>();
                 var myFitter = new EventFit<double>();
@@ -90,7 +90,7 @@ public static class FitEventCommand
                     ConsoleWriter.Debug
                 );
 
-                foreach (var line in nrc.JudgeLineList)
+                foreach (var line in kpc.JudgeLineList)
                 {
                     foreach (var el in line.EventLayers.OfType<EventLayer>())
                     {
@@ -103,11 +103,11 @@ public static class FitEventCommand
                         el.SpeedEvents = spFitter.FitEvents(el.SpeedEvents, tolerance);
                     }
 
-                    nrcCopy.JudgeLineList[nrc.JudgeLineList.IndexOf(line)] = line;
+                    kpcClone.JudgeLineList[kpc.JudgeLineList.IndexOf(line)] = line;
                 }
 
                 var output = await ChartService.SaveAsRpeAsync(
-                    nrcCopy,
+                    kpcClone,
                     svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
                     dryRun,
                     ct

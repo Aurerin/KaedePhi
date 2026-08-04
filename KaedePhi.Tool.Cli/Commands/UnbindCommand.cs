@@ -50,14 +50,14 @@ public static class UnbindFatherCommand
                 var dryRun = SharedOptions.GetIfSpecified(result, DryRunOpt) ?? c.DryRun;
 
                 var svc = new ChartService();
-                var nrc = await svc.LoadKpcAsync(input, workspace, ct);
-                if (nrc == null)
+                var kpc = await svc.LoadKpcAsync(input, workspace, ct);
+                if (kpc == null)
                 {
                     ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
                     return 1;
                 }
 
-                var nrcCopy = nrc.Clone();
+                var kpcClone = kpc.Clone();
                 var unbinder = new JudgeLineUnbinder();
                 unbinder.SubscribeLog(
                     ConsoleWriter.Info,
@@ -66,16 +66,16 @@ public static class UnbindFatherCommand
                     ConsoleWriter.Debug
                 );
 
-                for (var i = 0; i < nrc.JudgeLineList.Count; i++)
+                for (var i = 0; i < kpc.JudgeLineList.Count; i++)
                 {
-                    if (nrc.JudgeLineList[i].Father != -1)
-                        nrcCopy.JudgeLineList[i] = classic
-                            ? unbinder.FatherUnbind(i, nrc.JudgeLineList, precision)
-                            : unbinder.FatherUnbind(i, nrc.JudgeLineList, precision, tolerance);
+                    if (kpc.JudgeLineList[i].Father != -1)
+                        kpcClone.JudgeLineList[i] = classic
+                            ? unbinder.FatherUnbind(i, kpc.JudgeLineList, precision)
+                            : unbinder.FatherUnbind(i, kpc.JudgeLineList, precision, tolerance);
                 }
 
                 var output = await ChartService.SaveAsRpeAsync(
-                    nrcCopy,
+                    kpcClone,
                     svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
                     dryRun,
                     ct

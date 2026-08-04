@@ -61,16 +61,16 @@ public static class LayerMergeCommand
                 }
 
                 var svc = new ChartService();
-                var nrc = await svc.LoadKpcAsync(input, workspace, ct);
-                if (nrc == null)
+                var kpc = await svc.LoadKpcAsync(input, workspace, ct);
+                if (kpc == null)
                 {
                     ConsoleWriter.Error(CliLocalizationString.err_unimplemented);
                     return 1;
                 }
 
-                var nrcCopy = nrc.Clone();
+                var kpcClone = kpc.Clone();
                 var processor = new LayerProcessor();
-                foreach (var line in nrcCopy.JudgeLineList)
+                foreach (var line in kpcClone.JudgeLineList)
                 {
                     if (line.EventLayers is not { Count: > 1 })
                         continue;
@@ -83,7 +83,7 @@ public static class LayerMergeCommand
                 }
 
                 var output = await ChartService.SaveAsRpeAsync(
-                    nrcCopy,
+                    kpcClone,
                     svc.ResolveOutputPath(input, result.GetValue(OutputOpt), workspace),
                     dryRun,
                     ct

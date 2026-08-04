@@ -115,8 +115,8 @@ public static class RenderCommand
                 var c = config.RenderConfig;
 
                 var svc = new ChartService();
-                var nrc = await svc.LoadKpcAsync(input, workspace, ct);
-                if (nrc == null)
+                var kpc = await svc.LoadKpcAsync(input, workspace, ct);
+                if (kpc == null)
                 {
                     ConsoleWriter.Error(CliLocalizationString.render_err_load_failed);
                     return 1;
@@ -171,7 +171,7 @@ public static class RenderCommand
                 {
                     var lineIndex = SharedOptions.GetIfSpecified(result, LineIndexOpt);
                     var layerIndex = SharedOptions.GetIfSpecified(result, LayerIndexOpt);
-                    var files = exporter.ExportChart(nrc, outputDir, opts, lineIndex, layerIndex);
+                    var files = exporter.ExportChart(kpc, outputDir, opts, lineIndex, layerIndex);
                     if (files.Count == 0)
                         ConsoleWriter.Warn(CliLocalizationString.render_warn_nothing);
                     else
