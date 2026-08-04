@@ -67,103 +67,81 @@ namespace KaedePhi.Core.Common
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected static TTo Cast<TFrom, TTo>(TFrom value) => Unsafe.As<TFrom, TTo>(ref value);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private float GetValueAsSingle(T value)
+        {
+            if (typeof(T) == typeof(float))
+                return Cast<T, float>(value);
+            if (typeof(T) == typeof(double))
+                return (float)Cast<T, double>(value);
+            if (typeof(T) == typeof(int))
+                return Cast<T, int>(value);
+            if (typeof(T) == typeof(byte))
+                return Cast<T, byte>(value);
+            return Convert.ToSingle(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private double GetValueAsDouble(T value)
+        {
+            if (typeof(T) == typeof(double))
+                return Cast<T, double>(value);
+            if (typeof(T) == typeof(float))
+                return Cast<T, float>(value);
+            if (typeof(T) == typeof(int))
+                return Cast<T, int>(value);
+            return Convert.ToDouble(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetValueAsInt32(T value)
+        {
+            if (typeof(T) == typeof(int))
+                return Cast<T, int>(value);
+            if (typeof(T) == typeof(float))
+                return (int)Cast<T, float>(value);
+            if (typeof(T) == typeof(double))
+                return (int)Cast<T, double>(value);
+            if (typeof(T) == typeof(byte))
+                return Cast<T, byte>(value);
+            return Convert.ToInt32(value);
+        }
+
         /// <summary>
         /// 获取 StartValue 的 float 表示。
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float GetStartValueAsSingle()
-        {
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(StartValue);
-            if (typeof(T) == typeof(double))
-                return (float)Cast<T, double>(StartValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(StartValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(StartValue);
-            return Convert.ToSingle(StartValue);
-        }
+        public float GetStartValueAsSingle() => GetValueAsSingle(StartValue);
 
         /// <summary>
         /// 获取 EndValue 的 float 表示。
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float GetEndValueAsSingle()
-        {
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(EndValue);
-            if (typeof(T) == typeof(double))
-                return (float)Cast<T, double>(EndValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(EndValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(EndValue);
-            return Convert.ToSingle(EndValue);
-        }
+        public float GetEndValueAsSingle() => GetValueAsSingle(EndValue);
 
         /// <summary>
         /// 获取 StartValue 的 double 表示。
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetStartValueAsDouble()
-        {
-            if (typeof(T) == typeof(double))
-                return Cast<T, double>(StartValue);
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(StartValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(StartValue);
-            return Convert.ToDouble(StartValue);
-        }
+        public double GetStartValueAsDouble() => GetValueAsDouble(StartValue);
 
         /// <summary>
         /// 获取 EndValue 的 double 表示。
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetEndValueAsDouble()
-        {
-            if (typeof(T) == typeof(double))
-                return Cast<T, double>(EndValue);
-            if (typeof(T) == typeof(float))
-                return Cast<T, float>(EndValue);
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(EndValue);
-            return Convert.ToDouble(EndValue);
-        }
+        public double GetEndValueAsDouble() => GetValueAsDouble(EndValue);
 
         /// <summary>
         /// 获取 StartValue 的 int 表示。
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetStartValueAsInt32()
-        {
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(StartValue);
-            if (typeof(T) == typeof(float))
-                return (int)Cast<T, float>(StartValue);
-            if (typeof(T) == typeof(double))
-                return (int)Cast<T, double>(StartValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(StartValue);
-            return Convert.ToInt32(StartValue);
-        }
+        public int GetStartValueAsInt32() => GetValueAsInt32(StartValue);
 
         /// <summary>
         /// 获取 EndValue 的 int 表示。
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetEndValueAsInt32()
-        {
-            if (typeof(T) == typeof(int))
-                return Cast<T, int>(EndValue);
-            if (typeof(T) == typeof(float))
-                return (int)Cast<T, float>(EndValue);
-            if (typeof(T) == typeof(double))
-                return (int)Cast<T, double>(EndValue);
-            if (typeof(T) == typeof(byte))
-                return Cast<T, byte>(EndValue);
-            return Convert.ToInt32(EndValue);
-        }
+        public int GetEndValueAsInt32() => GetValueAsInt32(EndValue);
 
         /// <summary>
         /// 针对已知类型的深拷贝

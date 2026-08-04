@@ -8,13 +8,14 @@ namespace KaedePhi.Tool.Converter.RePhiEdit;
 /// <summary>
 /// RePhiEdit 格式转换器。
 /// </summary>
-public class RePhiEditConverter : LoggableBase, IChartConverter<Rpe.Chart, Unit?, ConvertOption>
+public class RePhiEditConverter
+    : LoggableBase,
+        IChartConverter<Rpe.Chart, Unit?, ConvertOption>,
+        ICancellableChartConverter
 {
     private CancellationToken _ct;
 
-    /// <summary>
-    /// 设置取消令牌。
-    /// </summary>
+    /// <inheritdoc/>
     public void SetCancellationToken(CancellationToken ct) => _ct = ct;
 
     /// <summary>

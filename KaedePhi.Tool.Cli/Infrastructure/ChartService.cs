@@ -1,13 +1,7 @@
 using KaedePhi.Tool.Common;
 using KaedePhi.Tool.Converter;
-using KaedePhi.Tool.Converter.KaedePhi;
-using KaedePhi.Tool.Converter.PhiChain;
-using KaedePhi.Tool.Converter.PhiChain.Model;
-using KaedePhi.Tool.Converter.PhiEdit;
 using KaedePhi.Tool.Converter.PhiEdit.Model;
-using KaedePhi.Tool.Converter.Phigros.v3;
 using KaedePhi.Tool.Converter.Phigros.v3.Model;
-using KaedePhi.Tool.Converter.RePhiEdit;
 using KaedePhi.Tool.Converter.RePhiEdit.Model;
 using Chart = KaedePhi.Core.KaedePhi.Chart;
 
@@ -32,10 +26,26 @@ public sealed record SaveAsOptions
 
     /// <summary>Phigros v3 转换选项（仅 <see cref="ChartType.PhigrosV3"/> 时生效）。</summary>
     public KpcToPhigrosV3ConvertOptions? PhigrosOptions { get; init; }
+
+    /// <summary>其他格式的转换选项，按目标格式自行匹配类型。</summary>
+    public object? ExportOptions { get; init; }
+
+    /// <summary>
+    /// 挑选与目标格式匹配的转换选项。
+    /// </summary>
+    /// <param name="target">目标格式</param>
+    /// <returns>选项实例，无匹配时返回 <see langword="null"/> 以使用格式默认值</returns>
+    internal object? ResolveFor(ChartType target) =>
+        target switch
+        {
+            ChartType.PhiEdit => PhiEditOptions ?? ExportOptions,
+            ChartType.PhigrosV3 => PhigrosOptions ?? ExportOptions,
+            _ => ExportOptions,
+        };
 }
 
 /// <summary>
-/// 谱面加载、格式检测与导出服务。
+/// 谱面加载、格式检测与导出服务。格式相关的转换细节委托给 <see cref="ChartFormatRegistry"/>。
 /// </summary>
 public sealed class ChartService
 {
@@ -67,7 +77,7 @@ public sealed class ChartService
         return await File.ReadAllTextAsync(path, ct);
     }
 
-    /// <summary>将输入谱面统一转换为中间类型。</summary>
+    /// <summary>将输入谱面统一转换为中间类型，格式不支持导入时返回 <see langword="null"/>。</summary>
     public async Task<Chart?> LoadKpcAsync(
         string? input,
         string? workspace,
@@ -75,54 +85,11 @@ public sealed class ChartService
     )
     {
         var text = await LoadChartTextAsync(input, workspace, ct);
-        var chartType = ChartGetType.GetType(text);
+        var descriptor = ChartFormatRegistry.Find(ChartGetType.GetType(text));
+        if (descriptor is not { CanImport: true })
+            return null;
 
-        switch (chartType)
-        {
-            case ChartType.RePhiEdit:
-            {
-                var rePhiEditConverter = new RePhiEditConverter();
-                var kaedePhiConverter = new KaedePhiConverter();
-                var rePhiEditChart = await Core.RePhiEdit.Chart.LoadFromJsonAsync(text);
-
-                return ChartPipeline
-                    .From(rePhiEditChart, rePhiEditConverter, null)
-                    .To(kaedePhiConverter, null);
-            }
-
-            case ChartType.PhiEdit:
-            {
-                var phiEditConverter = new PhiEditConverter();
-                var kaedePhiConverter = new KaedePhiConverter();
-                var phiEditChart = await Core.PhiEdit.Chart.LoadAsync(text);
-                return ChartPipeline
-                    .From(phiEditChart, phiEditConverter, new PhiEditToKpcConvertOptions())
-                    .To(kaedePhiConverter, null);
-            }
-
-            case ChartType.PhigrosV3:
-            {
-                var phigrosV3Converter = new PhigrosV3Converter();
-                var kaedePhiConverter = new KaedePhiConverter();
-                var phigrosV3Chart = await Core.Phigros.v3.Chart.LoadFromJsonAsync(text);
-                return ChartPipeline
-                    .From(phigrosV3Chart, phigrosV3Converter, null)
-                    .To(kaedePhiConverter, null);
-            }
-
-            case ChartType.PhiChain:
-            {
-                var phiChainConverter = new PhiChainConverter();
-                var kaedePhiConverter = new KaedePhiConverter();
-                var phiChainChart = Core.PhiChain.v6.Chart.LoadFromJson(text);
-                return ChartPipeline
-                    .From(phiChainChart, phiChainConverter, new PhiChainToKpcConvertOptions())
-                    .To(kaedePhiConverter, null);
-            }
-
-            default:
-                return null;
-        }
+        return await descriptor.ImportAsync(text, ct: ct);
     }
 
     /// <summary>根据输入路径或工作区自动计算输出路径。</summary>
@@ -148,15 +115,16 @@ public sealed class ChartService
         CancellationToken ct = default
     )
     {
-        var rpeChart = new RePhiEditConverter().FromKpc(chart, new ConvertOption());
         if (dryRun)
             return outputPath;
-        var json = await rpeChart.ExportToJsonAsync(false);
-        await File.WriteAllTextAsync(outputPath, json, ct);
+
+        await ChartFormatRegistry
+            .Get(ChartType.RePhiEdit)
+            .ExportAsync(chart, outputPath, exportOptions: new ConvertOption(), ct: ct);
         return outputPath;
     }
 
-    /// <summary>将 KPC 谱面导出为目标格式并写入。</summary>
+    /// <summary>将 KPC 谱面导出为目标格式并写入，格式不支持导出时返回 <see langword="null"/>。</summary>
     public static async Task<string?> SaveAsAsync(
         Chart chart,
         string outputPath,
@@ -165,101 +133,19 @@ public sealed class ChartService
         CancellationToken ct = default
     )
     {
+        var descriptor = ChartFormatRegistry.Find(target);
+        if (descriptor is not { CanExport: true })
+            return null;
         if (options.DryRun)
-            return
-                target
-                    is ChartType.RePhiEdit
-                        or ChartType.PhiEdit
-                        or ChartType.PhigrosV3
-                        or ChartType.PhiChain
-                ? outputPath
-                : null;
-        switch (target)
-        {
-            case ChartType.RePhiEdit:
-            {
-                var rpeChart = new RePhiEditConverter().FromKpc(chart, new ConvertOption());
+            return outputPath;
 
-                if (options.Stream)
-                {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await rpeChart.ExportToJsonStreamAsync(s, options.Format);
-                }
-                else
-                {
-                    await File.WriteAllTextAsync(
-                        outputPath,
-                        await rpeChart.ExportToJsonAsync(options.Format),
-                        ct
-                    );
-                }
-
-                return outputPath;
-            }
-            case ChartType.PhiEdit:
-            {
-                var peChart = new PhiEditConverter().FromKpc(
-                    chart,
-                    options.PhiEditOptions ?? new KpcToPhiEditConvertOptions()
-                );
-                if (options.Stream)
-                {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await peChart.ExportToStreamAsync(s);
-                }
-                else
-                {
-                    await File.WriteAllTextAsync(outputPath, await peChart.ExportAsync(), ct);
-                }
-
-                return outputPath;
-            }
-            case ChartType.PhigrosV3:
-            {
-                var phigrosChart = new PhigrosV3Converter().FromKpc(
-                    chart,
-                    options.PhigrosOptions ?? new KpcToPhigrosV3ConvertOptions()
-                );
-                if (options.Stream)
-                {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await phigrosChart.ExportToJsonStreamAsync(s, options.Format);
-                }
-                else
-                {
-                    await File.WriteAllTextAsync(
-                        outputPath,
-                        await phigrosChart.ExportToJsonAsync(options.Format),
-                        ct
-                    );
-                }
-
-                return outputPath;
-            }
-            case ChartType.PhiChain:
-            {
-                var phiChainChart = new PhiChainConverter().FromKpc(
-                    chart,
-                    new KpcToPhiChainConvertOptions()
-                );
-                if (options.Stream)
-                {
-                    await using var s = new FileStream(outputPath, FileMode.Create);
-                    await phiChainChart.ExportToJsonStreamAsync(s, options.Format);
-                }
-                else
-                {
-                    await File.WriteAllTextAsync(
-                        outputPath,
-                        await phiChainChart.ExportToJsonAsync(options.Format),
-                        ct
-                    );
-                }
-
-                return outputPath;
-            }
-            default:
-                return null;
-        }
+        await descriptor.ExportAsync(
+            chart,
+            outputPath,
+            new ChartWriteSettings { UseStream = options.Stream, Indented = options.Format },
+            options.ResolveFor(target),
+            ct: ct
+        );
+        return outputPath;
     }
 }
