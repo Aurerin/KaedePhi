@@ -213,9 +213,17 @@ public static class ChartFormatRegistry
         Func<Stream, Task> serializeStream,
         CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         if (write.UseStream)
         {
-            await using var stream = new FileStream(path, FileMode.Create);
+            await using var stream = new FileStream(
+                path,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                4096,
+                useAsync: true
+            );
             await serializeStream(stream);
         }
         else

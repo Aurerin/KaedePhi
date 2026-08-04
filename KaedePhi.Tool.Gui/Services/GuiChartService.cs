@@ -92,9 +92,12 @@ public sealed class GuiChartService
         var detectedType = ChartGetType.GetType(text);
         _log.Information(log_step_detected, detectedType);
 
-        var kpcChart = await ChartFormatRegistry
-            .Get(detectedType)
-            .ImportAsync(text, importOptions, CreateLogSink(), ct);
+        var kpcChart = await Task.Run(
+            async () => await ChartFormatRegistry
+                .Get(detectedType)
+                .ImportAsync(text, importOptions, CreateLogSink(), ct),
+            ct
+        );
 
         CurrentChart = kpcChart;
         SourceFormat = detectedType;
