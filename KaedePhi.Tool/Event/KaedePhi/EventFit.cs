@@ -9,7 +9,7 @@ namespace KaedePhi.Tool.Event.KaedePhi;
 public class EventFit<TPayload> : LoggableBase, IEventFit<KpcEvents.Event<TPayload>>
     where TPayload : notnull
 {
-    private static readonly int[] AllEasingIds = Enumerable.Range(1, 31).ToArray();
+    private static readonly int[] AllEasingIds = [.. Enumerable.Range(1, 31)];
 
     /// <inheritdoc/>
     public List<KpcEvents.Event<TPayload>> FitEvents(

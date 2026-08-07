@@ -9,13 +9,12 @@ namespace KaedePhi.Tool.Converter.PhiEdit;
 /// </summary>
 public class PhiEditConverter
     : LoggableBase,
-        IChartConverter<Pe.Chart, PhiEditToKpcConvertOptions, KpcToPhiEditConvertOptions>
+        IChartConverter<Pe.Chart, PhiEditToKpcConvertOptions, KpcToPhiEditConvertOptions>,
+        ICancellableChartConverter
 {
     private CancellationToken _ct;
 
-    /// <summary>
-    /// 设置取消令牌。
-    /// </summary>
+    /// <inheritdoc/>
     public void SetCancellationToken(CancellationToken ct) => _ct = ct;
 
     /// <summary>

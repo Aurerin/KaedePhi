@@ -11,7 +11,8 @@ namespace KaedePhi.Tool.Converter.Phigros.v3;
 /// </summary>
 public class PhigrosV3Converter
     : LoggableBase,
-        IChartConverter<PhigrosChart, Unit?, KpcToPhigrosV3ConvertOptions>
+        IChartConverter<PhigrosChart, Unit?, KpcToPhigrosV3ConvertOptions>,
+        ICancellableChartConverter
 {
     /// <summary>
     /// Phigros 格式默认 BPM（当谱面未提供 BPM 时使用）。

@@ -67,14 +67,7 @@ namespace KaedePhi.Core.RePhiEdit
         /// 用户绝对不要访问此值。
         /// </summary>
         [JsonProperty("numOfNotes")]
-        private int TotalNumberOfNotes
-        {
-            get
-            {
-                // Note总数量(包含 FakeNote，不包含任何形式的Hold)
-                return Notes?.Count(note => note.Type != NoteType.Hold) ?? 0;
-            }
-        }
+        private int TotalNumberOfNotes => Notes?.Count(note => note.Type != NoteType.Hold) ?? 0;
 
         /// <summary>
         /// 特殊事件层（故事板）

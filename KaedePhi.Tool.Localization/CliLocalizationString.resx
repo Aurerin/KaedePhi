@@ -100,7 +100,7 @@
         <comment>RpeOperationSettings --input 选项</comment>
     </data>
     <data name="cli_opt_output_auto_desc" xml:space="preserve">
-        <value>输出文件路径（不填则自动生成 _PFC.json 后缀）</value>
+        <value>输出文件路径（不填则自动生成 _KaedePhi 后缀）</value>
         <comment>RpeOperationSettings --output 选项</comment>
     </data>
     <data name="cli_opt_workspace_rpe_desc" xml:space="preserve">
@@ -349,5 +349,8 @@
     </data>
     <data name="hit_help" xml:space="preserve">
         <value>咦？是输错命令了吗？可以试试--help哦~</value>
+    </data>
+    <data name="app_description" xml:space="preserve">
+        <value>KaedePhi - 简单易用万能的Phigros社区谱面工具集</value>
     </data>
 </root>

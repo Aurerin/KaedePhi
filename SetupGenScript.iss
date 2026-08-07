@@ -11,7 +11,7 @@
 #define MyAppName "KaedePhi"
 #define MyAppPublisher "NuanR_Star Ciallo Team"
 #define MyAppURL "https://www.nuanr-mxi.com"
-#define MyAppExeName "KaedePhi.Tool.Gui.exe"
+#define MyAppExeName "KaedePhi.Tool.App.exe"
 
 ; 从环境变量获取版本号，如果未设置则报错
 #define MyAppVersion GetEnv("KAEPHI_VERSION")
