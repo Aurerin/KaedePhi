@@ -5,7 +5,7 @@ using KaedePhi.Tool.Converter.Phigros.v3.Model;
 using KaedePhi.Tool.Converter.RePhiEdit.Model;
 using Chart = KaedePhi.Core.KaedePhi.Chart;
 
-namespace KaedePhi.Tool.Cli.Infrastructure;
+namespace KaedePhi.Tool.App.Cli.Infrastructure;
 
 /// <summary>
 /// <see cref="ChartService.SaveAsAsync"/> 的导出选项。

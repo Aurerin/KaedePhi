@@ -159,7 +159,7 @@ namespace KaedePhi.Tool.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 输出文件路径（不填则自动生成 _PFC.json 后缀）.
+        ///   Looks up a localized string similar to 输出文件路径（不填则自动生成 _KaedePhi 后缀）.
         /// </summary>
         public static string cli_opt_output_auto_desc {
             get {

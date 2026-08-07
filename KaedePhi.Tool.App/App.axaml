@@ -1,0 +1,40 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:KaedePhi.Tool.App.Gui.ViewModels"
+             xmlns:views="using:KaedePhi.Tool.App.Gui.Views"
+             x:Class="KaedePhi.Tool.App.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <Style Selector="TextBlock.fa-icon">
+            <Setter Property="FontFamily"
+                    Value="avares://KaedePhi.Tool.App/Assets/Fonts/fa-solid-900.ttf#Font Awesome 6 Free"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Application.Styles>
+
+    <Application.DataTemplates>
+        <DataTemplate DataType="vm:ImportViewModel">
+            <views:ImportPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ImportOptionsViewModel">
+            <views:ImportOptionsPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ToolViewModel">
+            <views:ToolPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ExportViewModel">
+            <views:ExportPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ProcessingViewModel">
+            <views:ProcessingPage/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:SettingsViewModel">
+            <views:SettingsPage/>
+        </DataTemplate>
+    </Application.DataTemplates>
+</Application>

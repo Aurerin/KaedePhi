@@ -100,7 +100,7 @@
         <comment>RpeOperationSettings --input 选项</comment>
     </data>
     <data name="cli_opt_output_auto_desc" xml:space="preserve">
-        <value>输出文件路径（不填则自动生成 _PFC.json 后缀）</value>
+        <value>输出文件路径（不填则自动生成 _KaedePhi 后缀）</value>
         <comment>RpeOperationSettings --output 选项</comment>
     </data>
     <data name="cli_opt_workspace_rpe_desc" xml:space="preserve">

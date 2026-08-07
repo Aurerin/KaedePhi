@@ -34,7 +34,7 @@ if (-not (Test-Path $IsccPath)) {
 # 确定发布目录
 if ([string]::IsNullOrEmpty($PublishDir)) {
     # 默认发布目录
-    $PublishDir = Join-Path $ProjectRoot "KaedePhi.Tool.Gui\bin\PreRelease\publish"
+    $PublishDir = Join-Path $ProjectRoot "KaedePhi.Tool.App\bin\PreRelease\publish"
 }
 
 # 检查发布目录是否存在
